@@ -4,6 +4,7 @@
     "target": "ES2015",
     "experimentalDecorators": true,
     "sourceMap": true,
+    "skipLibCheck": true,
     "types": [
       "reflect-metadata"
     ]
