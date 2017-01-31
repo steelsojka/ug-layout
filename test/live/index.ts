@@ -5,7 +5,7 @@ import { RootLayout } from '../../src';
 const container = document.createElement('div');
 document.body.appendChild(container);
 
-const rootLayout = new RootLayout({
+const rootLayout = RootLayout.create({
   container 
 });
 

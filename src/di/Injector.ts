@@ -27,6 +27,8 @@ export class Injector {
 
       return provider;
     });
+
+    this._providers.push({ provide: Injector, useValue: this });
   }
 
   get parent(): Injector|null {

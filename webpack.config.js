@@ -16,7 +16,12 @@ module.exports = {
       use: ['babel-loader', 'ts-loader']
     }]
   },
+  devtool: 'inline-source-map',
   devServer: {
-    contentBase: path.join(__dirname, 'test/live')
+    contentBase: path.join(__dirname, 'test/live'),
+    watchContentBase: true,
+    watchOptions: {
+      poll: 2000
+    }
   }
 };
