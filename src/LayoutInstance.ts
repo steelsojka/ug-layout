@@ -6,7 +6,7 @@ import { ParentLayoutRef, Element, Node } from './common';
 import { appendChild } from './utils';
 
 export class LayoutInstance {
-  private _vnode: VNode = h('div', { class: 'ug-layout__layout' });
+  private _vnode: VNode = h('div.ug-layout__layout');
   
   constructor(
     @Inject(Injector) private _injector: Injector,

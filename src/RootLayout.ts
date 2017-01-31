@@ -1,6 +1,7 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 import * as snabbdom from 'snabbdom';
+import DOMClass from 'snabbdom/modules/class';
 
 import { Injector, forwardRef } from './di';
 import { RootInjector } from './RootInjector';
@@ -18,13 +19,15 @@ export class RootLayout {
   private _vnode: VNode;
   private _layout: LayoutInstance;
   private _isAttached: boolean = false;
-  private _patch: Function = snabbdom.init([]);
+  private _patch: Function = snabbdom.init([
+    DOMClass  
+  ]);
   private _lastVNode: VNode|null = null;
   
   constructor(config: RootLayoutConfig = {}) {
     this._injector = config.injector || new RootInjector();
     this._container = config.container || null;
-    this._vnode = h('div', { class: 'ug-layout__root' });
+    this._vnode = h('div.ug-layout__root');
   }
 
   get isAttached(): boolean {
