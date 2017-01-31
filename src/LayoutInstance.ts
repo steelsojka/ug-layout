@@ -10,7 +10,7 @@ export class LayoutInstance {
   
   constructor(
     @Inject(Injector) private _injector: Injector,
-    @Inject(ParentLayoutRef) @Optional() private _parent: LayoutInstance,
+    @Inject(ParentLayoutRef) @Optional() private _parent: LayoutInstance|null,
     @Inject(Node) @Optional() private _container: VNode|null
   ) {
     if (this._container) {
