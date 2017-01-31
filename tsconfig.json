@@ -4,7 +4,10 @@
     "moduleResolution": "node",
     "target": "ES2015",
     "experimentalDecorators": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "types": [
+      "reflect-metadata"
+    ]
   },
   "include": [
     "src/**/*"
