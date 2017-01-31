@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "ts-node test/LayoutInstance.ts"
+    "test": "ts-node test/index.ts"
   },
   "author": "",
   "license": "ISC",
@@ -13,5 +13,8 @@
     "reflect-metadata": "^0.1.9",
     "ts-node": "^2.0.0",
     "typescript": "^2.1.5"
+  },
+  "dependencies": {
+    "snabbdom": "^0.6.3"
   }
 }
