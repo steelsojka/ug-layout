@@ -37,7 +37,7 @@ export class Injector {
 
   get(token: any, defaultValue?: any, metadata: InjectionMetadata = {}): any {
     let resource;
-    let { injector = this, optional, lazy } = metadata;
+    let { optional = false, lazy = false } = metadata;
 
     if (lazy) {
       return () => this.get(token, defaultValue, { ...metadata, lazy: false });
@@ -83,16 +83,14 @@ export class Injector {
   }
 
   private resolve(provider: Provider, metadata: InjectionMetadata = {}): any {
-    const { injector = this } = metadata;
-    
     if (provider.useClass) {
       const injections = Reflect.getOwnMetadata(INJECT_PARAM_KEY, provider.useClass, undefined) || [];
-      const resolved = this.getDependencies(injections, injector);
+      const resolved = this.getDependencies(injections);
       const ref = this.resolveRef(provider.useClass);
 
       return this.instantiate(ref, ...resolved);
     } else if (provider.useFactory) {
-      const resolved = this.getDependencies(provider.deps || [], injector);
+      const resolved = this.getDependencies(provider.deps || []);
       const ref = this.resolveRef(provider.useFactory);
 
       return ref(...resolved);
@@ -113,8 +111,8 @@ export class Injector {
     return value;
   }
       
-  private getDependencies(metadata: any[], injector: Injector = this): any[] {
-    return metadata.map(meta => injector.get(meta.token, undefined, { ...meta, injector }));
+  private getDependencies(metadata: any[]): any[] {
+    return metadata.map(meta => this.get(meta.token, undefined, meta));
   }
 
   private instantiate(Ref: any, ...d: any[]): any {

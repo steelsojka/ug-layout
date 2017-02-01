@@ -4,12 +4,12 @@ import DOMClass from 'snabbdom/modules/class';
 import DOMStyle from 'snabbdom/modules/style';
 import DOMProps from 'snabbdom/modules/props';
 
-import { Deferred } from './Deferred';
+import { Deferred } from '../utils';
 
 export class DOMRenderer {
   private _patch: (oldVNode: VNode|Node, newVNode: VNode) => VNode = snabbdom.init([
     DOMClass,
-    DOMClass,
+    DOMStyle,
     DOMProps  
   ]);
 
