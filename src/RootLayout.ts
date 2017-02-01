@@ -48,6 +48,8 @@ export class RootLayout {
 
     this._layout = layoutInjector.get(LayoutInstance);
 
+    this._vnode.children = [ this._layout.node ];
+
     if (this._container) {
       this.attach(this._container);
     }
