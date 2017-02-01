@@ -61,11 +61,11 @@ export class Injector {
       }
     }
 
-    if (!resource && this._parent) {
+    if (resource === undefined && this._parent) {
       resource = this._parent.get(token, defaultValue, metadata);
     }
     
-    if (!resource) {
+    if (resource === undefined) {
       if (defaultValue !== undefined) {
         resource = defaultValue;
       } else if (optional) {
@@ -83,20 +83,20 @@ export class Injector {
   }
 
   private resolve(provider: Provider, metadata: InjectionMetadata = {}): any {
-    if (provider.useClass) {
-      const injections = Reflect.getOwnMetadata(INJECT_PARAM_KEY, provider.useClass, undefined) || [];
+    if (provider.hasOwnProperty('useClass')) {
+      const injections = Reflect.getOwnMetadata(INJECT_PARAM_KEY, provider.useClass, (<any>undefined)) || [];
       const resolved = this.getDependencies(injections);
       const ref = this.resolveRef(provider.useClass);
 
       return this.instantiate(ref, ...resolved);
-    } else if (provider.useFactory) {
+    } else if (provider.hasOwnProperty('useFactory')) {
       const resolved = this.getDependencies(provider.deps || []);
       const ref = this.resolveRef(provider.useFactory);
 
       return ref(...resolved);
-    } else if (provider.useValue) {
+    } else if (provider.hasOwnProperty('useValue')) {
       return this.resolveRef(provider.useValue);
-    } else if (provider.useExisting) {
+    } else if (provider.hasOwnProperty('useExisting')) {
       return this.get(this.resolveRef(provider.useExisting));
     }
 

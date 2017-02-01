@@ -3,19 +3,27 @@ import h from 'snabbdom/h';
 
 import { Injector, Inject, Optional } from './di';
 import { RootInjector } from './RootInjector';
-import { LayoutInstance } from './LayoutInstance';
-import { DOMRenderer, Renderable } from './dom';
-import { ContainerRef, RootConfigRef } from './common';
+import { Layout } from './Layout';
+import { DOMRenderer, Renderable, ConfiguredRenderable, RenderableInjector } from './dom';
+import { 
+  ConfigurationRef, 
+  ContainerRef, 
+  RootConfigRef,
+  RenderableConfig,
+  Type
+} from './common';
 
 export interface RootLayoutConfig {
   container: HTMLElement,
   injector?: Injector
 }
 
+export interface RootConfiguration extends RenderableConfig<Layout> {}
+
 export class RootLayout implements Renderable {
   private _container: HTMLElement;
   private _vnode: VNode;
-  private _layout: LayoutInstance;
+  private _layout: Layout;
   private _isAttached: boolean = false;
   private _lastVNode: VNode|null = null;
   private _height: number = 0;
@@ -67,18 +75,13 @@ export class RootLayout implements Renderable {
   }
 
   update(): void {
-    this._lastVNode = this._domRenderer.update(this._lastVNode, this.render());
+    this._lastVNode = this._domRenderer.update(this._lastVNode as VNode, this.render());
   }
 
-  initialize(): void {
-    const layoutInjector = this._injector.spawn([
-      LayoutInstance,
-      { provide: ContainerRef, useValue: this }
-    ]);
-
-    this._layout = layoutInjector.get(LayoutInstance);
-
+  initialize(): this {
     this.mount();
+
+    return this;
   }
 
   mount(): void {
@@ -94,6 +97,17 @@ export class RootLayout implements Renderable {
   attach(): void {
     this._container.appendChild(this._mountPoint);
     this._isAttached = true;
+  }
+
+  configure(config: RootConfiguration): this {
+    const injector = RenderableInjector.fromRenderable(config.use, [
+      { provide: ContainerRef, useValue: this },
+      { provide: Layout, useExisting: ConfiguredRenderable }
+    ], this._injector);
+
+    this._layout = injector.get(ConfiguredRenderable);
+
+    return this;
   }
 
   static create(config: RootLayoutConfig): RootLayout {

@@ -5,5 +5,5 @@ export interface Renderable {
   readonly height: number;
   
   render(parent?: Renderable): VNode;
-  resize(): void;
+  resize(dimensions?: { height: number, width: number }): void;
 }

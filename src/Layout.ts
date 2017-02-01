@@ -2,19 +2,26 @@ import h from 'snabbdom/h';
 import { VNode } from 'snabbdom/vnode';
 
 import { Injector, Inject, Optional } from './di';
-import { Renderable, DOMRenderer } from './dom';
+import { 
+  Renderable, 
+  DOMRenderer, 
+  RenderableInjector,
+  ConfiguredRenderable
+} from './dom';
 import { 
   ParentLayoutRef, 
   ContainerRef, 
   ConfigurationRef,
-  RenderableConfig
+  RenderableConfig,
+  Type
 } from './common';
+import { XYContainer } from './XYContainer';
 
 export interface LayoutConfig {
-  child: RenderableConfig;
+  child: Type<XYContainer>|ConfiguredRenderable<XYContainer>;
 }
 
-export class LayoutInstance implements Renderable {
+export class Layout implements Renderable {
   private _height: number = 0;
   private _width: number = 0;
   private _child: Renderable;
@@ -23,20 +30,18 @@ export class LayoutInstance implements Renderable {
     @Inject(Injector) private _injector: Injector,
     @Inject(DOMRenderer) private _domRender: DOMRenderer,
     @Inject(ContainerRef) private _container: Renderable,
-    @Inject(ConfigurationRef) private _config: LayoutConfig
+    @Inject(ConfigurationRef) private _config: LayoutConfig|null
   ) {
-    if (!this._config.child) {
+    if (!this._config || !this._config.child) {
       throw new Error('A layout requires a child renderable.');
     }
 
     const config = this._config.child;
-    const injector = this._injector.spawn([
-      { provide: ConfigurationRef, useValue: this._config.child },
+    const injector = RenderableInjector.fromRenderable(config, [
       { provide: ContainerRef, useValue: this },
-      config.use
-    ]);
+    ], this._injector);
 
-    this._child = injector.get(config.use);
+    this._child = injector.get(ConfiguredRenderable);
   }  
 
   get height(): number {
@@ -63,5 +68,9 @@ export class LayoutInstance implements Renderable {
     }, [
       this._child.render()
     ]);
+  }
+
+  static configure(config: LayoutConfig): ConfiguredRenderable<Layout> {
+    return new ConfiguredRenderable(Layout, config);    
   }
 }
