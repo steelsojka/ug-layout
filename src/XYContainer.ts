@@ -12,12 +12,13 @@ import {
   XYDirectionRef, 
   XYDirection,
   ConfigurationRef,
-  RenderableConfig
+  RenderableConfig,
+  RenderableArg
 } from './common';
 import { XYItemContainer } from './XYItemContainer';
 
 export interface XYContainerConfig {
-  children: RenderableConfig<Renderable>[];
+  children: RenderableArg<Renderable>[];
 }
 
 export class XYContainer implements Renderable {
@@ -26,6 +27,7 @@ export class XYContainer implements Renderable {
   protected _direction: XYDirection;
   protected _className: string;
   protected _children: XYItemContainer[] = [];
+  protected _splitterClass: string = '';
 
   constructor(
     @Inject(ContainerRef) protected _container: Renderable,
@@ -38,7 +40,7 @@ export class XYContainer implements Renderable {
       const injector = this._injector.spawn([
         { provide: ContainerRef, useValue: this },
         { provide: XYContainer, useValue: this },
-        { provide: ConfigurationRef, useValue: config },
+        { provide: ConfigurationRef, useValue: { use: config } },
         XYItemContainer
       ]);
 
@@ -63,27 +65,45 @@ export class XYContainer implements Renderable {
   }
   
   render(): VNode {
+    const children: VNode[] = [];
+    const splitterHeight = this.direction === XYDirection.X ? this._height : 5;
+    const splitterWidth = this.direction === XYDirection.X ? 5 : this._width;
+
+    // TODO: Split splitter into seperate renderables.
+
+    for (const [ index, child ] of this._children.entries()) {
+      if (index > 0) {
+        children.push(h(`div.ug-layout__splitter.${this._splitterClass}`, {
+          style: {
+            height: `${splitterHeight}px`,
+            width: `${splitterWidth}px`
+          }
+        }, [
+          h('div.ug-layout__drag-handle', {
+            style: this.direction === XYDirection.X 
+              ? { width: splitterWidth * 5, left: -((splitterWidth * 5) / 2) }
+              : { height: splitterHeight * 5, top: -((splitterHeight * 5) / 2) }
+          })
+        ]));
+      }
+      
+      children.push(child.render());
+    }
+    
     return h(`div.${this._className}`, {
       style: {
         height: `${this._height}px`,
         width: `${this._width}px`
       }
-    }, this._children.map(child => child.render()));
+    }, children);
+  }
+
+  updateChildSize(child: XYItemContainer, newDimension: number): void {
+              
   }
 
   resize(): void {
     this._height = this._container.height;
     this._width = this._container.width;
-
-    for (const child of this._children) {
-      let height = this._height;
-      let width = this._width;
-      
-      if (this.direction === XYDirection.X) {
-        child.resize({ height, width: width / (100 * child.dimension) });
-      } else {
-        child.resize({ height: height / (100 * child.dimension), width });
-      }
-    }
   }
 }

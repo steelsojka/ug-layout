@@ -13,6 +13,7 @@ export interface ColumnConfig extends XYContainerConfig {}
 export class Column extends XYContainer {
   protected _direction: XYDirection.Y = XYDirection.Y;
   protected _className: string = 'ug-layout__column';
+  protected _splitterClass: string = 'ug-layout__splitter-y';
 
   constructor(
     @Inject(ContainerRef) container: Renderable,
@@ -20,6 +21,19 @@ export class Column extends XYContainer {
     @Inject(Injector) injector: Injector
   ) {
     super(container, config, injector);
+  }
+  
+  resize(): void {
+    super.resize();
+    
+    const splitterSize = (this._children.length - 1) * 5;
+    
+    for (const child of this._children) {
+      child.resize({
+        width: this._width, 
+        height: (this._height / (100 / child.dimension)) - (splitterSize / this._children.length)
+      });
+    }
   }
   
   static configure(config: ColumnConfig): ConfiguredRenderable<Column> {
