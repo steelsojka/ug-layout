@@ -7,13 +7,16 @@ module.exports = {
     path: path.join(__dirname, 'test/live/bundle')
   },
   resolve: {
-    extensions: ['.ts', '.js']
+    extensions: ['.ts', '.js', '.css']
   },
   module: {
     rules: [{
       exclude: /node_modules/,
       test: /\.ts$/,
       use: ['babel-loader', 'ts-loader']
+    }, {
+      test: /\.css$/,
+      use: ['style-loader', 'css-loader']
     }]
   },
   devtool: 'inline-source-map',

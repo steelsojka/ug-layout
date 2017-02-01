@@ -1,5 +1,5 @@
 import { Injector } from './di';
-import { DOMRenderer } from './DOMRenderer';
+import { DOMRenderer } from './dom';
 
 export class RootInjector extends Injector {
   constructor() {

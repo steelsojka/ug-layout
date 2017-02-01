@@ -10,7 +10,6 @@ export interface Provider {
 }
 
 export interface InjectionMetadata {
-  injector?: Injector;
   lazy?: boolean;
   optional?: boolean;
   token?: any;

@@ -1,12 +1,11 @@
 import 'reflect-metadata';
+import '../../src/styles/core.css';
+import './index.css';
 
 import { RootLayout } from '../../src';
 
-const container = document.createElement('div');
-document.body.appendChild(container);
-
 const rootLayout = RootLayout.create({
-  container 
+  container: document.body
 });
 
 rootLayout.initialize();
