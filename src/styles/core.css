@@ -3,3 +3,28 @@
   height: 100%;
   width: 100%;
 }
+
+.ug-layout__row {
+  display: flex;
+  flex-direction: row;
+}
+
+.ug-layout__column {
+  display: flex;
+  flex-direction: column;
+}
+
+.ug-layout__splitter {
+  background-color: black;
+  position: relative;
+}
+
+.ug-layout__drag-handle {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  cursor: pointer;
+}

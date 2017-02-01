@@ -10,6 +10,8 @@ export enum XYDirection {
   Y
 }
 
+export type RenderableArg<T extends Renderable> = Type<T>|ConfiguredRenderable<T>;
+
 export interface RenderableConfig<T extends Renderable> {
   use: Type<T>|ConfiguredRenderable<T>;
 }

@@ -10,13 +10,20 @@ const rootLayout = RootLayout.create({
   .configure({
     use: Layout.configure({
       child: Row.configure({
-        children: [{
-          use: Column
-        }, {
-          use: Layout.configure({
+        children: [
+          Column.configure({
+            children: [
+              Row,
+              Row,
+              Row,
+              Row,
+              Row
+            ]
+          }),
+          Layout.configure({
             child: Row
           })
-        }]
+        ]
       })  
     })
   })
