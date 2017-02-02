@@ -13,13 +13,16 @@ import {
   XYDirection,
   ConfigurationRef,
   RenderableConfig,
-  RenderableArg
+  RenderableArg,
+  UNALLOCATED
 } from './common';
-import { XYItemContainer } from './XYItemContainer';
-import { Splitter } from './Splitter';
+import { XYItemContainer, XYItemContainerConfig } from './XYItemContainer';
+import { Splitter, SPLITTER_SIZE } from './Splitter';
+import { isNumber } from './utils';
 
 export interface XYContainerConfig {
-  children: RenderableArg<Renderable>[];
+  splitterSize?: number;
+  children: XYItemContainerConfig[];
 }
 
 export class XYContainer implements Renderable {
@@ -37,29 +40,7 @@ export class XYContainer implements Renderable {
   ) {
     const children = this._config && this._config.children ? this._config.children : [];
     
-    this._children = children.map<XYItemContainer>(config => {
-      const injector = this._injector.spawn([
-        { provide: ContainerRef, useValue: this },
-        { provide: XYContainer, useValue: this },
-        { provide: ConfigurationRef, useValue: { use: config } },
-        XYItemContainer
-      ]);
-
-      const item = injector.get(XYItemContainer) as XYItemContainer;
-
-      item.dimension = 100 / children.length;
-
-      return item;
-    });
-
-    for (let i = 0; i < this._children.length - 1; i++) {
-      const injector = this._injector.spawn([
-        { provide: ContainerRef, useValue: this },
-        Splitter
-      ]);
-      
-      this._splitters.push(injector.get(Splitter));
-    }
+    this._children = children.map<XYItemContainer>(config => this.addChild(config));
   }
 
   get height(): number {
@@ -74,8 +55,36 @@ export class XYContainer implements Renderable {
     return this._direction;
   }
 
+  get isRow(): boolean {
+    return this.direction === XYDirection.X;
+  }
+
   protected get _totalSplitterSize(): number {
     return this._splitters.reduce((result, splitter) => result + splitter.size, 0);
+  }
+
+  addChild(config: XYItemContainerConfig, options: { index?: number } = {}) {
+    const { index } = options
+    
+    const item = this._injector.spawn([
+      { provide: ContainerRef, useValue: this },
+      { provide: XYContainer, useValue: this },
+      { provide: ConfigurationRef, useValue: config },
+      XYItemContainer
+    ])
+      .get(XYItemContainer) as XYItemContainer;
+
+    if (typeof index === 'number') {
+      this._children.splice(index, 0, item);
+    } else {
+      this._children.push(item);
+    }
+
+    while (this._splitters.length < this._children.length - 1) {
+      this._splitters.push(this._createSplitter());
+    }
+
+    return item;
   }
   
   render(): VNode {
@@ -104,5 +113,96 @@ export class XYContainer implements Renderable {
   resize(): void {
     this._height = this._container.height;
     this._width = this._container.width;
+
+    this._calculateRatios();
+    this._setDimensions();
+
+    for (const child of this._children) {
+      child.resize();
+    }
+  }
+
+  private _createSplitter(): Splitter {
+    const splitterConfig = {
+      size: this._config && this._config.splitterSize ? this._config.splitterSize : SPLITTER_SIZE
+    };
+  
+    return this._injector.spawn([
+      { provide: ContainerRef, useValue: this },
+      { provide: ConfigurationRef, useValue: splitterConfig },
+      Splitter
+    ])
+      .get(Splitter);
+  }
+
+  private _setDimensions(): void {
+    const totalSplitterSize = this._totalSplitterSize;
+    let total = 0;
+    let totalWidth = this._width;
+    let totalHeight = this._height;
+    let sizes: number[] = [];
+
+    if (this.isRow) {
+      totalWidth -= totalSplitterSize;
+    } else {
+      totalHeight -= totalSplitterSize;
+    }
+
+    for (const child of this._children) {
+      let size = Math.floor((this.isRow ? totalWidth : totalHeight) * (<number>child.ratio / 100));
+
+      total += size;
+      sizes.push(size);
+    }
+
+    const extraPixels = (this.isRow ? totalWidth : totalHeight) - total;
+
+    for (const [ index, child ] of this._children.entries()) {
+      if (extraPixels - 1 > 0) {
+        sizes[index] = sizes[index] + 1;
+      }
+
+      if (this.isRow) {
+        child.setSize({ width: sizes[index], height: totalHeight });
+      } else {
+        child.setSize({ width: totalWidth, height: sizes[index] });
+      }
+    }
+  }
+
+  private _calculateRatios(): void {
+    let total = 0;
+    const unallocatedChildren: XYItemContainer[] = [];
+
+    for (const child of this._children) {
+      if (child.ratio !== UNALLOCATED) {
+        total += child.ratio as number;
+      } else {
+        unallocatedChildren.push(child);
+      }
+    }
+
+    if (Math.round(total) === 100) {
+      return;
+    }
+
+    if (Math.round(total) < 100 && unallocatedChildren.length) {
+      for (const child of unallocatedChildren) {
+        child.ratio = (100 - total) / unallocatedChildren.length
+      }
+
+      return;
+    }
+
+    if (Math.round(total) > 100) {
+      for (const child of unallocatedChildren) {
+        child.ratio = 50;
+        total += 50;
+      }
+    }
+
+    for (const child of this._children) {
+      child.ratio = (<number>child.ratio / total) * 100;
+    }
   }
 }

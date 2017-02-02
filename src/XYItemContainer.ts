@@ -3,17 +3,25 @@ import h from 'snabbdom/h';
 
 import { Inject, Injector } from './di'
 import { Renderable, RenderableInjector, ConfiguredRenderable } from './dom';
-import { Type, ConfigurationRef, ContainerRef, XYDirection } from './common';
+import { 
+  Type, 
+  ConfigurationRef, 
+  ContainerRef, 
+  XYDirection, 
+  UNALLOCATED,
+  RenderableArg  
+} from './common';
+import { isNumber } from './utils';
 import { XYContainer } from './XYContainer';
 
-console.log(XYContainer)
 
 export interface XYItemContainerConfig {
-  use: Type<Renderable>|ConfiguredRenderable<Renderable>;
+  use: RenderableArg<Renderable>;
+  ratio?: number;
 }
 
 export class XYItemContainer implements Renderable {
-  dimension: number = 0;
+  ratio: number|typeof UNALLOCATED = UNALLOCATED;
   
   private _height: number = 0;
   private _width: number = 0;
@@ -24,12 +32,19 @@ export class XYItemContainer implements Renderable {
     @Inject(ContainerRef) private _container: XYContainer,
     @Inject(ConfigurationRef) private _config: XYItemContainerConfig
   ) {
-    const injector = RenderableInjector.fromRenderable(this._config.use, [
-      { provide: XYItemContainer, useValue: this },
-      { provide: ContainerRef, useValue: this }
-    ], this._injector);
-
-    this._item = injector.get(ConfiguredRenderable);
+    if (this._config) {
+      this.ratio = isNumber(this._config.ratio) ? this._config.ratio : UNALLOCATED;
+    }
+    
+    this._item = RenderableInjector.fromRenderable(
+      this._config.use, 
+      [
+        { provide: XYItemContainer, useValue: this },
+        { provide: ContainerRef, useValue: this }
+      ], 
+      this._injector
+    )
+      .get(ConfiguredRenderable);
   }
 
   get width(): number {
@@ -50,16 +65,13 @@ export class XYItemContainer implements Renderable {
       this._item.render()
     ]);
   }
-  
-  resize(dimensions: { width: number, height: number }): void {
-    if (this._container.direction === XYDirection.X) {
-      this._height = this._container.height;
-      this._width = dimensions.width;
-    } else {
-      this._width = this._container.width;
-      this._height = dimensions.height;
-    }
 
+  setSize(args: { width: number, height: number }): void {
+    this._width = args.width;
+    this._height = args.height;
+  }
+  
+  resize(): void {
     this._item.resize();
   }  
 }

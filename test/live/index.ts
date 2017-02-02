@@ -10,20 +10,21 @@ const rootLayout = RootLayout.create({
   .configure({
     use: Layout.configure({
       child: Row.configure({
-        children: [
-          Column.configure({
-            children: [
-              Row,
-              Row,
-              Row,
-              Row,
-              Row
-            ]
-          }),
-          Layout.configure({
-            child: Row
+        splitterSize: 50,
+        children: [{
+          ratio: 25,
+          use: Column.configure({
+            children: [{
+              use: Row,
+              ratio: 10
+            }, {
+              use: Row
+            }]
           })
-        ]
+        }, {
+          ratio: 75,
+          use: Column
+        }]
       })  
     })
   })
