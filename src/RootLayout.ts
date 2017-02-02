@@ -4,7 +4,7 @@ import h from 'snabbdom/h';
 import { Injector, Inject, Optional } from './di';
 import { RootInjector } from './RootInjector';
 import { Layout } from './Layout';
-import { DOMRenderer, Renderable, ConfiguredRenderable, RenderableInjector } from './dom';
+import { Renderer, Renderable, ConfiguredRenderable, RenderableInjector } from './dom';
 import { 
   ConfigurationRef, 
   ContainerRef, 
@@ -32,7 +32,7 @@ export class RootLayout implements Renderable {
   
   constructor(
     @Inject(RootConfigRef) @Optional() config: RootLayoutConfig,
-    @Inject(DOMRenderer) private _domRenderer: DOMRenderer,
+    @Inject(Renderer) private _renderer: Renderer,
     @Inject(Injector) private _injector: Injector
   ) {
     this._container = config.container;
@@ -66,7 +66,6 @@ export class RootLayout implements Renderable {
   }
 
   resize(dimensions?: { height: number, width: number }): void {
-
     if (dimensions) {
       this._width = dimensions.width;
       this._height = dimensions.height;
@@ -81,7 +80,7 @@ export class RootLayout implements Renderable {
   }
 
   update(): void {
-    this._lastVNode = this._domRenderer.update(this._lastVNode as VNode, this.render());
+    this._renderer.render();
   }
 
   initialize(): this {
@@ -97,7 +96,8 @@ export class RootLayout implements Renderable {
 
     this.attach();
     this.resize();
-    this._lastVNode = this._domRenderer.update(this._mountPoint, this.render());
+    this._lastVNode = this._renderer.patch(this._mountPoint, this.render());
+    this._renderer.onRender.subscribe(this._onRender.bind(this));
   }
 
   attach(): void {
@@ -114,6 +114,10 @@ export class RootLayout implements Renderable {
     this._layout = injector.get(ConfiguredRenderable);
 
     return this;
+  }
+
+  private _onRender(): void {
+    this._lastVNode = this._renderer.patch(this._lastVNode as VNode, this.render());
   }
 
   static create(config: RootLayoutConfig): RootLayout {

@@ -1,11 +1,11 @@
 import { Injector } from './di';
-import { DOMRenderer } from './dom';
+import { Renderer } from './dom';
 import { DocumentRef } from './common';
 
 export class RootInjector extends Injector {
   constructor() {
     super([
-      DOMRenderer,
+      Renderer,
       { provide: DocumentRef, useValue: document }
     ]);
   }
