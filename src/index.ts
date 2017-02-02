@@ -5,3 +5,6 @@ export * from './common';
 export * from './dom';
 export * from './Row';
 export * from './Column';
+export * from './View';
+export * from './XYContainer';
+export * from './XYItemContainer';

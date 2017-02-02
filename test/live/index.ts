@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import '../../src/styles/core.css';
 import './index.css';
 
-import { RootLayout, Row, Column, Layout } from '../../src';
+import { RootLayout, Row, Column, Layout, View } from '../../src';
 
 const rootLayout = RootLayout.create({
   container: document.body
@@ -15,7 +15,7 @@ const rootLayout = RootLayout.create({
           ratio: 25,
           use: Column.configure({
             children: [{
-              use: Row,
+              use: View,
               ratio: 10
             }, {
               use: Row
@@ -23,7 +23,7 @@ const rootLayout = RootLayout.create({
           })
         }, {
           ratio: 75,
-          use: Column
+          use: View
         }]
       })  
     })
@@ -32,7 +32,11 @@ const rootLayout = RootLayout.create({
   
 
 window.addEventListener('resize', () => {
-  rootLayout.resize();
+  rootLayout.resize({
+    height: window.innerHeight,
+    width: window.innerWidth
+  });
+  
   rootLayout.update();
 }, false);
 

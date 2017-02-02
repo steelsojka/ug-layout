@@ -3,8 +3,9 @@ import h from 'snabbdom/h';
 
 import { Inject } from './di';
 import { Renderable } from './dom';
-import { ContainerRef, XYDirection, ConfigurationRef } from './common';
+import { DocumentRef, ContainerRef, XYDirection, ConfigurationRef } from './common';
 import { XYContainer } from './XYContainer';
+import { Observable, ReplaySubject } from './events';
 
 export const SPLITTER_SIZE = 5;
 
@@ -12,11 +13,34 @@ export interface SplitterConfig {
   size: number;
 }
 
+export enum SplitterDragStatus {
+  START,
+  STOP,
+  DRAGGING  
+}
+
+export interface SplitterDragEvent {
+  splitter: Splitter;
+  x: number,
+  y: number,
+  dragStatus: SplitterDragStatus
+}
+
 export class Splitter implements Renderable {
+  dragStatus: Observable<SplitterDragEvent>;
+  
+  private _isDragging: boolean = false;
+  private _dragStatus: ReplaySubject<SplitterDragEvent> = new ReplaySubject(1);
+  
   constructor(
     @Inject(ContainerRef) private _container: XYContainer,
-    @Inject(ConfigurationRef) private _config: SplitterConfig
-  ) {}
+    @Inject(ConfigurationRef) private _config: SplitterConfig,
+    @Inject(DocumentRef) private _document: Document
+  ) {
+    this.dragStatus = this._dragStatus.asObservable();
+    this.onMouseMove = this.onMouseMove.bind(this);
+    this.onMouseUp = this.onMouseUp.bind(this);
+  }
   
   get height(): number {
     return this._isRow ? this._container.height : this._config.size;
@@ -64,8 +88,53 @@ export class Splitter implements Renderable {
       }
     }, [
       h('div.ug-layout__drag-handle', {
-        style: this.handleStyles 
+        style: this.handleStyles,
+        on: {
+          mousedown: e => this.onMouseDown(e)
+        }
       })
     ]);
+  }
+
+  destroy(): void {
+    this._dragStatus.complete();  
+  }
+
+  private onMouseMove(e: MouseEvent): void {
+    if (!this._isDragging) {
+      return;
+    }
+
+    this._dragStatus.next({
+      dragStatus: SplitterDragStatus.DRAGGING,
+      x: e.clientX,
+      y: e.clientY,
+      splitter: this
+    });
+  }
+  
+  private onMouseUp(e: MouseEvent): void {
+    this._isDragging = false;
+    this._document.removeEventListener('mousemove', this.onMouseMove, false);
+    this._document.removeEventListener('mouseup', this.onMouseUp, false);
+    this._dragStatus.next({
+      dragStatus: SplitterDragStatus.STOP,
+      x: e.clientX,
+      y: e.clientY,
+      splitter: this
+    });
+  }
+
+  private onMouseDown(e: MouseEvent): void {
+    e.preventDefault();
+    this._isDragging = true;
+    this._document.addEventListener('mousemove', this.onMouseMove, false);
+    this._document.addEventListener('mouseup', this.onMouseUp, false);
+    this._dragStatus.next({
+      dragStatus: SplitterDragStatus.START,
+      x: e.clientX,
+      y: e.clientY,
+      splitter: this
+    });
   }
 }

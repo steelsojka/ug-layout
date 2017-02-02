@@ -3,6 +3,7 @@ import * as snabbdom from 'snabbdom';
 import DOMClass from 'snabbdom/modules/class';
 import DOMStyle from 'snabbdom/modules/style';
 import DOMProps from 'snabbdom/modules/props';
+import DOMEvents from 'snabbdom/modules/eventlisteners';
 
 import { Deferred } from '../utils';
 
@@ -10,7 +11,8 @@ export class DOMRenderer {
   private _patch: (oldVNode: VNode|Node, newVNode: VNode) => VNode = snabbdom.init([
     DOMClass,
     DOMStyle,
-    DOMProps  
+    DOMProps,
+    DOMEvents
   ]);
 
   private _queue: Array<{ old: VNode|Node, new: VNode, deferred: Deferred<VNode> }> = [];
