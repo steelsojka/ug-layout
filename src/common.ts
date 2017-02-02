@@ -18,6 +18,7 @@ export interface RenderableConfig<T extends Renderable> {
   use: Type<T>|ConfiguredRenderable<T>;
 }
 
+export const DocumentRef = new Token('DocumentRef');
 export const ParentLayoutRef = new Token('ParentLayoutRef');
 export const RootConfigRef = new Token('RootConfigRef');
 export const ContainerRef = new Token('ContainerRef');

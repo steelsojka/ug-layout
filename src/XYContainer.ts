@@ -17,7 +17,7 @@ import {
   UNALLOCATED
 } from './common';
 import { XYItemContainer, XYItemContainerConfig } from './XYItemContainer';
-import { Splitter, SPLITTER_SIZE } from './Splitter';
+import { Splitter, SPLITTER_SIZE, SplitterDragEvent, SplitterDragStatus } from './Splitter';
 import { isNumber } from './utils';
 
 export interface XYContainerConfig {
@@ -127,12 +127,45 @@ export class XYContainer implements Renderable {
       size: this._config && this._config.splitterSize ? this._config.splitterSize : SPLITTER_SIZE
     };
   
-    return this._injector.spawn([
+    const splitter = this._injector.spawn([
       { provide: ContainerRef, useValue: this },
       { provide: ConfigurationRef, useValue: splitterConfig },
       Splitter
     ])
-      .get(Splitter);
+      .get(Splitter) as Splitter;
+
+    splitter.dragStatus.subscribe(this._dragStatusChanged.bind(this));
+
+    return splitter;
+  }
+
+  private _dragStatusChanged(event: SplitterDragEvent): void {
+    switch (event.dragStatus) {
+      case SplitterDragStatus.START: return this._dragStart(event);
+      case SplitterDragStatus.STOP: return this._dragEnd(event);
+      case SplitterDragStatus.DRAGGING: return this._dragMove(event);
+    }
+  }
+
+  private _getSplitterItems(splitter: Splitter): { before: Renderable, after: Renderable } {
+    const index = this._splitters.indexOf(splitter);
+
+    return {
+      before: this._children[index],
+      after: this._children[index + 1]
+    };
+  }
+
+  private _dragStart(event: SplitterDragEvent): void {
+    console.log('dragStart');
+  }
+
+  private _dragEnd(event: SplitterDragEvent): void {
+    console.log('dragEnd');
+  }
+  
+  private _dragMove(event: SplitterDragEvent): void {
+    console.log('dragging');
   }
 
   private _setDimensions(): void {

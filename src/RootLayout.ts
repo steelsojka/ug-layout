@@ -65,11 +65,17 @@ export class RootLayout implements Renderable {
     ]);
   }
 
-  resize(): void {
-    const clientRec = this._container.getBoundingClientRect();
+  resize(dimensions?: { height: number, width: number }): void {
 
-    this._width = clientRec.width;
-    this._height = clientRec.height;
+    if (dimensions) {
+      this._width = dimensions.width;
+      this._height = dimensions.height;
+    } else {
+      const clientRec = this._container.getBoundingClientRect();
+      
+      this._width = clientRec.width;
+      this._height = clientRec.height;
+    }
     
     this._layout.resize();
   }
