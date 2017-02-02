@@ -16,6 +16,7 @@ import {
   RenderableArg
 } from './common';
 import { XYItemContainer } from './XYItemContainer';
+import { Splitter } from './Splitter';
 
 export interface XYContainerConfig {
   children: RenderableArg<Renderable>[];
@@ -27,7 +28,7 @@ export class XYContainer implements Renderable {
   protected _direction: XYDirection;
   protected _className: string;
   protected _children: XYItemContainer[] = [];
-  protected _splitterClass: string = '';
+  protected _splitters: Splitter[] = [];
 
   constructor(
     @Inject(ContainerRef) protected _container: Renderable,
@@ -50,6 +51,15 @@ export class XYContainer implements Renderable {
 
       return item;
     });
+
+    for (let i = 0; i < this._children.length - 1; i++) {
+      const injector = this._injector.spawn([
+        { provide: ContainerRef, useValue: this },
+        Splitter
+      ]);
+      
+      this._splitters.push(injector.get(Splitter));
+    }
   }
 
   get height(): number {
@@ -63,28 +73,17 @@ export class XYContainer implements Renderable {
   get direction(): XYDirection {
     return this._direction;
   }
+
+  protected get _totalSplitterSize(): number {
+    return this._splitters.reduce((result, splitter) => result + splitter.size, 0);
+  }
   
   render(): VNode {
     const children: VNode[] = [];
-    const splitterHeight = this.direction === XYDirection.X ? this._height : 5;
-    const splitterWidth = this.direction === XYDirection.X ? 5 : this._width;
-
-    // TODO: Split splitter into seperate renderables.
 
     for (const [ index, child ] of this._children.entries()) {
       if (index > 0) {
-        children.push(h(`div.ug-layout__splitter.${this._splitterClass}`, {
-          style: {
-            height: `${splitterHeight}px`,
-            width: `${splitterWidth}px`
-          }
-        }, [
-          h('div.ug-layout__drag-handle', {
-            style: this.direction === XYDirection.X 
-              ? { width: splitterWidth * 5, left: -((splitterWidth * 5) / 2) }
-              : { height: splitterHeight * 5, top: -((splitterHeight * 5) / 2) }
-          })
-        ]));
+        children.push(this._splitters[index - 1].render());
       }
       
       children.push(child.render());

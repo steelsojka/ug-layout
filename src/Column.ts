@@ -26,12 +26,10 @@ export class Column extends XYContainer {
   resize(): void {
     super.resize();
     
-    const splitterSize = (this._children.length - 1) * 5;
-    
     for (const child of this._children) {
       child.resize({
         width: this._width, 
-        height: (this._height / (100 / child.dimension)) - (splitterSize / this._children.length)
+        height: (this._height / (100 / child.dimension)) - (this._totalSplitterSize / this._children.length)
       });
     }
   }

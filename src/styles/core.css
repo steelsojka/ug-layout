@@ -28,3 +28,21 @@
   z-index: 100;
   cursor: pointer;
 }
+
+.ug-layout__splitter-x {
+  width: 5px;
+}
+
+.ug-layout__splitter-y {
+  height: 5px;
+}
+
+.ug-layout__splitter-x .ug-layout__drag-handle {
+  width: 25px;
+  left: -12px;
+}
+
+.ug-layout__splitter-y .ug-layout__drag-handle {
+  height: 25px;
+  top: -12px;
+}
