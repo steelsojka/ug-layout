@@ -28,6 +28,8 @@ export interface SplitterDragEvent {
 
 export class Splitter implements Renderable {
   dragStatus: Observable<SplitterDragEvent>;
+  x: number = 0;
+  y: number = 0;
   
   private _isDragging: boolean = false;
   private _dragStatus: ReplaySubject<SplitterDragEvent> = new ReplaySubject(1);
@@ -59,7 +61,7 @@ export class Splitter implements Renderable {
       return {
         height: `${this.height}px`,
         width: `${this.width + 20}px`,
-        left: '-10px',
+        left: '${this.x - 10}px',
         top: 0
       };
     }
@@ -68,7 +70,7 @@ export class Splitter implements Renderable {
       height: `${this.height + 20}px`,
       width: `${this.width}px`,
       left: 0,
-      top: '-10px'
+      top: '${this.y - 10}px'
     };
   }
 
@@ -84,7 +86,9 @@ export class Splitter implements Renderable {
     return h(`div.ug-layout__splitter.${_class}`, {
       style: {
         height: this.height,
-        width: this.width
+        width: this.width,
+        left: `${this.x}`,
+        top: `${this.y}`,
       }
     }, [
       h('div.ug-layout__drag-handle', {
@@ -107,8 +111,8 @@ export class Splitter implements Renderable {
 
     this._dragStatus.next({
       dragStatus: SplitterDragStatus.DRAGGING,
-      x: e.clientX,
-      y: e.clientY,
+      x: e.offsetX,
+      y: e.offsetY,
       splitter: this
     });
   }
@@ -119,8 +123,8 @@ export class Splitter implements Renderable {
     this._document.removeEventListener('mouseup', this.onMouseUp, false);
     this._dragStatus.next({
       dragStatus: SplitterDragStatus.STOP,
-      x: e.clientX,
-      y: e.clientY,
+      x: e.offsetX,
+      y: e.offsetY,
       splitter: this
     });
   }
@@ -132,8 +136,8 @@ export class Splitter implements Renderable {
     this._document.addEventListener('mouseup', this.onMouseUp, false);
     this._dragStatus.next({
       dragStatus: SplitterDragStatus.START,
-      x: e.clientX,
-      y: e.clientY,
+      x: e.offsetX,
+      y: e.offsetY,
       splitter: this
     });
   }

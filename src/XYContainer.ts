@@ -165,7 +165,7 @@ export class XYContainer implements Renderable {
   }
   
   private _dragMove(event: SplitterDragEvent): void {
-    console.log('dragging');
+    console.log('dragging', event.x, event.y);
   }
 
   private _setDimensions(): void {

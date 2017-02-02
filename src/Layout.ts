@@ -4,7 +4,6 @@ import { VNode } from 'snabbdom/vnode';
 import { Injector, Inject, Optional } from './di';
 import { 
   Renderable, 
-  DOMRenderer, 
   RenderableInjector,
   ConfiguredRenderable
 } from './dom';
@@ -28,7 +27,6 @@ export class Layout implements Renderable {
   
   constructor(
     @Inject(Injector) private _injector: Injector,
-    @Inject(DOMRenderer) private _domRender: DOMRenderer,
     @Inject(ContainerRef) private _container: Renderable,
     @Inject(ConfigurationRef) private _config: LayoutConfig|null
   ) {
