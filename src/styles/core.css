@@ -76,6 +76,27 @@
 }
 
 .ug-layout__stack-tab {
+  display: flex;
+  flex-direction: row;
+  position: relative;
   height: 100%;
   min-width: 50px;
+  padding: 0 5px;
+  align-items: center;
+  cursor: pointer;
+} 
+
+.ug-layout__stack-tab:hover .ug-layout__stack-tab-close {
+}
+
+.ug-layout__stack-tab-close {
+  flex-grow: 0;
+  padding: 0 0 0 5px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.ug-layout__stack-tab-active {
+  background-color: black;
+  color: white;
 }

@@ -1,5 +1,5 @@
 import { Type } from '../common';
-import { Renderable } from './common'
+import { Renderable } from './Renderable'
 
 export class ConfiguredRenderable<T extends Renderable> {
   constructor(

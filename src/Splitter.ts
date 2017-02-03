@@ -26,7 +26,7 @@ export interface SplitterDragEvent {
   dragStatus: SplitterDragStatus
 }
 
-export class Splitter implements Renderable {
+export class Splitter extends Renderable {
   dragStatus: Observable<SplitterDragEvent>;
   x: number = 0;
   y: number = 0;
@@ -41,6 +41,8 @@ export class Splitter implements Renderable {
     @Inject(ConfigurationRef) private _config: SplitterConfig,
     @Inject(DocumentRef) private _document: Document
   ) {
+    super();
+    
     this.dragStatus = this._dragStatus.asObservable();
     this.onMouseMove = this.onMouseMove.bind(this);
     this.onMouseUp = this.onMouseUp.bind(this);
@@ -104,6 +106,7 @@ export class Splitter implements Renderable {
 
   destroy(): void {
     this._dragStatus.complete();  
+    super.destroy();
   }
 
   private onMouseMove(e: MouseEvent): void {

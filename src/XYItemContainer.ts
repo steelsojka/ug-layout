@@ -19,11 +19,12 @@ export interface XYItemContainerConfig {
   ratio?: number;
 }
 
-export class XYItemContainer implements Renderable {
+export class XYItemContainer extends Renderable {
   ratio: number|typeof UNALLOCATED = UNALLOCATED;
   
-  private _height: number = 0;
-  private _width: number = 0;
+  protected _height: number = 0;
+  protected _width: number = 0;
+  
   private _item: Renderable;
 
   constructor(
@@ -31,6 +32,8 @@ export class XYItemContainer implements Renderable {
     @Inject(ContainerRef) private _container: XYContainer,
     @Inject(ConfigurationRef) private _config: XYItemContainerConfig
   ) {
+    super();
+    
     if (this._config) {
       this.ratio = isNumber(this._config.ratio) ? this._config.ratio : UNALLOCATED;
     }
@@ -73,4 +76,9 @@ export class XYItemContainer implements Renderable {
   resize(): void {
     this._item.resize();
   }  
+
+  destroy(): void {
+    this._item.destroy();
+    super.destroy();
+  }
 }

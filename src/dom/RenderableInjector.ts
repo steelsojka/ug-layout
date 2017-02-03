@@ -1,7 +1,7 @@
 import { Provider, Injector } from '../di';
 import { ConfiguredRenderable } from './ConfiguredRenderable';
-import { Renderable } from './common';
 import { ConfigurationRef, Type } from '../common';
+import { Renderable } from './Renderable';
 
 export class RenderableInjector extends Injector {
   static fromRenderable(

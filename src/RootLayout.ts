@@ -20,14 +20,14 @@ export interface RootLayoutConfig {
 
 export interface RootConfiguration extends RenderableConfig<Layout> {}
 
-export class RootLayout implements Renderable {
+export class RootLayout extends Renderable {
+  protected _height: number = 0;
+  protected _width: number = 0;
   private _container: HTMLElement;
   private _vnode: VNode;
   private _layout: Layout;
   private _isAttached: boolean = false;
   private _lastVNode: VNode|null = null;
-  private _height: number = 0;
-  private _width: number = 0;
   private _mountPoint: Node = document.createElement('div');
   
   constructor(
@@ -35,6 +35,8 @@ export class RootLayout implements Renderable {
     @Inject(Renderer) private _renderer: Renderer,
     @Inject(Injector) private _injector: Injector
   ) {
+    super();
+    
     this._container = config.container;
   }
 
