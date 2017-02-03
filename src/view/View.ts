@@ -1,9 +1,9 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
-import { Inject } from './di';
-import { Renderable } from './dom';
-import { ContainerRef } from './common';
+import { Inject } from '../di';
+import { Renderable } from '../dom';
+import { ContainerRef } from '../common';
 
 export class View implements Renderable {
   constructor(

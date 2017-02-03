@@ -12,12 +12,13 @@ import {
   ContainerRef, 
   ConfigurationRef,
   RenderableConfig,
+  RenderableArg,
   Type
 } from './common';
 import { XYContainer } from './XYContainer';
 
 export interface LayoutConfig {
-  child: Type<XYContainer>|ConfiguredRenderable<XYContainer>;
+  child: RenderableArg<Renderable>;
 }
 
 export class Layout implements Renderable {
@@ -43,25 +44,22 @@ export class Layout implements Renderable {
   }  
 
   get height(): number {
-    return this._height;
+    return this._container.height;
   }
 
   get width(): number {
-    return this._width;
+    return this._container.width;
   }
 
   resize(): void {
-    this._height = this._container.height;
-    this._width = this._container.width;
-
     this._child.resize();
   }
 
   render(): VNode {
     return h('div.ug-layout__layout', {
       style: {
-        height: `${this._height}px`,
-        width: `${this._width}px`
+        height: `${this.height}px`,
+        width: `${this.width}px`
       }
     }, [
       this._child.render()
