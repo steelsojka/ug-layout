@@ -4,7 +4,8 @@ import h from 'snabbdom/h';
 import { 
   Renderable, 
   RenderableInjector,
-  ConfiguredRenderable
+  ConfiguredRenderable,
+  Renderer
 } from './dom';
 import { Inject, Injector } from './di';
 import { 
@@ -36,7 +37,8 @@ export class XYContainer implements Renderable {
   constructor(
     @Inject(ContainerRef) protected _container: Renderable,
     @Inject(ConfigurationRef) protected _config: XYContainerConfig|null,
-    @Inject(Injector) protected _injector: Injector
+    @Inject(Injector) protected _injector: Injector,
+    @Inject(Renderer) protected _renderer: Renderer
   ) {
     const children = this._config && this._config.children ? this._config.children : [];
     
@@ -147,7 +149,7 @@ export class XYContainer implements Renderable {
     }
   }
 
-  private _getSplitterItems(splitter: Splitter): { before: Renderable, after: Renderable } {
+  private _getSplitterItems(splitter: Splitter): { before: XYItemContainer, after: XYItemContainer } {
     const index = this._splitters.indexOf(splitter);
 
     return {
@@ -161,11 +163,37 @@ export class XYContainer implements Renderable {
   }
 
   private _dragEnd(event: SplitterDragEvent): void {
-    console.log('dragEnd');
+    const { splitter, x, y } = event;
+    
+    splitter.x = 0;
+    splitter.y = 0;
+
+    this._updateSplitterItems(splitter, x, y);
+    this._renderer.render();
+  }
+
+  private _updateSplitterItems(splitter: Splitter, x: number, y: number): void {
+    const { before, after } = this._getSplitterItems(splitter);
+    
+    if (this.isRow) {
+      before.ratio = ((before.width + x) / this._container.width) * 100;
+      after.ratio = ((after.width - x) / this._container.width) * 100;
+    } else {
+      before.ratio = ((before.height + y) / this._container.height) * 100;
+      after.ratio = ((after.height - y) / this._container.height) * 100;
+    }
+
+    this.resize();
   }
   
   private _dragMove(event: SplitterDragEvent): void {
-    console.log('dragging', event.x, event.y);
+    if (this.isRow) {
+      event.splitter.x = event.x;
+    } else {
+      event.splitter.y = event.y;
+    }
+
+    this._renderer.render();
   }
 
   private _setDimensions(): void {

@@ -31,6 +31,8 @@ export class Splitter implements Renderable {
   x: number = 0;
   y: number = 0;
   
+  private _startX: number = 0;
+  private _startY: number = 0;
   private _isDragging: boolean = false;
   private _dragStatus: ReplaySubject<SplitterDragEvent> = new ReplaySubject(1);
   
@@ -111,8 +113,8 @@ export class Splitter implements Renderable {
 
     this._dragStatus.next({
       dragStatus: SplitterDragStatus.DRAGGING,
-      x: e.offsetX,
-      y: e.offsetY,
+      x: e.x - this._startX,
+      y: e.y - this._startY,
       splitter: this
     });
   }
@@ -123,21 +125,24 @@ export class Splitter implements Renderable {
     this._document.removeEventListener('mouseup', this.onMouseUp, false);
     this._dragStatus.next({
       dragStatus: SplitterDragStatus.STOP,
-      x: e.offsetX,
-      y: e.offsetY,
+      x: e.x - this._startX,
+      y: e.y - this._startY,
       splitter: this
     });
   }
 
   private onMouseDown(e: MouseEvent): void {
     e.preventDefault();
+    
     this._isDragging = true;
+    this._startX = e.x;
+    this._startY = e.y;
     this._document.addEventListener('mousemove', this.onMouseMove, false);
     this._document.addEventListener('mouseup', this.onMouseUp, false);
     this._dragStatus.next({
       dragStatus: SplitterDragStatus.START,
-      x: e.offsetX,
-      y: e.offsetY,
+      x: this._startX,
+      y: this._startY,
       splitter: this
     });
   }

@@ -1,6 +1,6 @@
 import { Inject, Injector } from './di';
 import { XYContainer, XYContainerConfig } from './XYContainer';
-import { Renderable, ConfiguredRenderable } from './dom';
+import { Renderable, ConfiguredRenderable, Renderer } from './dom';
 import { 
   XYDirection, 
   ContainerRef, 
@@ -17,9 +17,10 @@ export class Column extends XYContainer {
   constructor(
     @Inject(ContainerRef) container: Renderable,
     @Inject(ConfigurationRef) config: ColumnConfig|null,
-    @Inject(Injector) injector: Injector
+    @Inject(Injector) injector: Injector,
+    @Inject(Renderer) renderer: Renderer
   ) {
-    super(container, config, injector);
+    super(container, config, injector, renderer);
   }
   
   static configure(config: ColumnConfig): ConfiguredRenderable<Column> {
