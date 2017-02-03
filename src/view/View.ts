@@ -5,10 +5,12 @@ import { Inject } from '../di';
 import { Renderable } from '../dom';
 import { ContainerRef } from '../common';
 
-export class View implements Renderable {
+export class View extends Renderable {
   constructor(
     @Inject(ContainerRef) private _container: Renderable
-  ) {}
+  ) {
+    super();
+  }
 
   get width(): number {
     return this._container.width;
@@ -27,5 +29,5 @@ export class View implements Renderable {
     });
   }
 
-  resize() {}
+  resize(): void {}
 }

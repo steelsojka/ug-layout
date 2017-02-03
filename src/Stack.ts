@@ -23,10 +23,26 @@ export interface StackConfig {
   header?: StackHeaderConfigArgs;
 }
 
+export interface StackEntry {
+  item: StackItemContainer;
+  tab: StackTab;
+}
+
 export const DEFAULT_STACK_HEADER_SIZE = 25;
 
-export class Stack implements Renderable {
-  private _children: Array<{ tab: StackTab, item: StackItemContainer }> = [];
+export class Stack extends Renderable {
+  getIndexOfContainer: (container: StackItemContainer) => number = this._getIndexOf.bind(this, 'item');
+  getIndexOfTab: (tab: StackTab) => number = this._getIndexOf.bind(this, 'tab');
+  isActiveContainer: (container: StackItemContainer) => boolean = this._isActive.bind(this, 'item');
+  isActiveTab: (tab: StackTab) => boolean = this._isActive.bind(this, 'tab');
+  getContainerAtIndex: (index: number) => StackItemContainer|null = this._getAtIndex.bind(this, 'item');
+  getTabAtIndex: (index: number) => StackTab|null = this._getAtIndex.bind(this, 'tab');
+  setActiveContainer: (container: StackItemContainer) => void = this._setActive.bind(this, 'item');
+  setActiveTab: (tab: StackTab) => void = this._setActive.bind(this, 'tab');
+  removeContainer: (container: StackItemContainer) => void = this._remove.bind(this, 'item');
+  removeTab: (tab: StackTab) => void = this._remove.bind(this, 'tab');
+  
+  private _children: StackEntry[] = [];
   private _direction: XYDirection;
   private _header: StackHeader;
   private _activeIndex: number = 0;
@@ -37,6 +53,8 @@ export class Stack implements Renderable {
     @Inject(ConfigurationRef) private _config: StackConfig|null,
     @Inject(Renderer) private _renderer: Renderer
   ) {
+    super();
+    
     const headerConfig = {
       size: DEFAULT_STACK_HEADER_SIZE  
     };
@@ -118,9 +136,52 @@ export class Stack implements Renderable {
     this._children.push({ item, tab });
   }
 
-  getIndexOfContainer(container: StackItemContainer): number {
-    for (const [ index, { item } ] of this._children.entries()) {
-      if (item === container) {
+  setActiveIndex(index: number): void {
+    this._activeIndex = clamp(index, 0, this._children.length - 1);
+    this._renderer.render();
+  }
+
+  removeAtIndex(index: number): void {
+    if (index >= this._children.length && index < 0) {
+      return;      
+    }
+
+    const entry = this._children[index];
+
+    entry.item.destroy();
+
+    if (!entry.tab.isDestroyed) {
+      this._header.removeTab(entry.tab);
+    }
+
+    this._children.splice(index, 1);
+    this._activeIndex = clamp(this._activeIndex, 0, this._children.length - 1);
+    this._renderer.render();
+  }
+
+  destroy(): void {
+    this._header.destroy();
+
+    for (const { item } of this._children) {
+      item.destroy();
+    }
+
+    super.destroy();
+  }
+
+  private _remove(entryKey: keyof StackEntry, item: StackItemContainer|StackTab): void {
+    this.removeAtIndex(this._getIndexOf(entryKey, item));
+  }
+
+  private _getAtIndex(entryKey: keyof StackEntry, index: number): StackItemContainer|StackTab|null {
+    const entry = this._children[index];
+
+    return entry ? entry[entryKey] : null;
+  }
+
+  private _getIndexOf(entryKey: keyof StackEntry, item: StackItemContainer|StackTab): number {
+    for (const [ index, entry ] of this._children.entries()) {
+      if (entry[entryKey] === item) {
         return index;
       }
     }
@@ -128,21 +189,12 @@ export class Stack implements Renderable {
     return -1;
   }
 
-  isActiveContainer(container: StackItemContainer) {
-    return this.getIndexOfContainer(container) === this.activeIndex;
+  private _isActive(entryKey: keyof StackEntry, item: StackItemContainer|StackTab): boolean {
+    return this._getIndexOf(entryKey, item) === this.activeIndex;
   }
-
-  setActive(container: StackItemContainer|number): void {
-    let index;
-    
-    if (container instanceof StackItemContainer) {
-      index = this.getIndexOfContainer(container);
-    } else {
-      index = container;
-    }
-
-    this._activeIndex = clamp(index, 0, this._children.length - 1);
-    this._renderer.render();
+  
+  private _setActive(entryKey: keyof StackEntry, item: StackItemContainer|StackTab): void {
+    this.setActiveIndex(this._getIndexOf(entryKey, item));
   }
 
   static configure(config: StackConfig): ConfiguredRenderable<Stack> {

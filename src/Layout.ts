@@ -21,9 +21,7 @@ export interface LayoutConfig {
   child: RenderableArg<Renderable>;
 }
 
-export class Layout implements Renderable {
-  private _height: number = 0;
-  private _width: number = 0;
+export class Layout extends Renderable {
   private _child: Renderable;
   
   constructor(
@@ -31,6 +29,8 @@ export class Layout implements Renderable {
     @Inject(ContainerRef) private _container: Renderable,
     @Inject(ConfigurationRef) private _config: LayoutConfig|null
   ) {
+    super();
+    
     if (!this._config || !this._config.child) {
       throw new Error('A layout requires a child renderable.');
     }
@@ -64,6 +64,11 @@ export class Layout implements Renderable {
     }, [
       this._child.render()
     ]);
+  }
+
+  destroy(): void {
+    this._child.destroy();
+    super.destroy();
   }
 
   static configure(config: LayoutConfig): ConfiguredRenderable<Layout> {

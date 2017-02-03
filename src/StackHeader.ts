@@ -6,6 +6,7 @@ import { Renderable } from './dom';
 import { Stack } from './Stack';
 import { StackTab, StackTabConfigArgs } from './StackTab';
 import { ConfigurationRef, ContainerRef } from './common';
+import { Subject, Observable } from './events';
 
 export interface StackHeaderConfig {
   size: number;
@@ -16,14 +17,21 @@ export type StackHeaderConfigArgs = {
   [P in keyof StackHeaderConfig]?: StackHeaderConfig[P];
 }
 
-export class StackHeader implements Renderable {
+export class StackHeader extends Renderable {
+  tabSelected: Observable<StackTab>;
+  
   private _tabs: StackTab[] = [];
+  private _tabSelected: Subject<StackTab> = new Subject();
   
   constructor(
     @Inject(Injector) private _injector: Injector,
     @Inject(ConfigurationRef) private _config: StackHeaderConfig,
     @Inject(ContainerRef) private _container: Stack
-  ) {} 
+  ) {
+    super();
+    
+    this.tabSelected = this._tabSelected.asObservable();
+  } 
 
   get width(): number {
     return this._container.isHorizontal ? this._container.width : this._config.size;
@@ -52,6 +60,22 @@ export class StackHeader implements Renderable {
     return tab;
   }
 
+  removeTab(tab: StackTab): void {
+    const index = this._tabs.indexOf(tab);
+    
+    if (index === -1) {
+      return;   
+    }
+    
+    tab.destroy();
+    this._tabs.splice(index, 1);
+    this._container.removeTab(tab);
+  }
+
+  isTabActive(tab: StackTab): boolean {
+    return this._container.isActiveTab(tab);
+  }
+
   render(): VNode {
     return h('div.ug-layout__stack-header', {
       style: {
@@ -69,7 +93,16 @@ export class StackHeader implements Renderable {
     }
   }
 
+  destroy(): void {
+    for (const tab of this._tabs) {
+      tab.destroy();
+    }
+
+    super.destroy();
+  }
+
   private _onTabSelection(tab: StackTab): void {
-    this._container.setActive(this._tabs.indexOf(tab));
+    this._tabSelected.next(tab);
+    this._container.setActiveTab(tab);
   }
 }

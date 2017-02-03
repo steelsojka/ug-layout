@@ -15,7 +15,7 @@ export interface StackItemContainerConfig {
   title?: string;
 }
 
-export class StackItemContainer implements Renderable {
+export class StackItemContainer extends Renderable {
   private _item: Renderable;
   
   constructor(
@@ -23,6 +23,8 @@ export class StackItemContainer implements Renderable {
     @Inject(ContainerRef) private _container: Stack,
     @Inject(ConfigurationRef) private _config: StackItemContainerConfig
   ) {
+    super();
+    
     this._item = RenderableInjector.fromRenderable(
       this._config.use, 
       [
@@ -46,6 +48,10 @@ export class StackItemContainer implements Renderable {
       : this._container.height;
   }
 
+  get isActive(): boolean {
+    return this._container.isActiveContainer(this);
+  }
+
   resize(): void {
     this._item.resize();
   }
@@ -53,12 +59,17 @@ export class StackItemContainer implements Renderable {
   render(): VNode {
     return h('div.ug-layout__stack-item-container', {
       props: {
-        hidden: !this._container.isActiveContainer(this)
+        hidden: !this.isActive
       },
       style: {
         height: `${this.height}px`,
         width: `${this.width}px`
       }
     }, [ this._item.render() ]);
+  }
+
+  destroy(): void {
+    this._item.destroy();
+    super.destroy();
   }
 }

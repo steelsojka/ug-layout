@@ -26,7 +26,7 @@ export interface XYContainerConfig {
   children: XYItemContainerConfig[];
 }
 
-export class XYContainer implements Renderable {
+export class XYContainer extends Renderable {
   protected _height: number = 0;
   protected _width: number = 0;
   protected _direction: XYDirection;
@@ -42,6 +42,8 @@ export class XYContainer implements Renderable {
     @Inject(Injector) protected _injector: Injector,
     @Inject(Renderer) protected _renderer: Renderer
   ) {
+    super();
+    
     const children = this._config && this._config.children ? this._config.children : [];
     
     this._children = children.map<XYItemContainer>(config => this.addChild(config));
@@ -110,8 +112,12 @@ export class XYContainer implements Renderable {
     }, children);
   }
 
-  updateChildSize(child: XYItemContainer, newDimension: number): void {
-              
+  destroy(): void {
+    for (const child of this._children) {
+      child.destroy();
+    }
+
+    super.destroy();
   }
 
   resize(): void {
