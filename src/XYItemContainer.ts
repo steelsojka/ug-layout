@@ -14,7 +14,6 @@ import {
 import { isNumber } from './utils';
 import { XYContainer } from './XYContainer';
 
-
 export interface XYItemContainerConfig {
   use: RenderableArg<Renderable>;
   ratio?: number;
