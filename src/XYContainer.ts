@@ -19,7 +19,7 @@ import {
 } from './common';
 import { XYItemContainer, XYItemContainerConfig } from './XYItemContainer';
 import { Splitter, SPLITTER_SIZE, SplitterDragEvent, SplitterDragStatus } from './Splitter';
-import { isNumber } from './utils';
+import { isNumber, clamp } from './utils';
 
 export interface XYContainerConfig {
   splitterSize?: number;
@@ -33,6 +33,8 @@ export class XYContainer implements Renderable {
   protected _className: string;
   protected _children: XYItemContainer[] = [];
   protected _splitters: Splitter[] = [];
+  protected _dragLimitMin: number = 0;
+  protected _dragLimitMax: number = 0;
 
   constructor(
     @Inject(ContainerRef) protected _container: Renderable,
@@ -159,14 +161,21 @@ export class XYContainer implements Renderable {
   }
 
   private _dragStart(event: SplitterDragEvent): void {
-    console.log('dragStart');
+    const { splitter } = event;
+    const { before, after } = this._getSplitterItems(splitter);
+    
+    this._dragLimitMin = (this.isRow ? -before.width : -before.height);
+    this._dragLimitMax = (this.isRow ? after.width : after.height) - 50;
   }
 
   private _dragEnd(event: SplitterDragEvent): void {
-    const { splitter, x, y } = event;
+    let { splitter, x, y } = event;
     
     splitter.x = 0;
     splitter.y = 0;
+
+    x = clamp(x, this._dragLimitMin, this._dragLimitMax);
+    y = clamp(y, this._dragLimitMin, this._dragLimitMax);
 
     this._updateSplitterItems(splitter, x, y);
     this._renderer.render();
@@ -188,9 +197,9 @@ export class XYContainer implements Renderable {
   
   private _dragMove(event: SplitterDragEvent): void {
     if (this.isRow) {
-      event.splitter.x = event.x;
+      event.splitter.x = clamp(event.x, this._dragLimitMin, this._dragLimitMax);
     } else {
-      event.splitter.y = event.y;
+      event.splitter.y = clamp(event.y, this._dragLimitMin, this._dragLimitMax);
     }
 
     this._renderer.render();
@@ -216,11 +225,11 @@ export class XYContainer implements Renderable {
       sizes.push(size);
     }
 
-    const extraPixels = (this.isRow ? totalWidth : totalHeight) - total;
+    const extraPixels = Math.floor((this.isRow ? totalWidth : totalHeight) - total);
 
     for (const [ index, child ] of this._children.entries()) {
-      if (extraPixels - 1 > 0) {
-        sizes[index] = sizes[index] + 1;
+      if (extraPixels - index > 0) {
+        sizes[index]++;
       }
 
       if (this.isRow) {
