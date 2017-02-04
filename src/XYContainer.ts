@@ -72,12 +72,16 @@ export class XYContainer extends Renderable {
   addChild(config: XYItemContainerConfig, options: { index?: number } = {}) {
     const { index } = options
     
-    const item = this._injector.spawn([
-      { provide: ContainerRef, useValue: this },
-      { provide: XYContainer, useValue: this },
-      { provide: ConfigurationRef, useValue: config },
-      XYItemContainer
-    ])
+    const item = Injector.fromInjectable(
+      XYItemContainer, 
+      [
+        { provide: ContainerRef, useValue: this },
+        { provide: XYContainer, useValue: this },
+        { provide: ConfigurationRef, useValue: config },
+        XYItemContainer
+      ],
+      this._injector
+    )
       .get(XYItemContainer) as XYItemContainer;
 
     if (typeof index === 'number') {
@@ -137,11 +141,15 @@ export class XYContainer extends Renderable {
       size: this._config && this._config.splitterSize ? this._config.splitterSize : SPLITTER_SIZE
     };
   
-    const splitter = this._injector.spawn([
-      { provide: ContainerRef, useValue: this },
-      { provide: ConfigurationRef, useValue: splitterConfig },
-      Splitter
-    ])
+    const splitter = Injector.fromInjectable(
+      Splitter,
+      [
+        { provide: ContainerRef, useValue: this },
+        { provide: ConfigurationRef, useValue: splitterConfig },
+        Splitter
+      ],
+      this._injector
+    )
       .get(Splitter) as Splitter;
 
     splitter.dragStatus.subscribe(this._dragStatusChanged.bind(this));

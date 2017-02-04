@@ -63,12 +63,16 @@ export class Stack extends Renderable {
       Object.assign(headerConfig, this._config.header);
     }
 
-    this._header = this._injector.spawn([
-      { provide: ContainerRef, useValue: this },
-      { provide: Stack, useValue: this },
-      { provide: ConfigurationRef, useValue: headerConfig },
-      StackHeader  
-    ])
+    this._header = Injector.fromInjectable(
+      StackHeader, 
+      [
+        { provide: ContainerRef, useValue: this },
+        { provide: Stack, useValue: this },
+        { provide: ConfigurationRef, useValue: headerConfig },
+        StackHeader 
+      ], 
+      this._injector
+    )
       .get(StackHeader);
     
     if (this._config) {
@@ -120,12 +124,16 @@ export class Stack extends Renderable {
   }
 
   addChild(config: StackItemContainerConfig): void {
-    const item = this._injector.spawn([
-      { provide: ContainerRef, useValue: this },
-      { provide: Stack, useValue: this },
-      { provide: ConfigurationRef, useValue: config },
-      StackItemContainer
-    ])
+    const item = Injector.fromInjectable(
+      StackItemContainer, 
+      [
+        { provide: ContainerRef, useValue: this },
+        { provide: Stack, useValue: this },
+        { provide: ConfigurationRef, useValue: config },
+        StackItemContainer
+      ],
+      this._injector
+    )
       .get(StackItemContainer) as StackItemContainer
 
     const tab = this._header.addTab({

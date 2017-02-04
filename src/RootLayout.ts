@@ -9,8 +9,7 @@ import {
   ConfigurationRef, 
   ContainerRef, 
   RootConfigRef,
-  RenderableConfig,
-  Type
+  RenderableConfig
 } from './common';
 
 export interface RootLayoutConfig {

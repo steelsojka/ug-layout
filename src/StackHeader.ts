@@ -46,11 +46,15 @@ export class StackHeader extends Renderable {
   }
 
   addTab(config: StackTabConfigArgs): StackTab {
-    const tab = this._injector.spawn([
-      { provide: ContainerRef, useValue: this },
-      { provide: ConfigurationRef, useValue: config },
-      StackTab 
-    ])
+    const tab = Injector.fromInjectable(
+      StackTab, 
+      [
+        { provide: ContainerRef, useValue: this },
+        { provide: ConfigurationRef, useValue: config },
+        StackTab 
+      ],
+      this._injector
+    )
       .get(StackTab) as StackTab;
 
     tab.onSelection.subscribe(this._onTabSelection.bind(this));

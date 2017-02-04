@@ -1,7 +1,7 @@
 import h from 'snabbdom/h';
 import { VNode } from 'snabbdom/vnode';
 
-import { Injector, Inject, Optional } from './di';
+import { Injector, Inject, Optional, Injectable } from './di';
 import { 
   Renderable, 
   RenderableInjector,
@@ -12,15 +12,18 @@ import {
   ContainerRef, 
   ConfigurationRef,
   RenderableConfig,
-  RenderableArg,
-  Type
+  RenderableArg
 } from './common';
 import { XYContainer } from './XYContainer';
+import { DragHandler } from './DragHandler';
 
 export interface LayoutConfig {
   child: RenderableArg<Renderable>;
 }
 
+@Injectable({
+  providers: [ DragHandler ]
+})
 export class Layout extends Renderable {
   private _child: Renderable;
   

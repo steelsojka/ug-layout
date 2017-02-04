@@ -1,4 +1,4 @@
-import { Type } from '../common';
+import { Type } from '../di';
 import { Renderable } from './Renderable'
 
 export class ConfiguredRenderable<T extends Renderable> {
