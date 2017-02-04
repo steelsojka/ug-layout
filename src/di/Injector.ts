@@ -1,4 +1,16 @@
-import { Provider, INJECT_PARAM_KEY, InjectionMetadata } from './common';
+import { 
+  Type,
+  Provider, 
+  ProviderArg,
+  INJECT_PARAM_KEY, 
+  InjectionMetadata,
+  InjectableConfig,
+  INJECTABLE_META_KEY,
+  ClassProvider,
+  FactoryProvider,
+  ValueProvider,
+  ExistingProvider
+} from './common';
 
 export class ForwardRef {
   constructor(private fn: Function) {}
@@ -83,20 +95,20 @@ export class Injector {
   }
 
   private resolve(provider: Provider, metadata: InjectionMetadata = {}): any {
-    if (provider.hasOwnProperty('useClass')) {
+    if (this._isClassProvider(provider)) {
       const injections = Reflect.getOwnMetadata(INJECT_PARAM_KEY, provider.useClass, (<any>undefined)) || [];
       const resolved = this.getDependencies(injections);
       const ref = this.resolveRef(provider.useClass);
 
       return this.instantiate(ref, ...resolved);
-    } else if (provider.hasOwnProperty('useFactory')) {
+    } else if (this._isFactoryProvider(provider)) {
       const resolved = this.getDependencies(provider.deps || []);
       const ref = this.resolveRef(provider.useFactory);
 
       return ref(...resolved);
-    } else if (provider.hasOwnProperty('useValue')) {
+    } else if (this._isValueProvider(provider)) {
       return this.resolveRef(provider.useValue);
-    } else if (provider.hasOwnProperty('useExisting')) {
+    } else if (this._isExistingProvider(provider)) {
       return this.get(this.resolveRef(provider.useExisting));
     }
 
@@ -141,5 +153,31 @@ export class Injector {
       default: 
         return new Ref(...d);
     }
+  }
+
+  private _isClassProvider(provider: Provider): provider is ClassProvider {
+    return provider.hasOwnProperty('useClass');
+  }
+
+  private _isFactoryProvider(provider: Provider): provider is FactoryProvider {
+    return provider.hasOwnProperty('useFactory');
+  }
+
+  private _isValueProvider(provider: Provider): provider is ValueProvider {
+    return provider.hasOwnProperty('useValue');
+  }
+
+  private _isExistingProvider(provider: Provider): provider is ExistingProvider {
+    return provider.hasOwnProperty('useExisting');
+  }
+
+  static fromInjectable(injectable: Type<any>, providers: ProviderArg[] = [], parent?: Injector): Injector {
+    const metadata = Reflect.getOwnMetadata(INJECTABLE_META_KEY, injectable);
+
+    if (metadata) {
+      providers = [...providers, ...(<InjectableConfig>metadata).providers];
+    }
+
+    return new Injector(providers, parent);
   }
 }

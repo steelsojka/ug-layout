@@ -1,9 +1,5 @@
-import { Token } from './di';
+import { Token, Type } from './di';
 import { Renderable, ConfiguredRenderable } from './dom';
-
-export interface Type<T> {
-  new (...args: any[]): T;
-}
 
 export enum XYDirection {
   X,

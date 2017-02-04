@@ -1,6 +1,6 @@
-import { Provider, Injector } from '../di';
+import { Provider, Injector, Type } from '../di';
 import { ConfiguredRenderable } from './ConfiguredRenderable';
-import { ConfigurationRef, Type } from '../common';
+import { ConfigurationRef } from '../common';
 import { Renderable } from './Renderable';
 
 export class RenderableInjector extends Injector {
@@ -9,18 +9,18 @@ export class RenderableInjector extends Injector {
     providers: Provider[] = [],
     parent?: Injector
   ): RenderableInjector {
-    providers.push({
-      provide: ConfiguredRenderable,
-      useClass: renderable instanceof ConfiguredRenderable 
-        ? renderable.renderable 
-        : renderable
-    }, {
-      provide: ConfigurationRef,
-      useValue: renderable instanceof ConfiguredRenderable
-        ? renderable.config 
-        : null
-    });
+    let Ctor = renderable;
+    let config: any = null;
+    
+    if (renderable instanceof ConfiguredRenderable) {
+      Ctor = renderable.renderable;
+      config = renderable.config;
+    }
 
-    return new RenderableInjector(providers, parent);
+    return Injector.fromInjectable(Ctor as Type<Renderable>, [
+      { provide: ConfiguredRenderable, useClass: Ctor },
+      { provide: ConfigurationRef, useValue: config },
+      ...providers
+    ], parent);
   }
 }

@@ -4,7 +4,6 @@ import h from 'snabbdom/h';
 import { Inject, Injector } from './di'
 import { Renderable, RenderableInjector, ConfiguredRenderable } from './dom';
 import { 
-  Type, 
   ConfigurationRef, 
   ContainerRef, 
   XYDirection, 
