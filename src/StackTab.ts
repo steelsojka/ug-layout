@@ -9,7 +9,7 @@ import { StackHeader } from './StackHeader';
 import { Stack } from './Stack';
 
 export interface StackTabConfig {
-  maxWidth: number;
+  maxSize: number;
   title: string;
 }
 
@@ -21,6 +21,7 @@ export class StackTab extends Renderable {
   onSelection: Observable<StackTab>;
   
   private _onSelection: Subject<StackTab> = new Subject();
+  private _element: HTMLElement;
   
   constructor(
     @Inject(ContainerRef) private _container: StackHeader,
@@ -30,7 +31,7 @@ export class StackTab extends Renderable {
     
     this.onSelection = this._onSelection.asObservable();
     this._config = Object.assign({
-      maxWidth: 150,
+      maxSize: 150,
       title: ''   
     }, this._config || {});
   }
@@ -44,15 +45,16 @@ export class StackTab extends Renderable {
   }
   
   render(): VNode {
-    let className = 'ug-layout__stack-tab';
-
-    if (this._container.isTabActive(this)) {
-      className += '.ug-layout__stack-tab-active';
-    }
-    
-    return h(`div.${className}`, {
-      style: {
-        'max-width': `${this._config.maxWidth}px`
+    return h(`div.ug-layout__stack-tab`, {
+      style: this._getStyles(),
+      class: {
+        'ug-layout__stack-tab-active': this._container.isTabActive(this),
+        'ug-layout__stack-tab-distributed': this._container.isDistributed,
+        'ug-layout__stack-tab-x': this._container.isHorizontal,
+        'ug-layout__stack-tab-y': !this._container.isHorizontal
+      },
+      hook: {
+        create: (oldNode, newNode) => this._element = newNode.elm as HTMLElement
       },
       on: {
         click: () => this._onClick()
@@ -74,9 +76,31 @@ export class StackTab extends Renderable {
     super.destroy();
   }
 
-  private _onClose(e: MouseEvent): void {
+  private _getStyles(): { [key: string]: string } {
+    let result = {};
+
+    if (this._container.isHorizontal) {
+      if (!this._container.isDistributed) {
+        result['max-width'] = `${this._config.maxSize}px`;
+      }
+      
+      result['max-height'] = `${this._container.height}px`;
+    } else {
+      if (!this._container.isDistributed) {
+        result['max-height'] = `${this._config.maxSize}px`;
+      }
+      
+      result['max-width'] = `${this._container.width}px`;
+    }
+    
+    return result;
+  }
+
+  private async _onClose(e: MouseEvent): Promise<void> {
     e.stopPropagation();
-    this._container.removeTab(this);
+    
+    await this.waitForDestroy();
+    this.destroy();
   }
 
   private _onClick(): void {

@@ -5,6 +5,7 @@
     "experimentalDecorators": true,
     "sourceMap": true,
     "strictNullChecks": true,
+    "importHelpers": true,
     "skipLibCheck": true,
     "types": [
       "reflect-metadata"

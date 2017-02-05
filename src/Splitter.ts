@@ -2,7 +2,7 @@ import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
 import { Inject } from './di';
-import { Renderable } from './dom';
+import { Renderable, Renderer } from './dom';
 import { DocumentRef, ContainerRef, XYDirection, ConfigurationRef } from './common';
 import { XYContainer } from './XYContainer';
 import { Observable, ReplaySubject } from './events';
@@ -35,11 +35,13 @@ export class Splitter extends Renderable {
   private _startY: number = 0;
   private _isDragging: boolean = false;
   private _dragStatus: ReplaySubject<SplitterDragEvent> = new ReplaySubject(1);
+  private _element: HTMLElement;
   
   constructor(
     @Inject(ContainerRef) private _container: XYContainer,
     @Inject(ConfigurationRef) private _config: SplitterConfig,
-    @Inject(DocumentRef) private _document: Document
+    @Inject(DocumentRef) private _document: Document,
+    @Inject(Renderer) private _renderer: Renderer
   ) {
     super();
     
@@ -58,6 +60,10 @@ export class Splitter extends Renderable {
 
   get size(): number {
     return this._isRow ? this.width : this.height;
+  }
+
+  get element(): HTMLElement {
+    return this._element;
   }
 
   private get handleStyles(): { [key:string]: any } {
@@ -84,6 +90,13 @@ export class Splitter extends Renderable {
 
   resize(): void {}
 
+  dragTo(x = this.x, y = this.y): void {
+    this.x = x;
+    this.y = y;
+    this._element.style.left = `${this.x}px`;
+    this._element.style.top = `${this.y}px`;
+  }
+
   render(): VNode {
     const _class = this._isRow ? 'ug-layout__splitter-x' : 'ug-layout__splitter-y';
     
@@ -92,7 +105,10 @@ export class Splitter extends Renderable {
         height: this.height,
         width: this.width,
         left: `${this.x}`,
-        top: `${this.y}`,
+        top: `${this.y}`
+      },
+      hook: {
+        create: (oldNode, newNode) => this._element = newNode.elm as HTMLElement
       }
     }, [
       h('div.ug-layout__drag-handle', {
