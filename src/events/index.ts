@@ -2,4 +2,8 @@ export * from 'rxjs/Observable';
 export * from 'rxjs/ReplaySubject';
 export * from 'rxjs/Subject';
 
-import 'rxjs/add/operator/takeUntil';
+export * from './AsyncEvent';
+export * from './CancelAction';
+export * from './Cancellable';
+
+import 'rxjs/add/operator/toPromise';

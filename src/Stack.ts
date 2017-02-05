@@ -109,7 +109,12 @@ export class Stack extends Renderable {
   }
 
   render(): VNode {
-    return h('div.ug-layout__stack', {}, [
+    return h(`div.ug-layout__stack`, {
+      class: {
+        'ug-layout__stack-y': !this.isHorizontal,
+        'ug-layout__stack-reverse': this.isReversed
+      }
+    }, [
       this._header.render(),
       ...this._children.map(child => child.item.render())  
     ]);
@@ -137,7 +142,7 @@ export class Stack extends Renderable {
       .get(StackItemContainer) as StackItemContainer
 
     const tab = this._header.addTab({
-      maxWidth: get<number>(this._config, 'header.maxTabWidth', 200),
+      maxSize: get<number>(this._config, 'header.maxTabSize', 200),
       title: config.title
     });
 

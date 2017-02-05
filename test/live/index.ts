@@ -1,8 +1,9 @@
+import 'babel-polyfill';
 import 'reflect-metadata';
 import '../../src/styles/core.css';
 import './index.css';
 
-import { RootLayout, Row, Column, Layout, View, Stack } from '../../src';
+import { RootLayout, Row, Column, Layout, View, Stack, XYDirection } from '../../src';
 
 const rootLayout = RootLayout.create({
   container: document.body
@@ -10,9 +11,12 @@ const rootLayout = RootLayout.create({
   .configure({
     use: Layout.configure({
       child: Stack.configure({
+        startIndex: 1,
         children: [{
           use: Row.configure({
             children: [{
+              use: View
+            }, {
               use: View
             }, {
               use: View
@@ -21,6 +25,10 @@ const rootLayout = RootLayout.create({
           title: 'Test View 1'
         }, {
           use: Stack.configure({
+            direction: XYDirection.Y,
+            header: {
+              size: 100
+            },
             children: [{
               title: 'NESTED 1',
               use: Column.configure({

@@ -6,11 +6,12 @@ import { Renderable } from './dom';
 import { Stack } from './Stack';
 import { StackTab, StackTabConfigArgs } from './StackTab';
 import { ConfigurationRef, ContainerRef } from './common';
-import { Subject, Observable } from './events';
+import { Subject, Observable, CancelAction } from './events';
 
 export interface StackHeaderConfig {
   size: number;
-  maxTabWidth?: number;
+  maxTabSize: number;
+  distribute: boolean;
 }
 
 export type StackHeaderConfigArgs = {
@@ -45,6 +46,10 @@ export class StackHeader extends Renderable {
     return this._container.isHorizontal;
   }
 
+  get isDistributed(): boolean {
+    return Boolean(this._config.distribute);
+  }
+
   addTab(config: StackTabConfigArgs): StackTab {
     const tab = Injector.fromInjectable(
       StackTab, 
@@ -58,6 +63,7 @@ export class StackHeader extends Renderable {
       .get(StackTab) as StackTab;
 
     tab.onSelection.subscribe(this._onTabSelection.bind(this));
+    tab.onDestroy.subscribe(tab => this.removeTab(tab as StackTab));
 
     this._tabs.push(tab);
 
@@ -71,7 +77,6 @@ export class StackHeader extends Renderable {
       return;   
     }
     
-    tab.destroy();
     this._tabs.splice(index, 1);
     this._container.removeTab(tab);
   }

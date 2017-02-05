@@ -69,6 +69,12 @@ export class XYContainer extends Renderable {
     return this._splitters.reduce((result, splitter) => result + splitter.size, 0);
   }
 
+  protected get _totalContainerSize(): number {
+    return this.isRow 
+      ? this._container.width - this._totalSplitterSize
+      : this._container.height - this._totalSplitterSize;
+  }
+
   addChild(config: XYItemContainerConfig, options: { index?: number } = {}) {
     const { index } = options
     
@@ -185,8 +191,7 @@ export class XYContainer extends Renderable {
   private _dragEnd(event: SplitterDragEvent): void {
     let { splitter, x, y } = event;
     
-    splitter.x = 0;
-    splitter.y = 0;
+    splitter.dragTo(0, 0);
 
     x = clamp(x, this._dragLimitMin, this._dragLimitMax);
     y = clamp(y, this._dragLimitMin, this._dragLimitMax);
@@ -197,13 +202,14 @@ export class XYContainer extends Renderable {
 
   private _updateSplitterItems(splitter: Splitter, x: number, y: number): void {
     const { before, after } = this._getSplitterItems(splitter);
+    const totalContainerSize = this._totalContainerSize;
     
     if (this.isRow) {
-      before.ratio = ((before.width + x) / this._container.width) * 100;
-      after.ratio = ((after.width - x) / this._container.width) * 100;
+      before.ratio = ((before.width + x) / totalContainerSize) * 100;
+      after.ratio = ((after.width - x) / totalContainerSize) * 100;
     } else {
-      before.ratio = ((before.height + y) / this._container.height) * 100;
-      after.ratio = ((after.height - y) / this._container.height) * 100;
+      before.ratio = ((before.height + y) / totalContainerSize) * 100;
+      after.ratio = ((after.height - y) / totalContainerSize) * 100;
     }
 
     this.resize();
@@ -211,12 +217,10 @@ export class XYContainer extends Renderable {
   
   private _dragMove(event: SplitterDragEvent): void {
     if (this.isRow) {
-      event.splitter.x = clamp(event.x, this._dragLimitMin, this._dragLimitMax);
+      event.splitter.dragTo(clamp(event.x, this._dragLimitMin, this._dragLimitMax), event.splitter.y);
     } else {
-      event.splitter.y = clamp(event.y, this._dragLimitMin, this._dragLimitMax);
+      event.splitter.dragTo(event.splitter.x, clamp(event.y, this._dragLimitMin, this._dragLimitMax));
     }
-
-    this._renderer.render();
   }
 
   private _setDimensions(): void {
@@ -233,7 +237,7 @@ export class XYContainer extends Renderable {
     }
 
     for (const child of this._children) {
-      let size = Math.floor((this.isRow ? totalWidth : totalHeight) * (<number>child.ratio / 100));
+      let size = (this.isRow ? totalWidth : totalHeight) * (<number>child.ratio / 100);
 
       total += size;
       sizes.push(size);
