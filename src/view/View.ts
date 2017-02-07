@@ -1,14 +1,15 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
-import { Inject, Injector, Optional } from '../di';
+import { ProviderArg, Inject, Injector, Optional } from '../di';
 import { Renderable, ConfiguredRenderable } from '../dom';
 import { ContainerRef, ConfigurationRef } from '../common';
 import { Stack } from '../Stack';
 import { ViewContainer } from './ViewContainer';
-import { ViewFactoriesRef } from './common';
+import { ViewFactoriesRef, ViewFactoryRef } from './common';
 
 export interface ViewConfig {
+  injectable?: boolean;
   name?: string;
   factory?: ViewFactory;
 }
@@ -18,7 +19,8 @@ export type ViewFactory = (element: HTMLElement, container: ViewContainer) => vo
 export class View extends Renderable {
   private _viewContainer: ViewContainer;
   private _element: HTMLElement;
-  private _factory: ViewFactory|null = null;
+  private _factory: ViewFactory;
+  private _viewInjector: Injector;
   
   constructor(
     @Inject(ContainerRef) protected _container: Renderable,
@@ -28,15 +30,10 @@ export class View extends Renderable {
   ) {
     super(_container);
 
-    this._viewContainer = Injector.fromInjectable(
-      ViewContainer, 
-      [
-        { provide: ContainerRef, useValue: this },
-        ViewContainer
-      ], 
-      this._injector
-    )
-      .get(ViewContainer);
+    let providers: ProviderArg[] = [
+      { provide: ContainerRef, useValue: this },
+      ViewContainer
+    ];
 
     if (this._configuration) {
       if (this._configuration.factory) {
@@ -48,7 +45,22 @@ export class View extends Renderable {
 
         this._factory = this._factories.get(this._configuration.name) as ViewFactory;
       }
+
+      if (this._configuration.injectable) {
+        providers.push({
+          provide: ViewFactoryRef,
+          useClass: this._factory as any
+        });
+      } else {
+        providers.push({
+          provide: ViewFactoryRef,
+          useFactory: () => this._factory(this._element, this._viewContainer)
+        });
+      }
     }
+
+    this._viewInjector = Injector.fromInjectable(ViewContainer, providers, this._injector)
+    this._viewContainer = this._viewInjector.get(ViewContainer);
   }
 
   get width(): number {
@@ -79,10 +91,7 @@ export class View extends Renderable {
 
   private _onCreate(element: HTMLElement): void {
     this._element = element;
-
-    if (this._factory) {
-      this._factory(element, this._viewContainer);
-    }
+    this._viewInjector.get(ViewFactoryRef, null);
   }
 
   static configure(config: ViewConfig): ConfiguredRenderable<View> {
