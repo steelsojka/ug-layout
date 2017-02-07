@@ -1,9 +1,9 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
-import { ProviderArg, Inject, Injector, Optional } from '../di';
+import { Type, ProviderArg, Inject, Injector, Optional, forwardRef } from '../di';
 import { Renderable, ConfiguredRenderable } from '../dom';
-import { ContainerRef, ConfigurationRef } from '../common';
+import { ContainerRef, ConfigurationRef, ElementRef } from '../common';
 import { Stack } from '../Stack';
 import { ViewContainer } from './ViewContainer';
 import { ViewFactoriesRef, ViewFactoryRef } from './common';
@@ -11,7 +11,7 @@ import { ViewFactoriesRef, ViewFactoryRef } from './common';
 export interface ViewConfig {
   injectable?: boolean;
   name?: string;
-  factory?: ViewFactory;
+  factory?: ViewFactory|Type<any>;
 }
 
 export type ViewFactory = (element: HTMLElement, container: ViewContainer) => void;
@@ -19,7 +19,7 @@ export type ViewFactory = (element: HTMLElement, container: ViewContainer) => vo
 export class View extends Renderable {
   private _viewContainer: ViewContainer;
   private _element: HTMLElement;
-  private _factory: ViewFactory;
+  private _factory: ViewFactory|Type<any>;
   private _viewInjector: Injector;
   
   constructor(
@@ -31,6 +31,7 @@ export class View extends Renderable {
     super(_container);
 
     let providers: ProviderArg[] = [
+      { provide: ElementRef, useValue: forwardRef(() => this._element )},
       { provide: ContainerRef, useValue: this },
       ViewContainer
     ];
@@ -54,7 +55,7 @@ export class View extends Renderable {
       } else {
         providers.push({
           provide: ViewFactoryRef,
-          useFactory: () => this._factory(this._element, this._viewContainer)
+          useFactory: () => (<ViewFactory>this._factory)(this._element, this._viewContainer)
         });
       }
     }
@@ -95,6 +96,8 @@ export class View extends Renderable {
   }
 
   static configure(config: ViewConfig): ConfiguredRenderable<View> {
-    return new ConfiguredRenderable(View, config);
+    return new ConfiguredRenderable(View, Object.assign({
+      injectable: false
+    }, config));
   }
 }
