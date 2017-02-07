@@ -15,7 +15,11 @@ const rootLayout = RootLayout.create({
         children: [{
           use: Row.configure({
             children: [{
-              use: View
+              use: View.configure({
+                factory(el, view) {
+                  console.log(el, view);
+                }
+              })
             }, {
               use: View
             }, {

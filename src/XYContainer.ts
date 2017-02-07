@@ -141,6 +141,10 @@ export class XYContainer extends Renderable {
       child.resize();
     }
   }
+  
+  isVisible(): boolean {
+    return this._container.isVisible();
+  }
 
   private _createSplitter(): Splitter {
     const splitterConfig = {

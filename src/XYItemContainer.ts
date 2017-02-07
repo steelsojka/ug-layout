@@ -28,10 +28,10 @@ export class XYItemContainer extends Renderable {
 
   constructor(
     @Inject(Injector) private _injector: Injector,
-    @Inject(ContainerRef) private _container: XYContainer,
+    @Inject(ContainerRef) protected _container: XYContainer,
     @Inject(ConfigurationRef) private _config: XYItemContainerConfig
   ) {
-    super();
+    super(_container);
     
     if (this._config) {
       this.ratio = isNumber(this._config.ratio) ? this._config.ratio : UNALLOCATED;
@@ -79,5 +79,9 @@ export class XYItemContainer extends Renderable {
   destroy(): void {
     this._item.destroy();
     super.destroy();
+  }
+
+  isVisible(): boolean {
+    return this._container.isVisible();
   }
 }

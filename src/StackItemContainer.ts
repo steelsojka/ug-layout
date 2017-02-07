@@ -20,10 +20,10 @@ export class StackItemContainer extends Renderable {
   
   constructor(
     @Inject(Injector) private _injector: Injector,
-    @Inject(ContainerRef) private _container: Stack,
-    @Inject(ConfigurationRef) private _config: StackItemContainerConfig
+    @Inject(ConfigurationRef) private _config: StackItemContainerConfig,
+    @Inject(ContainerRef) protected _container: Stack
   ) {
-    super();
+    super(_container);
     
     this._item = RenderableInjector.fromRenderable(
       this._config.use, 
@@ -71,5 +71,9 @@ export class StackItemContainer extends Renderable {
   destroy(): void {
     this._item.destroy();
     super.destroy();
+  }
+
+  isVisible(): boolean {
+    return this._container.isVisible() && this._container.isActiveContainer(this);
   }
 }

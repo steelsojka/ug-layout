@@ -29,10 +29,10 @@ export class Layout extends Renderable {
   
   constructor(
     @Inject(Injector) private _injector: Injector,
-    @Inject(ContainerRef) private _container: Renderable,
-    @Inject(ConfigurationRef) private _config: LayoutConfig|null
+    @Inject(ConfigurationRef) private _config: LayoutConfig|null,
+    @Inject(ContainerRef) protected _container: Renderable
   ) {
-    super();
+    super(_container);
     
     if (!this._config || !this._config.child) {
       throw new Error('A layout requires a child renderable.');
@@ -72,6 +72,10 @@ export class Layout extends Renderable {
   destroy(): void {
     this._child.destroy();
     super.destroy();
+  }
+
+  isVisible(): boolean {
+    return this._container.isVisible();
   }
 
   static configure(config: LayoutConfig): ConfiguredRenderable<Layout> {

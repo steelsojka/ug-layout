@@ -22,7 +22,7 @@ export interface RootConfiguration extends RenderableConfig<Layout> {}
 export class RootLayout extends Renderable {
   protected _height: number = 0;
   protected _width: number = 0;
-  private _container: HTMLElement;
+  private _containerEl: HTMLElement;
   private _vnode: VNode;
   private _layout: Layout;
   private _isAttached: boolean = false;
@@ -36,7 +36,7 @@ export class RootLayout extends Renderable {
   ) {
     super();
     
-    this._container = config.container;
+    this._containerEl = config.container;
   }
 
   get height(): number {
@@ -52,7 +52,7 @@ export class RootLayout extends Renderable {
   }
   
   get container(): Node|null {
-    return this._container;
+    return this._containerEl;
   }
 
   render(): VNode {
@@ -71,7 +71,7 @@ export class RootLayout extends Renderable {
       this._width = dimensions.width;
       this._height = dimensions.height;
     } else {
-      const clientRec = this._container.getBoundingClientRect();
+      const clientRec = this._containerEl.getBoundingClientRect();
       
       this._width = clientRec.width;
       this._height = clientRec.height;
@@ -102,7 +102,7 @@ export class RootLayout extends Renderable {
   }
 
   attach(): void {
-    this._container.appendChild(this._mountPoint);
+    this._containerEl.appendChild(this._mountPoint);
     this._isAttached = true;
   }
 
@@ -115,6 +115,10 @@ export class RootLayout extends Renderable {
     this._layout = injector.get(ConfiguredRenderable);
 
     return this;
+  }
+
+  isVisible(): boolean {
+    return true;
   }
 
   private _onRender(): void {

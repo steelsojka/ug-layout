@@ -27,9 +27,9 @@ export class StackHeader extends Renderable {
   constructor(
     @Inject(Injector) private _injector: Injector,
     @Inject(ConfigurationRef) private _config: StackHeaderConfig,
-    @Inject(ContainerRef) private _container: Stack
+    @Inject(ContainerRef) protected _container: Stack
   ) {
-    super();
+    super(_container);
     
     this.tabSelected = this._tabSelected.asObservable();
   } 
@@ -63,7 +63,7 @@ export class StackHeader extends Renderable {
       .get(StackTab) as StackTab;
 
     tab.onSelection.subscribe(this._onTabSelection.bind(this));
-    tab.onDestroy.subscribe(tab => this.removeTab(tab as StackTab));
+    tab.onDestroy.subscribe(tab => this.removeTab(tab));
 
     this._tabs.push(tab);
 
@@ -108,6 +108,10 @@ export class StackHeader extends Renderable {
     }
 
     super.destroy();
+  }
+
+  isVisible(): boolean {
+    return this._container.isVisible();
   }
 
   private _onTabSelection(tab: StackTab): void {

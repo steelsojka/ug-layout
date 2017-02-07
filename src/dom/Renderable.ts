@@ -1,5 +1,6 @@
 import { VNode } from 'snabbdom/vnode';
 
+import { Type } from '../di';
 import { 
   Observable, 
   Subject, 
@@ -8,16 +9,16 @@ import {
 } from '../events';
 
 export abstract class Renderable {
-  onDestroy: Observable<Renderable>;
-  onBeforeDestroy: Observable<AsyncEvent<Renderable>>;
+  onDestroy: Observable<this>;
+  onBeforeDestroy: Observable<AsyncEvent<this>>;
   
   protected _width: number;  
   protected _height: number;
   protected _isDestroyed: boolean = false;
-  protected _onDestroy: Subject<Renderable> = new Subject();
-  protected _onBeforeDestroy: Subject<AsyncEvent<Renderable>> = new Subject();
+  protected _onDestroy: Subject<this> = new Subject();
+  protected _onBeforeDestroy: Subject<AsyncEvent<this>> = new Subject();
 
-  constructor() {
+  constructor(protected _container: Renderable|null = null) {
     this.onDestroy = this._onDestroy.asObservable();
     this.onBeforeDestroy = this._onBeforeDestroy.asObservable();
   }
@@ -34,8 +35,9 @@ export abstract class Renderable {
     return this._isDestroyed;
   }
 
-  abstract render(): VNode
-  abstract resize(): void
+  abstract render(): VNode;
+  abstract resize(): void;
+  abstract isVisible(): boolean;
 
   destroy(): void {
     if (this._isDestroyed) {
@@ -49,7 +51,19 @@ export abstract class Renderable {
     this._onBeforeDestroy.complete();
   }
 
-  protected waitForDestroy(): Promise<Renderable>  {
+  getParent(Ctor: Type<Renderable>): Renderable|null {
+    if (this._container) {
+      if (this._container instanceof Ctor) {
+        return this._container;
+      }
+      
+      return this._container.getParent(Ctor);
+    }  
+
+    return null;
+  }
+
+  protected waitForDestroy(): Promise<this>  {
     return Cancellable.dispatch(this._onBeforeDestroy, this).toPromise();
   }
 }
