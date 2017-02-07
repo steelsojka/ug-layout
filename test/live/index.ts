@@ -3,7 +3,27 @@ import 'reflect-metadata';
 import '../../src/styles/core.css';
 import './index.css';
 
-import { RootLayout, Row, Column, Layout, View, Stack, XYDirection } from '../../src';
+import { 
+  RootLayout, 
+  Row, 
+  Column, 
+  Layout, 
+  View, 
+  Stack, 
+  XYDirection,
+  Inject,
+  ViewContainer,
+  ElementRef
+} from '../../src';
+
+class TestView {
+  constructor(
+    @Inject(ViewContainer) container: ViewContainer,
+    @Inject(ElementRef) element: HTMLElement
+  ) {
+    console.log(container, element);
+  }
+}
 
 const rootLayout = RootLayout.create({
   container: document.body
@@ -16,9 +36,8 @@ const rootLayout = RootLayout.create({
           use: Row.configure({
             children: [{
               use: View.configure({
-                factory(el, view) {
-                  console.log(el, view);
-                }
+                injectable: true,
+                factory: TestView
               })
             }, {
               use: View

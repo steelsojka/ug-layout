@@ -20,3 +20,4 @@ export const RootConfigRef = new Token('RootConfigRef');
 export const ContainerRef = new Token('ContainerRef');
 export const XYDirectionRef = new Token('XYDirectionRef');
 export const ConfigurationRef = new Token('ConfigurationRef');
+export const ElementRef = new Token('ElementRef');

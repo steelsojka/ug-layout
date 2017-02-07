@@ -25,22 +25,22 @@ export function forwardRef(fn: Function) {
 }
 
 export class Injector {
-  private _providers: Provider[] = [];
+  private _providers: Map<any, Provider> = new Map();
   private _cache: Map<any, any> = new Map();
   
   constructor(
     providers: Array<Provider|Function> = [],
     private _parent: Injector|null = null
   ) {
-    this._providers = providers.map(provider => {
+    this._providers.set(Injector, { provide: Injector, useValue: this });
+    
+    for (const provider of providers) {
       if (typeof provider === 'function') {
-        return { provide: provider, useClass: provider };
+        this._providers.set(provider, { provide: provider, useClass: provider });
+      } else {
+        this._providers.set(provider.provide, provider);
       }
-
-      return provider;
-    });
-
-    this._providers.push({ provide: Injector, useValue: this });
+    }
   }
 
   get parent(): Injector|null {
@@ -59,18 +59,11 @@ export class Injector {
       return this._cache.get(token);
     }
 
-    for (const provider of this._providers) {
-      let provideRef = provider.provide;
-      
-      if (provideRef instanceof ForwardRef) {
-        provideRef = provideRef.ref;
-      }
-      
-      if (provideRef === token) {
-        resource = this.resolve(provider, metadata);
+    if (this._providers.has(token)) {
+      const provider = this._providers.get(token);
+      resource = this._resolve(provider as Provider, metadata);
 
-        this._cache.set(token, resource);
-      }
+      this._cache.set(token, resource);
     }
 
     if (resource === undefined && !metadata.self && this._parent) {
@@ -94,7 +87,7 @@ export class Injector {
     return new Injector(providers, this);    
   }
 
-  private resolve(provider: Provider, metadata: InjectionMetadata = {}): any {
+  private _resolve(provider: Provider, metadata: InjectionMetadata = {}): any {
     if (this._isClassProvider(provider)) {
       const injections = Reflect.getOwnMetadata(INJECT_PARAM_KEY, provider.useClass, (<any>undefined)) || [];
       const resolved = this.getDependencies(injections);
