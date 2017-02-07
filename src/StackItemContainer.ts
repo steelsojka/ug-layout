@@ -76,4 +76,9 @@ export class StackItemContainer extends Renderable {
   isVisible(): boolean {
     return this._container.isVisible() && this._container.isActiveContainer(this);
   }
+
+  makeVisible(): void {
+    this._container.setActiveContainer(this);
+    super.makeVisible();
+  }
 }

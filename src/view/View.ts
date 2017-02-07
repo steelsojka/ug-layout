@@ -90,6 +90,16 @@ export class View extends Renderable {
     return this._container.isVisible();
   }
 
+  async close(args: { silent?: boolean } = {}): Promise<void> {
+    const { silent = false } = args;
+    
+    if (!silent) {
+      await this.waitForDestroy();
+    }
+
+    this.destroy();
+  }
+
   private _onCreate(element: HTMLElement): void {
     this._element = element;
     this._viewInjector.get(ViewFactoryRef, null);

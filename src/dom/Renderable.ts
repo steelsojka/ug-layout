@@ -37,8 +37,17 @@ export abstract class Renderable {
 
   abstract render(): VNode;
   abstract resize(): void;
-  abstract isVisible(): boolean;
+  
+  makeVisible(): void {
+    if (this._container) {
+      this._container.makeVisible();
+    }
+  }
 
+  isVisible(): boolean {
+    return Boolean(this._container && this._container.isVisible());
+  }
+  
   destroy(): void {
     if (this._isDestroyed) {
       return;
@@ -51,16 +60,27 @@ export abstract class Renderable {
     this._onBeforeDestroy.complete();
   }
 
-  getParent(Ctor: Type<Renderable>): Renderable|null {
+  getParent<T extends Renderable>(Ctor: Type<T>): T|null {
     if (this._container) {
       if (this._container instanceof Ctor) {
-        return this._container;
+        return this._container as T;
       }
       
       return this._container.getParent(Ctor);
     }  
 
     return null;
+  }
+
+  getParents<T extends Renderable>(Ctor: Type<T>): T[] {
+    let parent: Renderable|null = this;
+    let result: T[] = [];
+
+    while (parent = parent.getParent(Ctor)) {
+      result.push(parent as T);
+    }
+
+    return result;
   }
 
   protected waitForDestroy(): Promise<this>  {

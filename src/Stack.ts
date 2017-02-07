@@ -181,10 +181,6 @@ export class Stack extends Renderable {
 
     super.destroy();
   }
-  
-  isVisible(): boolean {
-    return this._container.isVisible();
-  }
 
   private _remove(entryKey: keyof StackEntry, item: StackItemContainer|StackTab): void {
     this.removeAtIndex(this._getIndexOf(entryKey, item));
