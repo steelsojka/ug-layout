@@ -24,10 +24,10 @@ export class StackTab extends Renderable {
   private _element: HTMLElement;
   
   constructor(
-    @Inject(ContainerRef) private _container: StackHeader,
+    @Inject(ContainerRef) protected _container: StackHeader,
     @Inject(ConfigurationRef) private _config: StackTabConfig
   ) {
-    super();
+    super(_container);
     
     this.onSelection = this._onSelection.asObservable();
     this._config = Object.assign({
@@ -74,6 +74,10 @@ export class StackTab extends Renderable {
   destroy(): void {
     this._onSelection.complete();
     super.destroy();
+  }
+
+  isVisible(): boolean {
+    return this._container.isVisible();
   }
 
   private _getStyles(): { [key: string]: string } {

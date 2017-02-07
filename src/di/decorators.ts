@@ -22,6 +22,12 @@ export function Lazy(): ParameterDecorator {
   };
 }
 
+export function Self(): ParameterDecorator {
+  return (target: Object, key: string, index: number) => {
+    addParamEntryProperty(target, key, index, { self: true });
+  };
+}
+
 export function Injectable(config: InjectableConfigArgs = {}): ClassDecorator {
   return (target: Function) => {
     if (!Array.isArray(config.providers)) {
@@ -39,7 +45,8 @@ function addParamEntryProperty(target: Object, key: string, index: number, keyVa
     existingInjections[index] = {
       token: null,
       optional: false,
-      lazy: false
+      lazy: false,
+      self: false
     };
   }
 

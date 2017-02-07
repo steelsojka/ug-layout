@@ -38,12 +38,12 @@ export class Splitter extends Renderable {
   private _element: HTMLElement;
   
   constructor(
-    @Inject(ContainerRef) private _container: XYContainer,
     @Inject(ConfigurationRef) private _config: SplitterConfig,
     @Inject(DocumentRef) private _document: Document,
-    @Inject(Renderer) private _renderer: Renderer
+    @Inject(Renderer) private _renderer: Renderer,
+    @Inject(ContainerRef) protected _container: XYContainer
   ) {
-    super();
+    super(_container);
     
     this.dragStatus = this._dragStatus.asObservable();
     this.onMouseMove = this.onMouseMove.bind(this);
@@ -64,6 +64,10 @@ export class Splitter extends Renderable {
 
   get element(): HTMLElement {
     return this._element;
+  }
+  
+  isVisible(): boolean {
+    return this._container.isVisible();
   }
 
   private get handleStyles(): { [key:string]: any } {

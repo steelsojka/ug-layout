@@ -48,12 +48,12 @@ export class Stack extends Renderable {
   private _activeIndex: number = 0;
   
   constructor(
-    @Inject(ContainerRef) private _container: Renderable,
     @Inject(Injector) private _injector: Injector,
     @Inject(ConfigurationRef) private _config: StackConfig|null,
-    @Inject(Renderer) private _renderer: Renderer
+    @Inject(Renderer) private _renderer: Renderer,
+    @Inject(ContainerRef) protected _container: Renderable
   ) {
-    super();
+    super(_container);
     
     const headerConfig = {
       size: DEFAULT_STACK_HEADER_SIZE  
@@ -180,6 +180,10 @@ export class Stack extends Renderable {
     }
 
     super.destroy();
+  }
+  
+  isVisible(): boolean {
+    return this._container.isVisible();
   }
 
   private _remove(entryKey: keyof StackEntry, item: StackItemContainer|StackTab): void {

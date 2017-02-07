@@ -73,7 +73,7 @@ export class Injector {
       }
     }
 
-    if (resource === undefined && this._parent) {
+    if (resource === undefined && !metadata.self && this._parent) {
       resource = this._parent.get(token, defaultValue, metadata);
     }
     
