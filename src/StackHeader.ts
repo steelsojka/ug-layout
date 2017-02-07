@@ -110,10 +110,6 @@ export class StackHeader extends Renderable {
     super.destroy();
   }
 
-  isVisible(): boolean {
-    return this._container.isVisible();
-  }
-
   private _onTabSelection(tab: StackTab): void {
     this._tabSelected.next(tab);
     this._container.setActiveTab(tab);

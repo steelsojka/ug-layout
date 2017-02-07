@@ -18,10 +18,19 @@ import {
 
 class TestView {
   constructor(
-    @Inject(ViewContainer) container: ViewContainer,
-    @Inject(ElementRef) element: HTMLElement
+    @Inject(ViewContainer) private container: ViewContainer,
+    @Inject(ElementRef) private element: HTMLElement
   ) {
-    console.log(container, element);
+    element.innerHTML = '<div>TEST!!</div>';
+    (<any>window).testComp = this;
+
+    container.beforeDestroyed.subscribe(e => {
+      e.wait(() => {
+        return new Promise(resolve => {
+          setTimeout(resolve, 0);
+        })
+      });
+    });
   }
 }
 

@@ -102,6 +102,26 @@ export class XYContainer extends Renderable {
 
     return item;
   }
+
+  removeChild(item: XYItemContainer): void {
+    const index = this._children.indexOf(item);
+
+    if (index === -1) {
+      return;
+    }
+
+    this._children.splice(index, 1);
+    item.destroy();
+
+    const splitter = this._splitters[clamp(index, 0, this._splitters.length - 1)];
+
+    if (splitter) {
+      splitter.destroy();
+    }
+    
+    this.resize();
+    this._renderer.render();
+  }
   
   render(): VNode {
     const children: VNode[] = [];
@@ -140,10 +160,6 @@ export class XYContainer extends Renderable {
     for (const child of this._children) {
       child.resize();
     }
-  }
-  
-  isVisible(): boolean {
-    return this._container.isVisible();
   }
 
   private _createSplitter(): Splitter {

@@ -65,10 +65,6 @@ export class Splitter extends Renderable {
   get element(): HTMLElement {
     return this._element;
   }
-  
-  isVisible(): boolean {
-    return this._container.isVisible();
-  }
 
   private get handleStyles(): { [key:string]: any } {
     if (this._isRow) {

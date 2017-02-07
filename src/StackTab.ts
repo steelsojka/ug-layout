@@ -76,10 +76,6 @@ export class StackTab extends Renderable {
     super.destroy();
   }
 
-  isVisible(): boolean {
-    return this._container.isVisible();
-  }
-
   private _getStyles(): { [key: string]: string } {
     let result = {};
 

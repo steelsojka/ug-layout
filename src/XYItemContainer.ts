@@ -46,6 +46,8 @@ export class XYItemContainer extends Renderable {
       this._injector
     )
       .get(ConfiguredRenderable);
+
+    this._item.onDestroy.subscribe(this._onItemDestroy.bind(this));
   }
 
   get width(): number {
@@ -81,7 +83,7 @@ export class XYItemContainer extends Renderable {
     super.destroy();
   }
 
-  isVisible(): boolean {
-    return this._container.isVisible();
+  private _onItemDestroy(): void {
+    this._container.removeChild(this);
   }
 }

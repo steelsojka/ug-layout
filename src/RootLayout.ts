@@ -55,6 +55,10 @@ export class RootLayout extends Renderable {
     return this._containerEl;
   }
 
+  makeVisible(): void {
+    this._renderer.render();
+  }
+
   render(): VNode {
     return h('div.ug-layout__root', {
       style: {
