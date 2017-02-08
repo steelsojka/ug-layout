@@ -7,6 +7,7 @@ import {
   Cancellable,
   AsyncEvent
 } from '../events';
+import { uid } from '../utils';
 
 export abstract class Renderable {
   onDestroy: Observable<this>;
@@ -17,6 +18,7 @@ export abstract class Renderable {
   protected _isDestroyed: boolean = false;
   protected _onDestroy: Subject<this> = new Subject();
   protected _onBeforeDestroy: Subject<AsyncEvent<this>> = new Subject();
+  protected _uid: number = uid();
 
   constructor(protected _container: Renderable|null = null) {
     this.onDestroy = this._onDestroy.asObservable();
@@ -33,6 +35,10 @@ export abstract class Renderable {
 
   get isDestroyed(): boolean {
     return this._isDestroyed;
+  }
+
+  get uid(): number {
+    return this._uid;
   }
 
   abstract render(): VNode;
