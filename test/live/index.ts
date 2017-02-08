@@ -13,9 +13,11 @@ import {
   XYDirection,
   Inject,
   ViewContainer,
-  ElementRef
+  ElementRef,
+  ViewComponent
 } from '../../src';
 
+@ViewComponent()
 class TestView {
   constructor(
     @Inject(ViewContainer) private container: ViewContainer<TestView>,
@@ -24,7 +26,7 @@ class TestView {
     element.innerHTML = '<div>TEST!!</div>';
     (<any>window).testComp = this;
 
-    container.beforeDestroyed.subscribe(e => {
+    container.beforeDestroy.subscribe(e => {
       e.wait(() => {
         return new Promise(resolve => {
           setTimeout(resolve, 0);

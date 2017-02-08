@@ -1,4 +1,4 @@
-import { Type, Inject, Optional } from '../di';
+import { Injector, Type, Inject, Optional } from '../di';
 import { Renderable } from '../dom';
 import { Observable, AsyncEvent } from '../events';
 import { ContainerRef, ConfigurationRef } from '../common';
@@ -15,16 +15,17 @@ export class ViewContainer<T> {
   isVisible: () => void = this._container.isVisible.bind(this._container);
   close: (args: { silent?: boolean }) => Promise<void> = this._container.close.bind(this._container);
   
-  beforeDestroyed: Observable<AsyncEvent<this>>;
+  beforeDestroy: Observable<AsyncEvent<this>>;
   destroyed: Observable<this>;
 
   private _view: T;
   
   constructor(
-    @Inject(ContainerRef) protected _container: View
+    @Inject(ContainerRef) protected _container: View,
+    @Inject(Injector) protected _injector: Injector
   ) {
-    this.beforeDestroyed = this._container.beforeDestroy.map(() => new AsyncEvent(this));
-    this.destroyed = this._container.beforeDestroy.map(() => this);
+    this.beforeDestroy = this._container.beforeDestroy.map(() => new AsyncEvent(this));
+    this.destroyed = this._container.destroyed.map(() => this);
   }
 
   get width(): number {
@@ -45,5 +46,9 @@ export class ViewContainer<T> {
     }
 
     this._view = view;
+  }
+
+  get(token: any): any {
+    return this._injector.get(token, null);
   }
 }
