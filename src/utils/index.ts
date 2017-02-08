@@ -27,3 +27,9 @@ export function get<T>(obj: any, path: string, defaultValue?: T): T|undefined {
 
   return result === undefined ? defaultValue : result;
 }
+
+export const uid: () => number = (() => {
+  let uid = 0;
+  
+  return () => uid++;
+})();

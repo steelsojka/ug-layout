@@ -60,6 +60,7 @@ export class XYItemContainer extends Renderable {
 
   render(): VNode {
     return h('div.ug-layout__xy-item-container', {
+      key: this._uid,
       style: {
         height: `${this._height}px`,
         width: `${this._width}px`

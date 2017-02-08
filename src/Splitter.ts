@@ -101,6 +101,7 @@ export class Splitter extends Renderable {
     const _class = this._isRow ? 'ug-layout__splitter-x' : 'ug-layout__splitter-y';
     
     return h(`div.ug-layout__splitter.${_class}`, {
+      key: this.uid,
       style: {
         height: this.height,
         width: this.width,

@@ -58,6 +58,7 @@ export class StackItemContainer extends Renderable {
 
   render(): VNode {
     return h('div.ug-layout__stack-item-container', {
+      key: this._uid,
       props: {
         hidden: !this.isActive
       },

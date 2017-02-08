@@ -113,9 +113,11 @@ export class XYContainer extends Renderable {
     this._children.splice(index, 1);
     item.destroy();
 
-    const splitter = this._splitters[clamp(index, 0, this._splitters.length - 1)];
+    const splitterIndex = clamp(index, 0, this._splitters.length - 1);
+    const splitter = this._splitters[splitterIndex];
 
     if (splitter) {
+      this._splitters.splice(splitterIndex, 1);
       splitter.destroy();
     }
     
