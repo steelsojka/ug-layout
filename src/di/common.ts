@@ -4,7 +4,6 @@ export interface Type<T> {
   new (...args: any[]): T;
 }
 
-
 export interface ClassProvider {
   provide: any;
   useClass: any;

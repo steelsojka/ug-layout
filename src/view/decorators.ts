@@ -4,7 +4,7 @@ import {
   ResolverStrategy
 } from './common';
 
-export function ViewComponent(config: ViewComponentConfig): ClassDecorator {
+export function ViewComponent(config: ViewComponentConfig = {}): ClassDecorator {
   return (target: Function): void => {
     config = Object.assign({
       resolution: ResolverStrategy.SINGLETON,
