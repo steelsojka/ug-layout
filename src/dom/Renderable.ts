@@ -10,8 +10,8 @@ import {
 import { uid } from '../utils';
 
 export abstract class Renderable {
-  onDestroy: Observable<this>;
-  onBeforeDestroy: Observable<AsyncEvent<this>>;
+  destroyed: Observable<this>;
+  beforeDestroy: Observable<AsyncEvent<this>>;
   
   protected _width: number;  
   protected _height: number;
@@ -21,8 +21,8 @@ export abstract class Renderable {
   protected _uid: number = uid();
 
   constructor(protected _container: Renderable|null = null) {
-    this.onDestroy = this._onDestroy.asObservable();
-    this.onBeforeDestroy = this._onBeforeDestroy.asObservable();
+    this.destroyed = this._onDestroy.asObservable();
+    this.beforeDestroy = this._onBeforeDestroy.asObservable();
   }
 
   get width(): number {

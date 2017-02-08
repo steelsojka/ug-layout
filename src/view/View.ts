@@ -6,62 +6,20 @@ import { Renderable, ConfiguredRenderable } from '../dom';
 import { ContainerRef, ConfigurationRef, ElementRef } from '../common';
 import { Stack } from '../Stack';
 import { ViewContainer } from './ViewContainer';
-import { ViewFactoriesRef, ViewFactoryRef } from './common';
-
-export interface ViewConfig {
-  injectable?: boolean;
-  name?: string;
-  factory?: ViewFactory|Type<any>;
-}
-
-export type ViewFactory = (element: HTMLElement, container: ViewContainer) => void;
+import { ViewConfig } from './common';
+import { ViewManager } from './ViewManager';
 
 export class View extends Renderable {
-  private _viewContainer: ViewContainer;
+  private _viewContainer: ViewContainer<any>;
   private _element: HTMLElement;
-  private _factory: ViewFactory|Type<any>;
-  private _viewInjector: Injector;
   
   constructor(
     @Inject(ContainerRef) protected _container: Renderable,
     @Inject(Injector) protected _injector: Injector,
-    @Inject(ConfigurationRef) private _configuration: ViewConfig|null,
-    @Inject(ViewFactoriesRef) @Optional() private _factories: Map<string, ViewFactory>|null
+    @Inject(ConfigurationRef) private _configuration: ViewConfig,
+    @Inject(ViewManager) private _viewManager: ViewManager
   ) {
     super(_container);
-
-    let providers: ProviderArg[] = [
-      { provide: ElementRef, useValue: forwardRef(() => this._element )},
-      { provide: ContainerRef, useValue: this },
-      ViewContainer
-    ];
-
-    if (this._configuration) {
-      if (this._configuration.factory) {
-        this._factory = this._configuration.factory;
-      } else if (this._factories) {
-        if (!this._configuration.name || !this._factories.has(this._configuration.name)) {
-          throw new Error(`${this._configuration.name} is not a configured view.`);
-        }
-
-        this._factory = this._factories.get(this._configuration.name) as ViewFactory;
-      }
-
-      if (this._configuration.injectable) {
-        providers.push({
-          provide: ViewFactoryRef,
-          useClass: this._factory as any
-        });
-      } else {
-        providers.push({
-          provide: ViewFactoryRef,
-          useFactory: () => (<ViewFactory>this._factory)(this._element, this._viewContainer)
-        });
-      }
-    }
-
-    this._viewInjector = Injector.fromInjectable(ViewContainer, providers, this._injector)
-    this._viewContainer = this._viewInjector.get(ViewContainer);
   }
 
   get width(): number {
@@ -102,7 +60,13 @@ export class View extends Renderable {
 
   private _onCreate(element: HTMLElement): void {
     this._element = element;
-    this._viewInjector.get(ViewFactoryRef, null);
+    
+    this._viewContainer = this._viewManager.create<any>({
+      element,
+      config: this._configuration,
+      injector: this._injector,
+      container: this
+    });
   }
 
   static configure(config: ViewConfig): ConfiguredRenderable<View> {

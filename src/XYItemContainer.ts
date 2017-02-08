@@ -47,7 +47,7 @@ export class XYItemContainer extends Renderable {
     )
       .get(ConfiguredRenderable);
 
-    this._item.onDestroy.subscribe(this._onItemDestroy.bind(this));
+    this._item.destroyed.subscribe(this._onItemDestroy.bind(this));
   }
 
   get width(): number {

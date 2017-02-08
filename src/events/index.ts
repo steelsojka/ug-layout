@@ -7,4 +7,5 @@ export * from './CancelAction';
 export * from './Cancellable';
 
 import 'rxjs/add/operator/toPromise';
+import 'rxjs/add/operator/map';
 import 'rxjs/add/observable/merge';

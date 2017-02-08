@@ -18,7 +18,7 @@ import {
 
 class TestView {
   constructor(
-    @Inject(ViewContainer) private container: ViewContainer,
+    @Inject(ViewContainer) private container: ViewContainer<TestView>,
     @Inject(ElementRef) private element: HTMLElement
   ) {
     element.innerHTML = '<div>TEST!!</div>';
@@ -45,13 +45,12 @@ const rootLayout = RootLayout.create({
           use: Row.configure({
             children: [{
               use: View.configure({
-                injectable: true,
-                factory: TestView
+                useClass: TestView
               })
             }, {
-              use: View
+              use: Row
             }, {
-              use: View
+              use: Row
             }]
           }),
           title: 'Test View 1'
@@ -65,13 +64,13 @@ const rootLayout = RootLayout.create({
               title: 'NESTED 1',
               use: Column.configure({
                 children: [{
-                  use: View
+                  use: Row
                 }, {
-                  use: View
+                  use: Row
                 }]
               })
             }, {
-              use: View,
+              use: Row,
               title: 'NESTED 2'
             }]
           }),
