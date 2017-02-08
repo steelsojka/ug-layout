@@ -63,7 +63,7 @@ export class StackHeader extends Renderable {
       .get(StackTab) as StackTab;
 
     tab.onSelection.subscribe(this._onTabSelection.bind(this));
-    tab.onDestroy.subscribe(tab => this.removeTab(tab));
+    tab.destroyed.subscribe(tab => this.removeTab(tab));
 
     this._tabs.push(tab);
 
