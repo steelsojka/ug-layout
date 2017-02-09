@@ -3,7 +3,7 @@ import h from 'snabbdom/h';
 
 import { Inject, Injector } from './di'
 import { Subject, Observable } from './events';
-import { Renderable, ConfiguredRenderable } from './dom';
+import { Renderable, ConfiguredRenderable, Transferable } from './dom';
 import { ContainerRef, ConfigurationRef } from './common';
 import { StackHeader } from './StackHeader';
 import { Stack } from './Stack';
@@ -22,12 +22,15 @@ export class StackTab extends Renderable {
   
   private _onSelection: Subject<StackTab> = new Subject();
   private _element: HTMLElement;
+  protected _container: StackHeader;
   
   constructor(
-    @Inject(ContainerRef) protected _container: StackHeader,
+    @Inject(ContainerRef) _container: StackHeader,
     @Inject(ConfigurationRef) private _config: StackTabConfig
   ) {
     super(_container);
+
+    this.setContainer(_container);
     
     this.onSelection = this._onSelection.asObservable();
     this._config = Object.assign({
@@ -57,6 +60,7 @@ export class StackTab extends Renderable {
         create: (oldNode, newNode) => this._element = newNode.elm as HTMLElement
       },
       on: {
+        mousedown: e => this._onMouseDown(e),
         click: () => this._onClick()
       }
     }, [
@@ -69,11 +73,13 @@ export class StackTab extends Renderable {
     ]);
   }  
 
-  resize(): void {}
-
   destroy(): void {
     this._onSelection.complete();
     super.destroy();
+  }
+
+  setContainer(container: StackHeader): void {
+    this._container = container;
   }
 
   private _getStyles(): { [key: string]: string } {
@@ -94,6 +100,10 @@ export class StackTab extends Renderable {
     }
     
     return result;
+  }
+
+  private _onMouseDown(e: MouseEvent): void {
+    
   }
 
   private async _onClose(e: MouseEvent): Promise<void> {

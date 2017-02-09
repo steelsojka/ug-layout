@@ -26,12 +26,10 @@ class TestView {
     element.innerHTML = '<div>TEST!!</div>';
     (<any>window).testComp = this;
 
+    container.visibilityChanges.subscribe(isVisible => console.log(isVisible));
+    container.sizeChanges.subscribe(size => console.log(size));
     container.beforeDestroy.subscribe(e => {
-      e.wait(() => {
-        return new Promise(resolve => {
-          setTimeout(resolve, 0);
-        })
-      });
+      console.log(e);
     });
   }
 }
@@ -46,9 +44,7 @@ const rootLayout = RootLayout.create({
         children: [{
           use: Row.configure({
             children: [{
-              use: View.configure({
-                useClass: TestView
-              })
+              use: Row
             }, {
               use: Row
             }, {
@@ -66,7 +62,9 @@ const rootLayout = RootLayout.create({
               title: 'NESTED 1',
               use: Column.configure({
                 children: [{
-                  use: Row
+                  use: View.configure({
+                    useClass: TestView
+                  })
                 }, {
                   use: Row
                 }]

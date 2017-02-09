@@ -15,18 +15,17 @@ export class ViewContainer<T> {
   isVisible: () => void = this._container.isVisible.bind(this._container);
   close: (args: { silent?: boolean }) => Promise<void> = this._container.close.bind(this._container);
   
-  beforeDestroy: Observable<AsyncEvent<this>>;
-  destroyed: Observable<this>;
+  beforeDestroy: Observable<AsyncEvent<Renderable>> = this._container.beforeDestroy;
+  destroyed: Observable<Renderable> = this._container.destroyed;
+  visibilityChanges: Observable<boolean> = this._container.visibilityChanges;
+  sizeChanges: Observable<{ width: number, height: number }> = this._container.sizeChanges;
 
   private _view: T;
   
   constructor(
     @Inject(ContainerRef) protected _container: View,
     @Inject(Injector) protected _injector: Injector
-  ) {
-    this.beforeDestroy = this._container.beforeDestroy.map(() => new AsyncEvent(this));
-    this.destroyed = this._container.destroyed.map(() => this);
-  }
+  ) {}
 
   get width(): number {
     return this._container.width;
