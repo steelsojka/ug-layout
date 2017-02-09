@@ -53,11 +53,7 @@ export class Layout extends Renderable {
   get width(): number {
     return this._container.width;
   }
-
-  resize(): void {
-    this._child.resize();
-  }
-
+  
   render(): VNode {
     return h('div.ug-layout__layout', {
       style: {
@@ -74,8 +70,8 @@ export class Layout extends Renderable {
     super.destroy();
   }
 
-  isVisible(): boolean {
-    return this._container.isVisible();
+  getChildren(): Renderable[] {
+    return [ this._child ];
   }
 
   static configure(config: LayoutConfig): ConfiguredRenderable<Layout> {

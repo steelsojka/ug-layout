@@ -9,9 +9,9 @@ import { Subject, Observable } from '../events';
 import { Deferred } from '../utils';
 
 export class Renderer {
-  onRender: Observable<void>;
+  rendered: Observable<void>;
   
-  private _onRender: Subject<void> = new Subject<void>();
+  private _rendered: Subject<void> = new Subject<void>();
   private _patch: (oldVNode: VNode|Node, newVNode: VNode) => VNode = snabbdom.init([
     DOMClass,
     DOMStyle,
@@ -20,11 +20,11 @@ export class Renderer {
   ]);
 
   constructor() {
-    this.onRender = this._onRender.asObservable();
+    this.rendered = this._rendered.asObservable();
   }
 
   destroy() {
-    this._onRender.complete();
+    this._rendered.complete();
   }
 
   patch(oldVNode: VNode|Node, newVNode: VNode): VNode {
@@ -32,6 +32,6 @@ export class Renderer {
   }
 
   render(): void {
-    this._onRender.next();
+    this._rendered.next();
   }
 }

@@ -74,14 +74,14 @@ export class XYItemContainer extends Renderable {
     this._width = args.width;
     this._height = args.height;
   }
-  
-  resize(): void {
-    this._item.resize();
-  }  
 
   destroy(): void {
     this._item.destroy();
     super.destroy();
+  }
+
+  getChildren(): Renderable[] {
+    return [ this._item ];
   }
 
   private _onItemDestroy(): void {

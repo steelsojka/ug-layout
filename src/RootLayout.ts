@@ -101,8 +101,8 @@ export class RootLayout extends Renderable {
 
     this.attach();
     this.resize();
-    this._lastVNode = this._renderer.patch(this._mountPoint, this.render());
-    this._renderer.onRender.subscribe(this._onRender.bind(this));
+    this._renderer.rendered.subscribe(this._onRender.bind(this));
+    this._renderer.render();
   }
 
   attach(): void {
@@ -125,8 +125,14 @@ export class RootLayout extends Renderable {
     return true;
   }
 
+  getChildren(): Renderable[] {
+    return [ this._layout ];
+  }
+
   private _onRender(): void {
-    this._lastVNode = this._renderer.patch(this._lastVNode as VNode, this.render());
+    const node = this._lastVNode ? this._lastVNode : this._mountPoint;
+    
+    this._lastVNode = this._renderer.patch(node, this.render());
   }
 
   static create(config: RootLayoutConfig): RootLayout {

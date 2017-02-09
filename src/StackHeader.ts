@@ -6,7 +6,7 @@ import { Renderable } from './dom';
 import { Stack } from './Stack';
 import { StackTab, StackTabConfigArgs } from './StackTab';
 import { ConfigurationRef, ContainerRef } from './common';
-import { Subject, Observable, CancelAction } from './events';
+import { Subject, Observable, CancelAction, AsyncEvent } from './events';
 
 export interface StackHeaderConfig {
   size: number;
@@ -20,9 +20,11 @@ export type StackHeaderConfigArgs = {
 
 export class StackHeader extends Renderable {
   tabSelected: Observable<StackTab>;
+  tabClosed: Observable<AsyncEvent<StackTab>>;
   
   private _tabs: StackTab[] = [];
   private _tabSelected: Subject<StackTab> = new Subject();
+  private _tabClosed: Subject<AsyncEvent<StackTab>> = new Subject();
   
   constructor(
     @Inject(Injector) private _injector: Injector,
@@ -32,6 +34,7 @@ export class StackHeader extends Renderable {
     super(_container);
     
     this.tabSelected = this._tabSelected.asObservable();
+    this.tabClosed = this._tabClosed.asObservable();
   } 
 
   get width(): number {
@@ -62,7 +65,14 @@ export class StackHeader extends Renderable {
     )
       .get(StackTab) as StackTab;
 
-    tab.onSelection.subscribe(this._onTabSelection.bind(this));
+    tab.onSelection
+      .takeUntil(tab.destroyed)
+      .subscribe(this._onTabSelection.bind(this));
+      
+    tab.beforeDestroy
+      .takeUntil(tab.destroyed)
+      .subscribe(e => this._tabClosed.next(e));
+      
     tab.destroyed.subscribe(tab => this.removeTab(tab));
 
     this._tabs.push(tab);
@@ -96,18 +106,16 @@ export class StackHeader extends Renderable {
     );
   }
 
-  resize(): void {
-    for (const tab of this._tabs) {
-      tab.resize();
-    }
-  }
-
   destroy(): void {
     for (const tab of this._tabs) {
       tab.destroy();
     }
 
     super.destroy();
+  }
+
+  getChildren(): StackTab[] {
+    return [ ...this._tabs ];
   }
 
   private _onTabSelection(tab: StackTab): void {

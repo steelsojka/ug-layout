@@ -6,6 +6,7 @@ import { Renderable, Renderer } from './dom';
 import { DocumentRef, ContainerRef, XYDirection, ConfigurationRef } from './common';
 import { XYContainer } from './XYContainer';
 import { Observable, ReplaySubject } from './events';
+import { DragEvent, Draggable } from './Draggable';
 
 export const SPLITTER_SIZE = 5;
 
@@ -13,41 +14,26 @@ export interface SplitterConfig {
   size: number;
 }
 
-export enum SplitterDragStatus {
-  START,
-  STOP,
-  DRAGGING  
-}
-
-export interface SplitterDragEvent {
-  splitter: Splitter;
-  x: number,
-  y: number,
-  dragStatus: SplitterDragStatus
-}
-
 export class Splitter extends Renderable {
-  dragStatus: Observable<SplitterDragEvent>;
+  dragStatus: Observable<DragEvent<Splitter>>;
   x: number = 0;
   y: number = 0;
   
   private _startX: number = 0;
   private _startY: number = 0;
   private _isDragging: boolean = false;
-  private _dragStatus: ReplaySubject<SplitterDragEvent> = new ReplaySubject(1);
   private _element: HTMLElement;
   
   constructor(
     @Inject(ConfigurationRef) private _config: SplitterConfig,
     @Inject(DocumentRef) private _document: Document,
     @Inject(Renderer) private _renderer: Renderer,
-    @Inject(ContainerRef) protected _container: XYContainer
+    @Inject(ContainerRef) protected _container: XYContainer,
+    @Inject(Draggable) protected _draggable: Draggable<Splitter>
   ) {
     super(_container);
     
-    this.dragStatus = this._dragStatus.asObservable();
-    this.onMouseMove = this.onMouseMove.bind(this);
-    this.onMouseUp = this.onMouseUp.bind(this);
+    this.dragStatus = this._draggable.drag;
   }
   
   get height(): number {
@@ -88,8 +74,6 @@ export class Splitter extends Renderable {
     return this._container.isRow;
   }
 
-  resize(): void {}
-
   dragTo(x = this.x, y = this.y): void {
     this.x = x;
     this.y = y;
@@ -115,55 +99,19 @@ export class Splitter extends Renderable {
       h('div.ug-layout__drag-handle', {
         style: this.handleStyles,
         on: {
-          mousedown: e => this.onMouseDown(e)
+          mousedown: e => this._onMouseDown(e)
         }
       })
     ]);
   }
 
   destroy(): void {
-    this._dragStatus.complete();  
+    this._draggable.destroy();
     super.destroy();
   }
 
-  private onMouseMove(e: MouseEvent): void {
-    if (!this._isDragging) {
-      return;
-    }
-
-    this._dragStatus.next({
-      dragStatus: SplitterDragStatus.DRAGGING,
-      x: e.x - this._startX,
-      y: e.y - this._startY,
-      splitter: this
-    });
-  }
-  
-  private onMouseUp(e: MouseEvent): void {
-    this._isDragging = false;
-    this._document.removeEventListener('mousemove', this.onMouseMove, false);
-    this._document.removeEventListener('mouseup', this.onMouseUp, false);
-    this._dragStatus.next({
-      dragStatus: SplitterDragStatus.STOP,
-      x: e.x - this._startX,
-      y: e.y - this._startY,
-      splitter: this
-    });
-  }
-
-  private onMouseDown(e: MouseEvent): void {
+  private _onMouseDown(e: MouseEvent): void {
     e.preventDefault();
-    
-    this._isDragging = true;
-    this._startX = e.x;
-    this._startY = e.y;
-    this._document.addEventListener('mousemove', this.onMouseMove, false);
-    this._document.addEventListener('mouseup', this.onMouseUp, false);
-    this._dragStatus.next({
-      dragStatus: SplitterDragStatus.START,
-      x: this._startX,
-      y: this._startY,
-      splitter: this
-    });
+    this._draggable.startDrag(this, e.x, e.y);
   }
 }

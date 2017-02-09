@@ -9,6 +9,11 @@ import {
 } from '../events';
 import { uid } from '../utils';
 
+export interface Transferable {
+  transferred: Observable<Transferable>;
+  transferTo(container: Renderable): void;
+}
+
 export abstract class Renderable {
   destroyed: Observable<this>;
   beforeDestroy: Observable<AsyncEvent<this>>;
@@ -16,13 +21,18 @@ export abstract class Renderable {
   protected _width: number;  
   protected _height: number;
   protected _isDestroyed: boolean = false;
-  protected _onDestroy: Subject<this> = new Subject();
-  protected _onBeforeDestroy: Subject<AsyncEvent<this>> = new Subject();
+  protected _destroyed: Subject<this> = new Subject();
+  protected _beforeDestroy: Subject<AsyncEvent<this>> = new Subject();
   protected _uid: number = uid();
 
   constructor(protected _container: Renderable|null = null) {
-    this.destroyed = this._onDestroy.asObservable();
-    this.beforeDestroy = this._onBeforeDestroy.asObservable();
+    this.destroyed = this._destroyed.asObservable();
+
+    if (this._container) {
+      this.beforeDestroy = Observable.merge(this._beforeDestroy, this._container.beforeDestroy.map(e => AsyncEvent.transfer(e, this)));
+    } else {
+      this.beforeDestroy = this._beforeDestroy.asObservable();
+    }
   }
 
   get width(): number {
@@ -42,7 +52,16 @@ export abstract class Renderable {
   }
 
   abstract render(): VNode;
-  abstract resize(): void;
+  
+  resize(): void {
+    for (const child of this.getChildren()) {
+      child.resize();
+    }
+  }
+  
+  getChildren(): Renderable[] {
+    return [];
+  }
   
   makeVisible(): void {
     if (this._container) {
@@ -60,10 +79,10 @@ export abstract class Renderable {
     }
     
     this._isDestroyed = true;
-    this._onDestroy.next(this);
+    this._destroyed.next(this);
 
-    this._onDestroy.complete();
-    this._onBeforeDestroy.complete();
+    this._destroyed.complete();
+    this._beforeDestroy.complete();
   }
 
   getParent<T extends Renderable>(Ctor: Type<T>): T|null {
@@ -90,6 +109,6 @@ export abstract class Renderable {
   }
 
   protected waitForDestroy(): Promise<this>  {
-    return Cancellable.dispatch(this._onBeforeDestroy, this).toPromise();
+    return Cancellable.dispatch(this._beforeDestroy, this).toPromise();
   }
 }

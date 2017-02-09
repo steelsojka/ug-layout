@@ -18,7 +18,8 @@ import {
   UNALLOCATED
 } from './common';
 import { XYItemContainer, XYItemContainerConfig } from './XYItemContainer';
-import { Splitter, SPLITTER_SIZE, SplitterDragEvent, SplitterDragStatus } from './Splitter';
+import { Draggable, DragStatus, DragEvent } from './Draggable';
+import { Splitter, SPLITTER_SIZE } from './Splitter';
 import { isNumber, clamp } from './utils';
 
 export interface XYContainerConfig {
@@ -159,9 +160,11 @@ export class XYContainer extends Renderable {
     this._calculateRatios();
     this._setDimensions();
 
-    for (const child of this._children) {
-      child.resize();
-    }
+    super.resize();
+  }
+
+  getChildren(): XYItemContainer[] {
+    return [ ...this._children ];
   }
 
   private _createSplitter(): Splitter {
@@ -174,6 +177,7 @@ export class XYContainer extends Renderable {
       [
         { provide: ContainerRef, useValue: this },
         { provide: ConfigurationRef, useValue: splitterConfig },
+        Draggable,
         Splitter
       ],
       this._injector
@@ -185,11 +189,11 @@ export class XYContainer extends Renderable {
     return splitter;
   }
 
-  private _dragStatusChanged(event: SplitterDragEvent): void {
-    switch (event.dragStatus) {
-      case SplitterDragStatus.START: return this._dragStart(event);
-      case SplitterDragStatus.STOP: return this._dragEnd(event);
-      case SplitterDragStatus.DRAGGING: return this._dragMove(event);
+  private _dragStatusChanged(event: DragEvent<Splitter>): void {
+    switch (event.status) {
+      case DragStatus.START: return this._dragStart(event);
+      case DragStatus.STOP: return this._dragEnd(event);
+      case DragStatus.DRAGGING: return this._dragMove(event);
     }
   }
 
@@ -202,23 +206,23 @@ export class XYContainer extends Renderable {
     };
   }
 
-  private _dragStart(event: SplitterDragEvent): void {
-    const { splitter } = event;
-    const { before, after } = this._getSplitterItems(splitter);
+  private _dragStart(event: DragEvent<Splitter>): void {
+    const { host } = event;
+    const { before, after } = this._getSplitterItems(host);
     
     this._dragLimitMin = (this.isRow ? -before.width : -before.height);
     this._dragLimitMax = (this.isRow ? after.width : after.height) - 50;
   }
 
-  private _dragEnd(event: SplitterDragEvent): void {
-    let { splitter, x, y } = event;
+  private _dragEnd(event: DragEvent<Splitter>): void {
+    let { host, x, y } = event;
     
-    splitter.dragTo(0, 0);
+    host.dragTo(0, 0);
 
     x = clamp(x, this._dragLimitMin, this._dragLimitMax);
     y = clamp(y, this._dragLimitMin, this._dragLimitMax);
 
-    this._updateSplitterItems(splitter, x, y);
+    this._updateSplitterItems(host, x, y);
     this._renderer.render();
   }
 
@@ -237,11 +241,11 @@ export class XYContainer extends Renderable {
     this.resize();
   }
   
-  private _dragMove(event: SplitterDragEvent): void {
+  private _dragMove(event: DragEvent<Splitter>): void {
     if (this.isRow) {
-      event.splitter.dragTo(clamp(event.x, this._dragLimitMin, this._dragLimitMax), event.splitter.y);
+      event.host.dragTo(clamp(event.x, this._dragLimitMin, this._dragLimitMax), event.host.y);
     } else {
-      event.splitter.dragTo(event.splitter.x, clamp(event.y, this._dragLimitMin, this._dragLimitMax));
+      event.host.dragTo(event.host.x, clamp(event.y, this._dragLimitMin, this._dragLimitMax));
     }
   }
 

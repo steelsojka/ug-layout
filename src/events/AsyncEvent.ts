@@ -18,4 +18,12 @@ export class AsyncEvent<T> {
       return Promise.resolve(fn()).then(() => value);
     });
   }
+
+  static transfer<T, U>(event: AsyncEvent<T>, value: U): AsyncEvent<U> {
+    const newEvent = new AsyncEvent(value);
+
+    newEvent.wait(() => event.done);
+
+    return newEvent;
+  }
 }

@@ -2,28 +2,41 @@ import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
 import { Inject, Injector } from './di'
-import { Renderable, RenderableInjector, ConfiguredRenderable } from './dom';
+import { Renderable, RenderableInjector, ConfiguredRenderable, Transferable } from './dom';
+import { AsyncEvent, Subject, Observable } from './events';
 import { 
   ConfigurationRef, 
   ContainerRef, 
   RenderableArg  
 } from './common';
 import { Stack } from './Stack';
+import { StackTab } from './StackTab';
 
 export interface StackItemContainerConfig {
   use: RenderableArg<Renderable>;
   title?: string;
 }
 
-export class StackItemContainer extends Renderable {
+export class StackItemContainer extends Renderable implements Transferable {
+  transferred: Observable<this>;
+  
   private _item: Renderable;
+  private _transferred: Subject<this> = new Subject();
+  protected _container: Stack;
   
   constructor(
     @Inject(Injector) private _injector: Injector,
     @Inject(ConfigurationRef) private _config: StackItemContainerConfig,
-    @Inject(ContainerRef) protected _container: Stack
+    @Inject(ContainerRef) _container: Stack
   ) {
     super(_container);
+
+    this.transferred = this._transferred.asObservable();
+    this._container = _container;
+    
+    this._container.beforeTabDestroy
+      .takeUntil(this.destroyed)
+      .subscribe(this._onTabDestroy.bind(this));
     
     this._item = RenderableInjector.fromRenderable(
       this._config.use, 
@@ -52,10 +65,6 @@ export class StackItemContainer extends Renderable {
     return this._container.isActiveContainer(this);
   }
 
-  resize(): void {
-    this._item.resize();
-  }
-
   render(): VNode {
     return h('div.ug-layout__stack-item-container', {
       key: this._uid,
@@ -70,6 +79,7 @@ export class StackItemContainer extends Renderable {
   }
 
   destroy(): void {
+    this._transferred.complete();
     this._item.destroy();
     super.destroy();
   }
@@ -81,5 +91,18 @@ export class StackItemContainer extends Renderable {
   makeVisible(): void {
     this._container.setActiveContainer(this);
     super.makeVisible();
+  }
+
+  transferTo(container: Stack): void {
+    this._container = container;
+    this._transferred.next(this);
+  }
+
+  getChildren(): Renderable[] {
+    return [ this._item ];
+  }
+
+  private _onTabDestroy(e: AsyncEvent<StackTab>): void {
+    this._beforeDestroy.next(AsyncEvent.transfer(e, this));
   }
 }
