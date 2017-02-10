@@ -20,7 +20,7 @@ export class Column extends XYContainer {
     @Inject(Injector) injector: Injector,
     @Inject(Renderer) renderer: Renderer
   ) {
-    super(container, config, injector, renderer);
+    super(config, injector, renderer, container);
   }
   
   static configure(config: ColumnConfig): ConfiguredRenderable<Column> {
