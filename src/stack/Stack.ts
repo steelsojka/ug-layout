@@ -13,6 +13,7 @@ import { ConfigurationRef, ContainerRef, RenderableArg, XYDirection } from '../c
 import { XYItemContainer, XYItemContainerConfig } from '../XYItemContainer';
 import { StackHeader, StackHeaderConfigArgs } from './StackHeader';
 import { TabCloseEvent } from './TabCloseEvent';
+import { TabSelectionEvent } from './TabSelectionEvent';
 import { StackItemCloseEvent } from './StackItemCloseEvent';
 import { StackItemContainer, StackItemContainerConfig } from './StackItemContainer';
 import { StackTab } from './StackTab';
@@ -79,6 +80,7 @@ export class Stack extends Renderable {
       .get(StackHeader);
 
     this._header.subscribe(TabCloseEvent, this._onTabClose.bind(this));
+    this._header.subscribe(TabSelectionEvent, this._onTabSelect.bind(this));
     
     if (this._config) {
       this._config.children.forEach(child => this.addChild(child));
@@ -148,8 +150,6 @@ export class Stack extends Renderable {
       maxSize: get<number>(this._config, 'header.maxTabSize', 200),
       title: config.title
     });
-
-    // item.transferred.first().subscribe(this._onItemTransfer.bind(this));
 
     this._children.push({ item, tab });
   }
@@ -238,6 +238,10 @@ export class Stack extends Renderable {
   
   private _setActive(entryKey: keyof StackEntry, item: StackItemContainer|StackTab): void {
     this.setActiveIndex(this._getIndexOf(entryKey, item));
+  }
+
+  private _onTabSelect(e: TabSelectionEvent): void {
+    this.setActiveTab(e.target);
   }
 
   static configure(config: StackConfig): ConfiguredRenderable<Stack> {

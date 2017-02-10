@@ -4,8 +4,10 @@ import h from 'snabbdom/h';
 import { Inject, Injector } from '../di';
 import { Renderable } from '../dom';
 import { Stack } from './Stack';
+import { Draggable } from '../Draggable';
 import { StackTab, StackTabConfigArgs } from './StackTab';
 import { TabCloseEvent } from './TabCloseEvent';
+import { TabSelectionEvent } from './TabSelectionEvent';
 import { ConfigurationRef, ContainerRef } from '../common';
 import { Subject, Observable, BeforeDestroyEvent } from '../events';
 
@@ -60,13 +62,14 @@ export class StackHeader extends Renderable {
       [
         { provide: ContainerRef, useValue: this },
         { provide: ConfigurationRef, useValue: config },
+        Draggable,
         StackTab 
       ],
       this._injector
     )
       .get(StackTab) as StackTab;
 
-    tab.selection.subscribe(this._onTabSelection.bind(this));
+    tab.subscribe(TabSelectionEvent, this._onTabSelection.bind(this));
 
     tab.subscribe(BeforeDestroyEvent, e => {
       this._eventBus.next(e.delegate(TabCloseEvent));
@@ -117,8 +120,7 @@ export class StackHeader extends Renderable {
     return [ ...this._tabs ];
   }
 
-  private _onTabSelection(tab: StackTab): void {
-    this._tabSelected.next(tab);
-    this._container.setActiveTab(tab);
+  private _onTabSelection(event: TabSelectionEvent): void {
+    this._eventBus.next(event);
   }
 }
