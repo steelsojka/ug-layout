@@ -29,8 +29,6 @@ export class StackTab extends Renderable {
     @Inject(ConfigurationRef) private _config: StackTabConfig
   ) {
     super(_container);
-
-    this.setContainer(_container);
     
     this.onSelection = this._onSelection.asObservable();
     this._config = Object.assign({
@@ -76,10 +74,6 @@ export class StackTab extends Renderable {
   destroy(): void {
     this._onSelection.complete();
     super.destroy();
-  }
-
-  setContainer(container: StackHeader): void {
-    this._container = container;
   }
 
   private _getStyles(): { [key: string]: string } {

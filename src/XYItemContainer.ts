@@ -23,13 +23,14 @@ export class XYItemContainer extends Renderable {
   
   protected _height: number = 0;
   protected _width: number = 0;
+  protected _container: XYContainer;
   
   private _item: Renderable;
 
   constructor(
     @Inject(Injector) private _injector: Injector,
-    @Inject(ContainerRef) protected _container: XYContainer,
-    @Inject(ConfigurationRef) private _config: XYItemContainerConfig
+    @Inject(ConfigurationRef) private _config: XYItemContainerConfig,
+    @Inject(ContainerRef) _container: XYContainer
   ) {
     super(_container);
     

@@ -20,7 +20,7 @@ export class Row extends XYContainer {
     @Inject(Injector) injector: Injector,
     @Inject(Renderer) renderer: Renderer
   ) {
-    super(container, config, injector, renderer);
+    super(config, injector, renderer, container);
   }
 
   static configure(config: RowConfig): ConfiguredRenderable<Row> {

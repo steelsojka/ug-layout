@@ -36,12 +36,13 @@ export class XYContainer extends Renderable {
   protected _splitters: Splitter[] = [];
   protected _dragLimitMin: number = 0;
   protected _dragLimitMax: number = 0;
+  protected _container: Renderable;
 
   constructor(
-    @Inject(ContainerRef) protected _container: Renderable,
     @Inject(ConfigurationRef) protected _config: XYContainerConfig|null,
     @Inject(Injector) protected _injector: Injector,
-    @Inject(Renderer) protected _renderer: Renderer
+    @Inject(Renderer) protected _renderer: Renderer,
+    @Inject(ContainerRef) _container: Renderable
   ) {
     super(_container);
     

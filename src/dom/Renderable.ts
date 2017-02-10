@@ -16,6 +16,7 @@ export interface Transferable {
 export abstract class Renderable {
   destroyed: Observable<this>;
   beforeDestroy: Observable<Cancellable<Renderable>>;
+  containerChange: Observable<Renderable|null>;
   
   protected _width: number;  
   protected _height: number;
@@ -23,15 +24,22 @@ export abstract class Renderable {
   protected _destroyed: Subject<this> = new Subject();
   protected _beforeDestroy: Subject<Cancellable<Renderable>> = new Subject();
   protected _uid: number = uid();
+  protected _container: Renderable|null = null
+  protected _containerChange: Subject<Renderable|null> = new Subject<Renderable|null>();
 
-  constructor(protected _container: Renderable|null = null) {
+  constructor(_container: Renderable|null = null) {
     this.destroyed = this._destroyed.asObservable();
+    this.beforeDestroy = this._beforeDestroy.asObservable();
+    this.containerChange = this._containerChange.asObservable();
+    this.setContainer(_container);
 
-    if (this._container) {
-      this.beforeDestroy = Observable.merge(this._beforeDestroy, this._container.beforeDestroy);
-    } else {
-      this.beforeDestroy = this._beforeDestroy.asObservable();
-    }
+    this.containerChange.subscribe(container => {
+      if (container) {
+        container.beforeDestroy
+          .takeUntil(this.containerChange)
+          .subscribe(e => this._beforeDestroy.next(e));
+      }
+    });
   }
 
   get width(): number {
@@ -105,6 +113,11 @@ export abstract class Renderable {
     }
 
     return result;
+  }
+
+  setContainer(container: Renderable|null): void {
+    this._container = container;
+    this._containerChange.next(container);
   }
 
   protected waitForDestroy(): Observable<this>  {
