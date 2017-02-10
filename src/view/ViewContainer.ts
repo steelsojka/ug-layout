@@ -1,6 +1,6 @@
 import { Injector, Type, Inject, Optional } from '../di';
 import { Renderable } from '../dom';
-import { Observable, Cancellable } from '../events';
+import { Observable, BeforeDestroyEvent } from '../events';
 import { ContainerRef, ConfigurationRef } from '../common';
 import { View } from './View';
 import { ViewFactoriesRef, ViewComponentRef } from './common';
@@ -15,7 +15,7 @@ export class ViewContainer<T> {
   isVisible: () => void = this._container.isVisible.bind(this._container);
   close: (args: { silent?: boolean }) => Promise<void> = this._container.close.bind(this._container);
   
-  beforeDestroy: Observable<Cancellable<Renderable>> = this._container.beforeDestroy;
+  beforeDestroy: Observable<BeforeDestroyEvent<Renderable>> = this._container.scope(BeforeDestroyEvent);
   destroyed: Observable<Renderable> = this._container.destroyed;
   visibilityChanges: Observable<boolean> = this._container.visibilityChanges;
   sizeChanges: Observable<{ width: number, height: number }> = this._container.sizeChanges;

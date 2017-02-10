@@ -19,6 +19,7 @@ import {
 } from './common';
 import { XYItemContainer, XYItemContainerConfig } from './XYItemContainer';
 import { Draggable, DragStatus, DragEvent } from './Draggable';
+import { BeforeDestroyEvent } from './events';
 import { Splitter, SPLITTER_SIZE } from './Splitter';
 import { isNumber, clamp } from './utils';
 

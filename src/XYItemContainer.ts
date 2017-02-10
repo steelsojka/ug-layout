@@ -11,6 +11,7 @@ import {
   RenderableArg  
 } from './common';
 import { isNumber } from './utils';
+import { BeforeDestroyEvent } from './events';
 import { XYContainer } from './XYContainer';
 
 export interface XYItemContainerConfig {

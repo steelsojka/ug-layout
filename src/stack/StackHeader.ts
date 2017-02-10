@@ -1,12 +1,13 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
-import { Inject, Injector } from './di';
-import { Renderable } from './dom';
+import { Inject, Injector } from '../di';
+import { Renderable } from '../dom';
 import { Stack } from './Stack';
 import { StackTab, StackTabConfigArgs } from './StackTab';
-import { ConfigurationRef, ContainerRef } from './common';
-import { Subject, Observable, Cancellable } from './events';
+import { TabCloseEvent } from './TabCloseEvent';
+import { ConfigurationRef, ContainerRef } from '../common';
+import { Subject, Observable, BeforeDestroyEvent } from '../events';
 
 export interface StackHeaderConfig {
   size: number;
@@ -20,11 +21,11 @@ export type StackHeaderConfigArgs = {
 
 export class StackHeader extends Renderable {
   tabSelected: Observable<StackTab>;
-  tabClosed: Observable<Cancellable<StackTab>>;
+  tabClosed: Observable<BeforeDestroyEvent<StackTab>>;
   
   private _tabs: StackTab[] = [];
   private _tabSelected: Subject<StackTab> = new Subject();
-  private _tabClosed: Subject<Cancellable<StackTab>> = new Subject();
+  private _tabClosed: Subject<BeforeDestroyEvent<StackTab>> = new Subject();
   
   constructor(
     @Inject(Injector) private _injector: Injector,
@@ -65,11 +66,10 @@ export class StackHeader extends Renderable {
     )
       .get(StackTab) as StackTab;
 
-    tab.onSelection.subscribe(this._onTabSelection.bind(this));
-      
-    tab.beforeDestroy.subscribe(e => {
-      this._tabClosed.next(e as Cancellable<StackTab>);
-      console.log(e);
+    tab.selection.subscribe(this._onTabSelection.bind(this));
+
+    tab.subscribe(BeforeDestroyEvent, e => {
+      this._eventBus.next(e.delegate(TabCloseEvent));
     });
       
     tab.destroyed.subscribe(tab => this.removeTab(tab));

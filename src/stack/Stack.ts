@@ -1,20 +1,22 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
-import { Inject, Injector } from './di';
+import { Inject, Injector } from '../di';
 import { 
   RenderableInjector, 
   Renderable, 
   ConfiguredRenderable,
   Renderer
-} from './dom';
-import { AsyncEvent, Subject, Observable } from './events';
-import { ConfigurationRef, ContainerRef, RenderableArg, XYDirection } from './common';
-import { XYItemContainer, XYItemContainerConfig } from './XYItemContainer';
+} from '../dom';
+import { BeforeDestroyEvent, BusEvent, Subject, Observable } from '../events';
+import { ConfigurationRef, ContainerRef, RenderableArg, XYDirection } from '../common';
+import { XYItemContainer, XYItemContainerConfig } from '../XYItemContainer';
 import { StackHeader, StackHeaderConfigArgs } from './StackHeader';
+import { TabCloseEvent } from './TabCloseEvent';
+import { StackItemCloseEvent } from './StackItemCloseEvent';
 import { StackItemContainer, StackItemContainerConfig } from './StackItemContainer';
 import { StackTab } from './StackTab';
-import { clamp, get, isNumber } from './utils';
+import { clamp, get, isNumber } from '../utils';
 
 export interface StackConfig {
   children: StackItemContainerConfig[];
@@ -32,7 +34,6 @@ export interface StackEntry {
 export const DEFAULT_STACK_HEADER_SIZE = 25;
 
 export class Stack extends Renderable {
-  beforeTabDestroy: Observable<AsyncEvent<StackTab>>;
   getIndexOfContainer: (container: StackItemContainer) => number = this._getIndexOf.bind(this, 'item');
   getIndexOfTab: (tab: StackTab) => number = this._getIndexOf.bind(this, 'tab');
   isActiveContainer: (container: StackItemContainer) => boolean = this._isActive.bind(this, 'item');
@@ -48,7 +49,6 @@ export class Stack extends Renderable {
   private _direction: XYDirection;
   private _header: StackHeader;
   private _activeIndex: number = 0;
-  private _beforeTabDestroy: Subject<AsyncEvent<StackTab>> = new Subject();
   
   constructor(
     @Inject(Injector) private _injector: Injector,
@@ -57,8 +57,6 @@ export class Stack extends Renderable {
     @Inject(ContainerRef) protected _container: Renderable
   ) {
     super(_container);
-
-    this.beforeTabDestroy = this._beforeTabDestroy.asObservable();
     
     const headerConfig = {
       size: DEFAULT_STACK_HEADER_SIZE  
@@ -80,7 +78,7 @@ export class Stack extends Renderable {
     )
       .get(StackHeader);
 
-    this._header.tabClosed.subscribe(this._onBeforeTabDestroy.bind(this));
+    this._header.subscribe(TabCloseEvent, this._onTabClose.bind(this));
     
     if (this._config) {
       this._config.children.forEach(child => this.addChild(child));
@@ -198,13 +196,11 @@ export class Stack extends Renderable {
     return this._children.map(entry => entry.item);
   }
 
-  private _onBeforeTabDestroy(e: AsyncEvent<StackTab>): void {
-    const { value:tab } = e;
-
-    const container = this.getContainerAtIndex(this.getIndexOfTab(tab));
+  private _onTabClose(e: TabCloseEvent): void {
+    const container = this.getContainerAtIndex(this.getIndexOfTab(e.target));
 
     if (container) {
-      this._beforeTabDestroy.next(e);
+      this._eventBus.next(e.delegate(StackItemCloseEvent, container));
     }
   }
 

@@ -12,6 +12,10 @@ export function isObject(val: any): boolean {
   return typeof val === 'object';
 }
 
+export function isFunction(val: any): val is Function {
+  return typeof val === 'function';
+}
+
 export function get<T>(obj: any, path: string, defaultValue?: T): T|undefined {
   const pathParts = path.split('.');
 

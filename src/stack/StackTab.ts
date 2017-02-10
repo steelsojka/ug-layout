@@ -1,10 +1,15 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
-import { Inject, Injector } from './di'
-import { Subject, Observable } from './events';
-import { Renderable, ConfiguredRenderable, Transferable } from './dom';
-import { ContainerRef, ConfigurationRef } from './common';
+import { Inject, Injector } from '../di'
+import { 
+  Subject, 
+  Observable, 
+  Cancellable,
+  BeforeDestroyEvent
+} from '../events';
+import { Renderable, ConfiguredRenderable, Transferable } from '../dom';
+import { ContainerRef, ConfigurationRef } from '../common';
 import { StackHeader } from './StackHeader';
 import { Stack } from './Stack';
 
@@ -18,9 +23,11 @@ export type StackTabConfigArgs = {
 }
 
 export class StackTab extends Renderable {
-  onSelection: Observable<StackTab>;
+  selection: Observable<StackTab>;
+  close: Observable<Cancellable<StackTab>>;
   
-  private _onSelection: Subject<StackTab> = new Subject();
+  private _selection: Subject<StackTab> = new Subject();
+  private _close: Subject<Cancellable<StackTab>> = new Subject();
   private _element: HTMLElement;
   protected _container: StackHeader;
   
@@ -30,7 +37,7 @@ export class StackTab extends Renderable {
   ) {
     super(_container);
     
-    this.onSelection = this._onSelection.asObservable();
+    this.selection = this._selection.asObservable();
     this._config = Object.assign({
       maxSize: 150,
       title: ''   
@@ -72,7 +79,7 @@ export class StackTab extends Renderable {
   }  
 
   destroy(): void {
-    this._onSelection.complete();
+    this._selection.complete();
     super.destroy();
   }
 
@@ -102,12 +109,14 @@ export class StackTab extends Renderable {
 
   private _onClose(e: MouseEvent): void {
     e.stopPropagation();
-    
-    this.waitForDestroy()
-      .subscribe(() => this.destroy());
+
+    const event = new BeforeDestroyEvent(this);
+
+    this._eventBus.next(event);
+    event.results().subscribe(() => this.destroy());
   }
 
   private _onClick(): void {
-    this._onSelection.next(this);
+    this._selection.next(this);
   }
 }
