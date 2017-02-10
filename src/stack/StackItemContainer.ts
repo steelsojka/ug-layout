@@ -1,16 +1,17 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
-import { Inject, Injector } from './di'
-import { Renderable, RenderableInjector, ConfiguredRenderable, Transferable } from './dom';
-import { Cancellable, Subject, Observable } from './events';
+import { Inject, Injector } from '../di'
+import { Renderable, RenderableInjector, ConfiguredRenderable, Transferable } from '../dom';
+import { BeforeDestroyEvent, Cancellable, Subject, Observable } from '../events';
 import { 
   ConfigurationRef, 
   ContainerRef, 
   RenderableArg  
-} from './common';
+} from '../common';
 import { Stack } from './Stack';
 import { StackTab } from './StackTab';
+import { StackItemCloseEvent } from './StackItemCloseEvent';
 
 export interface StackItemContainerConfig {
   use: RenderableArg<Renderable>;
@@ -33,10 +34,6 @@ export class StackItemContainer extends Renderable implements Transferable {
 
     this.transferred = this._transferred.asObservable();
     this._container = _container;
-    
-    this._container.beforeTabDestroy
-      .takeUntil(this.destroyed)
-      .subscribe(this._onTabDestroy.bind(this));
     
     this._item = RenderableInjector.fromRenderable(
       this._config.use, 
@@ -102,7 +99,19 @@ export class StackItemContainer extends Renderable implements Transferable {
     return [ this._item ];
   }
 
-  private _onTabDestroy(e: Cancellable<StackTab>): void {
-    this._beforeDestroy.next(e);
+  setContainer(container: Stack): void {
+    if (container === this._container) {
+      return;
+    }
+    
+    super.setContainer(container);
+
+    this._container.scope(StackItemCloseEvent)
+      .filter(e => e.target === this)
+      .subscribe(this._onTabClose.bind(this));
+  }
+
+  private _onTabClose(e: StackItemCloseEvent): void {
+    this.emitDown(e.delegate(BeforeDestroyEvent, this));
   }
 }

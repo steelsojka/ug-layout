@@ -7,7 +7,7 @@ import { ContainerRef, ConfigurationRef, ElementRef } from '../common';
 import { Stack } from '../Stack';
 import { ViewContainer } from './ViewContainer';
 import { ViewConfig } from './common';
-import { Subject, Observable } from '../events';
+import { Subject, Observable, BeforeDestroyEvent } from '../events';
 import { ViewManager } from './ViewManager';
 
 export class View extends Renderable {
@@ -63,7 +63,10 @@ export class View extends Renderable {
     const { silent = false } = args;
     
     if (!silent) {
-      this.waitForDestroy().subscribe(() => this.destroy());
+      const event = new BeforeDestroyEvent(this);
+      
+      this._eventBus.next(event);
+      event.results().subscribe(() => this.destroy());
     } else {
       this.destroy();
     }

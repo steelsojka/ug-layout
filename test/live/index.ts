@@ -32,6 +32,9 @@ class TestView {
     container.sizeChanges.subscribe(size => console.log(size));
     container.beforeDestroy.subscribe(e => {
       e.wait(() => {
+        return new Promise(resolve => {
+          setTimeout(resolve, 3000);
+        });
       });
     });
   }
