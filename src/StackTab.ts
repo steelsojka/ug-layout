@@ -106,11 +106,11 @@ export class StackTab extends Renderable {
     
   }
 
-  private async _onClose(e: MouseEvent): Promise<void> {
+  private _onClose(e: MouseEvent): void {
     e.stopPropagation();
     
-    await this.waitForDestroy();
-    this.destroy();
+    this.waitForDestroy()
+      .subscribe(() => this.destroy());
   }
 
   private _onClick(): void {

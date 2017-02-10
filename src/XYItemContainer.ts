@@ -36,7 +36,7 @@ export class XYItemContainer extends Renderable {
     if (this._config) {
       this.ratio = isNumber(this._config.ratio) ? this._config.ratio : UNALLOCATED;
     }
-    
+
     this._item = RenderableInjector.fromRenderable(
       this._config.use, 
       [

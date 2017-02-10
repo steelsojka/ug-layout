@@ -54,14 +54,19 @@ export class View extends Renderable {
     });
   }
 
-  async close(args: { silent?: boolean } = {}): Promise<void> {
+  destroy(): void {
+    this._sizeChanges.complete();
+    this._visiblityChanges.complete();
+  }
+
+  close(args: { silent?: boolean } = {}): void {
     const { silent = false } = args;
     
     if (!silent) {
-      await this.waitForDestroy();
+      this.waitForDestroy().subscribe(() => this.destroy());
+    } else {
+      this.destroy();
     }
-
-    this.destroy();
   }
 
   private _postRender(): void {

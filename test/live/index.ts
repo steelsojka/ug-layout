@@ -2,6 +2,7 @@ import 'babel-polyfill';
 import 'reflect-metadata';
 import '../../src/styles/core.css';
 import './index.css';
+import { Observable } from 'rxjs/Rx';
 
 import { 
   RootLayout, 
@@ -14,7 +15,8 @@ import {
   Inject,
   ViewContainer,
   ElementRef,
-  ViewComponent
+  ViewComponent,
+  CancelAction
 } from '../../src';
 
 @ViewComponent()
@@ -29,7 +31,8 @@ class TestView {
     container.visibilityChanges.subscribe(isVisible => console.log(isVisible));
     container.sizeChanges.subscribe(size => console.log(size));
     container.beforeDestroy.subscribe(e => {
-      console.log(e);
+      e.wait(() => {
+      });
     });
   }
 }
@@ -54,10 +57,6 @@ const rootLayout = RootLayout.create({
           title: 'Test View 1'
         }, {
           use: Stack.configure({
-            direction: XYDirection.Y,
-            header: {
-              size: 100
-            },
             children: [{
               title: 'NESTED 1',
               use: Column.configure({

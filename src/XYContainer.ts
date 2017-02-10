@@ -43,7 +43,7 @@ export class XYContainer extends Renderable {
     @Inject(Injector) protected _injector: Injector,
     @Inject(Renderer) protected _renderer: Renderer
   ) {
-    super();
+    super(_container);
     
     const children = this._config && this._config.children ? this._config.children : [];
     
@@ -90,7 +90,7 @@ export class XYContainer extends Renderable {
       this._injector
     )
       .get(XYItemContainer) as XYItemContainer;
-
+      
     if (typeof index === 'number') {
       this._children.splice(index, 0, item);
     } else {

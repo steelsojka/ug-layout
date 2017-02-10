@@ -14,7 +14,7 @@ import { XYItemContainer, XYItemContainerConfig } from './XYItemContainer';
 import { StackHeader, StackHeaderConfigArgs } from './StackHeader';
 import { StackItemContainer, StackItemContainerConfig } from './StackItemContainer';
 import { StackTab } from './StackTab';
-import { clamp, get } from './utils';
+import { clamp, get, isNumber } from './utils';
 
 export interface StackConfig {
   children: StackItemContainerConfig[];
@@ -84,6 +84,7 @@ export class Stack extends Renderable {
     
     if (this._config) {
       this._config.children.forEach(child => this.addChild(child));
+      this.setActiveIndex(this._config.startIndex);
     }
   }
 
@@ -155,7 +156,11 @@ export class Stack extends Renderable {
     this._children.push({ item, tab });
   }
 
-  setActiveIndex(index: number): void {
+  setActiveIndex(index?: number): void {
+    if (!isNumber(index)) {
+      return;
+    }
+    
     this._activeIndex = clamp(index, 0, this._children.length - 1);
     this._renderer.render();
   }
@@ -174,6 +179,7 @@ export class Stack extends Renderable {
     }
 
     this._children.splice(index, 1);
+    
     this._activeIndex = clamp(this._activeIndex, 0, this._children.length - 1);
     this._renderer.render();
   }

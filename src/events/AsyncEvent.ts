@@ -19,7 +19,7 @@ export class AsyncEvent<T> {
     });
   }
 
-  static transfer<T, U>(event: AsyncEvent<T>, value: U): AsyncEvent<U> {
+  static merge<T, U>(event: AsyncEvent<T>, value: U): AsyncEvent<U> {
     const newEvent = new AsyncEvent(value);
 
     newEvent.wait(() => event.done);
