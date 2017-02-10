@@ -4,10 +4,14 @@ import { Subject } from 'rxjs/Subject';
 import { AsyncEvent } from './AsyncEvent';
 import { CancelAction } from './CancelAction';
 
-export abstract class Cancellable {
-  static dispatch<T>(subject: Subject<AsyncEvent<T>>, value: T): Observable<T> {
+export class Cancellable<T> extends AsyncEvent<T> {
+  cancel(): void {
+    throw new CancelAction();  
+  }
+  
+  static dispatch<T>(subject: Subject<Cancellable<T>>, value: T): Observable<T> {
     return Observable.create(async subscriber => {
-      const event = new AsyncEvent(value);
+      const event = new Cancellable(value);
 
       subject.next(event);
 

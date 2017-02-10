@@ -3,7 +3,7 @@ import h from 'snabbdom/h';
 
 import { Inject, Injector } from './di'
 import { Renderable, RenderableInjector, ConfiguredRenderable, Transferable } from './dom';
-import { AsyncEvent, Subject, Observable } from './events';
+import { Cancellable, Subject, Observable } from './events';
 import { 
   ConfigurationRef, 
   ContainerRef, 
@@ -102,7 +102,7 @@ export class StackItemContainer extends Renderable implements Transferable {
     return [ this._item ];
   }
 
-  private _onTabDestroy(e: AsyncEvent<StackTab>): void {
-    this._beforeDestroy.next(AsyncEvent.transfer(e, this));
+  private _onTabDestroy(e: Cancellable<StackTab>): void {
+    this._beforeDestroy.next(e);
   }
 }

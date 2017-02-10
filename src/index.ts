@@ -2,6 +2,7 @@ export * from './di';
 export * from './view';
 export * from './dom';
 export * from './common';
+export * from './events';
 export * from './Layout';
 export * from './RootLayout';
 export * from './Row';

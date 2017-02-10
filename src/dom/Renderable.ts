@@ -4,8 +4,7 @@ import { Type } from '../di';
 import { 
   Observable, 
   Subject, 
-  Cancellable,
-  AsyncEvent
+  Cancellable
 } from '../events';
 import { uid } from '../utils';
 
@@ -16,20 +15,20 @@ export interface Transferable {
 
 export abstract class Renderable {
   destroyed: Observable<this>;
-  beforeDestroy: Observable<AsyncEvent<this>>;
+  beforeDestroy: Observable<Cancellable<Renderable>>;
   
   protected _width: number;  
   protected _height: number;
   protected _isDestroyed: boolean = false;
   protected _destroyed: Subject<this> = new Subject();
-  protected _beforeDestroy: Subject<AsyncEvent<this>> = new Subject();
+  protected _beforeDestroy: Subject<Cancellable<Renderable>> = new Subject();
   protected _uid: number = uid();
 
   constructor(protected _container: Renderable|null = null) {
     this.destroyed = this._destroyed.asObservable();
 
     if (this._container) {
-      this.beforeDestroy = Observable.merge(this._beforeDestroy, this._container.beforeDestroy.map(e => AsyncEvent.transfer(e, this)));
+      this.beforeDestroy = Observable.merge(this._beforeDestroy, this._container.beforeDestroy);
     } else {
       this.beforeDestroy = this._beforeDestroy.asObservable();
     }
@@ -108,7 +107,7 @@ export abstract class Renderable {
     return result;
   }
 
-  protected waitForDestroy(): Promise<this>  {
-    return Cancellable.dispatch(this._beforeDestroy, this).toPromise();
+  protected waitForDestroy(): Observable<this>  {
+    return Cancellable.dispatch(this._beforeDestroy, this);
   }
 }
