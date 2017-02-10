@@ -8,7 +8,9 @@ import {
   Cancellable,
   BeforeDestroyEvent
 } from '../events';
+import { TabSelectionEvent } from './TabSelectionEvent';
 import { Renderable, ConfiguredRenderable, Transferable } from '../dom';
+import { Draggable } from '..//Draggable';
 import { ContainerRef, ConfigurationRef } from '../common';
 import { StackHeader } from './StackHeader';
 import { Stack } from './Stack';
@@ -23,21 +25,16 @@ export type StackTabConfigArgs = {
 }
 
 export class StackTab extends Renderable {
-  selection: Observable<StackTab>;
-  close: Observable<Cancellable<StackTab>>;
-  
-  private _selection: Subject<StackTab> = new Subject();
-  private _close: Subject<Cancellable<StackTab>> = new Subject();
   private _element: HTMLElement;
   protected _container: StackHeader;
   
   constructor(
     @Inject(ContainerRef) _container: StackHeader,
-    @Inject(ConfigurationRef) private _config: StackTabConfig
+    @Inject(ConfigurationRef) private _config: StackTabConfig,
+    @Inject(Draggable) private _draggable: Draggable<StackTab>
   ) {
     super(_container);
     
-    this.selection = this._selection.asObservable();
     this._config = Object.assign({
       maxSize: 150,
       title: ''   
@@ -79,7 +76,7 @@ export class StackTab extends Renderable {
   }  
 
   destroy(): void {
-    this._selection.complete();
+    this._draggable.destroy();
     super.destroy();
   }
 
@@ -104,7 +101,7 @@ export class StackTab extends Renderable {
   }
 
   private _onMouseDown(e: MouseEvent): void {
-    
+    this._draggable.startDrag(this, e.x, e.y);
   }
 
   private _onClose(e: MouseEvent): void {
@@ -117,6 +114,6 @@ export class StackTab extends Renderable {
   }
 
   private _onClick(): void {
-    this._selection.next(this);
+    this._eventBus.next(new TabSelectionEvent(this));
   }
 }
