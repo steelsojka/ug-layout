@@ -3,6 +3,7 @@ import { BusEvent, BusEventOptions } from '../events';
 
 export interface MinimizeCommandOptions extends BusEventOptions {
   size?: number;
+  minimize?: boolean;
 }
 
 export class MinimizeCommand<T> extends Command<T> {
@@ -18,5 +19,9 @@ export class MinimizeCommand<T> extends Command<T> {
   
   get size(): number {
     return this.options.size || 0;
+  }
+
+  get minimize(): boolean|undefined {
+    return this._options.minimize;
   }
 }

@@ -28,6 +28,12 @@ export interface XYContainerConfig {
   children: XYItemContainerConfig[];
 }
 
+export interface XYSizingOptions {
+  distribute?: boolean;
+}
+
+type AdjacentResults = { before: XYItemContainer|null, after: XYItemContainer|null };
+
 export class XYContainer extends Renderable {
   protected _height: number = 0;
   protected _width: number = 0;
@@ -80,6 +86,8 @@ export class XYContainer extends Renderable {
 
   addChild(config: XYItemContainerConfig, options: { index?: number } = {}) {
     const { index } = options
+
+    const splitter = this._createSplitter();
     
     const item = Injector.fromInjectable(
       XYItemContainer, 
@@ -87,6 +95,7 @@ export class XYContainer extends Renderable {
         { provide: ContainerRef, useValue: this },
         { provide: XYContainer, useValue: this },
         { provide: ConfigurationRef, useValue: config },
+        { provide: Splitter, useValue: splitter },
         XYItemContainer
       ],
       this._injector
@@ -95,12 +104,10 @@ export class XYContainer extends Renderable {
       
     if (typeof index === 'number') {
       this._children.splice(index, 0, item);
+      this._splitters.splice(index, 0, splitter);
     } else {
       this._children.push(item);
-    }
-
-    while (this._splitters.length < this._children.length - 1) {
-      this._splitters.push(this._createSplitter());
+      this._splitters.push(splitter);
     }
 
     return item;
@@ -165,8 +172,48 @@ export class XYContainer extends Renderable {
     super.resize();
   }
 
+  setSizeOf(item: XYItemContainer, size: number, options: XYSizingOptions = {}): void {
+    const { distribute = false } = options;
+    const { before, after } = this.getAdjacentItems(item);
+    const prevRatio = item.ratio;
+
+    item.ratio = (size / this._totalContainerSize) * 100;
+
+    if (after && isNumber(after.ratio)) {
+      after.ratio = after.ratio + (<number>prevRatio - item.ratio);
+    } else if (before && isNumber(before.ratio)) {
+      before.ratio = before.ratio + (<number>prevRatio - item.ratio);
+    }
+
+    this.resize();
+    this._renderer.render();
+  }
+
   getChildren(): XYItemContainer[] {
     return [ ...this._children ];
+  }
+
+  getAdjacentItems(item: XYItemContainer): AdjacentResults {
+    const index = this._children.indexOf(item);
+
+    return {
+      before: index > 0 ? this._children[index - 1] : null,
+      after: index < this._children.length - 1 ? this._children[index + 1] : null
+    };
+  }
+
+  getSplitterFromItem(item: XYItemContainer): Splitter|null {
+    const index = this._children.indexOf(item);
+
+    if (index === -1) {
+      return null;
+    }
+
+    if (index < this._children.length - 1) {
+      return this._splitters[index] || null;
+    }
+
+    return this._splitters[index - 1] || null;
   }
 
   private _createSplitter(): Splitter {
@@ -212,8 +259,8 @@ export class XYContainer extends Renderable {
     const { host } = event;
     const { before, after } = this._getSplitterItems(host);
     
-    this._dragLimitMin = (this.isRow ? -before.width : -before.height);
-    this._dragLimitMax = (this.isRow ? after.width : after.height);
+    this._dragLimitMin = (this.isRow ? -before.width : -before.height) + before.minSize;
+    this._dragLimitMax = (this.isRow ? after.width : after.height) - after.minSize;
   }
 
   private _dragEnd(event: DragEvent<Splitter>): void {

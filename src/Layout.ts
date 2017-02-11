@@ -8,7 +8,6 @@ import {
   ConfiguredRenderable
 } from './dom';
 import { 
-  ParentLayoutRef, 
   ContainerRef, 
   ConfigurationRef,
   RenderableConfig,

@@ -14,10 +14,14 @@ import { isNumber } from './utils';
 import { BeforeDestroyEvent } from './events';
 import { XYContainer } from './XYContainer';
 import { MinimizeCommand } from './commands';
+import { Splitter } from './Splitter';
 
 export interface XYItemContainerConfig {
   use: RenderableArg<Renderable>;
   ratio?: number;
+  minSize?: number;
+  maxSize?: number;
+  fixed?: boolean;
 }
 
 export class XYItemContainer extends Renderable {
@@ -28,17 +32,24 @@ export class XYItemContainer extends Renderable {
   protected _container: XYContainer;
   
   private _item: Renderable;
+  private _lastSize: number|null = null;
+  private _isMinimized: boolean = false;
 
   constructor(
     @Inject(Injector) private _injector: Injector,
     @Inject(ConfigurationRef) private _config: XYItemContainerConfig,
     @Inject(ContainerRef) _container: XYContainer,
-    @Inject(Renderer) private _renderer: Renderer
+    @Inject(Renderer) private _renderer: Renderer,
+    @Inject(Splitter) private _splitter: Splitter
   ) {
     super(_container);
     
     if (this._config) {
       this.ratio = isNumber(this._config.ratio) ? this._config.ratio : UNALLOCATED;
+    }
+
+    if (this.fixed) {
+      this._splitter.disable();
     }
 
     this._item = RenderableInjector.fromRenderable(
@@ -67,6 +78,18 @@ export class XYItemContainer extends Renderable {
     return this._height;
   }
 
+  get minSize(): number {
+    return isNumber(this._config.minSize) ? this._config.minSize : 50;
+  }
+
+  get maxSize(): number {
+    return isNumber(this._config.maxSize) ? this._config.maxSize : Number.MAX_SAFE_INTEGER;
+  }
+
+  get fixed(): boolean {
+    return Boolean(this._config.fixed);
+  }
+
   render(): VNode {
     return h('div.ug-layout__xy-item-container', {
       key: this._uid,
@@ -93,12 +116,38 @@ export class XYItemContainer extends Renderable {
     return [ this._item ];
   }
 
+  isVisible(): boolean {
+    return !this._isMinimized && this._container.isVisible();
+  }
+
   private _minimize(e: MinimizeCommand<Renderable>): void {
+    const minimize = e.minimize == null ? !this._isMinimized : e.minimize;
+    const splitter = this._container.getSplitterFromItem(this);
+    let size: number|null = null;
+    
     e.stopPropagation();
     
-    this.ratio = e.size / this.size;
-    this._container.resize();
-    this._renderer.render();
+    if (minimize && !this._isMinimized) {
+      size = e.size;
+      this._lastSize = this.size;
+      this._isMinimized = true;
+
+      if (splitter) {
+        splitter.disable();
+      }
+    } else if (!minimize && this._isMinimized && this._lastSize != null) {
+      size = this._lastSize;
+      this._isMinimized = false;
+      this._lastSize = null;
+      
+      if (splitter) {
+        splitter.enable();
+      }
+    }
+
+    if (size != null) {
+      this._container.setSizeOf(this, size);
+    }
   }
 
   private _onItemDestroy(): void {

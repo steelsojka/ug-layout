@@ -23,6 +23,7 @@ export class Splitter extends Renderable {
   private _startY: number = 0;
   private _isDragging: boolean = false;
   private _element: HTMLElement;
+  private _isDisabled: boolean = false;
   
   constructor(
     @Inject(ConfigurationRef) private _config: SplitterConfig,
@@ -50,6 +51,10 @@ export class Splitter extends Renderable {
 
   get element(): HTMLElement {
     return this._element;
+  }
+
+  get isDisabled(): boolean {
+    return this._isDisabled;
   }
 
   private get handleStyles(): { [key:string]: any } {
@@ -82,10 +87,13 @@ export class Splitter extends Renderable {
   }
 
   render(): VNode {
-    const _class = this._isRow ? 'ug-layout__splitter-x' : 'ug-layout__splitter-y';
-    
-    return h(`div.ug-layout__splitter.${_class}`, {
+    return h(`div.ug-layout__splitter`, {
       key: this.uid,
+      class: {
+        'ug-layout__splitter-disabled': this.isDisabled,
+        'ug-layout__splitter-x': this._isRow,
+        'ug-layout__splitter-y': !this._isRow,
+      },
       style: {
         height: this.height,
         width: this.width,
@@ -110,8 +118,19 @@ export class Splitter extends Renderable {
     super.destroy();
   }
 
+  disable(): void {
+    this._isDisabled = true;
+  }
+
+  enable(): void {
+    this._isDisabled = false;
+  }
+
   private _onMouseDown(e: MouseEvent): void {
     e.preventDefault();
-    this._draggable.startDrag(this, e.x, e.y);
+    
+    if (!this.isDisabled) {
+      this._draggable.startDrag(this, e.x, e.y);
+    }
   }
 }
