@@ -15,7 +15,6 @@ export interface RenderableConfig<T extends Renderable> {
 }
 
 export const DocumentRef = new Token('DocumentRef');
-export const ParentLayoutRef = new Token('ParentLayoutRef');
 export const RootConfigRef = new Token('RootConfigRef');
 export const ContainerRef = new Token('ContainerRef');
 export const XYDirectionRef = new Token('XYDirectionRef');

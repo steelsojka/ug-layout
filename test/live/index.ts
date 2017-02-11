@@ -58,9 +58,21 @@ const rootLayout = RootLayout.create({
               title: 'NESTED 1',
               use: Column.configure({
                 children: [{
-                  use: View.configure({
-                    useClass: TestView
+                  use: Stack.configure({
+                    header: {
+                      controls: [{
+                        use: MinimizeStackControl
+                      }]  
+                    },
+                    children: [{
+                      title: 'Account Summary',
+                      use: View.configure({
+                        useClass: TestView
+                      })
+                    }]
                   })
+                }, {
+                  use: Row
                 }, {
                   use: Stack.configure({
                     header: {

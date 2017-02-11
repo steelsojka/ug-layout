@@ -37,11 +37,18 @@
   top: 0;
   left: 0;
   z-index: 100;
-  cursor: pointer;
 }
 
 .ug-layout__splitter-x {
   width: 5px;
+}
+
+.ug-layout__splitter-x:not(.ug-layout__splitter-disabled) .ug-layout__drag-handle {
+  cursor: col-resize;
+}
+
+.ug-layout__splitter-y:not(.ug-layout__splitter-disabled) .ug-layout__drag-handle {
+  cursor: row-resize;
 }
 
 .ug-layout__splitter-y {
