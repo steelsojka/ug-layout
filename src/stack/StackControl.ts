@@ -1,8 +1,10 @@
-import { VNode } from 'snabbdom/vnode';
-import h from 'snabbdom/h';
-
 import { Renderable } from '../dom';
+import { RenderableArg } from '../common';
+
+export interface StackControlConfig {
+  use: RenderableArg<StackControl>
+}
 
 export abstract class StackControl extends Renderable {
-    
+  
 }

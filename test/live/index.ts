@@ -16,7 +16,8 @@ import {
   ViewContainer,
   ElementRef,
   ViewComponent,
-  CancelAction
+  CancelAction,
+  MinimizeStackControl
 } from '../../src';
 
 @ViewComponent()
@@ -30,13 +31,6 @@ class TestView {
 
     container.visibilityChanges.subscribe(isVisible => console.log(isVisible));
     container.sizeChanges.subscribe(size => console.log(size));
-    container.beforeDestroy.subscribe(e => {
-      e.wait(() => {
-        return new Promise(resolve => {
-          setTimeout(resolve, 3000);
-        });
-      });
-    });
   }
 }
 
@@ -68,7 +62,19 @@ const rootLayout = RootLayout.create({
                     useClass: TestView
                   })
                 }, {
-                  use: Row
+                  use: Stack.configure({
+                    header: {
+                      controls: [{
+                        use: MinimizeStackControl
+                      }]  
+                    },
+                    children: [{
+                      title: 'Order Entry',
+                      use: View.configure({
+                        useClass: TestView
+                      })
+                    }]  
+                  })
                 }]
               })
             }, {

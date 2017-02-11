@@ -32,8 +32,6 @@ export interface StackEntry {
   tab: StackTab;
 }
 
-export const DEFAULT_STACK_HEADER_SIZE = 25;
-
 export class Stack extends Renderable {
   getIndexOfContainer: (container: StackItemContainer) => number = this._getIndexOf.bind(this, 'item');
   getIndexOfTab: (tab: StackTab) => number = this._getIndexOf.bind(this, 'tab');
@@ -59,20 +57,12 @@ export class Stack extends Renderable {
   ) {
     super(_container);
     
-    const headerConfig = {
-      size: DEFAULT_STACK_HEADER_SIZE  
-    };
-
-    if (this._config && this._config.header) {
-      Object.assign(headerConfig, this._config.header);
-    }
-
     this._header = Injector.fromInjectable(
       StackHeader, 
       [
         { provide: ContainerRef, useValue: this },
         { provide: Stack, useValue: this },
-        { provide: ConfigurationRef, useValue: headerConfig },
+        { provide: ConfigurationRef, useValue: this._config ? this._config.header : null },
         StackHeader 
       ], 
       this._injector
@@ -130,6 +120,10 @@ export class Stack extends Renderable {
 
   resize(): void {
     this._header.resize();
+
+    for (const { item } of this._children) {
+    }
+    
     super.resize();
   }
 
