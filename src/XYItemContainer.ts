@@ -2,7 +2,7 @@ import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
 import { Inject, Injector } from './di'
-import { Renderable, RenderableInjector, ConfiguredRenderable } from './dom';
+import { Renderer, Renderable, RenderableInjector, ConfiguredRenderable } from './dom';
 import { 
   ConfigurationRef, 
   ContainerRef, 
@@ -13,6 +13,7 @@ import {
 import { isNumber } from './utils';
 import { BeforeDestroyEvent } from './events';
 import { XYContainer } from './XYContainer';
+import { MinimizeCommand } from './commands';
 
 export interface XYItemContainerConfig {
   use: RenderableArg<Renderable>;
@@ -31,7 +32,8 @@ export class XYItemContainer extends Renderable {
   constructor(
     @Inject(Injector) private _injector: Injector,
     @Inject(ConfigurationRef) private _config: XYItemContainerConfig,
-    @Inject(ContainerRef) _container: XYContainer
+    @Inject(ContainerRef) _container: XYContainer,
+    @Inject(Renderer) private _renderer: Renderer
   ) {
     super(_container);
     
@@ -50,6 +52,11 @@ export class XYItemContainer extends Renderable {
       .get(ConfiguredRenderable);
 
     this._item.destroyed.subscribe(this._onItemDestroy.bind(this));
+    this.subscribe(MinimizeCommand, this._minimize.bind(this));
+  }
+
+  get size(): number {
+    return this._container.isRow ? this.width : this.height;
   }
 
   get width(): number {
@@ -84,6 +91,14 @@ export class XYItemContainer extends Renderable {
 
   getChildren(): Renderable[] {
     return [ this._item ];
+  }
+
+  private _minimize(e: MinimizeCommand<Renderable>): void {
+    e.stopPropagation();
+    
+    this.ratio = e.size / this.size;
+    this._container.resize();
+    this._renderer.render();
   }
 
   private _onItemDestroy(): void {

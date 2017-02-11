@@ -128,3 +128,13 @@
   background-color: rgb(27, 43, 52);
   color: white;
 }
+
+.ug-layout__stack-controls {
+  flex-grow: 0;
+}
+
+.ug-layout__tab-container {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+}

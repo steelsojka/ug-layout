@@ -3,17 +3,16 @@ import { Observable } from 'rxjs/Observable';
 
 import { Type } from '../di';
 
-export interface BusEventOptions {
-  passthrough?: boolean;
-}
+export interface BusEventOptions {}
 
 export class BusEvent<T> {
   private _promise: Promise<this>;
+  private _isPropagationStopped: boolean = false;
   
   constructor(
     protected _target: T, 
-    protected _parent: BusEvent<any>|null = null,
-    protected _options: BusEventOptions = {}
+    protected _options: BusEventOptions = {},
+    protected _parent: BusEvent<any>|null = null
   ) {
     this._promise = Promise.resolve(this);
   }
@@ -30,8 +29,8 @@ export class BusEvent<T> {
     return this;
   }
 
-  get passthrough(): boolean {
-    return Boolean(this._options.passthrough);
+  get isPropagationStopped(): boolean {
+    return this._isPropagationStopped;
   }
 
   get options(): BusEventOptions {
@@ -59,7 +58,11 @@ export class BusEvent<T> {
   }
 
   delegate<U extends BusEvent<any>>(Ctor: Type<U>, target: any = this.target, options: BusEventOptions = {}): U {
-    return new Ctor(target, this, { ...this.options, ...options });
+    return new Ctor(target, { ...this.options, ...options }, this);
+  }
+
+  stopPropagation(): void {
+    this._isPropagationStopped = true;
   }
 
   dispatch(subscriber: Observer<this>): void {

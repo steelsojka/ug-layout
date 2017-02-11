@@ -10,11 +10,13 @@ import { TabCloseEvent } from './TabCloseEvent';
 import { TabSelectionEvent } from './TabSelectionEvent';
 import { ConfigurationRef, ContainerRef } from '../common';
 import { Subject, Observable, BeforeDestroyEvent } from '../events';
+import { StackControl } from './StackControl';
 
 export interface StackHeaderConfig {
   size: number;
   maxTabSize: number;
   distribute: boolean;
+  controls: StackControl[];
 }
 
 export type StackHeaderConfigArgs = {
@@ -26,6 +28,7 @@ export class StackHeader extends Renderable {
   tabClosed: Observable<BeforeDestroyEvent<StackTab>>;
   
   private _tabs: StackTab[] = [];
+  private _controls: StackControl[] = [];
   private _tabSelected: Subject<StackTab> = new Subject();
   private _tabClosed: Subject<BeforeDestroyEvent<StackTab>> = new Subject();
   
@@ -104,7 +107,10 @@ export class StackHeader extends Renderable {
         width: `${this.width}px`
       }
     }, 
-      this._tabs.map(tab => tab.render())
+      [
+        h('div.ug-layout__tab-container', this._tabs.map(tab => tab.render())),
+        h('div.ug-layout__stack-controls', this._controls.map(control => control.render()))
+      ]
     );
   }
 

@@ -213,7 +213,7 @@ export class XYContainer extends Renderable {
     const { before, after } = this._getSplitterItems(host);
     
     this._dragLimitMin = (this.isRow ? -before.width : -before.height);
-    this._dragLimitMax = (this.isRow ? after.width : after.height) - 50;
+    this._dragLimitMax = (this.isRow ? after.width : after.height);
   }
 
   private _dragEnd(event: DragEvent<Splitter>): void {

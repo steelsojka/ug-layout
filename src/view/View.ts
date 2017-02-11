@@ -4,10 +4,11 @@ import h from 'snabbdom/h';
 import { Type, ProviderArg, Inject, Injector, Optional, forwardRef } from '../di';
 import { Renderer, Renderable, ConfiguredRenderable } from '../dom';
 import { ContainerRef, ConfigurationRef, ElementRef } from '../common';
-import { Stack } from '../Stack';
+import { Stack } from '../stack';
 import { ViewContainer } from './ViewContainer';
 import { ViewConfig } from './common';
 import { Subject, Observable, BeforeDestroyEvent } from '../events';
+import { MakeVisibleCommand, MinimizeCommand } from '../commands';
 import { ViewManager } from './ViewManager';
 
 export class View extends Renderable {
@@ -70,6 +71,14 @@ export class View extends Renderable {
     } else {
       this.destroy();
     }
+  }
+
+  makeVisible(): void {
+    this.emitUp(new MakeVisibleCommand(this));
+  }
+
+  minimize(): void {
+    this.emitUp(new MinimizeCommand(this));
   }
 
   private _postRender(): void {
