@@ -52,12 +52,12 @@ export class StackItemContainer extends Renderable implements Transferable {
   get width(): number {
     return this._container.isHorizontal 
       ? this._container.width 
-      : this._container.width - this._container.header.width;
+      : Math.max(this._container.width - this._container.header.width, 0);
   }
 
   get height(): number {
     return this._container.isHorizontal 
-      ? this._container.height - this._container.header.height 
+      ? Math.max(this._container.height - this._container.header.height, 0)
       : this._container.height;
   }
 

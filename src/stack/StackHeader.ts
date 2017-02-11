@@ -2,7 +2,7 @@ import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
 import { Inject, Injector } from '../di';
-import { Renderable } from '../dom';
+import { Renderable, RenderableInjector, ConfiguredRenderable } from '../dom';
 import { Stack } from './Stack';
 import { Draggable } from '../Draggable';
 import { StackTab, StackTabConfigArgs } from './StackTab';
@@ -10,18 +10,19 @@ import { TabCloseEvent } from './TabCloseEvent';
 import { TabSelectionEvent } from './TabSelectionEvent';
 import { ConfigurationRef, ContainerRef } from '../common';
 import { Subject, Observable, BeforeDestroyEvent } from '../events';
-import { StackControl } from './StackControl';
+import { StackControl, StackControlConfig } from './StackControl';
 
 export interface StackHeaderConfig {
   size: number;
-  maxTabSize: number;
   distribute: boolean;
-  controls: StackControl[];
+  controls: StackControlConfig[];
 }
 
 export type StackHeaderConfigArgs = {
   [P in keyof StackHeaderConfig]?: StackHeaderConfig[P];
 }
+
+export const DEFAULT_STACK_HEADER_SIZE = 25;
 
 export class StackHeader extends Renderable {
   tabSelected: Observable<StackTab>;
@@ -31,16 +32,25 @@ export class StackHeader extends Renderable {
   private _controls: StackControl[] = [];
   private _tabSelected: Subject<StackTab> = new Subject();
   private _tabClosed: Subject<BeforeDestroyEvent<StackTab>> = new Subject();
+  private _config: StackHeaderConfig;
   
   constructor(
     @Inject(Injector) private _injector: Injector,
-    @Inject(ConfigurationRef) private _config: StackHeaderConfig,
+    @Inject(ConfigurationRef) _config: StackHeaderConfigArgs|null,
     @Inject(ContainerRef) protected _container: Stack
   ) {
     super(_container);
     
     this.tabSelected = this._tabSelected.asObservable();
     this.tabClosed = this._tabClosed.asObservable();
+
+    this._config = Object.assign({
+      controls: [],
+      size: DEFAULT_STACK_HEADER_SIZE,
+      distribute: false
+    }, _config);
+
+    this._config.controls.forEach(control => this.addControl(control));
   } 
 
   get width(): number {
@@ -94,6 +104,18 @@ export class StackHeader extends Renderable {
     
     this._tabs.splice(index, 1);
     this._container.removeTab(tab);
+  }
+
+  addControl(config: StackControlConfig): void {
+    const control = RenderableInjector.fromRenderable(
+      config.use, 
+      [
+        { provide: ContainerRef, useValue: this }
+      ]
+    )
+      .get(ConfiguredRenderable);
+
+    this._controls.push(control);
   }
 
   isTabActive(tab: StackTab): boolean {

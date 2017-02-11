@@ -131,10 +131,21 @@
 
 .ug-layout__stack-controls {
   flex-grow: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.ug-layout__stack-controls > * {
+  padding: 0 5px;
 }
 
 .ug-layout__tab-container {
   display: flex;
   flex-direction: row;
   flex-grow: 1;
+}
+
+.ug-layout__view-container {
+  overflow: hidden;
 }
