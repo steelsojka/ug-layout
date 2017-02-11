@@ -4,6 +4,15 @@
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
+    
+  {
+    "type": "chrome",
+    "request": "launch",
+    "name": "Launch Chrome w/ User Data",
+    "url": "http://localhost:8080",
+    "webRoot": "${workspaceRoot}",
+    "userDataDir": "${workspaceRoot}/.vscode/chrome"
+  },
     {
       "type": "chrome",
       "request": "launch",

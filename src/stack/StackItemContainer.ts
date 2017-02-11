@@ -4,6 +4,7 @@ import h from 'snabbdom/h';
 import { Inject, Injector } from '../di'
 import { Renderable, RenderableInjector, ConfiguredRenderable, Transferable } from '../dom';
 import { BeforeDestroyEvent, Cancellable, Subject, Observable } from '../events';
+import { MakeVisibleCommand } from '../commands';
 import { 
   ConfigurationRef, 
   ContainerRef, 
@@ -44,6 +45,8 @@ export class StackItemContainer extends Renderable implements Transferable {
       this._injector
     )
       .get(ConfiguredRenderable);
+
+    this.subscribe(MakeVisibleCommand, this.makeVisible.bind(this));
   }
 
   get width(): number {
@@ -87,7 +90,6 @@ export class StackItemContainer extends Renderable implements Transferable {
 
   makeVisible(): void {
     this._container.setActiveContainer(this);
-    super.makeVisible();
   }
 
   transferTo(container: Stack): void {

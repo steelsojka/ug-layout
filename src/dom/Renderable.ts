@@ -15,6 +15,7 @@ import { uid } from '../utils';
 export interface EmitEventOptions {
   recursively?: boolean;
   skipSelf?: boolean;
+  direction?: 'up'|'down';
 }
 
 export interface Transferable {
@@ -69,12 +70,6 @@ export abstract class Renderable {
   getChildren(): Renderable[] {
     return [];
   }
-  
-  makeVisible(): void {
-    if (this._container) {
-      this._container.makeVisible();
-    }
-  }
 
   isVisible(): boolean {
     return Boolean(this._container && this._container.isVisible());
@@ -91,8 +86,12 @@ export abstract class Renderable {
     this._destroyed.complete();
   }
 
-  getParent<T extends Renderable>(Ctor: Type<T>): T|null {
+  getParent<T extends Renderable>(Ctor?: Type<T>): T|null {
     if (this._container) {
+      if (!Ctor) {
+        return this._container as T;
+      }
+      
       if (this._container instanceof Ctor) {
         return this._container as T;
       }
@@ -103,7 +102,7 @@ export abstract class Renderable {
     return null;
   }
 
-  getParents<T extends Renderable>(Ctor: Type<T>): T[] {
+  getParents<T extends Renderable>(Ctor?: Type<T>): T[] {
     let parent: Renderable|null = this;
     let result: T[] = [];
 
@@ -123,20 +122,28 @@ export abstract class Renderable {
     return this._eventBus.subscribe(Event, observer);
   }
 
-  emit<T extends BusEvent<any>>(event: T, options: EmitEventOptions = {}): void {
-    if (!options.skipSelf) {
-      this._eventBus.next(event);
-    }
-
-    if (options.recursively) {
-      for (const child of this.getDescendants()) {
-        child.emit(event);
-      }
-    }
+  emit<T extends BusEvent<any>>(event: T): void {
+    this._eventBus.next(event);
   }
 
   emitDown<T extends BusEvent<any>>(event: T): void {
-    return this.emit(event, { skipSelf: true, recursively: true });
+    for (const child of this.getDescendants()) {
+      if (event.isPropagationStopped) {
+        break;
+      }
+      
+      child.emit(event);
+    }
+  }
+
+  emitUp<T extends BusEvent<any>>(event: T): void {
+    for (const parent of this.getParents()) {
+      if (event.isPropagationStopped) {
+        break;
+      }
+      
+      parent.emit(event);
+    }
   }
 
   getDescendants(): Renderable[] {
