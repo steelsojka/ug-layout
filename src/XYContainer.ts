@@ -56,7 +56,6 @@ export class XYContainer extends Renderable {
     const children = this._config && this._config.children ? this._config.children : [];
     
     this._children = children.map<XYItemContainer>(config => this.addChild(config));
-
   }
 
   get height(): number {
@@ -83,20 +82,6 @@ export class XYContainer extends Renderable {
     return this.isRow 
       ? this._container.width - this._totalSplitterSize
       : this._container.height - this._totalSplitterSize;
-  }
-
-  initialize(): void {
-    for (const child of this._children) {
-      if (child.fixed) {
-        const splitter = this.getSplitterFromItem(child);
-
-        if (splitter) {
-          splitter.disable();
-        }
-      }
-    }
-
-    super.initialize();
   }
 
   addChild(config: XYItemContainerConfig, options: { index?: number } = {}) {
@@ -190,13 +175,13 @@ export class XYContainer extends Renderable {
     const { distribute = false } = options;
     const { before, after } = this.getAdjacentItems(item);
     const prevRatio = item.ratio;
-
+    
     item.ratio = (size / this._totalContainerSize) * 100;
 
     if (after && isNumber(after.ratio)) {
-      after.ratio = after.ratio + (<number>prevRatio - item.ratio);
+      after.ratio = Math.max(0, after.ratio + (<number>prevRatio - item.ratio));
     } else if (before && isNumber(before.ratio)) {
-      before.ratio = before.ratio + (<number>prevRatio - item.ratio);
+      before.ratio = Math.max(0, before.ratio + (<number>prevRatio - item.ratio));
     }
 
     this.resize();
@@ -273,8 +258,8 @@ export class XYContainer extends Renderable {
     const { host } = event;
     const { before, after } = this._getSplitterItems(host);
     
-    this._dragLimitMin = (this.isRow ? -before.width : -before.height) + before.minSize;
-    this._dragLimitMax = (this.isRow ? after.width : after.height) - after.minSize;
+    this._dragLimitMin = Math.max((-before.size + before.minSize), -(after.maxSize - after.size));
+    this._dragLimitMax = Math.min(after.size - after.minSize, before.maxSize - before.size);
   }
 
   private _dragEnd(event: DragEvent<Splitter>): void {
@@ -378,6 +363,7 @@ export class XYContainer extends Renderable {
       }
     }
 
+    // Calculate ratios with min and max size.
     for (const child of this._children) {
       child.ratio = (<number>child.ratio / total) * 100;
     }

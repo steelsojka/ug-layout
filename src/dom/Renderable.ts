@@ -60,12 +60,6 @@ export abstract class Renderable {
   }
 
   abstract render(): VNode;
-
-  initialize(): void {
-    for (const child of this.getChildren()) {
-      child.initialize();
-    }
-  }
   
   resize(): void {
     for (const child of this.getChildren()) {

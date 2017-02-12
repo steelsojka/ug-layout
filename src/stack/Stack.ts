@@ -74,7 +74,7 @@ export class Stack extends Renderable {
     
     if (this._config) {
       this._config.children.forEach(child => this.addChild(child));
-      this.setActiveIndex(this._config.startIndex);
+      this._setActiveIndex(this._config.startIndex);
     }
   }
 
@@ -120,10 +120,6 @@ export class Stack extends Renderable {
 
   resize(): void {
     this._header.resize();
-
-    for (const { item } of this._children) {
-    }
-    
     super.resize();
   }
 
@@ -149,11 +145,7 @@ export class Stack extends Renderable {
   }
 
   setActiveIndex(index?: number): void {
-    if (!isNumber(index)) {
-      return;
-    }
-    
-    this._activeIndex = clamp(index, 0, this._children.length - 1);
+    this._setActiveIndex(index);
     this._renderer.render();
   }
 
@@ -171,8 +163,13 @@ export class Stack extends Renderable {
     }
 
     this._children.splice(index, 1);
+
+    if (this._children.length) {
+      this._activeIndex = clamp(this._activeIndex, 0, this._children.length - 1);
+    } else {
+      this.destroy();
+    }
     
-    this._activeIndex = clamp(this._activeIndex, 0, this._children.length - 1);
     this._renderer.render();
   }
 
@@ -236,6 +233,14 @@ export class Stack extends Renderable {
 
   private _onTabSelect(e: TabSelectionEvent): void {
     this.setActiveTab(e.target);
+  }
+
+  private _setActiveIndex(index?: number): void {
+    if (!isNumber(index)) {
+      return;
+    }
+    
+    this._activeIndex = clamp(index, 0, this._children.length - 1);
   }
 
   static configure(config: StackConfig): ConfiguredRenderable<Stack> {

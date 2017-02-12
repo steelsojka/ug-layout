@@ -33,6 +33,10 @@ export class View extends Renderable {
     this.sizeChanges = this._sizeChanges.asObservable().distinctUntilChanged((p, c) => {
       return p.width === c.width && p.height === c.height;
     });
+
+    this._renderer.afterRender
+      .takeUntil(this.destroyed)
+      .subscribe(this._postRender.bind(this));
   }
 
   get width(): number {
@@ -95,10 +99,6 @@ export class View extends Renderable {
       injector: this._injector,
       container: this
     });
-
-    this._renderer.rendered
-      .takeUntil(this.destroyed)
-      .subscribe(this._postRender.bind(this));
   }
 
   static configure(config: ViewConfig): ConfiguredRenderable<View> {
