@@ -99,6 +99,10 @@ export class XYItemContainer extends Renderable {
     return isNumber(this._config.maxSizeY) ? this._config.maxSizeY : Number.MAX_SAFE_INTEGER;
   }
 
+  get isMinimized(): boolean {
+    return this._isMinimized;
+  }
+
   get fixed(): boolean {
     return Boolean(this._config.fixed);
   }

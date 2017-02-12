@@ -336,6 +336,10 @@ export class XYContainer extends Renderable {
     let total = 0;
     const unallocatedChildren: XYItemContainer[] = [];
 
+    if (!this._children.length) {
+      return;
+    }
+
     for (const child of this._children) {
       if (child.ratio !== UNALLOCATED) {
         total += child.ratio as number;
@@ -345,6 +349,8 @@ export class XYContainer extends Renderable {
     }
 
     if (Math.round(total) === 100) {
+      this._distributeRatios();
+    
       return;
     }
 
@@ -352,20 +358,59 @@ export class XYContainer extends Renderable {
       for (const child of unallocatedChildren) {
         child.ratio = (100 - total) / unallocatedChildren.length
       }
-
-      return;
-    }
-
-    if (Math.round(total) > 100) {
-      for (const child of unallocatedChildren) {
-        child.ratio = 50;
-        total += 50;
+    } else {
+      if (Math.round(total) > 100) {
+        for (const child of unallocatedChildren) {
+          child.ratio = 50;
+          total += 50;
+        }
+      } 
+      
+      for (const child of this._children) {
+        child.ratio = (<number>child.ratio / total) * 100;
       }
     }
 
-    // Calculate ratios with min and max size.
+    this._distributeRatios();
+  }
+  
+  private _distributeRatios(): void {
+    // Recursion alert. Check for inifinite loop here.
+    const growable: XYItemContainer[] = [];
+    const shrinkable: XYItemContainer[] = [];
+    const containerSize = this._totalContainerSize;
+    let totalRatio = 0;
+
     for (const child of this._children) {
-      child.ratio = (<number>child.ratio / total) * 100;
+      const minRatio = !child.isMinimized ? (child.minSize / containerSize) * 100 : 0;
+      const maxRatio = (child.maxSize / containerSize) * 100;
+      
+      child.ratio = clamp(child.ratio, minRatio, maxRatio);
+      totalRatio += child.ratio;
+      
+      const size = containerSize * (<number>child.ratio / 100);
+
+      if (size < child.maxSize) {
+        growable.push(child);
+      }
+
+      if (size > child.minSize) {
+        shrinkable.push(child);
+      }
+    }
+
+    if (totalRatio > 100) {
+      for (const child of shrinkable) {
+        child.ratio = <number>child.ratio - ((totalRatio - 100) / shrinkable.length);
+      }
+
+      this._distributeRatios();
+    } else if (totalRatio < 100) {
+      for (const child of growable) {
+        child.ratio = <number>child.ratio + ((100 - totalRatio) / growable.length);
+      }
+      
+      this._distributeRatios();
     }
   }
 }
