@@ -58,6 +58,7 @@ const rootLayout = RootLayout.create({
               title: 'NESTED 1',
               use: Column.configure({
                 children: [{
+                  fixed: true,
                   use: Stack.configure({
                     header: {
                       controls: [{
