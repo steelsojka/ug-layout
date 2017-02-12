@@ -39,17 +39,12 @@ export class XYItemContainer extends Renderable {
     @Inject(Injector) private _injector: Injector,
     @Inject(ConfigurationRef) private _config: XYItemContainerConfig,
     @Inject(ContainerRef) _container: XYContainer,
-    @Inject(Renderer) private _renderer: Renderer,
-    @Inject(Splitter) private _splitter: Splitter
+    @Inject(Renderer) private _renderer: Renderer
   ) {
     super(_container);
     
     if (this._config) {
       this.ratio = isNumber(this._config.ratio) ? this._config.ratio : UNALLOCATED;
-    }
-
-    if (this.fixed) {
-      this._splitter.disable();
     }
 
     this._item = RenderableInjector.fromRenderable(
