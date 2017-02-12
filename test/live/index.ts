@@ -75,6 +75,7 @@ const rootLayout = RootLayout.create({
                 }, {
                   use: Row
                 }, {
+                  minSizeY: 300,
                   use: Stack.configure({
                     header: {
                       controls: [{

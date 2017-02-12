@@ -19,8 +19,10 @@ import { Splitter } from './Splitter';
 export interface XYItemContainerConfig {
   use: RenderableArg<Renderable>;
   ratio?: number;
-  minSize?: number;
-  maxSize?: number;
+  minSizeX?: number;
+  maxSizeX?: number;
+  minSizeY?: number;
+  maxSizeY?: number;
   fixed?: boolean;
 }
 
@@ -65,6 +67,14 @@ export class XYItemContainer extends Renderable {
     return this._container.isRow ? this.width : this.height;
   }
 
+  get minSize(): number {
+    return this._container.isRow ? this.minSizeX : this.minSizeY;
+  }
+  
+  get maxSize(): number {
+    return this._container.isRow ? this.maxSizeX : this.maxSizeY;
+  }
+
   get width(): number {
     return this._width;
   }
@@ -73,12 +83,20 @@ export class XYItemContainer extends Renderable {
     return this._height;
   }
 
-  get minSize(): number {
-    return isNumber(this._config.minSize) ? this._config.minSize : 50;
+  get minSizeX(): number {
+    return isNumber(this._config.minSizeX) ? this._config.minSizeX : 50;
   }
 
-  get maxSize(): number {
-    return isNumber(this._config.maxSize) ? this._config.maxSize : Number.MAX_SAFE_INTEGER;
+  get maxSizeX(): number {
+    return isNumber(this._config.maxSizeX) ? this._config.maxSizeX : Number.MAX_SAFE_INTEGER;
+  }
+  
+  get minSizeY(): number {
+    return isNumber(this._config.minSizeY) ? this._config.minSizeY : 50;
+  }
+
+  get maxSizeY(): number {
+    return isNumber(this._config.maxSizeY) ? this._config.maxSizeY : Number.MAX_SAFE_INTEGER;
   }
 
   get fixed(): boolean {

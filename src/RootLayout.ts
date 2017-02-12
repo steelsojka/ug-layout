@@ -89,7 +89,6 @@ export class RootLayout extends Renderable {
   }
 
   initialize(): this {
-    this._layout.initialize();
     this.mount();
 
     return this;
