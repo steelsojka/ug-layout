@@ -107,6 +107,36 @@ export class XYItemContainer extends Renderable {
     return Boolean(this._config.fixed);
   }
 
+  get offsetX(): number {
+    let offset = this._container ? this._container.offsetX : 0;
+    
+    if (this._container.isRow) {
+      const children = this._container.getChildren();
+      const index = children.indexOf(this);
+      const prev = children.slice(0, index);
+      const totalSplitterSize = this._container.getTotalSplitterSizes(0, index);
+
+      return prev.reduce((result, item) => result + item.width, offset) + totalSplitterSize;
+    }
+
+    return offset;
+  }
+
+  get offsetY(): number {
+    let offset = this._container ? this._container.offsetY : 0;
+    
+    if (!this._container.isRow) {
+      const children = this._container.getChildren();
+      const index = children.indexOf(this);
+      const prev = children.slice(0, index);
+      const totalSplitterSize = this._container.getTotalSplitterSizes(0, index);
+
+      return prev.reduce((result, item) => result + item.height, offset) + totalSplitterSize;
+    }
+
+    return offset;
+  }
+
   render(): VNode {
     return h('div.ug-layout__xy-item-container', {
       key: this._uid,

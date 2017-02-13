@@ -2,7 +2,7 @@ import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
 import { Inject, Injector } from '../di'
-import { Renderable, RenderableInjector, ConfiguredRenderable, Transferable } from '../dom';
+import { Renderable, RenderableInjector, ConfiguredRenderable } from '../dom';
 import { BeforeDestroyEvent, Cancellable, Subject, Observable } from '../events';
 import { MakeVisibleCommand } from '../commands';
 import { 
@@ -19,7 +19,7 @@ export interface StackItemContainerConfig {
   title?: string;
 }
 
-export class StackItemContainer extends Renderable implements Transferable {
+export class StackItemContainer extends Renderable {
   transferred: Observable<this>;
   
   private _item: Renderable;
@@ -63,6 +63,26 @@ export class StackItemContainer extends Renderable implements Transferable {
 
   get isActive(): boolean {
     return this._container.isActiveContainer(this);
+  }
+
+  get offsetY(): number {
+    if (this._container.isHorizontal) {
+      if (!this._container.isReversed) {
+        return this._container.offsetY + this._container.header.height
+      }
+    }
+    
+    return this._container.offsetX;
+  }
+
+  get offsetX(): number {
+    if (!this._container.isHorizontal) {
+      if (!this._container.isReversed) {
+        return this._container.offsetX + this._container.header.width
+      }
+    }
+    
+    return this._container.offsetX;
   }
 
   render(): VNode {
@@ -110,6 +130,7 @@ export class StackItemContainer extends Renderable implements Transferable {
 
     this._container.scope(StackItemCloseEvent)
       .filter(e => e.target === this)
+      .takeUntil(this.containerChange)
       .subscribe(this._onTabClose.bind(this));
   }
 

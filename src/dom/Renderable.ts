@@ -18,9 +18,14 @@ export interface EmitEventOptions {
   direction?: 'up'|'down';
 }
 
-export interface Transferable {
-  transferred: Observable<Transferable>;
-  transferTo(container: Renderable): void;
+export interface RenderableArea {
+  x: number;
+  y: number;
+  x2: number;
+  y2: number;
+  width: number;
+  height: number;
+  surface: number;
 }
 
 export abstract class Renderable {
@@ -49,6 +54,14 @@ export abstract class Renderable {
 
   get height(): number {
     return this._width;
+  }
+
+  get offsetX(): number {
+    return this._container ? this._container.offsetX : 0;
+  }
+
+  get offsetY(): number {
+    return this._container ? this._container.offsetY : 0;
   }
 
   get isDestroyed(): boolean {
@@ -156,5 +169,27 @@ export abstract class Renderable {
 
   scope<T extends BusEvent<any>>(Event: Type<T>): Observable<T> {
     return this._eventBus.scope(Event);
+  }
+
+  getArea(): RenderableArea {
+    const { height, width, offsetX, offsetY } = this;
+    
+    return {
+      height, width,
+      x: offsetX,
+      y: offsetY,
+      x2: offsetX + width,
+      y2: offsetY + height,
+      surface: height * width
+    };
+  }
+
+  highlightArea(x, y): void {
+    console.log(x - this.offsetX, y - this.offsetY);
+    // console.log(x, y);
+  }
+
+  isDroppable(): boolean {
+    return true;
   }
 }

@@ -156,3 +156,11 @@
 .ug-layout__view-container {
   overflow: hidden;
 }
+
+.ug-layout__drop-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  background-color: rgba(0, 0, 0, 0.75);
+}

@@ -74,6 +74,10 @@ export class XYContainer extends Renderable {
     return this.direction === XYDirection.X;
   }
 
+  get splitters(): Splitter[] {
+    return this._splitters;
+  }
+
   protected get _totalSplitterSize(): number {
     return this._splitters.reduce((result, splitter) => result + splitter.size, 0);
   }
@@ -213,6 +217,10 @@ export class XYContainer extends Renderable {
     }
 
     return this._splitters[index - 1] || null;
+  }
+
+  getTotalSplitterSizes(start: number = 0, end: number = this._splitters.length - 1): number {
+    return this._splitters.slice(start, end).reduce((res, sptr) => res + sptr.size, 0);
   }
 
   private _createSplitter(): Splitter {
@@ -374,7 +382,7 @@ export class XYContainer extends Renderable {
     this._distributeRatios();
   }
   
-  private _distributeRatios(): void {
+  private _distributeRatios(_lastTotalRatio?: number): void {
     // Recursion alert. Check for inifinite loop here.
     const growable: XYItemContainer[] = [];
     const shrinkable: XYItemContainer[] = [];
@@ -399,18 +407,30 @@ export class XYContainer extends Renderable {
       }
     }
 
+    // If we can't completely redistribute cleanly. Average the remainder to all getAdjacentItems
+    // and call it good. This will happen if we can't keep all items within their min/max bounds.
+    if (totalRatio === _lastTotalRatio) {
+      for (const child of this._children) {
+        child.ratio = (<number>child.ratio / totalRatio) * 100;
+      }
+
+      console.warn('Can not satisify all items min/max bounds. Please check configuration.');
+
+      return;
+    }
+
     if (totalRatio > 100) {
       for (const child of shrinkable) {
         child.ratio = <number>child.ratio - ((totalRatio - 100) / shrinkable.length);
       }
 
-      this._distributeRatios();
+      this._distributeRatios(totalRatio);
     } else if (totalRatio < 100) {
       for (const child of growable) {
         child.ratio = <number>child.ratio + ((100 - totalRatio) / growable.length);
       }
       
-      this._distributeRatios();
+      this._distributeRatios(totalRatio);
     }
   }
 }

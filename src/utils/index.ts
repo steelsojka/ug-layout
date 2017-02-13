@@ -32,6 +32,12 @@ export function get<T>(obj: any, path: string, defaultValue?: T): T|undefined {
   return result === undefined ? defaultValue : result;
 }
 
+export function propEq(prop: string, value: any): (obj: any) => boolean {
+  return function(obj: any): boolean {
+    return isObject(obj) && obj[prop] === value;
+  };
+}
+
 export const uid: () => number = (() => {
   let uid = 0;
   

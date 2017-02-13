@@ -5,7 +5,8 @@ import { Injector, Inject, Optional, Injectable } from './di';
 import { 
   Renderable, 
   RenderableInjector,
-  ConfiguredRenderable
+  ConfiguredRenderable,
+  RenderableArea
 } from './dom';
 import { 
   ContainerRef, 
@@ -14,14 +15,14 @@ import {
   RenderableArg
 } from './common';
 import { XYContainer } from './XYContainer';
-import { DragHandler } from './DragHandler';
+import { DragHost } from './DragHost';
 
 export interface LayoutConfig {
   child: RenderableArg<Renderable>;
 }
 
 @Injectable({
-  providers: [ DragHandler ]
+  providers: [ DragHost ]
 })
 export class Layout extends Renderable {
   private _child: Renderable;
@@ -29,7 +30,8 @@ export class Layout extends Renderable {
   constructor(
     @Inject(Injector) private _injector: Injector,
     @Inject(ConfigurationRef) private _config: LayoutConfig|null,
-    @Inject(ContainerRef) protected _container: Renderable
+    @Inject(ContainerRef) protected _container: Renderable,
+    @Inject(DragHost) protected _dragHost: DragHost
   ) {
     super(_container);
     
@@ -43,6 +45,9 @@ export class Layout extends Renderable {
     ], this._injector);
 
     this._child = injector.get(ConfiguredRenderable);
+
+    this._dragHost.start.subscribe(this._onDragHostStart.bind(this));
+    this._dragHost.dropped.subscribe(this._onDragHostDrop.bind(this));
   }  
 
   get height(): number {
@@ -71,6 +76,25 @@ export class Layout extends Renderable {
 
   getChildren(): Renderable[] {
     return [ this._child ];
+  }
+
+  getItemVisibleAreas(): Array<{ item: Renderable, area: RenderableArea }> {
+    return this.getDescendants()
+      .filter(item => item.isVisible())
+      .map(item => {
+        return {
+          item,
+          area: item.getArea()
+        };
+      });
+  }
+
+  private _onDragHostStart(item: Renderable): void {
+    this._dragHost.setDropAreas(this.getItemVisibleAreas());
+  }
+  
+  private _onDragHostDrop(item: Renderable): void {
+    
   }
 
   static configure(config: LayoutConfig): ConfiguredRenderable<Layout> {

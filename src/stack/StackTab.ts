@@ -9,11 +9,12 @@ import {
   BeforeDestroyEvent
 } from '../events';
 import { TabSelectionEvent } from './TabSelectionEvent';
-import { Renderable, ConfiguredRenderable, Transferable } from '../dom';
-import { Draggable } from '..//Draggable';
+import { Renderable, ConfiguredRenderable } from '../dom';
+import { Draggable, DragEvent, DragStatus } from '../Draggable';
 import { ContainerRef, ConfigurationRef } from '../common';
 import { StackHeader } from './StackHeader';
 import { Stack } from './Stack';
+import { DragHost } from '../DragHost';
 
 export interface StackTabConfig {
   maxSize: number;
@@ -31,7 +32,8 @@ export class StackTab extends Renderable {
   constructor(
     @Inject(ContainerRef) _container: StackHeader,
     @Inject(ConfigurationRef) private _config: StackTabConfig,
-    @Inject(Draggable) private _draggable: Draggable<StackTab>
+    @Inject(Draggable) private _draggable: Draggable<StackTab>,
+    @Inject(DragHost) private _dragHost: DragHost
   ) {
     super(_container);
     
@@ -39,6 +41,8 @@ export class StackTab extends Renderable {
       maxSize: 150,
       title: ''   
     }, this._config || {});
+
+    this._draggable.drag.subscribe(this._onDrag.bind(this));
   }
   
   get width(): number {
@@ -101,7 +105,37 @@ export class StackTab extends Renderable {
   }
 
   private _onMouseDown(e: MouseEvent): void {
-    this._draggable.startDrag(this, e.x, e.y);
+    this._draggable.startDrag({
+      host: this, 
+      startX: e.x,
+      startY: e.y,
+      pageX: e.pageX,
+      pageY: e.pageY
+    });
+    
+    this._draggable.drag
+      .filter(Draggable.isDragStartEvent)
+      .first()
+      .subscribe(() => {
+        this._dragHost.initialize(this, this._draggable);
+      });
+  }
+
+  private _onDrag(e: DragEvent<StackTab>): void {
+    switch (e.status) {
+      case DragStatus.DRAGGING: return this._onDragMove(e);
+      case DragStatus.STOP: return this._onDragStop(e);
+    }
+  }
+
+  private _onDragMove(e: DragEvent<StackTab>): void {
+    this._element.style.left = `${e.x}px`;
+    this._element.style.top = `${e.y}px`;
+  }
+  
+  private _onDragStop(e: DragEvent<StackTab>): void {
+    this._element.style.left = '0px';
+    this._element.style.top = '0px';
   }
 
   private _onClose(e: MouseEvent): void {
