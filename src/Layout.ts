@@ -47,7 +47,6 @@ export class Layout extends Renderable {
     this._child = injector.get(ConfiguredRenderable);
 
     this._dragHost.start.subscribe(this._onDragHostStart.bind(this));
-    this._dragHost.dropped.subscribe(this._onDragHostDrop.bind(this));
   }  
 
   get height(): number {
@@ -90,11 +89,9 @@ export class Layout extends Renderable {
   }
 
   private _onDragHostStart(item: Renderable): void {
-    this._dragHost.setDropAreas(this.getItemVisibleAreas());
-  }
-  
-  private _onDragHostDrop(item: Renderable): void {
-    
+    this._dragHost.setDropAreas(
+      this.getItemVisibleAreas().filter(({ item }) => item.isDroppable())
+    );
   }
 
   static configure(config: LayoutConfig): ConfiguredRenderable<Layout> {

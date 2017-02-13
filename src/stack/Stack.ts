@@ -183,8 +183,11 @@ export class Stack extends Renderable {
     super.destroy();
   }
 
-  getChildren(): StackItemContainer[] {
-    return this._children.map(entry => entry.item);
+  getChildren(): Renderable[] {
+    return [
+      ...this._children.map(entry => entry.item),
+      this._header
+    ];
   }
 
   private _onTabClose(e: TabCloseEvent): void {

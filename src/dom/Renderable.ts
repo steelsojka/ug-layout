@@ -184,12 +184,8 @@ export abstract class Renderable {
     };
   }
 
-  highlightArea(x, y): void {
-    console.log(x - this.offsetX, y - this.offsetY);
-    // console.log(x, y);
-  }
-
   isDroppable(): boolean {
+    // TODO: Don't allow items to be dropped if the item is a parent of this item.
     return true;
   }
 }
