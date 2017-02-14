@@ -1,7 +1,7 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
-import { Inject } from './di';
+import { Inject, Injector } from './di';
 import { Renderable, Renderer } from './dom';
 import { DocumentRef, ContainerRef, XYDirection, ConfigurationRef } from './common';
 import { XYContainer } from './XYContainer';
@@ -30,9 +30,10 @@ export class Splitter extends Renderable {
     @Inject(DocumentRef) private _document: Document,
     @Inject(Renderer) private _renderer: Renderer,
     @Inject(ContainerRef) protected _container: XYContainer,
-    @Inject(Draggable) protected _draggable: Draggable<Splitter>
+    @Inject(Draggable) protected _draggable: Draggable<Splitter>,
+    @Inject(Injector) protected _injector: Injector
   ) {
-    super(_container);
+    super(_injector);
     
     this.dragStatus = this._draggable.drag;
   }
@@ -82,8 +83,7 @@ export class Splitter extends Renderable {
   dragTo(x = this.x, y = this.y): void {
     this.x = x;
     this.y = y;
-    this._element.style.left = `${this.x}px`;
-    this._element.style.top = `${this.y}px`;
+    this._element.style.transform = `translateX(${this.x}px) translateY(${this.y}px)`
   }
 
   render(): VNode {
@@ -97,8 +97,7 @@ export class Splitter extends Renderable {
       style: {
         height: this.height,
         width: this.width,
-        left: `${this.x}`,
-        top: `${this.y}`
+        transform: `translateX(${this.x}px) translateY(${this.y}px)`
       },
       hook: {
         create: (oldNode, newNode) => this._element = newNode.elm as HTMLElement

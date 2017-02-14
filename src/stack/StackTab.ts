@@ -14,6 +14,7 @@ import { Draggable, DragEvent, DragStatus } from '../Draggable';
 import { ContainerRef, ConfigurationRef } from '../common';
 import { StackHeader } from './StackHeader';
 import { Stack } from './Stack';
+import { StackItemContainer } from './StackItemContainer';
 import { DragHost } from '../DragHost';
 
 export interface StackTabConfig {
@@ -33,9 +34,10 @@ export class StackTab extends Renderable {
     @Inject(ContainerRef) _container: StackHeader,
     @Inject(ConfigurationRef) private _config: StackTabConfig,
     @Inject(Draggable) private _draggable: Draggable<StackTab>,
-    @Inject(DragHost) private _dragHost: DragHost
+    @Inject(DragHost) private _dragHost: DragHost,
+    @Inject(Injector) _injector: Injector
   ) {
-    super(_container);
+    super(_injector);
     
     this._config = Object.assign({
       maxSize: 150,
@@ -56,11 +58,32 @@ export class StackTab extends Renderable {
   }
   
   get width(): number {
-    return this._container.isHorizontal ? Number.MAX_SAFE_INTEGER : this._container.width;
+    return this._container.isHorizontal ? this._width : this._container.width;
   }
 
   get height(): number {
-    return this._container.isHorizontal ? this._container.height : Number.MAX_SAFE_INTEGER;
+    return this._container.isHorizontal ? this._container.height : this._height;
+  }
+
+  get element(): HTMLElement {
+    return this._element;
+  }
+
+  get item(): StackItemContainer|null {
+    return this._container.getItemFromTab(this);
+  }
+
+  get offsetX(): number {
+    return this._container.getOffsetXForTab(this);
+  }
+
+  resize(): void {
+    if (this._element) {
+      const rect = this._element.getBoundingClientRect();
+
+      this._width = rect.width;
+      this._height = rect.height;
+    }
   }
   
   render(): VNode {
@@ -73,7 +96,8 @@ export class StackTab extends Renderable {
         'ug-layout__stack-tab-y': !this._container.isHorizontal
       },
       hook: {
-        create: (oldNode, newNode) => this._element = newNode.elm as HTMLElement
+        create: (oldNode, newNode) => this._element = newNode.elm as HTMLElement,
+        insert: () => this.resize()
       },
       on: {
         mousedown: e => this._onMouseDown(e),
@@ -135,13 +159,11 @@ export class StackTab extends Renderable {
   }
 
   private _onDragMove(e: DragEvent<StackTab>): void {
-    this._element.style.left = `${e.x}px`;
-    this._element.style.top = `${e.y}px`;
+    this._element.style.transform = `translateX(${e.x}px) translateY(${e.y}px)`;
   }
   
   private _onDragStop(e: DragEvent<StackTab>): void {
-    this._element.style.left = '0px';
-    this._element.style.top = '0px';
+    this._element.style.transform = `translateX(0px) translateY(0px)`;
     this._element.classList.remove('ug-layout__tab-dragging');
   }
 

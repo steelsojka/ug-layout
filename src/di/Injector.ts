@@ -87,6 +87,10 @@ export class Injector {
     return new Injector(providers, this);    
   }
 
+  setParent(parent: Injector): void {
+    this._parent = parent;
+  }
+
   private _resolve(provider: Provider, metadata: InjectionMetadata = {}): any {
     if (this._isClassProvider(provider)) {
       const injections = Reflect.getOwnMetadata(INJECT_PARAM_KEY, provider.useClass, (<any>undefined)) || [];

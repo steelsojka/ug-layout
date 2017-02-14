@@ -1,10 +1,9 @@
 import { Inject } from './di';
-import { DocumentRef } from './common';
+import { DocumentRef, DropTarget, DropArea, RenderableDropTarget } from './common';
 import { Renderable, RenderableArea } from './dom';
 import { Observable, Subject } from './events';
 import { Draggable, DragStatus, DragEvent } from './Draggable';
-
-type DropArea = { item: Renderable, area: RenderableArea };
+import { isObject, isFunction } from './utils';
 
 export interface DragAreaBounds {
   x: number; 
@@ -88,17 +87,36 @@ export class DragHost {
     }
 
     if (result) {
+      if (this._dropArea) {
+        this._dropArea.item.onDropHighlightExit();
+      }
+      
       this._dropArea = result;
-      this._element.style.left = `${result.area.x}px`;
-      this._element.style.top = `${result.area.y}px`;
-      this._element.style.width = `${result.area.width}px`;
-      this._element.style.height = `${result.area.height}px`;
+      
+      const area = this._dropArea.item.getHighlightCoordinates(e.pageX, e.pageY, result);
+      
+      this._element.style.left = `${area.x}px`;
+      this._element.style.top = `${area.y}px`;
+      this._element.style.width = `${area.width}px`;
+      this._element.style.height = `${area.height}px`;
     }
   }
 
   private _onDragStop(): void {
+    if (!this._dropArea) {
+      return;
+    }
+    
     this._areas = null;
-    console.log(this._dropArea, this._item);
     this._element.hidden = true;
+    this._item.handleDropCleanup();
+    this._dropArea.item.handleDrop(this._item);
+  }
+
+  static isDropTarget(item: any): item is RenderableDropTarget {
+    return isObject(item) 
+      && item instanceof Renderable
+      && isFunction(item['getHighlightCoordinates'])
+      && isFunction(item['handleDrop']);
   }
 }

@@ -5,7 +5,7 @@ import { Renderable } from './Renderable';
 
 export class RenderableInjector extends Injector {
   static fromRenderable(
-    renderable: Type<Renderable>|ConfiguredRenderable<Renderable>, 
+    renderable: Type<Renderable>|ConfiguredRenderable<Renderable>|Renderable, 
     providers: Provider[] = [],
     parent?: Injector
   ): RenderableInjector {
@@ -15,6 +15,11 @@ export class RenderableInjector extends Injector {
     if (renderable instanceof ConfiguredRenderable) {
       Ctor = renderable.renderable;
       config = renderable.config;
+    } else if (renderable instanceof Renderable) {
+      return new Injector([
+        { provide: ConfiguredRenderable, useValue: renderable },
+        ...providers
+      ]);
     }
 
     return Injector.fromInjectable(Ctor as Type<Renderable>, [

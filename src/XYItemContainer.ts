@@ -38,12 +38,12 @@ export class XYItemContainer extends Renderable {
   private _isMinimized: boolean = false;
 
   constructor(
-    @Inject(Injector) private _injector: Injector,
+    @Inject(Injector) _injector: Injector,
     @Inject(ConfigurationRef) private _config: XYItemContainerConfig,
     @Inject(ContainerRef) _container: XYContainer,
     @Inject(Renderer) private _renderer: Renderer
   ) {
-    super(_container);
+    super(_injector);
     
     if (this._config) {
       this.ratio = isNumber(this._config.ratio) ? this._config.ratio : UNALLOCATED;

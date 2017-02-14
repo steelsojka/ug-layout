@@ -2,7 +2,7 @@ import { VNode } from 'snabbdom/vnode';
 import { PartialObserver } from 'rxjs/Observer';
 import { Subscription } from 'rxjs/Subscription';
 
-import { Type } from '../di';
+import { Type, Injector } from '../di';
 import { 
   Observable, 
   Subject, 
@@ -11,6 +11,7 @@ import {
   BusEvent
 } from '../events';
 import { uid } from '../utils';
+import { ContainerRef } from '../common';
 
 export interface EmitEventOptions {
   recursively?: boolean;
@@ -41,11 +42,15 @@ export abstract class Renderable {
   protected _container: Renderable|null = null
   protected _containerChange: Subject<Renderable|null> = new Subject<Renderable|null>();
 
-  constructor(_container: Renderable|null = null) {
+  constructor(protected _injector: Injector) {
     this.destroyed = this._destroyed.asObservable();
     this.containerChange = this._containerChange.asObservable();
 
-    this.setContainer(_container);
+    this.setContainer(this._injector.get(ContainerRef, null));
+  }
+
+  get container(): Renderable|null {
+    return this._container || null;
   }
 
   get width(): number {
@@ -128,6 +133,11 @@ export abstract class Renderable {
 
   setContainer(container: Renderable|null): void {
     this._container = container;
+
+    if (this._container) {
+      this._injector.setParent(this._container._injector);
+    }
+    
     this._containerChange.next(container);
   }
 
@@ -174,6 +184,14 @@ export abstract class Renderable {
   contains(item: Renderable): boolean {
     return this.getDescendants().indexOf(item) !== -1;
   }
+  
+  isContainedWithin(item: Renderable): boolean {
+    return item.getDescendants().indexOf(this) !== -1;
+  }
+
+  transferTo(container: Renderable, injector: Injector): void {
+    this.setContainer(container);
+  }
 
   getArea(): RenderableArea {
     const { height, width, offsetX, offsetY } = this;
@@ -188,8 +206,9 @@ export abstract class Renderable {
     };
   }
 
-  isDroppable(): boolean {
-    // TODO: Don't allow items to be dropped if the item is a parent of this item.
-    return true;
+  handleDropCleanup(): void {}
+
+  isDroppable(target: Renderable): boolean {
+    return false;
   }
 }

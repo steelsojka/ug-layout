@@ -12,7 +12,8 @@ import {
   ContainerRef, 
   ConfigurationRef,
   RenderableConfig,
-  RenderableArg
+  RenderableArg,
+  DropArea
 } from './common';
 import { XYContainer } from './XYContainer';
 import { DragHost } from './DragHost';
@@ -28,12 +29,12 @@ export class Layout extends Renderable {
   private _child: Renderable;
   
   constructor(
-    @Inject(Injector) private _injector: Injector,
+    @Inject(Injector) _injector: Injector,
     @Inject(ConfigurationRef) private _config: LayoutConfig|null,
     @Inject(ContainerRef) protected _container: Renderable,
     @Inject(DragHost) protected _dragHost: DragHost
   ) {
-    super(_container);
+    super(_injector);
     
     if (!this._config || !this._config.child) {
       throw new Error('A layout requires a child renderable.');
@@ -89,9 +90,18 @@ export class Layout extends Renderable {
   }
 
   private _onDragHostStart(target: Renderable): void {
-    this._dragHost.setDropAreas(
-      this.getItemVisibleAreas().filter(({ item }) => item.isDroppable() && !target.contains(item) && target !== item)
-    );
+    this._dragHost.setDropAreas(this._getDropTargets(target));
+  }
+
+  private _getDropTargets(target: Renderable): DropArea[] {
+    return this.getItemVisibleAreas()
+      .filter(({ item }) => {
+        return DragHost.isDropTarget(item) 
+          && item !== target
+          && item.isDroppable(target)
+          && !target.contains(item)
+          && !target.isContainedWithin(item);
+      }) as any; 
   }
 
   static configure(config: LayoutConfig): ConfiguredRenderable<Layout> {

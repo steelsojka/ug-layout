@@ -27,7 +27,7 @@ export class View extends Renderable {
     @Inject(ViewManager) private _viewManager: ViewManager,
     @Inject(Renderer) private _renderer: Renderer
   ) {
-    super(_container);
+    super(_injector);
 
     this.visibilityChanges = this._visiblityChanges.asObservable().distinctUntilChanged();
     this.sizeChanges = this._sizeChanges.asObservable().distinctUntilChanged((p, c) => {

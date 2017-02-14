@@ -107,7 +107,9 @@ const rootLayout = RootLayout.create({
 window.addEventListener('resize', () => {
   rootLayout.resize({
     height: window.innerHeight,
-    width: window.innerWidth
+    width: window.innerWidth,
+    x: 0,
+    y: 0
   });
   
   rootLayout.update();

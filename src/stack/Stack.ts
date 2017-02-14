@@ -19,6 +19,10 @@ import { StackItemContainer, StackItemContainerConfig } from './StackItemContain
 import { StackTab } from './StackTab';
 import { clamp, get, isNumber } from '../utils';
 
+export interface StackItemRemovalOptions {
+ destroy?: boolean;
+}
+
 export interface StackConfig {
   children: StackItemContainerConfig[];
   startIndex?: number;
@@ -41,8 +45,8 @@ export class Stack extends Renderable {
   getTabAtIndex: (index: number) => StackTab|null = this._getAtIndex.bind(this, 'tab');
   setActiveContainer: (container: StackItemContainer) => void = this._setActive.bind(this, 'item');
   setActiveTab: (tab: StackTab) => void = this._setActive.bind(this, 'tab');
-  removeContainer: (container: StackItemContainer) => void = this._remove.bind(this, 'item');
-  removeTab: (tab: StackTab) => void = this._remove.bind(this, 'tab');
+  removeContainer: (container: StackItemContainer, options?: StackItemRemovalOptions) => void = this._remove.bind(this, 'item');
+  removeTab: (tab: StackTab, options?: StackItemRemovalOptions) => void = this._remove.bind(this, 'tab');
   
   private _children: StackEntry[] = [];
   private _direction: XYDirection;
@@ -50,12 +54,12 @@ export class Stack extends Renderable {
   private _activeIndex: number = 0;
   
   constructor(
-    @Inject(Injector) private _injector: Injector,
+    @Inject(Injector) _injector: Injector,
     @Inject(ConfigurationRef) private _config: StackConfig|null,
     @Inject(Renderer) private _renderer: Renderer,
     @Inject(ContainerRef) protected _container: Renderable
   ) {
-    super(_container);
+    super(_injector);
     
     this._header = Injector.fromInjectable(
       StackHeader, 
@@ -73,7 +77,10 @@ export class Stack extends Renderable {
     this._header.subscribe(TabSelectionEvent, this._onTabSelect.bind(this));
     
     if (this._config) {
-      this._config.children.forEach(child => this.addChild(child));
+      this._config.children.forEach(child => {
+        this.addChild(this.createChild(child), child.title);
+      });
+      
       this._setActiveIndex(this._config.startIndex);
     }
   }
@@ -118,13 +125,8 @@ export class Stack extends Renderable {
     ]);
   }
 
-  resize(): void {
-    this._header.resize();
-    super.resize();
-  }
-
-  addChild(config: StackItemContainerConfig): void {
-    const item = Injector.fromInjectable(
+  createChild(config: StackItemContainerConfig): StackItemContainer {
+    return Injector.fromInjectable(
       StackItemContainer, 
       [
         { provide: ContainerRef, useValue: this },
@@ -135,13 +137,18 @@ export class Stack extends Renderable {
       this._injector
     )
       .get(StackItemContainer) as StackItemContainer
+  }
 
+  addChild(item: StackItemContainer, title?: string): void {
     const tab = this._header.addTab({
+      title,
       maxSize: get<number>(this._config, 'header.maxTabSize', 200),
-      title: config.title
     });
 
+    item.setContainer(this);
     this._children.push({ item, tab });
+    this.resize();
+    this._renderer.render();
   }
 
   setActiveIndex(index?: number): void {
@@ -149,14 +156,16 @@ export class Stack extends Renderable {
     this._renderer.render();
   }
 
-  removeAtIndex(index: number): void {
+  removeAtIndex(index: number, options: StackItemRemovalOptions = {}): void {
     if (index >= this._children.length && index < 0) {
       return;      
     }
 
     const entry = this._children[index];
 
-    entry.item.destroy();
+    if (options.destroy) {
+      entry.item.destroy();
+    }
 
     if (!entry.tab.isDestroyed) {
       this._header.removeTab(entry.tab);
@@ -206,7 +215,7 @@ export class Stack extends Renderable {
     }
   }
 
-  private _remove(entryKey: keyof StackEntry, item: StackItemContainer|StackTab): void {
+  private _remove(entryKey: keyof StackEntry, item: StackItemContainer|StackTab, options?: StackItemRemovalOptions): void {
     this.removeAtIndex(this._getIndexOf(entryKey, item));
   }
 

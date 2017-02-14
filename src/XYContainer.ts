@@ -51,7 +51,7 @@ export class XYContainer extends Renderable {
     @Inject(Renderer) protected _renderer: Renderer,
     @Inject(ContainerRef) _container: Renderable
   ) {
-    super(_container);
+    super(_injector);
     
     const children = this._config && this._config.children ? this._config.children : [];
     

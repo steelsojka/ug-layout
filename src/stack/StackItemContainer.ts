@@ -2,13 +2,15 @@ import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
 import { Inject, Injector } from '../di'
-import { Renderable, RenderableInjector, ConfiguredRenderable } from '../dom';
+import { Renderable, RenderableInjector, ConfiguredRenderable, RenderableArea } from '../dom';
 import { BeforeDestroyEvent, Cancellable, Subject, Observable } from '../events';
 import { MakeVisibleCommand } from '../commands';
 import { 
   ConfigurationRef, 
   ContainerRef, 
-  RenderableArg  
+  RenderableArg,
+  DropTarget,
+  DropArea
 } from '../common';
 import { Stack } from './Stack';
 import { StackTab } from './StackTab';
@@ -19,7 +21,7 @@ export interface StackItemContainerConfig {
   title?: string;
 }
 
-export class StackItemContainer extends Renderable {
+export class StackItemContainer extends Renderable implements DropTarget {
   transferred: Observable<this>;
   
   private _item: Renderable;
@@ -27,11 +29,11 @@ export class StackItemContainer extends Renderable {
   protected _container: Stack;
   
   constructor(
-    @Inject(Injector) private _injector: Injector,
+    @Inject(Injector) _injector: Injector,
     @Inject(ConfigurationRef) private _config: StackItemContainerConfig,
     @Inject(ContainerRef) _container: Stack
   ) {
-    super(_container);
+    super(_injector);
 
     this.transferred = this._transferred.asObservable();
     this._container = _container;
@@ -73,6 +75,10 @@ export class StackItemContainer extends Renderable {
     }
     
     return this._container.offsetX;
+  }
+
+  get title(): string {
+    return (this._config && this._config.title) || '';
   }
 
   get offsetX(): number {
@@ -120,6 +126,44 @@ export class StackItemContainer extends Renderable {
   getChildren(): Renderable[] {
     return [ this._item ];
   }
+
+  handleDrop(item: Renderable): void {
+    // this._container.addChild(item);
+  }
+
+  handleDropCleanup(): void {
+    this._container.removeContainer(this, { destroy: false });
+  }
+
+  getHighlightCoordinates(pageX: number, pageY: number, dropArea: DropArea): RenderableArea {
+    let { x, x2, y, y2 } = dropArea.area;
+    const deltaX = pageX - x;
+    const deltaY = pageY - y;
+
+    if (deltaX < this.width / 3) {
+      x2 = this.width / 2;
+    } else if (deltaX > (this.width / 3) * 2) {
+      x = this.width / 2;  
+    } else if (deltaY < this.height / 2) {
+      y2 = this.height / 2;
+    } else if (deltaY >= this.height / 2) {
+      y = this.height / 2;
+    }
+
+    const height = y2 - y;
+    const width = x2 - x;
+
+    return {
+      x, y, x2, y2, height, width,
+      surface: height * width
+    };
+  }
+
+  isDroppable(): boolean {
+    return true;
+  }
+
+  onDropHighlightExit(): void {}
 
   setContainer(container: Stack): void {
     if (container === this._container) {

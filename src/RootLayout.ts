@@ -13,8 +13,9 @@ import {
 } from './common';
 
 export interface RootLayoutConfig {
-  container: HTMLElement,
-  injector?: Injector
+  container: HTMLElement;
+  manualOffset?: boolean;
+  injector?: Injector;
 }
 
 export interface RootConfiguration extends RenderableConfig<Layout> {}
@@ -28,13 +29,15 @@ export class RootLayout extends Renderable {
   private _isAttached: boolean = false;
   private _lastVNode: VNode|null = null;
   private _mountPoint: Node = document.createElement('div');
+  private _offsetX: number = 0;
+  private _offsetY: number = 0;
   
   constructor(
     @Inject(RootConfigRef) @Optional() config: RootLayoutConfig,
     @Inject(Renderer) private _renderer: Renderer,
-    @Inject(Injector) private _injector: Injector
+    @Inject(Injector) _injector: Injector
   ) {
-    super();
+    super(_injector);
     
     this._containerEl = config.container;
   }
@@ -51,8 +54,16 @@ export class RootLayout extends Renderable {
     return this._isAttached;
   }
   
-  get container(): Node|null {
+  get containerEl(): Node|null {
     return this._containerEl;
+  }
+
+  get offsetX(): number {
+    return this._offsetX;
+  }
+  
+  get offsetY(): number {
+    return this._offsetY;
   }
 
   makeVisible(): void {
@@ -70,15 +81,19 @@ export class RootLayout extends Renderable {
     ]);
   }
 
-  resize(dimensions?: { height: number, width: number }): void {
+  resize(dimensions?: { height: number, width: number, x: number, y: number }): void {
     if (dimensions) {
       this._width = dimensions.width;
       this._height = dimensions.height;
+      this._offsetX = dimensions.x;
+      this._offsetY = dimensions.y;
     } else {
       const clientRec = this._containerEl.getBoundingClientRect();
       
       this._width = clientRec.width;
       this._height = clientRec.height;
+      this._offsetX = clientRec.left;
+      this._offsetY = clientRec.top;
     }
     
     this._layout.resize();
