@@ -28,7 +28,6 @@ export class RootLayout extends Renderable {
   private _layout: Layout;
   private _isAttached: boolean = false;
   private _lastVNode: VNode|null = null;
-  private _mountPoint: Node = document.createElement('div');
   private _offsetX: number = 0;
   private _offsetY: number = 0;
   
@@ -104,25 +103,12 @@ export class RootLayout extends Renderable {
   }
 
   initialize(): this {
-    this.mount();
+    this._renderer.initialize(this._containerEl);
+    this._renderer.useNodeGenerator(() => this.render());
+    this.resize();
+    this._renderer.render();
 
     return this;
-  }
-
-  mount(): void {
-    if (this._isAttached) {
-      throw new Error(`Layout is already attached to DOM`);
-    }
-
-    this.attach();
-    this.resize();
-    this._renderer.rendered.subscribe(this._onRender.bind(this));
-    this._renderer.render();
-  }
-
-  attach(): void {
-    this._containerEl.appendChild(this._mountPoint);
-    this._isAttached = true;
   }
 
   configure(config: RootConfiguration): this {
@@ -142,12 +128,6 @@ export class RootLayout extends Renderable {
 
   getChildren(): Renderable[] {
     return [ this._layout ];
-  }
-
-  private _onRender(): void {
-    const node = this._lastVNode ? this._lastVNode : this._mountPoint;
-    
-    this._lastVNode = this._renderer.patch(node, this.render());
   }
 
   static create(config: RootLayoutConfig): RootLayout {

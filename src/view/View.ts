@@ -34,7 +34,7 @@ export class View extends Renderable {
       return p.width === c.width && p.height === c.height;
     });
 
-    this._renderer.afterRender
+    this._renderer.rendered
       .takeUntil(this.destroyed)
       .subscribe(this._postRender.bind(this));
   }

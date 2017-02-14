@@ -186,8 +186,6 @@ export class StackHeader extends Renderable implements DropTarget {
         continue;
       }
       
-      console.log(tabArea.x + (tabArea.width / 2));
-      
       if (deltaX >= tabArea.x + (tabArea.width / 2)) {
         leftMostTab = tabArea;
         leftMostTabIndex = index;

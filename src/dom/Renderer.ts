@@ -5,15 +5,19 @@ import DOMStyle from 'snabbdom/modules/style';
 import DOMProps from 'snabbdom/modules/props';
 import DOMEvents from 'snabbdom/modules/eventlisteners';
 
+import { Inject } from '../di';
 import { Subject, Observable } from '../events';
 import { Deferred } from '../utils';
+import { DocumentRef } from '../common';
 
 export class Renderer {
   rendered: Observable<void>;
-  afterRender: Observable<void>;
   
   private _rendered: Subject<void> = new Subject<void>();
-  private _afterRender: Subject<void> = new Subject<void>();
+  private _lastVNode: VNode|null = null;
+  private _containerEl: Node;
+  private _nodeGenerator: () => VNode;
+  private _mountPoint: HTMLElement;
   private _patch: (oldVNode: VNode|Node, newVNode: VNode) => VNode = snabbdom.init([
     DOMClass,
     DOMStyle,
@@ -21,22 +25,37 @@ export class Renderer {
     DOMEvents
   ]);
 
-  constructor() {
+  constructor(
+    @Inject(DocumentRef) private _document: Document
+  ) {
     this.rendered = this._rendered.asObservable();
-    this.afterRender = this._afterRender.asObservable();
+  }
+
+  initialize(containerEl: Node): void {
+    this._mountPoint = this._document.createElement('div');
+    this._containerEl = containerEl;
+    this._containerEl.appendChild(this._mountPoint);
+  }
+
+  useNodeGenerator(fn: () => VNode): void {
+    this._nodeGenerator = fn;
+  }
+
+  render(): void {
+    if (!this._nodeGenerator) {
+      return;
+    }
+    
+    if (this._lastVNode) {
+      this._lastVNode = this._patch(this._lastVNode, this._nodeGenerator());
+    } else {
+      this._lastVNode = this._patch(this._mountPoint, this._nodeGenerator());
+    }
+
+    this._rendered.next();
   }
 
   destroy() {
     this._rendered.complete();
-    this._afterRender.complete();
-  }
-
-  patch(oldVNode: VNode|Node, newVNode: VNode): VNode {
-    return this._patch(oldVNode, newVNode);
-  }
-
-  render(): void {
-    this._rendered.next();
-    this._afterRender.next();
   }
 }

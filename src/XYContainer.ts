@@ -34,6 +34,8 @@ export interface XYSizingOptions {
 
 type AdjacentResults = { before: XYItemContainer|null, after: XYItemContainer|null };
 
+export const MAX_RATIO_DISTRIBUTION_ITERATIONS = 5;
+
 export class XYContainer extends Renderable {
   protected _height: number = 0;
   protected _width: number = 0;
@@ -382,7 +384,7 @@ export class XYContainer extends Renderable {
     this._distributeRatios();
   }
   
-  private _distributeRatios(_lastTotalRatio?: number): void {
+  private _distributeRatios(_iterationCount: number = 0): void {
     // Recursion alert. Check for inifinite loop here.
     const growable: XYItemContainer[] = [];
     const shrinkable: XYItemContainer[] = [];
@@ -409,7 +411,7 @@ export class XYContainer extends Renderable {
 
     // If we can't completely redistribute cleanly. Average the remainder to all getAdjacentItems
     // and call it good. This will happen if we can't keep all items within their min/max bounds.
-    if (totalRatio === _lastTotalRatio) {
+    if (_iterationCount >= MAX_RATIO_DISTRIBUTION_ITERATIONS) {
       for (const child of this._children) {
         child.ratio = (<number>child.ratio / totalRatio) * 100;
       }
@@ -418,19 +420,21 @@ export class XYContainer extends Renderable {
 
       return;
     }
+    
+    console.log(totalRatio)
 
     if (totalRatio > 100) {
       for (const child of shrinkable) {
         child.ratio = <number>child.ratio - ((totalRatio - 100) / shrinkable.length);
       }
 
-      this._distributeRatios(totalRatio);
+      this._distributeRatios(++_iterationCount);
     } else if (totalRatio < 100) {
       for (const child of growable) {
         child.ratio = <number>child.ratio + ((100 - totalRatio) / growable.length);
       }
       
-      this._distributeRatios(totalRatio);
+      this._distributeRatios(++_iterationCount);
     }
   }
 }
