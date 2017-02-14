@@ -6,6 +6,13 @@ import { Draggable, DragStatus, DragEvent } from './Draggable';
 
 type DropArea = { item: Renderable, area: RenderableArea };
 
+export interface DragAreaBounds {
+  x: number; 
+  x2: number; 
+  y: number; 
+  y2: number;
+}
+
 export class DragHost {
   dropped: Observable<Renderable>;
   start: Observable<Renderable>;
@@ -16,6 +23,11 @@ export class DragHost {
   private _areas: DropArea[]|null = null;
   private _dropArea: DropArea|null = null;
   private _element: HTMLElement = this._document.createElement('div');
+  private _bounds: DragAreaBounds|null = null;
+
+  get bounds(): DragAreaBounds|null {
+    return this._bounds;
+  }
 
   constructor(
     @Inject(DocumentRef) private _document: Document
@@ -47,6 +59,10 @@ export class DragHost {
   
   setDropAreas(areas: DropArea[]): void {
     this._areas = areas;
+  }
+
+  setBounds(x: number, x2: number, y: number, y2: number): void {
+    this._bounds = { x, y, x2, y2 };
   }
 
   private _onDrag(e: DragEvent<Renderable>): void {
@@ -82,7 +98,7 @@ export class DragHost {
 
   private _onDragStop(): void {
     this._areas = null;
-    console.log(this._dropArea);
+    console.log(this._dropArea, this._item);
     this._element.hidden = true;
   }
 }

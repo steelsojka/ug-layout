@@ -11,6 +11,7 @@ import { TabSelectionEvent } from './TabSelectionEvent';
 import { ConfigurationRef, ContainerRef } from '../common';
 import { Subject, Observable, BeforeDestroyEvent } from '../events';
 import { StackControl, StackControlConfig } from './StackControl';
+import { StackItemContainer } from './StackItemContainer';
 
 export interface StackHeaderConfig {
   size: number;
@@ -120,6 +121,10 @@ export class StackHeader extends Renderable {
 
   isTabActive(tab: StackTab): boolean {
     return this._container.isActiveTab(tab);
+  }
+
+  getItemFromTab(tab: StackTab): StackItemContainer|null {
+    return this._container.getContainerAtIndex(this._tabs.indexOf(tab));
   }
 
   render(): VNode {

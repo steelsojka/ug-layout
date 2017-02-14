@@ -171,6 +171,10 @@ export abstract class Renderable {
     return this._eventBus.scope(Event);
   }
 
+  contains(item: Renderable): boolean {
+    return this.getDescendants().indexOf(item) !== -1;
+  }
+
   getArea(): RenderableArea {
     const { height, width, offsetX, offsetY } = this;
     

@@ -88,9 +88,9 @@ export class Layout extends Renderable {
       });
   }
 
-  private _onDragHostStart(item: Renderable): void {
+  private _onDragHostStart(target: Renderable): void {
     this._dragHost.setDropAreas(
-      this.getItemVisibleAreas().filter(({ item }) => item.isDroppable())
+      this.getItemVisibleAreas().filter(({ item }) => item.isDroppable() && !target.contains(item) && target !== item)
     );
   }
 

@@ -42,7 +42,17 @@ export class StackTab extends Renderable {
       title: ''   
     }, this._config || {});
 
-    this._draggable.drag.subscribe(this._onDrag.bind(this));
+    this._draggable.drag
+      .filter(Draggable.isDraggingEvent)
+      .subscribe(this._onDragMove.bind(this));
+    
+    this._draggable.drag
+      .filter(Draggable.isDragStopEvent)
+      .subscribe(this._onDragStop.bind(this));
+      
+    this._draggable.drag
+      .filter(Draggable.isDragStartEvent)
+      .subscribe(this._onDragStart.bind(this));
   }
   
   get width(): number {
@@ -112,20 +122,16 @@ export class StackTab extends Renderable {
       pageX: e.pageX,
       pageY: e.pageY
     });
-    
-    this._draggable.drag
-      .filter(Draggable.isDragStartEvent)
-      .first()
-      .subscribe(() => {
-        this._dragHost.initialize(this, this._draggable);
-      });
   }
 
-  private _onDrag(e: DragEvent<StackTab>): void {
-    switch (e.status) {
-      case DragStatus.DRAGGING: return this._onDragMove(e);
-      case DragStatus.STOP: return this._onDragStop(e);
-    }
+  private _onDragStart(e: DragEvent<StackTab>): void {
+    const item = this._container.getItemFromTab(this);
+    
+    if (item) {
+      this._dragHost.initialize(item, this._draggable);
+    } 
+
+    this._element.classList.add('ug-layout__tab-dragging');
   }
 
   private _onDragMove(e: DragEvent<StackTab>): void {
@@ -136,6 +142,7 @@ export class StackTab extends Renderable {
   private _onDragStop(e: DragEvent<StackTab>): void {
     this._element.style.left = '0px';
     this._element.style.top = '0px';
+    this._element.classList.remove('ug-layout__tab-dragging');
   }
 
   private _onClose(e: MouseEvent): void {
