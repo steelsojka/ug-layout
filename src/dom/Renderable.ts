@@ -12,21 +12,12 @@ import {
 } from '../events';
 import { uid } from '../utils';
 import { ContainerRef } from '../common';
+import { RenderableArea } from './RenderableArea';
 
 export interface EmitEventOptions {
   recursively?: boolean;
   skipSelf?: boolean;
   direction?: 'up'|'down';
-}
-
-export interface RenderableArea {
-  x: number;
-  y: number;
-  x2: number;
-  y2: number;
-  width: number;
-  height: number;
-  surface: number;
 }
 
 export abstract class Renderable {
@@ -196,14 +187,7 @@ export abstract class Renderable {
   getArea(): RenderableArea {
     const { height, width, offsetX, offsetY } = this;
     
-    return {
-      height, width,
-      x: offsetX,
-      y: offsetY,
-      x2: offsetX + width,
-      y2: offsetY + height,
-      surface: height * width
-    };
+    return new RenderableArea(offsetX, offsetX + width, offsetY, offsetY + height);
   }
 
   handleDropCleanup(): void {}

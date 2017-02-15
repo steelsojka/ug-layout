@@ -15,13 +15,15 @@ import {
   ConfigurationRef,
   RenderableConfig,
   RenderableArg,
-  UNALLOCATED
+  UNALLOCATED,
+  DragStatus,
+  DragEvent 
 } from './common';
 import { XYItemContainer, XYItemContainerConfig } from './XYItemContainer';
-import { Draggable, DragStatus, DragEvent } from './Draggable';
+import { Draggable } from './Draggable';
 import { BeforeDestroyEvent } from './events';
 import { Splitter, SPLITTER_SIZE } from './Splitter';
-import { isNumber, clamp } from './utils';
+import { isNumber, clamp, round } from './utils';
 
 export interface XYContainerConfig {
   splitterSize?: number;
@@ -420,10 +422,8 @@ export class XYContainer extends Renderable {
 
       return;
     }
-    
-    console.log(totalRatio)
 
-    if (totalRatio > 100) {
+    if (round(totalRatio, 2) > 100) {
       for (const child of shrinkable) {
         child.ratio = <number>child.ratio - ((totalRatio - 100) / shrinkable.length);
       }

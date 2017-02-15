@@ -9,7 +9,16 @@ import { DragHost } from '../DragHost';
 import { StackTab, StackTabConfigArgs } from './StackTab';
 import { TabCloseEvent } from './TabCloseEvent';
 import { TabSelectionEvent } from './TabSelectionEvent';
-import { ConfigurationRef, ContainerRef, DropTarget, DropArea } from '../common';
+import { TabDragEvent } from './TabDragEvent';
+import { isNumber } from '../utils';
+import { 
+  ConfigurationRef, 
+  ContainerRef, 
+  DropTarget, 
+  DropArea, 
+  HighlightCoordinateArgs,
+  DragEvent
+} from '../common';
 import { Subject, Observable, BeforeDestroyEvent } from '../events';
 import { StackControl, StackControlConfig } from './StackControl';
 import { StackItemContainer } from './StackItemContainer';
@@ -27,13 +36,8 @@ export type StackHeaderConfigArgs = {
 export const DEFAULT_STACK_HEADER_SIZE = 25;
 
 export class StackHeader extends Renderable implements DropTarget {
-  tabSelected: Observable<StackTab>;
-  tabClosed: Observable<BeforeDestroyEvent<StackTab>>;
-  
   private _tabs: StackTab[] = [];
   private _controls: StackControl[] = [];
-  private _tabSelected: Subject<StackTab> = new Subject();
-  private _tabClosed: Subject<BeforeDestroyEvent<StackTab>> = new Subject();
   private _config: StackHeaderConfig;
   private _tabAreas: RenderableArea[];
   
@@ -45,16 +49,20 @@ export class StackHeader extends Renderable implements DropTarget {
   ) {
     super(_injector);
     
-    this.tabSelected = this._tabSelected.asObservable();
-    this.tabClosed = this._tabClosed.asObservable();
-
     this._config = Object.assign({
       controls: [],
       size: DEFAULT_STACK_HEADER_SIZE,
       distribute: false
     }, _config);
 
-    this._dragHost.start.subscribe(this._onDragHostStart.bind(this));
+    this._dragHost.start
+      .takeUntil(this.destroyed)
+      .subscribe(this._onDragHostStart.bind(this));
+      
+    this._dragHost.dropped
+      .takeUntil(this.destroyed)
+      .subscribe(this._onDragHostDropped.bind(this));
+      
     this._config.controls.forEach(control => this.addControl(control));
   } 
 
@@ -74,7 +82,9 @@ export class StackHeader extends Renderable implements DropTarget {
     return Boolean(this._config.distribute);
   }
 
-  addTab(config: StackTabConfigArgs): StackTab {
+  addTab(config: StackTabConfigArgs, options: { index?: number } = {}): StackTab {
+    const { index } = options;
+    
     const tab = Injector.fromInjectable(
       StackTab, 
       [
@@ -87,18 +97,15 @@ export class StackHeader extends Renderable implements DropTarget {
     )
       .get(StackTab) as StackTab;
 
-    tab.subscribe(TabSelectionEvent, this._onTabSelection.bind(this));
+    tab.subscribe(TabSelectionEvent, e => this.emit(e));
+    tab.subscribe(TabCloseEvent, e => this.emit(e));
+    tab.subscribe(TabDragEvent, e => this.emit(e));
 
-    tab.subscribe(BeforeDestroyEvent, e => {
-      this._eventBus.next(e.delegate(TabCloseEvent));
-    });
-      
-    tab.destroyed.subscribe(tab => {
-      this.removeTab(tab);
-      this._container.removeTab(tab);
-    });
-
-    this._tabs.push(tab);
+    if (isNumber(index)) {
+      this._tabs.splice(index, 0, tab);
+    } else {
+      this._tabs.push(tab);
+    }
 
     return tab;
   }
@@ -163,10 +170,13 @@ export class StackHeader extends Renderable implements DropTarget {
     return true;
   }
 
-  handleDrop(item: Renderable): void {
+  handleDrop(item: Renderable, dropArea: DropArea, e: DragEvent<Renderable>): void {
+    const index = this._getIndexFromArea(e.pageX, e.pageY, dropArea.area) + 1;
+    
     if (item instanceof StackItemContainer) {
       if (this._container.getChildren().indexOf(item) === -1) {
-        this._container.addChild(item, item.title);
+        this._container.addChild(item, { index, title: item.title });
+        this._container.setActiveIndex(index);
       } else {
       }
     } 
@@ -174,61 +184,75 @@ export class StackHeader extends Renderable implements DropTarget {
     this.onDropHighlightExit();
   }
 
-  getHighlightCoordinates(pageX: number, pageY: number, dropArea: DropArea): RenderableArea {
-    let { item, area: { x, x2, y, y2, height } } = dropArea;
-    const deltaX = pageX - x;
-    const deltaY = pageY - y;
-    let leftMostTab: RenderableArea|null = null;
-    let leftMostTabIndex: number = 0;
+  getHighlightCoordinates(args: HighlightCoordinateArgs): RenderableArea {
+    let { pageX, pageY, dragArea, dropArea: { item, area: { x, x2, y, y2, height } } } = args;
+    
+    const highlightArea = new RenderableArea(0, 0, y, y2);
+    let leftMostTabIndex = this._getIndexFromArea(pageX, pageY, args.dropArea.area);
+    let leftMostTabArea = this._tabAreas[leftMostTabIndex];
 
-    for (const [ index, tabArea ] of this._tabAreas.entries()) {
-      if (item === this._tabs[index].item) {
-        continue;
-      }
-      
-      if (deltaX >= tabArea.x + (tabArea.width / 2)) {
-        leftMostTab = tabArea;
-        leftMostTabIndex = index;
-      }
-    }
-
-    if (leftMostTab) {
-      x = leftMostTab.x2;
-      x2 = x + 50;
+    if (leftMostTabArea) {
+      highlightArea.x = leftMostTabArea.x2;
+      highlightArea.x2 = leftMostTabArea.x2 + dragArea.width;
     } else {
-      x = 0;
-      x2 = 50;
+      highlightArea.x = 0;
+      highlightArea.x2 = dragArea.width;
     }
 
     for (const [ index, tab ] of this._tabs.entries()) {
-      if (item !== tab.item) {
-        tab.element.style.transform = index > leftMostTabIndex ? 'translateX(50px)' : 'translateX(0px)';
+      if (!tab.isDragging) {
+        tab.element.style.transform = index > leftMostTabIndex ? `translateX(${dragArea.width}px)` : 'translateX(0px)';
       }
     }
     
-    return {
-      x, x2, y, y2, height,
-      width: x + x2,
-      surface: (x + x2) * height
-    };
+    return highlightArea;
   }
 
   onDropHighlightExit(): void {
     for (const tab of this._tabs) {
-      tab.element.style.transform = 'translateX(0px)';
+      if (!tab.isDragging) {
+        tab.element.style.transform = 'translateX(0px)';
+      }
     }
   }
 
   getOffsetXForTab(tab: StackTab): number {
-    return this._tabs.slice(0, this._tabs.indexOf(tab)).reduce((result, tab) => result + tab.width, 0);
+    if (this.isHorizontal) {
+      return this._tabs.slice(0, this._tabs.indexOf(tab)).reduce((result, tab) => result + tab.width, this.offsetX);
+    }
+    
+    return this.offsetX;
+  }
+  
+  getOffsetYForTab(tab: StackTab): number {
+    if (!this.isHorizontal) {
+      return this._tabs.slice(0, this._tabs.indexOf(tab)).reduce((result, tab) => result + tab.height, this.offsetY);
+    }
+
+    return this.offsetY;
   }
 
   private _onDragHostStart(): void {
     this._tabAreas = this._tabs.map(tab => tab.getArea());
-    console.log(this._tabAreas);
+  }
+  
+  private _onDragHostDropped(): void {
+    this._tabAreas = [];
   }
 
-  private _onTabSelection(event: TabSelectionEvent): void {
-    this._eventBus.next(event);
+  private _getIndexFromArea(pageX: number, pageY: number, area: RenderableArea): number {
+    let { x, y } = area;
+    
+    const deltaX = pageX - x;
+    const deltaY = pageY - y;
+    let result = -1;
+    
+    for (const [ index, tabArea ] of this._tabAreas.entries()) {
+      if (deltaX >= tabArea.x + (tabArea.width / 2)) {
+        result = index;
+      }
+    }
+
+    return result;
   }
 }

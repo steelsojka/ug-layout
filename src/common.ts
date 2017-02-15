@@ -13,15 +13,47 @@ export type RenderableArg<T extends Renderable> = Type<T>|ConfiguredRenderable<T
 export interface DropArea { 
   item: RenderableDropTarget;
   area: RenderableArea;
+  dragArea: RenderableArea;
 };
 
 export interface RenderableConfig<T extends Renderable> {
   use: Type<T>|ConfiguredRenderable<T>;
 }
 
+export enum DragStatus {
+  START,
+  STOP,
+  DRAGGING  
+}
+
+export interface DragOptions<T> {
+  host: T;
+  startX: number;
+  startY: number;
+  pageX: number;
+  pageY: number;
+  threshold?: number;
+}
+
+export interface DragEvent<T> {
+  host: T;
+  x: number;
+  y: number;
+  pageX: number;
+  pageY: number;  
+  status: DragStatus;
+}
+
+export interface HighlightCoordinateArgs {
+  pageX: number;
+  pageY: number;
+  dropArea: DropArea;
+  dragArea: RenderableArea;
+}
+
 export interface DropTarget {
-  handleDrop(item: Renderable): void;
-  getHighlightCoordinates(pageX: number, pageY: number, area: DropArea): RenderableArea;
+  handleDrop(item: Renderable, dropArea: DropArea, event: DragEvent<Renderable>): void;
+  getHighlightCoordinates(args: HighlightCoordinateArgs): RenderableArea;
   onDropHighlightExit(): void;
 }
 

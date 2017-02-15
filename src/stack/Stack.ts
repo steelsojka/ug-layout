@@ -14,6 +14,7 @@ import { XYItemContainer, XYItemContainerConfig } from '../XYItemContainer';
 import { StackHeader, StackHeaderConfigArgs } from './StackHeader';
 import { TabCloseEvent } from './TabCloseEvent';
 import { TabSelectionEvent } from './TabSelectionEvent';
+import { TabDragEvent } from './TabDragEvent';
 import { StackItemCloseEvent } from './StackItemCloseEvent';
 import { StackItemContainer, StackItemContainerConfig } from './StackItemContainer';
 import { StackTab } from './StackTab';
@@ -29,6 +30,11 @@ export interface StackConfig {
   direction?: XYDirection;
   reverse?: boolean;
   header?: StackHeaderConfigArgs;
+}
+
+export interface StackAddChildOptions {
+  title?: string;
+  index?: number;
 }
 
 export interface StackEntry {
@@ -75,10 +81,11 @@ export class Stack extends Renderable {
 
     this._header.subscribe(TabCloseEvent, this._onTabClose.bind(this));
     this._header.subscribe(TabSelectionEvent, this._onTabSelect.bind(this));
+    this._header.subscribe(TabDragEvent, this._onTabDrag.bind(this));
     
     if (this._config) {
       this._config.children.forEach(child => {
-        this.addChild(this.createChild(child), child.title);
+        this.addChild(this.createChild(child), { title: child.title });
       });
       
       this._setActiveIndex(this._config.startIndex);
@@ -139,14 +146,22 @@ export class Stack extends Renderable {
       .get(StackItemContainer) as StackItemContainer
   }
 
-  addChild(item: StackItemContainer, title?: string): void {
+  addChild(item: StackItemContainer, options: StackAddChildOptions = {}): void {
+    const { index, title } = options;
+    
     const tab = this._header.addTab({
       title,
       maxSize: get<number>(this._config, 'header.maxTabSize', 200),
-    });
+    }, { index });
 
     item.setContainer(this);
-    this._children.push({ item, tab });
+    
+    if (isNumber(index)) {
+      this._children.splice(index, 0, { item, tab });
+    } else {
+      this._children.push({ item, tab });
+    }
+    
     this.resize();
     this._renderer.render();
   }
@@ -167,10 +182,7 @@ export class Stack extends Renderable {
       entry.item.destroy();
     }
 
-    if (!entry.tab.isDestroyed) {
-      this._header.removeTab(entry.tab);
-    }
-
+    this._header.removeTab(entry.tab);
     this._children.splice(index, 1);
 
     if (this._children.length) {
@@ -203,7 +215,14 @@ export class Stack extends Renderable {
     const container = this.getContainerAtIndex(this.getIndexOfTab(e.target));
 
     if (container) {
-      this._eventBus.next(e.delegate(StackItemCloseEvent, container));
+      const event = e.delegate(StackItemCloseEvent, container);
+      
+      this._eventBus.next(event);
+      
+      event.results().subscribe(() => {
+        this.removeTab(e.target, { destroy: true });
+        e.target.destroy();
+      });
     }
   }
 
@@ -245,6 +264,10 @@ export class Stack extends Renderable {
 
   private _onTabSelect(e: TabSelectionEvent): void {
     this.setActiveTab(e.target);
+  }
+  
+  private _onTabDrag(e: TabDragEvent): void {
+    this.removeTab(e.target, { destroy: false });
   }
 
   private _setActiveIndex(index?: number): void {

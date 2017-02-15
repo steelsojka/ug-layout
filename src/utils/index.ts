@@ -38,6 +38,12 @@ export function propEq(prop: string, value: any): (obj: any) => boolean {
   };
 }
 
+export function round(val: number, precision: number = 0): number {
+  const multiplier = Math.pow(10, precision);
+
+  return Math.round(val * multiplier) / multiplier;
+}
+
 export const uid: () => number = (() => {
   let uid = 0;
   

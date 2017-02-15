@@ -1,31 +1,38 @@
 import { Inject } from './di';
-import { DocumentRef, DropTarget, DropArea, RenderableDropTarget } from './common';
+import { 
+  DocumentRef, 
+  DropTarget, 
+  DropArea, 
+  RenderableDropTarget,
+  DragStatus,
+  DragEvent
+} from './common';
 import { Renderable, RenderableArea } from './dom';
 import { Observable, Subject } from './events';
-import { Draggable, DragStatus, DragEvent } from './Draggable';
+import { Draggable } from './Draggable';
 import { isObject, isFunction } from './utils';
 
-export interface DragAreaBounds {
-  x: number; 
-  x2: number; 
-  y: number; 
-  y2: number;
-}
-
 export class DragHost {
-  dropped: Observable<Renderable>;
+  dropped: Observable<DropArea>;
   start: Observable<Renderable>;
+  fail: Observable<Renderable>;
   
   private _item: Renderable;
-  private _dropped: Subject<Renderable> = new Subject();
+  private _dropped: Subject<DropArea> = new Subject();
   private _start: Subject<Renderable> = new Subject();
+  private _fail: Subject<Renderable> = new Subject();
   private _areas: DropArea[]|null = null;
   private _dropArea: DropArea|null = null;
   private _element: HTMLElement = this._document.createElement('div');
-  private _bounds: DragAreaBounds|null = null;
+  private _bounds: RenderableArea|null = null;
+  private _dragArea: RenderableArea;
 
-  get bounds(): DragAreaBounds|null {
+  get bounds(): RenderableArea|null {
     return this._bounds;
+  }
+
+  set bounds(val: RenderableArea|null) {
+    this._bounds = val;
   }
 
   constructor(
@@ -33,14 +40,16 @@ export class DragHost {
   ) {
     this.dropped = this._dropped.asObservable();
     this.start = this._start.asObservable();
+    this.fail = this._fail.asObservable();
     
     this._element.classList.add('ug-layout__drop-indicator');
     this._element.hidden = true;
     this._document.body.appendChild(this._element);
   }
 
-  initialize(item: Renderable, draggable: Draggable<Renderable>): void {
+  initialize(item: Renderable, draggable: Draggable<Renderable>, dragArea: RenderableArea): void {
     this._item = item;
+    this._dragArea = dragArea;
     this._start.next(item);
 
     draggable.drag
@@ -50,7 +59,7 @@ export class DragHost {
     
     draggable.drag
       .filter(Draggable.isDragStopEvent)
-      .first()
+      .takeUntil(this._dropped)
       .subscribe(this._onDragStop.bind(this));
 
     this._element.hidden = false;
@@ -58,10 +67,6 @@ export class DragHost {
   
   setDropAreas(areas: DropArea[]): void {
     this._areas = areas;
-  }
-
-  setBounds(x: number, x2: number, y: number, y2: number): void {
-    this._bounds = { x, y, x2, y2 };
   }
 
   private _onDrag(e: DragEvent<Renderable>): void {
@@ -93,16 +98,20 @@ export class DragHost {
       
       this._dropArea = result;
       
-      const area = this._dropArea.item.getHighlightCoordinates(e.pageX, e.pageY, result);
+      const area = this._dropArea.item.getHighlightCoordinates({
+        pageX: e.pageX, 
+        pageY: e.pageY, 
+        dropArea: result,
+        dragArea: this._dragArea
+      });
       
-      this._element.style.left = `${area.x}px`;
-      this._element.style.top = `${area.y}px`;
-      this._element.style.width = `${area.width}px`;
-      this._element.style.height = `${area.height}px`;
+      this._element.style.transform = `translate(${area.x}px, ${area.y}px) scale(${area.width}, ${area.height})`;
+      // this._element.style.width = `${area.width}px`;
+      // this._element.style.height = `${area.height}px`;
     }
   }
 
-  private _onDragStop(): void {
+  private _onDragStop(e: DragEvent<Renderable>): void {
     if (!this._dropArea) {
       return;
     }
@@ -110,7 +119,8 @@ export class DragHost {
     this._areas = null;
     this._element.hidden = true;
     this._item.handleDropCleanup();
-    this._dropArea.item.handleDrop(this._item);
+    this._dropArea.item.handleDrop(this._item, this._dropArea, e);
+    this._dropped.next(this._dropArea);
   }
 
   static isDropTarget(item: any): item is RenderableDropTarget {

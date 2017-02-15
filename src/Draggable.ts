@@ -1,37 +1,13 @@
 import { Inject } from './di';
-import { ReplaySubject, Observable } from './events';
-import { DocumentRef } from './common';
+import { Subject, Observable } from './events';
+import { DocumentRef, DragEvent, DragStatus, DragOptions } from './common';
 import { propEq } from './utils';
-
-export enum DragStatus {
-  START,
-  STOP,
-  DRAGGING  
-}
-
-export interface DragOptions<T> {
-  host: T;
-  startX: number;
-  startY: number;
-  pageX: number;
-  pageY: number;
-  threshold?: number;
-}
-
-export interface DragEvent<T> {
-  host: T;
-  x: number;
-  y: number;
-  pageX: number;
-  pageY: number;  
-  status: DragStatus;
-}
 
 export class Draggable<T> {
   drag: Observable<DragEvent<T>>;
   
   private _host: T;
-  private _drag: ReplaySubject<DragEvent<T>> = new ReplaySubject(1);
+  private _drag: Subject<DragEvent<T>> = new Subject();
   private _isDragging: boolean = false;
   private _startX: number = 0;
   private _startY: number = 0;

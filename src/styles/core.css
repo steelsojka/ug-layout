@@ -94,6 +94,9 @@
 
 .ug-layout__stack-tab.ug-layout__tab-dragging {
   z-index: 1050;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .ug-layout__stack-tab {
@@ -109,6 +112,10 @@
   border-right: 1px solid rgb(37, 37, 38);
   z-index: 150;
 } 
+
+.ug-layout__stack-tab.ug-layout__tab-drag-enabled:not(.ug-layout__tab-dragging) {
+  transition: transform 0.25s ease-in;
+}
 
 .ug-layout__stack-tab-x {
   padding: 0 5px;
@@ -168,4 +175,9 @@
   left: 0;
   z-index: 1000;
   background-color: rgba(0, 0, 0, 0.75);
+  height: 1px;
+  width: 1px;
+  transform-origin: top left;
+  transform: scale(1, 1) translate(0, 0);
+  transition: transform 0.15s ease-in;
 }

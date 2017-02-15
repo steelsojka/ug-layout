@@ -10,9 +10,11 @@ import {
 } from '../events';
 import { TabSelectionEvent } from './TabSelectionEvent';
 import { Renderable, ConfiguredRenderable } from '../dom';
-import { Draggable, DragEvent, DragStatus } from '../Draggable';
-import { ContainerRef, ConfigurationRef } from '../common';
+import { Draggable } from '../Draggable';
+import { ContainerRef, ConfigurationRef, DocumentRef, DragEvent, DragStatus } from '../common';
 import { StackHeader } from './StackHeader';
+import { TabCloseEvent } from './TabCloseEvent';
+import { TabDragEvent } from './TabDragEvent';
 import { Stack } from './Stack';
 import { StackItemContainer } from './StackItemContainer';
 import { DragHost } from '../DragHost';
@@ -28,6 +30,7 @@ export type StackTabConfigArgs = {
 
 export class StackTab extends Renderable {
   private _element: HTMLElement;
+  private _isDragging: boolean = false;
   protected _container: StackHeader;
   
   constructor(
@@ -35,6 +38,7 @@ export class StackTab extends Renderable {
     @Inject(ConfigurationRef) private _config: StackTabConfig,
     @Inject(Draggable) private _draggable: Draggable<StackTab>,
     @Inject(DragHost) private _dragHost: DragHost,
+    @Inject(DocumentRef) private _document: Document,
     @Inject(Injector) _injector: Injector
   ) {
     super(_injector);
@@ -55,6 +59,14 @@ export class StackTab extends Renderable {
     this._draggable.drag
       .filter(Draggable.isDragStartEvent)
       .subscribe(this._onDragStart.bind(this));
+
+    this._dragHost.start
+      .takeUntil(this.destroyed)
+      .subscribe(this._onDragHostStart.bind(this));
+    
+    this._dragHost.dropped
+      .takeUntil(this.destroyed)
+      .subscribe(this._onDragHostDropped.bind(this));
   }
   
   get width(): number {
@@ -76,6 +88,14 @@ export class StackTab extends Renderable {
   get offsetX(): number {
     return this._container.getOffsetXForTab(this);
   }
+  
+  get offsetY(): number {
+    return this._container.getOffsetYForTab(this);
+  }
+
+  get isDragging(): boolean {
+    return this._isDragging;
+  }
 
   resize(): void {
     if (this._element) {
@@ -88,6 +108,7 @@ export class StackTab extends Renderable {
   
   render(): VNode {
     return h(`div.ug-layout__stack-tab`, {
+      key: this.uid,
       style: this._getStyles(),
       class: {
         'ug-layout__stack-tab-active': this._container.isTabActive(this),
@@ -151,32 +172,44 @@ export class StackTab extends Renderable {
   private _onDragStart(e: DragEvent<StackTab>): void {
     const item = this._container.getItemFromTab(this);
     
-    if (item) {
-      this._dragHost.initialize(item, this._draggable);
-    } 
-
+    this._isDragging = true;
+    this.emit(new TabDragEvent(this));
     this._element.classList.add('ug-layout__tab-dragging');
+    this._document.body.appendChild(this._element);
+    
+    if (item) {
+      this._dragHost.initialize(item, this._draggable, this.getArea());
+      this._dragHost.dropped.first().subscribe(() => {
+        this.destroy();  
+      });
+    } 
   }
 
   private _onDragMove(e: DragEvent<StackTab>): void {
-    this._element.style.transform = `translateX(${e.x}px) translateY(${e.y}px)`;
+    this._element.style.transform = `translateX(${e.pageX}px) translateY(${e.pageY}px)`;
   }
   
   private _onDragStop(e: DragEvent<StackTab>): void {
+    this._isDragging = false;
     this._element.style.transform = `translateX(0px) translateY(0px)`;
     this._element.classList.remove('ug-layout__tab-dragging');
+    this._document.body.removeChild(this._element);
+  }
+
+  private _onDragHostStart(): void {
+    this._element.classList.add('ug-layout__tab-drag-enabled');
+  }
+  
+  private _onDragHostDropped(): void {
+    this._element.classList.remove('ug-layout__tab-drag-enabled');
   }
 
   private _onClose(e: MouseEvent): void {
     e.stopPropagation();
-
-    const event = new BeforeDestroyEvent(this);
-
-    this._eventBus.next(event);
-    event.results().subscribe(() => this.destroy());
+    this.emit(new TabCloseEvent(this));
   }
 
   private _onClick(): void {
-    this._eventBus.next(new TabSelectionEvent(this));
+    this.emit(new TabSelectionEvent(this));
   }
 }

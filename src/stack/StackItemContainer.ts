@@ -10,7 +10,8 @@ import {
   ContainerRef, 
   RenderableArg,
   DropTarget,
-  DropArea
+  DropArea,
+  HighlightCoordinateArgs
 } from '../common';
 import { Stack } from './Stack';
 import { StackTab } from './StackTab';
@@ -132,31 +133,26 @@ export class StackItemContainer extends Renderable implements DropTarget {
   }
 
   handleDropCleanup(): void {
-    this._container.removeContainer(this, { destroy: false });
+    // this._container.removeContainer(this, { destroy: false });
   }
 
-  getHighlightCoordinates(pageX: number, pageY: number, dropArea: DropArea): RenderableArea {
-    let { x, x2, y, y2 } = dropArea.area;
+  getHighlightCoordinates(args: HighlightCoordinateArgs): RenderableArea {
+    const { pageX, pageY, dropArea: { item, area: { x, x2, y, y2 } } } = args
     const deltaX = pageX - x;
     const deltaY = pageY - y;
+    const highlightArea = new RenderableArea(x, x2, y, y2);
 
     if (deltaX < this.width / 3) {
-      x2 = this.width / 2;
+      highlightArea.x2 = (this.width / 2) + x;
     } else if (deltaX > (this.width / 3) * 2) {
-      x = this.width / 2;  
+      highlightArea.x = (this.width / 2) + x;  
     } else if (deltaY < this.height / 2) {
-      y2 = this.height / 2;
+      highlightArea.y2 = (this.height / 2) + y;
     } else if (deltaY >= this.height / 2) {
-      y = this.height / 2;
+      highlightArea.y = (this.height / 2) + y;
     }
 
-    const height = y2 - y;
-    const width = x2 - x;
-
-    return {
-      x, y, x2, y2, height, width,
-      surface: height * width
-    };
+    return highlightArea;
   }
 
   isDroppable(): boolean {
