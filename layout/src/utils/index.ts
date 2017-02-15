@@ -38,10 +38,20 @@ export function propEq(prop: string, value: any): (obj: any) => boolean {
   };
 }
 
+export function eq(value: any): (value: any) => boolean {
+  return function(val: any): boolean {
+    return val === value;
+  };
+}
+
 export function round(val: number, precision: number = 0): number {
   const multiplier = Math.pow(10, precision);
 
   return Math.round(val * multiplier) / multiplier;
+}
+
+export function isPromise<T>(value: any): value is Promise<T> {
+  return isObject(value) && isFunction(value.then) && isFunction(value.catch);
 }
 
 export const uid: () => number = (() => {

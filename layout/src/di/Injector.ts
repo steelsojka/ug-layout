@@ -99,7 +99,7 @@ export class Injector {
 
       return this.instantiate(ref, ...resolved);
     } else if (this._isFactoryProvider(provider)) {
-      const resolved = this.getDependencies(provider.deps || []);
+      const resolved = this.getDependencies((provider.deps || []).map(token => ({ token })));
       const ref = this.resolveRef(provider.useFactory);
 
       return ref(...resolved);

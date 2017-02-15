@@ -1,10 +1,15 @@
 import { Injector, Type, Inject, Optional } from '../di';
 import { Renderable } from '../dom';
-import { Observable, BeforeDestroyEvent } from '../events';
+import { Observable, BeforeDestroyEvent, BehaviorSubject } from '../events';
 import { ContainerRef, ConfigurationRef } from '../common';
 import { View } from './View';
 import { ViewFactoriesRef, ViewComponentRef } from './common';
-import { uid } from '../utils';
+import { uid, eq, isPromise } from '../utils';
+
+export enum ViewContainerStatus {
+  READY,
+  PENDING
+}
 
 export class ViewContainer<T> {
   readonly id: number = uid();
@@ -19,13 +24,31 @@ export class ViewContainer<T> {
   destroyed: Observable<Renderable> = this._container.destroyed;
   visibilityChanges: Observable<boolean> = this._container.visibilityChanges;
   sizeChanges: Observable<{ width: number, height: number }> = this._container.sizeChanges;
+  status: Observable<ViewContainerStatus>;
 
-  private _view: T;
+  private _component: T;
+  private _status: BehaviorSubject<ViewContainerStatus> = new BehaviorSubject(ViewContainerStatus.PENDING);
   
   constructor(
     @Inject(ContainerRef) protected _container: View,
-    @Inject(Injector) protected _injector: Injector
-  ) {}
+    @Inject(Injector) protected _injector: Injector,
+    @Inject(ViewComponentRef) _maybeComponent: T|Promise<T>
+  ) {
+    this.status = this._status.asObservable();  
+
+    if (isPromise<T>(_maybeComponent)) {
+      _maybeComponent.then(val => this._onComponentReady(val));
+    } else {
+      this._onComponentReady(_maybeComponent);
+    }
+  }
+
+  get ready(): Promise<ViewContainer<T>> {
+    return this.status
+      .filter(eq(ViewContainerStatus.READY))
+      .toPromise()
+      .then(() => this);
+  }
 
   get width(): number {
     return this._container.width;
@@ -35,19 +58,16 @@ export class ViewContainer<T> {
     return this._container.height;
   }
 
-  get view(): T {
-    return this._view;
-  }
-
-  set view(view: T) {
-    if (this._view != null) {
-      throw new Error('Can not reinitialize view.');
-    }
-
-    this._view = view;
+  get component(): T {
+    return this._component;
   }
 
   get(token: any): any {
     return this._injector.get(token, null);
+  }
+
+  private _onComponentReady(component: T): void {
+    this._component = component;
+    this._status.next(ViewContainerStatus.READY);
   }
 }

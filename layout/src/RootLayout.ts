@@ -1,7 +1,7 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
-import { Injector, Inject, Optional } from './di';
+import { Injector, Inject, Optional, forwardRef } from './di';
 import { RootInjector } from './RootInjector';
 import { Layout } from './Layout';
 import { Renderer, Renderable, ConfiguredRenderable, RenderableInjector } from './dom';
@@ -134,7 +134,8 @@ export class RootLayout extends Renderable {
     const rootInjector = config.injector || new RootInjector();
     const injector = rootInjector.spawn([
       RootLayout,
-      { provide: RootConfigRef, useValue: config }
+      { provide: RootConfigRef, useValue: config },
+      { provide: Injector, useValue: forwardRef(() => injector) }
     ]);
 
     return injector.get(RootLayout);

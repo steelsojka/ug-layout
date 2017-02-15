@@ -11,7 +11,7 @@ export interface ViewFactoryArgs {
   element: HTMLElement;
 }
 
-type FactoryMap = Map<string, ViewFactory>;
+export type FactoryMap = Map<string, ViewFactory>;
 
 export class ViewFactory {
   constructor(
@@ -28,7 +28,11 @@ export class ViewFactory {
     ];
 
     if (config.useFactory) {
-      providers.push({ provide: ViewComponentRef, useFactory: config.useFactory });
+      providers.push({
+        provide: ViewComponentRef, 
+        useFactory: config.useFactory,
+        deps: config.deps
+      });
     } else if (config.useName) {
       this._assertFactoryExists(config.useName);
       
@@ -46,9 +50,6 @@ export class ViewFactory {
 
     const viewInjector = Injector.fromInjectable(ViewContainer, providers, injector);
     const viewContainer = viewInjector.get(ViewContainer) as ViewContainer<any>;
-    const viewComponent = viewInjector.get(ViewComponentRef);
-
-    viewContainer.view = viewComponent;
      
     return viewContainer;
   }  
@@ -73,7 +74,7 @@ export class ViewFactory {
     throw new Error('Can not resolve token from config.');
   }
 
-  private _assertFactoryExists(name: string): void {
+  protected _assertFactoryExists(name: string): void {
     if (!this._factories) {
       throw new Error('There are no configured views.');
     }

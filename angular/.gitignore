@@ -1,0 +1,4 @@
+node_modules
+dist
+test/live/bundle
+.vscode/chrome

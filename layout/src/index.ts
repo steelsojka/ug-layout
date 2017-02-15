@@ -6,6 +6,7 @@ export * from './events';
 export * from './stack';
 export * from './Layout';
 export * from './RootLayout';
+export * from './RootInjector';
 export * from './Row';
 export * from './Column';
 export * from './XYContainer';

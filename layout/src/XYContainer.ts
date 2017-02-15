@@ -34,7 +34,7 @@ export interface XYSizingOptions {
   distribute?: boolean;
 }
 
-type AdjacentResults = { before: XYItemContainer|null, after: XYItemContainer|null };
+export type AdjacentResults = { before: XYItemContainer|null, after: XYItemContainer|null };
 
 export const MAX_RATIO_DISTRIBUTION_ITERATIONS = 5;
 

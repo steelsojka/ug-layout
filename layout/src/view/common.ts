@@ -20,4 +20,5 @@ export interface ViewConfig {
   useValue?: Function;
   useName?: string;
   useClass?: Type<any>;
+  deps?: any[];
 }

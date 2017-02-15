@@ -6,13 +6,9 @@
     "sourceMap": true,
     "strictNullChecks": true,
     "importHelpers": true,
-    "skipLibCheck": true,
-    "types": [
-      "reflect-metadata"
-    ]
+    "skipLibCheck": true
   },
   "include": [
-    "src/**/*",
-    "test/**/*"
+    "layout/**/*"
   ]
 }
