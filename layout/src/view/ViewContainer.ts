@@ -31,16 +31,9 @@ export class ViewContainer<T> {
   
   constructor(
     @Inject(ContainerRef) protected _container: View,
-    @Inject(Injector) protected _injector: Injector,
-    @Inject(ViewComponentRef) _maybeComponent: T|Promise<T>
+    @Inject(Injector) protected _injector: Injector
   ) {
     this.status = this._status.asObservable();  
-
-    if (isPromise<T>(_maybeComponent)) {
-      _maybeComponent.then(val => this._onComponentReady(val));
-    } else {
-      this._onComponentReady(_maybeComponent);
-    }
   }
 
   get ready(): Promise<ViewContainer<T>> {
@@ -64,6 +57,16 @@ export class ViewContainer<T> {
 
   get(token: any): any {
     return this._injector.get(token, null);
+  }
+
+  initialize(): void {
+    const component = this._injector.get(ViewComponentRef);
+    
+    if (isPromise<T>(component)) {
+      component.then(val => this._onComponentReady(val));
+    } else {
+      this._onComponentReady(component);
+    }
   }
 
   private _onComponentReady(component: T): void {

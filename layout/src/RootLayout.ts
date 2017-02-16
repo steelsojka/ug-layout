@@ -1,7 +1,8 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
-import { Injector, Inject, Optional, forwardRef } from './di';
+import { Injector, Inject, Optional, forwardRef, ProviderArg } from './di';
+import { Plugin } from './plugins';
 import { RootInjector } from './RootInjector';
 import { Layout } from './Layout';
 import { Renderer, Renderable, ConfiguredRenderable, RenderableInjector } from './dom';
@@ -12,10 +13,12 @@ import {
   RenderableConfig
 } from './common';
 
-export interface RootLayoutConfig {
+export interface RootLayoutConfig<T> {
+  use?: T;
+  plugins?: Plugin[];
   container: HTMLElement;
   manualOffset?: boolean;
-  injector?: Injector;
+  providers?: ProviderArg[];
 }
 
 export interface RootConfiguration extends RenderableConfig<Layout> {}
@@ -23,22 +26,22 @@ export interface RootConfiguration extends RenderableConfig<Layout> {}
 export class RootLayout extends Renderable {
   protected _height: number = 0;
   protected _width: number = 0;
-  private _containerEl: HTMLElement;
-  private _vnode: VNode;
-  private _layout: Layout;
-  private _isAttached: boolean = false;
-  private _lastVNode: VNode|null = null;
-  private _offsetX: number = 0;
-  private _offsetY: number = 0;
+  protected _containerEl: HTMLElement;
+  protected _vnode: VNode;
+  protected _layout: Layout;
+  protected _isAttached: boolean = false;
+  protected _lastVNode: VNode|null = null;
+  protected _offsetX: number = 0;
+  protected _offsetY: number = 0;
   
   constructor(
-    @Inject(RootConfigRef) @Optional() config: RootLayoutConfig,
-    @Inject(Renderer) private _renderer: Renderer,
+    @Inject(RootConfigRef) protected _config: RootLayoutConfig<RootLayout>,
+    @Inject(Renderer) protected _renderer: Renderer,
     @Inject(Injector) _injector: Injector
   ) {
     super(_injector);
     
-    this._containerEl = config.container;
+    this._containerEl = _config.container;
   }
 
   get height(): number {
@@ -130,12 +133,12 @@ export class RootLayout extends Renderable {
     return [ this._layout ];
   }
 
-  static create(config: RootLayoutConfig): RootLayout {
-    const rootInjector = config.injector || new RootInjector();
-    const injector = rootInjector.spawn([
-      RootLayout,
+  static create<T extends RootLayout>(config: RootLayoutConfig<T>): T {
+    const injector = new RootInjector([
+      { provide: RootLayout, useClass: config.use ? config.use : RootLayout },
       { provide: RootConfigRef, useValue: config },
-      { provide: Injector, useValue: forwardRef(() => injector) }
+      { provide: Injector, useValue: forwardRef(() => injector) },
+      ...config.providers ? config.providers : []
     ]);
 
     return injector.get(RootLayout);

@@ -1,30 +1,31 @@
-import { ComponentFactoryResolver, Injector as NgInjector } from '@angular/core';
+import { ComponentFactoryResolver, Injector as NgInjector, ApplicationRef } from '@angular/core';
 import { 
   RootInjector, 
   Injector, 
   ViewFactory, 
-  ViewFactoriesRef
+  ViewFactoriesRef,
+  ProviderArg
 } from 'ug-layout';
 
-import { AngularViewFactory } from './AngularViewFactory';
+import { AngularViewFactory, factory, factoryDeps } from './AngularViewFactory';
+import { UgLayoutModuleConfigRef, UgLayoutModuleConfiguration } from './common';
 
 export function angularRootInjectorFactory(
   componentFactoryResolver: ComponentFactoryResolver,
-  viewFactories: Map<any, ViewFactory>,
-  ngInjector: NgInjector
-): Injector {
-  return new RootInjector([
+  viewFactories: Map<any, any>,
+  ngInjector: NgInjector,
+  moduleConfig: UgLayoutModuleConfiguration
+): ProviderArg[] {
+  return [
     { provide: ViewFactoriesRef, useValue: viewFactories },
-    {
+    { 
       provide: ViewFactory, 
-      useFactory: viewFactories => {
-        const factory = new AngularViewFactory(viewFactories);
-        
-        factory.initialize(componentFactoryResolver, ngInjector);
-
-        return factory;
-      },
-      deps: [ ViewFactoriesRef ]
+      useFactory: factory(
+        componentFactoryResolver,
+        viewFactories,
+        moduleConfig
+      ),
+      deps: factoryDeps
     }
-  ]);
+  ];
 }

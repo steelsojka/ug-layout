@@ -1,40 +1,59 @@
-import { Inject, Component, ViewChild, ViewContainerRef } from '@angular/core';
-import { Layout, ConfiguredRenderable, RootLayout, View, Stack, RootInjector } from 'ug-layout';
+import { Injector, Inject, Component, ViewChild, ViewContainerRef } from '@angular/core';
+import { Row, Layout, ConfiguredRenderable, View, Stack } from 'ug-layout';
 
 import { TestComponent } from './Test.component';
+import { RootLayout, RootLayoutProviders } from '../../src';
 
 @Component({
   selector: 'app',
-  template: '<div #main class="app"></div>'
+  template: `
+    <div class="app">
+      <div>
+        <button (click)="loadLayout(0)">Layout 1</button>
+        <button (click)="loadLayout(1)">Layout 2</button>
+      </div>
+      <ug-layout-outlet [root]="root"></ug-layout-outlet>
+    </div>
+  `
 })
 export class AppComponent {
-  @ViewChild('main', { read: ViewContainerRef } ) 
-  containerRef: ViewContainerRef;
-
-  constructor(
-    @Inject(RootInjector) private _rootInjector: RootInjector
-  ) { 
-    console.log(_rootInjector);
-  }
-  
-  ngOnInit(): void {
-    RootLayout
-      .create({
-        container: this.containerRef.element.nativeElement,
-        injector: this._rootInjector
+  root: ConfiguredRenderable<Layout>;
+  layouts = [
+    Layout.configure({
+      child: Stack.configure({
+        children: [{
+          title: 'Test',
+          use: View.configure({
+            useClass: TestComponent
+          })
+        }]
       })
-      .configure({
-        use: Layout.configure({
-          child: Stack.configure({
+    }),
+    Layout.configure({
+      child: Stack.configure({
+        children: [{
+          title: 'Test',
+          use: Row.configure({
             children: [{
-              title: 'Test',
+              use: View.configure({
+                useClass: TestComponent
+              })
+            }, {
               use: View.configure({
                 useClass: TestComponent
               })
             }]
           })
-        })
+        }]
       })
-      .initialize();
+    }),
+  ]
+  
+  ngOnInit(): void {
+    this.loadLayout(0);
+  }
+
+  loadLayout(index: number): void {
+    this.root = this.layouts[index];
   }
 }

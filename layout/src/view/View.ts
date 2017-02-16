@@ -62,6 +62,8 @@ export class View extends Renderable {
   destroy(): void {
     this._sizeChanges.complete();
     this._visiblityChanges.complete();
+
+    super.destroy();
   }
 
   close(args: { silent?: boolean } = {}): void {

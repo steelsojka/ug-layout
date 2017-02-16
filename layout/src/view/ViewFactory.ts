@@ -50,6 +50,8 @@ export class ViewFactory {
 
     const viewInjector = Injector.fromInjectable(ViewContainer, providers, injector);
     const viewContainer = viewInjector.get(ViewContainer) as ViewContainer<any>;
+
+    viewContainer.initialize();
      
     return viewContainer;
   }  
@@ -73,6 +75,8 @@ export class ViewFactory {
 
     throw new Error('Can not resolve token from config.');
   }
+
+  destroy(): void {}
 
   protected _assertFactoryExists(name: string): void {
     if (!this._factories) {

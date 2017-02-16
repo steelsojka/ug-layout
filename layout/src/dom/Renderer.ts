@@ -55,7 +55,17 @@ export class Renderer {
     this._rendered.next();
   }
 
-  destroy() {
+  destroy(): void {
     this._rendered.complete();
+  }
+
+  detach(): void {
+    if (this._lastVNode) {
+      if (this._lastVNode.elm) {
+        this._containerEl.removeChild(this._lastVNode.elm);
+      }
+    } else {
+      this._containerEl.removeChild(this._mountPoint);
+    }
   }
 }

@@ -20,6 +20,7 @@
     "@angular/platform-browser": "^2.4.5",
     "@angular/platform-browser-dynamic": "^2.4.5",
     "@types/reflect-metadata": "0.0.5",
+    "angular": "^1.6.2",
     "babel-cli": "^6.22.2",
     "babel-core": "^6.22.1",
     "babel-loader": "^6.2.10",

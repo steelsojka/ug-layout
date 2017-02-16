@@ -1,17 +1,47 @@
-import { NgModule, ComponentFactoryResolver, Injector } from '@angular/core';
+import { 
+  Provider, 
+  NgModule, 
+  ComponentFactoryResolver, 
+  Injector, 
+  ModuleWithProviders,
+  Type,
+  ApplicationRef
+} from '@angular/core';
 import { RootInjector, ViewFactoriesRef } from 'ug-layout';
 
-import { AngularViewFactory } from './AngularViewFactory';
 import { angularRootInjectorFactory } from './AngularRootInjectorFactory';
+import { RootLayoutProviders, UgLayoutModuleConfigRef, UgLayoutModuleConfiguration } from './common';
+import { UgLayoutOutletComponent } from './UgLayoutOutlet.component';
 
 @NgModule({
+  declarations: [
+    UgLayoutOutletComponent
+  ],
+  exports: [
+    UgLayoutOutletComponent
+  ],
   providers: [{
-    provide: RootInjector, 
+    provide: RootLayoutProviders, 
     useFactory: angularRootInjectorFactory,
-    deps: [ ComponentFactoryResolver, ViewFactoriesRef, Injector ]
+    deps: [
+      ComponentFactoryResolver, 
+      ViewFactoriesRef, 
+      Injector,
+      UgLayoutModuleConfigRef
+    ]
   }, {
-    provide: ViewFactoriesRef,
-    useValue: new Map()
+    provide: UgLayoutModuleConfigRef,
+    useValue: {}
   }]  
 })
-export class UgLayoutModule {}
+export class UgLayoutModule {
+  static forRoot(config: UgLayoutModuleConfiguration): ModuleWithProviders {
+    return {
+      providers: [
+        { provide: UgLayoutModuleConfigRef, useValue: config },
+        { provide: ViewFactoriesRef, useValue: config.factories || new Map() }
+      ],
+      ngModule: UgLayoutModule
+    };
+  }
+}
