@@ -11,7 +11,7 @@ import { AngularViewFactory } from './AngularViewFactory';
 export function angularRootInjectorFactory(
   componentFactoryResolver: ComponentFactoryResolver,
   viewFactories: Map<any, ViewFactory>,
-  ngInjector: NgInjector 
+  ngInjector: NgInjector
 ): Injector {
   return new RootInjector([
     { provide: ViewFactoriesRef, useValue: viewFactories },

@@ -8,7 +8,7 @@ import { angularRootInjectorFactory } from './AngularRootInjectorFactory';
   providers: [{
     provide: RootInjector, 
     useFactory: angularRootInjectorFactory,
-    deps: [ ComponentFactoryResolver, Injector ]
+    deps: [ ComponentFactoryResolver, ViewFactoriesRef, Injector ]
   }, {
     provide: ViewFactoriesRef,
     useValue: new Map()
