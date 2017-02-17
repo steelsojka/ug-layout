@@ -2,7 +2,7 @@ import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
 import { Inject, Injector } from '../di'
-import { Renderable, RenderableInjector, ConfiguredRenderable, RenderableArea } from '../dom';
+import { Renderer, Renderable, RenderableInjector, ConfiguredRenderable, RenderableArea } from '../dom';
 import { BeforeDestroyEvent, Cancellable, Subject, Observable } from '../events';
 import { MakeVisibleCommand } from '../commands';
 import { 
@@ -11,15 +11,26 @@ import {
   RenderableArg,
   DropTarget,
   DropArea,
+  DragEvent,
   HighlightCoordinateArgs
 } from '../common';
 import { Stack } from './Stack';
 import { StackTab } from './StackTab';
 import { StackItemCloseEvent } from './StackItemCloseEvent';
+import { XYContainer } from '../XYContainer';
+import { Row } from '../Row';
+import { Column } from '../Column';
 
 export interface StackItemContainerConfig {
   use: RenderableArg<Renderable>;
   title?: string;
+}
+
+export enum StackRegion {
+  NORTH,
+  SOUTH,
+  EAST,
+  WEST
 }
 
 export class StackItemContainer extends Renderable implements DropTarget {
@@ -32,7 +43,8 @@ export class StackItemContainer extends Renderable implements DropTarget {
   constructor(
     @Inject(Injector) _injector: Injector,
     @Inject(ConfigurationRef) private _config: StackItemContainerConfig,
-    @Inject(ContainerRef) _container: Stack
+    @Inject(ContainerRef) _container: Stack,
+    @Inject(Renderer) private _renderer: Renderer
   ) {
     super(_injector);
 
@@ -119,17 +131,51 @@ export class StackItemContainer extends Renderable implements DropTarget {
     this._container.setActiveContainer(this);
   }
 
-  transferTo(container: Stack): void {
-    this._container = container;
-    this._transferred.next(this);
-  }
-
   getChildren(): Renderable[] {
     return [ this._item ];
   }
 
-  handleDrop(item: Renderable): void {
-    // this._container.addChild(item);
+  handleDrop(item: StackItemContainer, dropArea: DropArea, e: DragEvent<Renderable>): void {
+    const region = this._getRegionFromArea(e.pageX, e.pageY, dropArea.area);
+    let Container = region === StackRegion.WEST || region === StackRegion.EAST ? Row : Column;
+    let index = region === StackRegion.WEST || region === StackRegion.NORTH ? 1 : 0;
+
+    const container = Injector.fromInjectable(
+      Container, 
+      [
+        { provide: ContainerRef, useValue: this },
+        Container
+      ], 
+      this._injector
+    )
+      .get(Container) as XYContainer;
+
+    const newStack = Injector.fromInjectable(
+      Stack, 
+      [
+        { provide: ContainerRef, useValue: this },
+        { provide: ConfigurationRef, useValue: { children: [] } },
+        Stack
+      ], 
+      this._injector
+    )
+      .get(Stack) as Stack;
+
+    newStack.addChild(item);
+    
+    const existing = container.createChild({ use: this._item });
+    const dropped = container.createChild({ use: newStack });
+
+    item.setContainer(newStack);
+    this._item.setContainer(existing);
+
+    container.addChild(dropped, { index });
+    container.addChild(existing, { index: index ? 1 : 0 });
+    
+    this._item = container;
+
+    this.resize();
+    this._renderer.render();
   }
 
   handleDropCleanup(): void {
@@ -137,19 +183,23 @@ export class StackItemContainer extends Renderable implements DropTarget {
   }
 
   getHighlightCoordinates(args: HighlightCoordinateArgs): RenderableArea {
-    const { pageX, pageY, dropArea: { item, area: { x, x2, y, y2 } } } = args
-    const deltaX = pageX - x;
-    const deltaY = pageY - y;
+    const { pageX, pageY, dropArea: { area: { x, x2, y, y2 } } } = args
     const highlightArea = new RenderableArea(x, x2, y, y2);
+    const region = this._getRegionFromArea(pageX, pageY, args.dropArea.area);
 
-    if (deltaX < this.width / 3) {
-      highlightArea.x2 = (this.width / 2) + x;
-    } else if (deltaX > (this.width / 3) * 2) {
-      highlightArea.x = (this.width / 2) + x;  
-    } else if (deltaY < this.height / 2) {
-      highlightArea.y2 = (this.height / 2) + y;
-    } else if (deltaY >= this.height / 2) {
-      highlightArea.y = (this.height / 2) + y;
+    switch (region) {
+      case StackRegion.WEST:
+        highlightArea.x2 = (this.width / 2) + x;
+        break;
+      case StackRegion.EAST:
+        highlightArea.x = (this.width / 2) + x;  
+        break;
+      case StackRegion.NORTH:
+        highlightArea.y2 = (this.height / 2) + y;
+        break;
+      case StackRegion.SOUTH:
+        highlightArea.y = (this.height / 2) + y;
+        break;
     }
 
     return highlightArea;
@@ -172,6 +222,24 @@ export class StackItemContainer extends Renderable implements DropTarget {
       .filter(e => e.target === this)
       .takeUntil(this.containerChange)
       .subscribe(this._onTabClose.bind(this));
+  }
+
+  private _getRegionFromArea(pageX: number, pageY: number, area: RenderableArea): StackRegion|null {
+    const { x, x2, y, y2 } = area;
+    const deltaX = pageX - x;
+    const deltaY = pageY - y;
+    
+    if (deltaX < this.width / 3) {
+      return StackRegion.WEST;
+    } else if (deltaX > (this.width / 3) * 2) {
+      return StackRegion.EAST;
+    } else if (deltaY < this.height / 2) {
+      return StackRegion.NORTH;
+    } else if (deltaY >= this.height / 2) {
+      return StackRegion.SOUTH;
+    }
+
+    return null;
   }
 
   private _onTabClose(e: StackItemCloseEvent): void {

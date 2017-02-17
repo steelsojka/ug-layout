@@ -186,7 +186,7 @@ export class StackTab extends Renderable {
   }
 
   private _onDragMove(e: DragEvent<StackTab>): void {
-    this._element.style.transform = `translateX(${e.pageX}px) translateY(${e.pageY}px)`;
+    this._element.style.transform = `translateX(${e.pageX - this.width / 2}px) translateY(${e.pageY - this.height / 2}px)`;
   }
   
   private _onDragStop(e: DragEvent<StackTab>): void {

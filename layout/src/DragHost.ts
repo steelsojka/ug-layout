@@ -106,8 +106,6 @@ export class DragHost {
       });
       
       this._element.style.transform = `translate(${area.x}px, ${area.y}px) scale(${area.width}, ${area.height})`;
-      // this._element.style.width = `${area.width}px`;
-      // this._element.style.height = `${area.height}px`;
     }
   }
 

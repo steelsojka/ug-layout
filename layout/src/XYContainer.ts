@@ -59,7 +59,9 @@ export class XYContainer extends Renderable {
     
     const children = this._config && this._config.children ? this._config.children : [];
     
-    this._children = children.map<XYItemContainer>(config => this.addChild(config));
+    this._children = children.map<XYItemContainer>(config => {
+      return this.addChild(this.createChild(config));
+    });
   }
 
   get height(): number {
@@ -92,10 +94,8 @@ export class XYContainer extends Renderable {
       : this._container.height - this._totalSplitterSize;
   }
 
-  addChild(config: XYItemContainerConfig, options: { index?: number } = {}) {
-    const { index } = options
-
-    const item = Injector.fromInjectable(
+  createChild(config: XYItemContainerConfig, options: { index?: number } = {}): XYItemContainer {
+    return Injector.fromInjectable(
       XYItemContainer, 
       [
         { provide: ContainerRef, useValue: this },
@@ -105,14 +105,18 @@ export class XYContainer extends Renderable {
       ],
       this._injector
     )
-      .get(XYItemContainer) as XYItemContainer;
-      
+      .get(XYItemContainer);
+  }
+
+  addChild(item: XYItemContainer, options: { index?: number } = {}): XYItemContainer {
+    const { index } = options;
+    
     if (typeof index === 'number') {
       this._children.splice(index, 0, item);
     } else {
       this._children.push(item);
     }
-
+    
     while (this._splitters.length < this._children.length - 1) {
       this._splitters.push(this._createSplitter());
     }
