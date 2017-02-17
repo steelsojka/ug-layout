@@ -10,7 +10,7 @@ import {
 import { Renderable, RenderableArea } from './dom';
 import { Observable, Subject } from './events';
 import { Draggable } from './Draggable';
-import { isObject, isFunction } from './utils';
+import { isObject, isFunction, clamp } from './utils';
 
 export class DragHost {
   dropped: Observable<DropArea>;
@@ -97,7 +97,7 @@ export class DragHost {
       }
       
       this._dropArea = result;
-      
+
       const area = this._dropArea.item.getHighlightCoordinates({
         pageX: e.pageX, 
         pageY: e.pageY, 
@@ -105,7 +105,9 @@ export class DragHost {
         dragArea: this._dragArea
       });
       
-      this._element.style.transform = `translate(${area.x}px, ${area.y}px) scale(${area.width}, ${area.height})`;
+      this._element.style.transform = `translate(${area.x}px, ${area.y}px)`;
+      this._element.style.height = `${area.height}px`;
+      this._element.style.width = `${area.width}px`;
     }
   }
 

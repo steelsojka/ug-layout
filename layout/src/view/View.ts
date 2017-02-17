@@ -24,8 +24,7 @@ export class View extends Renderable {
     @Inject(ContainerRef) protected _container: Renderable,
     @Inject(Injector) protected _injector: Injector,
     @Inject(ConfigurationRef) private _configuration: ViewConfig,
-    @Inject(ViewManager) private _viewManager: ViewManager,
-    @Inject(Renderer) private _renderer: Renderer
+    @Inject(ViewManager) private _viewManager: ViewManager
   ) {
     super(_injector);
 
@@ -73,7 +72,7 @@ export class View extends Renderable {
       const event = new BeforeDestroyEvent(this);
       
       this._eventBus.next(event);
-      event.results().subscribe(() => this.destroy());
+      event.results().subscribe(() => this.remove());
     } else {
       this.destroy();
     }
@@ -104,8 +103,6 @@ export class View extends Renderable {
   }
 
   static configure(config: ViewConfig): ConfiguredRenderable<View> {
-    return new ConfiguredRenderable(View, Object.assign({
-      injectable: false
-    }, config));
+    return new ConfiguredRenderable(View, config);
   }
 }

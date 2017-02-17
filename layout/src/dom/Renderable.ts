@@ -10,14 +10,22 @@ import {
   EventBus,
   BusEvent
 } from '../events';
-import { uid } from '../utils';
+import { uid, isNumber } from '../utils';
 import { ContainerRef } from '../common';
 import { RenderableArea } from './RenderableArea';
+import { Renderer } from './Renderer';
 
-export interface EmitEventOptions {
-  recursively?: boolean;
-  skipSelf?: boolean;
-  direction?: 'up'|'down';
+export interface BaseModificationArgs {
+  render?: boolean;
+}
+
+export interface RemoveChildArgs extends BaseModificationArgs {
+  destroy?: boolean;
+}
+
+export interface AddChildArgs extends BaseModificationArgs {
+  index?: number;
+  resize?: boolean;
 }
 
 export abstract class Renderable {
@@ -30,13 +38,16 @@ export abstract class Renderable {
   protected _isDestroyed: boolean = false;
   protected _destroyed: Subject<this> = new Subject();
   protected _uid: number = uid();
-  protected _container: Renderable|null = null
+  protected _container: Renderable|null;
   protected _containerChange: Subject<Renderable|null> = new Subject<Renderable|null>();
+  protected _contentItems: Renderable[] = [];
+  protected _renderer: Renderer;
 
   constructor(protected _injector: Injector) {
     this.destroyed = this._destroyed.asObservable();
     this.containerChange = this._containerChange.asObservable();
 
+    this._renderer = this._injector.get(Renderer);
     this.setContainer(this._injector.get(ContainerRef, null));
   }
 
@@ -68,6 +79,10 @@ export abstract class Renderable {
     return this._uid;
   }
 
+  get injector(): Injector {
+    return this._injector;
+  }
+
   abstract render(): VNode;
   
   resize(): void {
@@ -77,7 +92,7 @@ export abstract class Renderable {
   }
   
   getChildren(): Renderable[] {
-    return [];
+    return [ ...this._contentItems ];
   }
 
   isVisible(): boolean {
@@ -89,9 +104,12 @@ export abstract class Renderable {
       return;
     }
     
+    for (const item of this._contentItems) {
+      item.destroy();  
+    }
+    
     this._isDestroyed = true;
     this._destroyed.next(this);
-
     this._destroyed.complete();
   }
 
@@ -168,6 +186,86 @@ export abstract class Renderable {
     }, children);
   }
 
+  replaceChild(item: Renderable, withItem: Renderable, options: RemoveChildArgs = {}): void {
+    const { destroy = false, render = true } = options;
+    const index = this._contentItems.indexOf(item);
+
+    if (index !== -1) {
+      if (destroy) {
+        item.destroy();
+      }
+
+      this._contentItems.splice(index, 1, withItem);
+      withItem.setContainer(this);
+      this.resize();
+
+      if (render) {
+        this._renderer.render();
+      }
+    }
+  }
+
+  addChild(item: Renderable, options: AddChildArgs = {}): void {
+    const { index = -1, render = true, resize = true } = options;
+    
+    if (index === -1) {
+      this._contentItems.push(item);
+    } else {
+      this._contentItems.splice(index, 0, item);
+    }
+
+    item.setContainer(this);
+
+    if (resize) {
+      this.resize();
+    }
+
+    if (render) {
+      this._renderer.render();
+    }
+  }
+
+  removeChild(item: Renderable, options: RemoveChildArgs = {}): void {
+    const { destroy = true, render = true } = options;
+    const index = this._contentItems.indexOf(item);
+
+    if (index === -1) {
+      return;
+    }
+
+    if (destroy) {
+      item.destroy();
+    }
+
+    this._contentItems.splice(index, 1);
+
+    if (this._contentItems.length) {
+      this.resize();
+    } else {
+      this.remove();
+    }
+
+    if (render) {
+      this._renderer.render();
+    }
+  }
+
+  remove(): void {
+    if (this._container) {
+      this._container.removeChild(this);
+    } else {
+      this.destroy();
+    }
+  }
+
+  getIndexOf(item: Renderable): number {
+    return this._contentItems.indexOf(item);
+  }
+
+  getAtIndex(index: number): Renderable|null {
+    return this._contentItems[index] || null;
+  }
+
   scope<T extends BusEvent<any>>(Event: Type<T>): Observable<T> {
     return this._eventBus.scope(Event);
   }
@@ -178,10 +276,6 @@ export abstract class Renderable {
   
   isContainedWithin(item: Renderable): boolean {
     return item.getDescendants().indexOf(this) !== -1;
-  }
-
-  transferTo(container: Renderable, injector: Injector): void {
-    this.setContainer(container);
   }
 
   getArea(): RenderableArea {

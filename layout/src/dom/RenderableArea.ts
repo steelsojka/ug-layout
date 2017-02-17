@@ -1,3 +1,5 @@
+import { clamp } from '../utils';
+
 export class RenderableArea {
   private _width: number;
   private _height: number;
@@ -45,6 +47,14 @@ export class RenderableArea {
   
   get surface(): number {
     return this._surface;
+  }
+
+  clampX(x: number): number {
+    return clamp(x, this.x, this.x2);
+  }
+  
+  clampY(y: number): number {
+    return clamp(y, this.y, this.y2);
   }
 
   private _calculate(): void {

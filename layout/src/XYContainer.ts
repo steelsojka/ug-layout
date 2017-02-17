@@ -5,9 +5,10 @@ import {
   Renderable, 
   RenderableInjector,
   ConfiguredRenderable,
-  Renderer
+  Renderer,
+  AddChildArgs
 } from './dom';
-import { Inject, Injector } from './di';
+import { Inject, Injector, Optional } from './di';
 import { 
   ContainerRef, 
   XYDirectionRef, 
@@ -17,13 +18,14 @@ import {
   RenderableArg,
   UNALLOCATED,
   DragStatus,
-  DragEvent 
+  DragEvent
 } from './common';
 import { XYItemContainer, XYItemContainerConfig } from './XYItemContainer';
 import { Draggable } from './Draggable';
 import { BeforeDestroyEvent } from './events';
 import { Splitter, SPLITTER_SIZE } from './Splitter';
 import { isNumber, clamp, round } from './utils';
+import { Stack, StackItemContainer } from './stack';
 
 export interface XYContainerConfig {
   splitterSize?: number;
@@ -43,24 +45,23 @@ export class XYContainer extends Renderable {
   protected _width: number = 0;
   protected _direction: XYDirection;
   protected _className: string;
-  protected _children: XYItemContainer[] = [];
+  protected _contentItems: XYItemContainer[] = [];
   protected _splitters: Splitter[] = [];
   protected _dragLimitMin: number = 0;
   protected _dragLimitMax: number = 0;
-  protected _container: Renderable;
+  protected _container: Renderable|null;
 
   constructor(
-    @Inject(ConfigurationRef) protected _config: XYContainerConfig|null,
+    @Inject(ConfigurationRef) @Optional() protected _config: XYContainerConfig|null,
     @Inject(Injector) protected _injector: Injector,
-    @Inject(Renderer) protected _renderer: Renderer,
     @Inject(ContainerRef) _container: Renderable
   ) {
     super(_injector);
     
     const children = this._config && this._config.children ? this._config.children : [];
     
-    this._children = children.map<XYItemContainer>(config => {
-      return this.addChild(this.createChild(config));
+    children.forEach(config => {
+      return this.addChild(this.createChild(config), { render: false, resize: false });
     });
   }
 
@@ -89,6 +90,10 @@ export class XYContainer extends Renderable {
   }
 
   protected get _totalContainerSize(): number {
+    if (!this._container) {
+      return 0;
+    }
+    
     return this.isRow 
       ? this._container.width - this._totalSplitterSize
       : this._container.height - this._totalSplitterSize;
@@ -108,31 +113,44 @@ export class XYContainer extends Renderable {
       .get(XYItemContainer);
   }
 
-  addChild(item: XYItemContainer, options: { index?: number } = {}): XYItemContainer {
-    const { index } = options;
+  addChild(item: Renderable, options: AddChildArgs = {}): void {
+    const childArgs = Object.assign({}, options, { render: false, resize: false });
+    let container: XYItemContainer;
     
-    if (typeof index === 'number') {
-      this._children.splice(index, 0, item);
+    // If this is an item container just add it.
+    if (!(item instanceof XYItemContainer)) {
+      if (item instanceof StackItemContainer) {
+        item = this._createStackWrapper(item);
+      }
+      
+      container = this.createChild({ use: item }, childArgs);
+
+      item.setContainer(container);
     } else {
-      this._children.push(item);
-    }
-    
-    while (this._splitters.length < this._children.length - 1) {
-      this._splitters.push(this._createSplitter());
+      container = item;
     }
 
-    return item;
+    const newItemRatio = (1 / (this._contentItems.length + 1)) * 100;
+
+    container.ratio = newItemRatio;
+    
+    for (const item of this._contentItems) {
+      item.ratio = <number>item.ratio * ((100 - newItemRatio) / 100);
+    }
+    
+    while (this._splitters.length < this._contentItems.length) {
+      this._splitters.push(this._createSplitter());
+    }
+      
+    super.addChild(container, options);
   }
 
   removeChild(item: XYItemContainer): void {
-    const index = this._children.indexOf(item);
+    const index = this._contentItems.indexOf(item);
 
     if (index === -1) {
       return;
     }
-
-    this._children.splice(index, 1);
-    item.destroy();
 
     const splitterIndex = clamp(index, 0, this._splitters.length - 1);
     const splitter = this._splitters[splitterIndex];
@@ -142,15 +160,14 @@ export class XYContainer extends Renderable {
       splitter.destroy();
     }
     
-    this.resize();
-    this._renderer.render();
+    super.removeChild(item);
   }
   
   render(): VNode {
     const children: VNode[] = [];
 
-    for (const [ index, child ] of this._children.entries()) {
-      if (index > 0) {
+    for (const [ index, child ] of this._contentItems.entries()) {
+      if (index > 0 && this._splitters[index - 1]) {
         children.push(this._splitters[index - 1].render());
       }
       
@@ -165,17 +182,9 @@ export class XYContainer extends Renderable {
     }, children);
   }
 
-  destroy(): void {
-    for (const child of this._children) {
-      child.destroy();
-    }
-
-    super.destroy();
-  }
-
   resize(): void {
-    this._height = this._container.height;
-    this._width = this._container.width;
+    this._height = this._container ? this._container.height : 0 ;
+    this._width = this._container ? this._container.width : 0;
 
     this._calculateRatios();
     this._setDimensions();
@@ -201,26 +210,26 @@ export class XYContainer extends Renderable {
   }
 
   getChildren(): XYItemContainer[] {
-    return [ ...this._children ];
+    return super.getChildren() as XYItemContainer[];
   }
 
   getAdjacentItems(item: XYItemContainer): AdjacentResults {
-    const index = this._children.indexOf(item);
+    const index = this._contentItems.indexOf(item);
 
     return {
-      before: index > 0 ? this._children[index - 1] : null,
-      after: index < this._children.length - 1 ? this._children[index + 1] : null
+      before: index > 0 ? this._contentItems[index - 1] : null,
+      after: index < this._contentItems.length - 1 ? this._contentItems[index + 1] : null
     };
   }
 
   getSplitterFromItem(item: XYItemContainer): Splitter|null {
-    const index = this._children.indexOf(item);
+    const index = this._contentItems.indexOf(item);
 
     if (index === -1) {
       return null;
     }
 
-    if (index < this._children.length - 1) {
+    if (index < this._contentItems.length - 1) {
       return this._splitters[index] || null;
     }
 
@@ -265,8 +274,8 @@ export class XYContainer extends Renderable {
     const index = this._splitters.indexOf(splitter);
 
     return {
-      before: this._children[index],
-      after: this._children[index + 1]
+      before: this._contentItems[index],
+      after: this._contentItems[index + 1]
     };
   }
 
@@ -326,7 +335,7 @@ export class XYContainer extends Renderable {
       totalHeight -= totalSplitterSize;
     }
 
-    for (const child of this._children) {
+    for (const child of this._contentItems) {
       let size = (this.isRow ? totalWidth : totalHeight) * (<number>child.ratio / 100);
 
       total += size;
@@ -335,7 +344,7 @@ export class XYContainer extends Renderable {
 
     const extraPixels = Math.floor((this.isRow ? totalWidth : totalHeight) - total);
 
-    for (const [ index, child ] of this._children.entries()) {
+    for (const [ index, child ] of this._contentItems.entries()) {
       if (extraPixels - index > 0) {
         sizes[index]++;
       }
@@ -352,11 +361,11 @@ export class XYContainer extends Renderable {
     let total = 0;
     const unallocatedChildren: XYItemContainer[] = [];
 
-    if (!this._children.length) {
+    if (!this._contentItems.length) {
       return;
     }
 
-    for (const child of this._children) {
+    for (const child of this._contentItems) {
       if (child.ratio !== UNALLOCATED) {
         total += child.ratio as number;
       } else {
@@ -382,7 +391,7 @@ export class XYContainer extends Renderable {
         }
       } 
       
-      for (const child of this._children) {
+      for (const child of this._contentItems) {
         child.ratio = (<number>child.ratio / total) * 100;
       }
     }
@@ -397,7 +406,7 @@ export class XYContainer extends Renderable {
     const containerSize = this._totalContainerSize;
     let totalRatio = 0;
 
-    for (const child of this._children) {
+    for (const child of this._contentItems) {
       const minRatio = !child.isMinimized ? (child.minSize / containerSize) * 100 : 0;
       const maxRatio = (child.maxSize / containerSize) * 100;
       
@@ -415,30 +424,37 @@ export class XYContainer extends Renderable {
       }
     }
 
-    // If we can't completely redistribute cleanly. Average the remainder to all getAdjacentItems
-    // and call it good. This will happen if we can't keep all items within their min/max bounds.
-    if (_iterationCount >= MAX_RATIO_DISTRIBUTION_ITERATIONS) {
-      for (const child of this._children) {
-        child.ratio = (<number>child.ratio / totalRatio) * 100;
-      }
-
-      console.warn('Can not satisify all items min/max bounds. Please check configuration.');
-
-      return;
-    }
-
     if (round(totalRatio, 2) > 100) {
       for (const child of shrinkable) {
         child.ratio = <number>child.ratio - ((totalRatio - 100) / shrinkable.length);
       }
-
-      this._distributeRatios(++_iterationCount);
     } else if (totalRatio < 100) {
       for (const child of growable) {
         child.ratio = <number>child.ratio + ((100 - totalRatio) / growable.length);
       }
-      
-      this._distributeRatios(++_iterationCount);
     }
+
+    totalRatio = this._contentItems.reduce((r, i) => r + <number>i.ratio, 0);
+    
+    for (const child of this._contentItems) {
+      child.ratio = (<number>child.ratio / totalRatio) * 100;
+    }
+  }
+
+  private _createStackWrapper(item: Renderable): Stack {
+    const stack = Injector.fromInjectable(
+      Stack, 
+      [
+        { provide: ContainerRef, useValue: this },
+        { provide: ConfigurationRef, useValue: null },
+        Stack
+      ], 
+      this._injector
+    )
+    .get(Stack) as Stack;
+
+    stack.addChild(item, { render: false });
+
+    return stack;
   }
 }

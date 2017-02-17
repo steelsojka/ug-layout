@@ -17,10 +17,9 @@ export class Column extends XYContainer {
   constructor(
     @Inject(ContainerRef) container: Renderable,
     @Inject(ConfigurationRef) config: ColumnConfig|null,
-    @Inject(Injector) injector: Injector,
-    @Inject(Renderer) renderer: Renderer
+    @Inject(Injector) injector: Injector
   ) {
-    super(config, injector, renderer, container);
+    super(config, injector, container);
   }
   
   static configure(config: ColumnConfig): ConfiguredRenderable<Column> {

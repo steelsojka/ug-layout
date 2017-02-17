@@ -5,8 +5,10 @@ import { Inject, Injector } from '../di';
 import { 
   RenderableInjector, 
   Renderable, 
+  RemoveChildArgs,
+  AddChildArgs,
   ConfiguredRenderable,
-  Renderer
+  BaseModificationArgs
 } from '../dom';
 import { BeforeDestroyEvent, BusEvent, Subject, Observable } from '../events';
 import { ConfigurationRef, ContainerRef, RenderableArg, XYDirection } from '../common';
@@ -17,8 +19,12 @@ import { TabSelectionEvent } from './TabSelectionEvent';
 import { TabDragEvent } from './TabDragEvent';
 import { StackItemCloseEvent } from './StackItemCloseEvent';
 import { StackItemContainer, StackItemContainerConfig } from './StackItemContainer';
+import { RootInjector } from '../RootInjector';
 import { StackTab } from './StackTab';
 import { clamp, get, isNumber } from '../utils';
+import { StackRegion } from './common';
+import { Row } from '../Row';
+import { Column } from '../Column';
 
 export interface StackItemRemovalOptions {
  destroy?: boolean;
@@ -43,27 +49,16 @@ export interface StackEntry {
 }
 
 export class Stack extends Renderable {
-  getIndexOfContainer: (container: StackItemContainer) => number = this._getIndexOf.bind(this, 'item');
-  getIndexOfTab: (tab: StackTab) => number = this._getIndexOf.bind(this, 'tab');
-  isActiveContainer: (container: StackItemContainer) => boolean = this._isActive.bind(this, 'item');
-  isActiveTab: (tab: StackTab) => boolean = this._isActive.bind(this, 'tab');
-  getContainerAtIndex: (index: number) => StackItemContainer|null = this._getAtIndex.bind(this, 'item');
-  getTabAtIndex: (index: number) => StackTab|null = this._getAtIndex.bind(this, 'tab');
-  setActiveContainer: (container: StackItemContainer) => void = this._setActive.bind(this, 'item');
-  setActiveTab: (tab: StackTab) => void = this._setActive.bind(this, 'tab');
-  removeContainer: (container: StackItemContainer, options?: StackItemRemovalOptions) => void = this._remove.bind(this, 'item');
-  removeTab: (tab: StackTab, options?: StackItemRemovalOptions) => void = this._remove.bind(this, 'tab');
-  
-  private _children: StackEntry[] = [];
   private _direction: XYDirection;
   private _header: StackHeader;
   private _activeIndex: number = 0;
+  protected _contentItems: StackItemContainer[] = [];
   
   constructor(
     @Inject(Injector) _injector: Injector,
     @Inject(ConfigurationRef) private _config: StackConfig|null,
-    @Inject(Renderer) private _renderer: Renderer,
-    @Inject(ContainerRef) protected _container: Renderable
+    @Inject(ContainerRef) protected _container: Renderable,
+    @Inject(RootInjector) private _rootInjector: RootInjector
   ) {
     super(_injector);
     
@@ -85,7 +80,7 @@ export class Stack extends Renderable {
     
     if (this._config) {
       this._config.children.forEach(child => {
-        this.addChild(this.createChild(child), { title: child.title });
+        this.addChild(this.createChild(child), { render: false, resize: false });
       });
       
       this._setActiveIndex(this._config.startIndex);
@@ -128,7 +123,7 @@ export class Stack extends Renderable {
       }
     }, [
       this._header.render(),
-      ...this._children.map(child => child.item.render())  
+      ...this._contentItems.map(item => item.render())  
     ]);
   }
 
@@ -146,73 +141,149 @@ export class Stack extends Renderable {
       .get(StackItemContainer) as StackItemContainer
   }
 
-  addChild(item: StackItemContainer, options: StackAddChildOptions = {}): void {
-    const { index, title } = options;
+  addChild(item: Renderable, options: AddChildArgs = {}): void {
+    const { index } = options;
+    let container: StackItemContainer;
+
+    if (!(item instanceof StackItemContainer)) {
+      container = this.createChild({ use: item });
+    } else {
+      container = item;
+    }
     
     const tab = this._header.addTab({
-      title,
+      title: container.title,
       maxSize: get<number>(this._config, 'header.maxTabSize', 200),
-    }, { index });
-
-    item.setContainer(this);
+    }, {
+      index, 
+      render: false,
+      resize: false
+    });
     
-    if (isNumber(index)) {
-      this._children.splice(index, 0, { item, tab });
-    } else {
-      this._children.push({ item, tab });
-    }
-    
-    this.resize();
-    this._renderer.render();
+    super.addChild(item, options);
   }
 
-  setActiveIndex(index?: number): void {
+  removeChild(item: StackItemContainer, options: RemoveChildArgs = {}): void {
+    const { render = true } = options;
+    const index = this._contentItems.indexOf(item);
+
+    if (index === -1) {
+      return;
+    }
+
+    const tab = this._header.getAtIndex(index);
+    
+    if (tab) {
+      this._header.removeChild(tab, Object.assign({}, options, { render: false }));
+    }
+    
+    super.removeChild(item, Object.assign({}, options, { render: false }));
+
     this._setActiveIndex(index);
-    this._renderer.render();
+
+    if (render) {
+      this._renderer.render();
+    }
   }
 
-  removeAtIndex(index: number, options: StackItemRemovalOptions = {}): void {
-    if (index >= this._children.length && index < 0) {
-      return;      
-    }
-
-    const entry = this._children[index];
-
-    if (options.destroy) {
-      entry.item.destroy();
-    }
-
-    this._header.removeTab(entry.tab);
-    this._children.splice(index, 1);
-
-    if (this._children.length) {
-      this._activeIndex = clamp(this._activeIndex, 0, this._children.length - 1);
-    } else {
-      this.destroy();
-    }
+  setActiveIndex(index?: number, args: BaseModificationArgs = {}): void {
+    const { render = true } = args;
     
-    this._renderer.render();
+    this._setActiveIndex(index);
+
+    if (render) {
+      this._renderer.render();
+    }
+  }
+
+  removeAtIndex(index: number, options: RemoveChildArgs = {}): void {
+    const item = this.getAtIndex(index); 
+    
+    if (item) {
+      this.removeChild(item as StackItemContainer, options);
+    }
   }
 
   destroy(): void {
     this._header.destroy();
-
-    for (const { item } of this._children) {
-      item.destroy();
-    }
-
     super.destroy();
   }
 
   getChildren(): Renderable[] {
     return [
-      ...this._children.map(entry => entry.item),
+      ...this._contentItems,
       this._header
     ];
   }
+  
+  getIndexOfContainer(container: StackItemContainer): number {
+    return this.getIndexOf(container);
+  }
+  
+  getIndexOfTab(tab: StackTab): number {
+    return this._header.getIndexOf(tab);
+  }
+  
+  isActiveContainer(container: StackItemContainer): boolean {
+    return this.getIndexOf(container) === this.activeIndex;
+  } 
+  
+  isActiveTab(tab: StackTab): boolean {
+    return this._header.getIndexOf(tab) === this.activeIndex;
+  }
+  
+  getTabAtIndex(index: number): StackTab|null {
+    return this._header.getAtIndex(index) as StackTab|null;
+  }
+  
+  setActiveContainer(container: StackItemContainer): void {
+    this.setActiveIndex(this.getIndexOf(container));
+  }
+  
+  setActiveTab(tab: StackTab): void {
+    this.setActiveIndex(this.getIndexOfTab(tab));
+  }
+
+  _handleItemDrop(region: StackRegion, item: Renderable): void {
+    const index = region === StackRegion.NORTH || region === StackRegion.WEST ? 0 : -1;
+    
+    if (this._container instanceof XYItemContainer) {
+      if (
+        ((region === StackRegion.EAST || region === StackRegion.WEST) && this._container.isRow)
+        || ((region === StackRegion.NORTH || region === StackRegion.SOUTH) && !this._container.isRow)
+      ) {
+        this._container.addChild(item, { index, render: false });
+
+        // TODO: Cut ratio in half here
+      } else {
+        const container = this._createContainerFromRegion(region);
+        
+        this._container.replaceChild(this, container, { destroy: false, render: false });
+        
+        container.addChild(this, { render: false });
+        container.addChild(item, { render: false, index });
+      }
+    }
+        
+    this._renderer.render();
+  }
+
+  private _createContainerFromRegion(region: StackRegion): Row|Column {
+    const RowOrColumn = this._getContainerDropType(region);
+
+    return Injector.fromInjectable(RowOrColumn, [
+      { provide: ContainerRef, useValue: null },
+      { provide: ConfigurationRef, useValue: {} },
+      RowOrColumn
+    ], this._container.injector).get(RowOrColumn);
+  }
+
+  private _getContainerDropType(region: StackRegion): typeof Row|typeof Column {
+    return region === StackRegion.EAST || region === StackRegion.WEST ? Row : Column;
+  }
 
   private _onTabClose(e: TabCloseEvent): void {
-    const container = this.getContainerAtIndex(this.getIndexOfTab(e.target));
+    const container = this.getAtIndex(this.getIndexOfTab(e.target)) as StackItemContainer|null;
 
     if (container) {
       const event = e.delegate(StackItemCloseEvent, container);
@@ -220,46 +291,9 @@ export class Stack extends Renderable {
       this._eventBus.next(event);
       
       event.results().subscribe(() => {
-        this.removeTab(e.target, { destroy: true });
-        e.target.destroy();
+        this.removeChild(container);
       });
     }
-  }
-
-  private _onItemTransfer(item: StackItemContainer): void {
-    const index = this.getIndexOfContainer(item);
-
-    if (index !== -1) {
-      this._children.splice(index, 1);
-    }
-  }
-
-  private _remove(entryKey: keyof StackEntry, item: StackItemContainer|StackTab, options?: StackItemRemovalOptions): void {
-    this.removeAtIndex(this._getIndexOf(entryKey, item));
-  }
-
-  private _getAtIndex(entryKey: keyof StackEntry, index: number): StackItemContainer|StackTab|null {
-    const entry = this._children[index];
-
-    return entry ? entry[entryKey] : null;
-  }
-
-  private _getIndexOf(entryKey: keyof StackEntry, item: StackItemContainer|StackTab): number {
-    for (const [ index, entry ] of this._children.entries()) {
-      if (entry[entryKey] === item) {
-        return index;
-      }
-    }
-
-    return -1;
-  }
-
-  private _isActive(entryKey: keyof StackEntry, item: StackItemContainer|StackTab): boolean {
-    return this._getIndexOf(entryKey, item) === this.activeIndex;
-  }
-  
-  private _setActive(entryKey: keyof StackEntry, item: StackItemContainer|StackTab): void {
-    this.setActiveIndex(this._getIndexOf(entryKey, item));
   }
 
   private _onTabSelect(e: TabSelectionEvent): void {
@@ -267,7 +301,11 @@ export class Stack extends Renderable {
   }
   
   private _onTabDrag(e: TabDragEvent): void {
-    this.removeTab(e.target, { destroy: false });
+    const item = this.getAtIndex(this.getIndexOfTab(e.target)) as StackItemContainer|null;
+    
+    if (item) {
+      this.removeChild(item, { destroy: false });
+    }
   }
 
   private _setActiveIndex(index?: number): void {
@@ -275,7 +313,7 @@ export class Stack extends Renderable {
       return;
     }
     
-    this._activeIndex = clamp(index, 0, this._children.length - 1);
+    this._activeIndex = clamp(index, 0, this._contentItems.length - 1);
   }
 
   static configure(config: StackConfig): ConfiguredRenderable<Stack> {

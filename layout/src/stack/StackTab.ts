@@ -178,7 +178,7 @@ export class StackTab extends Renderable {
     this._document.body.appendChild(this._element);
     
     if (item) {
-      this._dragHost.initialize(item, this._draggable, this.getArea());
+      this._dragHost.initialize(<Renderable>item, this._draggable, this.getArea());
       this._dragHost.dropped.first().subscribe(() => {
         this.destroy();  
       });

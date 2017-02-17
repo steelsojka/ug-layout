@@ -26,8 +26,6 @@ export interface LayoutConfig {
   providers: [ DragHost ]
 })
 export class Layout extends Renderable {
-  private _child: Renderable;
-  
   constructor(
     @Inject(Injector) _injector: Injector,
     @Inject(ConfigurationRef) private _config: LayoutConfig|null,
@@ -45,7 +43,7 @@ export class Layout extends Renderable {
       { provide: ContainerRef, useValue: this },
     ], this._injector);
 
-    this._child = injector.get(ConfiguredRenderable);
+    this._contentItems.push(injector.get(ConfiguredRenderable));
 
     this._dragHost.start.subscribe(this._onDragHostStart.bind(this));
   }  
@@ -64,18 +62,9 @@ export class Layout extends Renderable {
         height: `${this.height}px`,
         width: `${this.width}px`
       }
-    }, [
-      this._child.render()
-    ]);
-  }
-
-  destroy(): void {
-    this._child.destroy();
-    super.destroy();
-  }
-
-  getChildren(): Renderable[] {
-    return [ this._child ];
+    }, 
+      this._contentItems.map(i => i.render())
+    );
   }
 
   getItemVisibleAreas(): Array<{ item: Renderable, area: RenderableArea }> {

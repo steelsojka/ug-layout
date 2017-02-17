@@ -39,64 +39,26 @@ const rootLayout = RootLayout.create({
 })
   .configure({
     use: Layout.configure({
-      child: Stack.configure({
-        startIndex: 1,
+      child: Row.configure({
         children: [{
-          use: Row.configure({
-            children: [{
-              use: Row
-            }, {
-              use: Row
-            }, {
-              use: Row
-            }]
-          }),
-          title: 'Test View 1'
-        }, {
           use: Stack.configure({
             children: [{
-              title: 'NESTED 1',
-              use: Column.configure({
-                children: [{
-                  fixed: true,
-                  use: Stack.configure({
-                    header: {
-                      controls: [{
-                        use: MinimizeStackControl
-                      }]  
-                    },
-                    children: [{
-                      title: 'Account Summary',
-                      use: View.configure({
-                        useClass: TestView
-                      })
-                    }]
-                  })
-                }, {
-                  use: Row
-                }, {
-                  minSizeY: 300,
-                  use: Stack.configure({
-                    header: {
-                      controls: [{
-                        use: MinimizeStackControl
-                      }]  
-                    },
-                    children: [{
-                      title: 'Order Entry',
-                      use: View.configure({
-                        useClass: TestView
-                      })
-                    }]  
-                  })
-                }]
+              title: 'View 1',
+              use: View.configure({
+                useClass: TestView
               })
             }, {
-              use: Row,
-              title: 'NESTED 2'
+              title: 'View 2',
+              use: View.configure({
+                useClass: TestView
+              })
+            }, {
+              title: 'View 3',
+              use: View.configure({
+                useClass: TestView
+              })
             }]
-          }),
-          title: 'Test View 2'
+          })
         }]  
       })
     })

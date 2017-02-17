@@ -17,10 +17,9 @@ export class Row extends XYContainer {
   constructor(
     @Inject(ContainerRef) container: Renderable,
     @Inject(ConfigurationRef) config: RowConfig|null,
-    @Inject(Injector) injector: Injector,
-    @Inject(Renderer) renderer: Renderer
+    @Inject(Injector) injector: Injector
   ) {
-    super(config, injector, renderer, container);
+    super(config, injector, container);
   }
 
   static configure(config: RowConfig): ConfiguredRenderable<Row> {

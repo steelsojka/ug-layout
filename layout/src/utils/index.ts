@@ -22,7 +22,7 @@ export function get<T>(obj: any, path: string, defaultValue?: T): T|undefined {
   let result = obj;
 
   while (pathParts.length) {
-    if (!isObject(result)) {
+    if (!isObject(result) || result === null) {
       return defaultValue; 
     }
     

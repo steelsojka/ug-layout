@@ -28,7 +28,6 @@ export class Splitter extends Renderable {
   constructor(
     @Inject(ConfigurationRef) private _config: SplitterConfig,
     @Inject(DocumentRef) private _document: Document,
-    @Inject(Renderer) private _renderer: Renderer,
     @Inject(ContainerRef) protected _container: XYContainer,
     @Inject(Draggable) protected _draggable: Draggable<Splitter>,
     @Inject(Injector) protected _injector: Injector
