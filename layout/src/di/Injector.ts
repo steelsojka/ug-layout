@@ -29,18 +29,14 @@ export class Injector {
   private _cache: Map<any, any> = new Map();
   
   constructor(
-    providers: Array<Provider|Function> = [],
+    providers: ProviderArg[] = [],
     private _parent: Injector|null = null
   ) {
     this._providers.set(Injector, { provide: Injector, useValue: this });
-    
-    for (const provider of providers) {
-      if (typeof provider === 'function') {
-        this._providers.set(provider, { provide: provider, useClass: provider });
-      } else {
-        this._providers.set(provider.provide, provider);
-      }
-    }
+
+    providers
+      .map(p => this._normalizeProvider(p))
+      .forEach(p => this._providers.set(p.provide, p));
   }
 
   get parent(): Injector|null {
@@ -83,7 +79,7 @@ export class Injector {
     return resource;
   }
   
-  spawn(providers: Array<Provider|Function> = []): Injector {
+  resolveAndCreateChild(providers: ProviderArg[] = []): Injector {
     return new Injector(providers, this);    
   }
 
@@ -91,7 +87,13 @@ export class Injector {
     this._parent = parent;
   }
 
-  private _resolve(provider: Provider, metadata: InjectionMetadata = {}): any {
+  resolveAndInstantiate<T>(provider: any): T {
+    return this._resolve(provider);
+  }
+
+  private _resolve(_provider: ProviderArg, metadata: InjectionMetadata = {}): any {
+    const provider = this._normalizeProvider(_provider);
+    
     if (this._isClassProvider(provider)) {
       const injections = Reflect.getOwnMetadata(INJECT_PARAM_KEY, provider.useClass, (<any>undefined)) || [];
       const resolved = this.getDependencies(injections);
@@ -166,6 +168,14 @@ export class Injector {
 
   private _isExistingProvider(provider: Provider): provider is ExistingProvider {
     return provider.hasOwnProperty('useExisting');
+  }
+
+  private _normalizeProvider(_provider: ProviderArg): Provider {
+    if (typeof _provider === 'function') {
+      return { provide: _provider, useClass: _provider };
+    } 
+
+    return _provider;
   }
 
   static fromInjectable(injectable: Type<any>, providers: ProviderArg[] = [], parent?: Injector): Injector {

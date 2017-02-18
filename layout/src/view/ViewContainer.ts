@@ -1,6 +1,6 @@
 import { Injector, Type, Inject, Optional } from '../di';
 import { Renderable } from '../dom';
-import { Observable, BeforeDestroyEvent, BehaviorSubject } from '../events';
+import { Subject, Observable, BeforeDestroyEvent, BehaviorSubject } from '../events';
 import { ContainerRef, ConfigurationRef } from '../common';
 import { View } from './View';
 import { ViewFactoriesRef, ViewComponentRef } from './common';
@@ -25,15 +25,18 @@ export class ViewContainer<T> {
   visibilityChanges: Observable<boolean> = this._container.visibilityChanges;
   sizeChanges: Observable<{ width: number, height: number }> = this._container.sizeChanges;
   status: Observable<ViewContainerStatus>;
+  mount: Observable<HTMLElement>;
 
   private _component: T;
   private _status: BehaviorSubject<ViewContainerStatus> = new BehaviorSubject(ViewContainerStatus.PENDING);
+  private _mount: Subject<HTMLElement> = new Subject();
   
   constructor(
     @Inject(ContainerRef) protected _container: View,
     @Inject(Injector) protected _injector: Injector
   ) {
     this.status = this._status.asObservable();  
+    this.mount = this._mount.asObservable();
   }
 
   get ready(): Promise<ViewContainer<T>> {
@@ -59,6 +62,11 @@ export class ViewContainer<T> {
     return this._injector.get(token, null);
   }
 
+  destroy(): void {
+    this._mount.complete();
+    this._status.complete();
+  }
+
   initialize(): void {
     const component = this._injector.get(ViewComponentRef);
     
@@ -67,6 +75,10 @@ export class ViewContainer<T> {
     } else {
       this._onComponentReady(component);
     }
+  }
+
+  _attach(element: HTMLElement): void {
+    this._mount.next(element);
   }
 
   private _onComponentReady(component: T): void {

@@ -48,6 +48,7 @@ export class View extends Renderable {
 
   render(): VNode {
     return h('div.ug-layout__view-container', {
+      key: this.uid,
       style: {
         width: `${this.width}px`,
         height: `${this.height}px`
@@ -94,12 +95,16 @@ export class View extends Renderable {
   private _onCreate(element: HTMLElement): void {
     this._element = element;
     
-    this._viewContainer = this._viewManager.create<any>({
-      element,
-      config: this._configuration,
-      injector: this._injector,
-      container: this
-    });
+    if (!this._viewContainer) {
+      this._viewContainer = this._viewManager.create<any>({
+        element,
+        config: this._configuration,
+        injector: this._injector,
+        container: this
+      });
+    }
+
+    this._viewContainer._attach(this._element);
   }
 
   static configure(config: ViewConfig): ConfiguredRenderable<View> {

@@ -36,6 +36,10 @@ export interface XYSizingOptions {
   distribute?: boolean;
 }
 
+export interface ContainerAddChildArgs extends AddChildArgs {
+  distribute?: boolean;
+}
+
 export type AdjacentResults = { before: XYItemContainer|null, after: XYItemContainer|null };
 
 export const MAX_RATIO_DISTRIBUTION_ITERATIONS = 5;
@@ -113,7 +117,8 @@ export class XYContainer extends Renderable {
       .get(XYItemContainer);
   }
 
-  addChild(item: Renderable, options: AddChildArgs = {}): void {
+  addChild(item: Renderable, options: ContainerAddChildArgs = {}): void {
+    const { distribute = true, resize = true } = options;
     const childArgs = Object.assign({}, options, { render: false, resize: false });
     let container: XYItemContainer;
     
@@ -130,12 +135,14 @@ export class XYContainer extends Renderable {
       container = item;
     }
 
-    const newItemRatio = (1 / (this._contentItems.length + 1)) * 100;
+    if (resize) {
+      const newItemRatio = (1 / (this._contentItems.length + 1)) * 100;
 
-    container.ratio = newItemRatio;
-    
-    for (const item of this._contentItems) {
-      item.ratio = <number>item.ratio * ((100 - newItemRatio) / 100);
+      container.ratio = newItemRatio;
+      
+      for (const item of this._contentItems) {
+        item.ratio = <number>item.ratio * ((100 - newItemRatio) / 100);
+      }
     }
     
     while (this._splitters.length < this._contentItems.length) {
@@ -159,8 +166,22 @@ export class XYContainer extends Renderable {
       this._splitters.splice(splitterIndex, 1);
       splitter.destroy();
     }
+
+    super.removeChild(item, { render: false });
+
+    if (this._contentItems.length === 1 && this.container) {
+      const container = this._contentItems[0];
+      const item = container.item;
+      
+      this._contentItems = [];
+      this.container.replaceChild(this, item, { destroy: true, render: false });
+      
+      container.setContainer(null);
+      container.removeChild(item, { destroy: false });
+    }
     
-    super.removeChild(item);
+    this.resize();
+    this._renderer.render();
   }
   
   render(): VNode {

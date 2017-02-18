@@ -20,17 +20,26 @@ import {
   MinimizeStackControl
 } from '../../src';
 
+const colors = [ 'red', 'blue', 'white', 'cyan', 'yellow' ];
+
 @ViewComponent()
 class TestView {
+  private _color: string = colors.shift() as string;
+  
   constructor(
     @Inject(ViewContainer) private container: ViewContainer<TestView>,
     @Inject(ElementRef) private element: HTMLElement
   ) {
-    element.innerHTML = '<div>TEST!!</div>';
     (<any>window).testComp = this;
 
+    container.mount.subscribe(this._onMount.bind(this));
     container.visibilityChanges.subscribe(isVisible => console.log(isVisible));
     container.sizeChanges.subscribe(size => console.log(size));
+  }
+
+  private _onMount(element: HTMLElement): void {
+    element.innerHTML = '<div>TEST!!</div>';
+    element.style.backgroundColor = this._color;
   }
 }
 
@@ -54,6 +63,16 @@ const rootLayout = RootLayout.create({
               })
             }, {
               title: 'View 3',
+              use: View.configure({
+                useClass: TestView
+              })
+            }, {
+              title: 'View 4',
+              use: View.configure({
+                useClass: TestView
+              })
+            }, {
+              title: 'View 5',
               use: View.configure({
                 useClass: TestView
               })

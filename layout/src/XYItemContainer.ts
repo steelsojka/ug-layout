@@ -120,6 +120,10 @@ export class XYItemContainer extends Renderable {
     return this._container;
   }
 
+  get isUnallocated(): boolean {
+    return this.ratio === UNALLOCATED;
+  }
+
   get offsetX(): number {
     let offset = this._container ? this._container.offsetX : 0;
     
@@ -148,6 +152,10 @@ export class XYItemContainer extends Renderable {
     }
 
     return offset;
+  }
+
+  get item(): Renderable {
+    return this._item;
   }
 
   protected get _item(): Renderable {

@@ -57,8 +57,7 @@ export class Stack extends Renderable {
   constructor(
     @Inject(Injector) _injector: Injector,
     @Inject(ConfigurationRef) private _config: StackConfig|null,
-    @Inject(ContainerRef) protected _container: Renderable,
-    @Inject(RootInjector) private _rootInjector: RootInjector
+    @Inject(ContainerRef) protected _container: Renderable
   ) {
     super(_injector);
     
@@ -66,7 +65,6 @@ export class Stack extends Renderable {
       StackHeader, 
       [
         { provide: ContainerRef, useValue: this },
-        { provide: Stack, useValue: this },
         { provide: ConfigurationRef, useValue: this._config ? this._config.header : null },
         StackHeader 
       ], 
@@ -132,7 +130,6 @@ export class Stack extends Renderable {
       StackItemContainer, 
       [
         { provide: ContainerRef, useValue: this },
-        { provide: Stack, useValue: this },
         { provide: ConfigurationRef, useValue: config },
         StackItemContainer
       ],
@@ -216,10 +213,6 @@ export class Stack extends Renderable {
     ];
   }
   
-  getIndexOfContainer(container: StackItemContainer): number {
-    return this.getIndexOf(container);
-  }
-  
   getIndexOfTab(tab: StackTab): number {
     return this._header.getIndexOf(tab);
   }
@@ -245,18 +238,23 @@ export class Stack extends Renderable {
   }
 
   _handleItemDrop(region: StackRegion, item: Renderable): void {
-    const index = region === StackRegion.NORTH || region === StackRegion.WEST ? 0 : -1;
     
     if (this._container instanceof XYItemContainer) {
       if (
         ((region === StackRegion.EAST || region === StackRegion.WEST) && this._container.isRow)
         || ((region === StackRegion.NORTH || region === StackRegion.SOUTH) && !this._container.isRow)
       ) {
-        this._container.addChild(item, { index, render: false });
-
-        // TODO: Cut ratio in half here
+        const containerIndex = this._container.container.getIndexOf(this._container);
+        const index = region === StackRegion.NORTH || region === StackRegion.WEST 
+          ? containerIndex
+          : containerIndex + 1;
+        
+        this._container.addChild(item, { index, render: false, resize: false });
+        this._container.ratio = <number>this._container.ratio * 0.5;
+        this._container.container.resize();
       } else {
         const container = this._createContainerFromRegion(region);
+        const index = region === StackRegion.NORTH || region === StackRegion.WEST ? 0 : -1;
         
         this._container.replaceChild(this, container, { destroy: false, render: false });
         
