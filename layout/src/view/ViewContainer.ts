@@ -1,10 +1,10 @@
 import { Injector, Type, Inject, Optional } from '../di';
 import { Renderable } from '../dom';
-import { Subject, Observable, BeforeDestroyEvent, BehaviorSubject } from '../events';
+import { ReplaySubject, Observable, BeforeDestroyEvent, BehaviorSubject } from '../events';
 import { ContainerRef, ConfigurationRef } from '../common';
 import { View } from './View';
 import { ViewFactoriesRef, ViewComponentRef } from './common';
-import { uid, eq, isPromise } from '../utils';
+import { uid, eq, isPromise, isObject } from '../utils';
 
 export enum ViewContainerStatus {
   READY,
@@ -25,18 +25,20 @@ export class ViewContainer<T> {
   visibilityChanges: Observable<boolean> = this._container.visibilityChanges;
   sizeChanges: Observable<{ width: number, height: number }> = this._container.sizeChanges;
   status: Observable<ViewContainerStatus>;
+  statusReady: Observable<ViewContainerStatus>;
   mount: Observable<HTMLElement>;
 
   private _component: T;
   private _status: BehaviorSubject<ViewContainerStatus> = new BehaviorSubject(ViewContainerStatus.PENDING);
-  private _mount: Subject<HTMLElement> = new Subject();
+  private _mount: ReplaySubject<HTMLElement> = new ReplaySubject(1);
   
   constructor(
     @Inject(ContainerRef) protected _container: View,
     @Inject(Injector) protected _injector: Injector
   ) {
     this.status = this._status.asObservable();  
-    this.mount = this._mount.asObservable();
+    this.mount = this._mount.asObservable().filter(isObject);
+    this.statusReady = this.status.filter(eq(ViewContainerStatus.READY));
   }
 
   get ready(): Promise<ViewContainer<T>> {
