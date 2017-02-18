@@ -3,7 +3,7 @@ import h from 'snabbdom/h';
 
 import { Type, ProviderArg, Inject, Injector, Optional, forwardRef } from '../di';
 import { Renderer, Renderable, ConfiguredRenderable } from '../dom';
-import { ContainerRef, ConfigurationRef, ElementRef } from '../common';
+import { ContainerRef, ConfigurationRef, ElementRef, DocumentRef } from '../common';
 import { Stack } from '../stack';
 import { ViewContainer } from './ViewContainer';
 import { ViewConfig } from './common';
@@ -16,18 +16,28 @@ export class View extends Renderable {
   sizeChanges: Observable<{ width: number, height: number }>;
   
   private _viewContainer: ViewContainer<any>;
-  private _element: HTMLElement;
   private _visiblityChanges: Subject<boolean> = new Subject();
   private _sizeChanges: Subject<{ width: number, height: number }> = new Subject();
+
+  /**
+   * This element is the mount point that views can mount to.
+   * The node created by the render method gets recreated when moved
+   * somewhere else in the tree. This element is constant.
+   * @private
+   * @type {HTMLElement}
+   */
+  private _element: HTMLElement = this._document.createElement('div');
   
   constructor(
     @Inject(ContainerRef) protected _container: Renderable,
     @Inject(Injector) protected _injector: Injector,
     @Inject(ConfigurationRef) private _configuration: ViewConfig,
-    @Inject(ViewManager) private _viewManager: ViewManager
+    @Inject(ViewManager) private _viewManager: ViewManager,
+    @Inject(DocumentRef) private _document: Document
   ) {
     super(_injector);
 
+    this._element.classList.add('ug-layout__view-container-mount');
     this.visibilityChanges = this._visiblityChanges.asObservable().distinctUntilChanged();
     this.sizeChanges = this._sizeChanges.asObservable().distinctUntilChanged((p, c) => {
       return p.width === c.width && p.height === c.height;
@@ -93,18 +103,16 @@ export class View extends Renderable {
   }
 
   private _onCreate(element: HTMLElement): void {
-    this._element = element;
-    
     if (!this._viewContainer) {
       this._viewContainer = this._viewManager.create<any>({
-        element,
+        element: this._element,
         config: this._configuration,
         injector: this._injector,
         container: this
       });
     }
 
-    this._viewContainer._attach(this._element);
+    element.appendChild(this._element);
   }
 
   static configure(config: ViewConfig): ConfiguredRenderable<View> {

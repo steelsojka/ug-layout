@@ -78,7 +78,7 @@ export class AngularViewFactory extends ViewFactory {
     
     componentRef.instance[COMPONENT_REF_KEY] = componentRef;
     
-    viewContainer.mount.subscribe(element => element.appendChild(componentRef.location.nativeElement));
+    elementRef.appendChild(componentRef.location.nativeElement));
     viewContainer.destroyed.subscribe(this._onComponentDestroy.bind(this, componentRef));
 
     // TODO: Add interceptor logic here

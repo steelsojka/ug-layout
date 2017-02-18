@@ -32,14 +32,13 @@ class TestView {
   ) {
     (<any>window).testComp = this;
 
-    container.mount.subscribe(this._onMount.bind(this));
+    element.innerHTML = '<div>TEST!!</div>';
+    element.style.backgroundColor = this._color;
     container.visibilityChanges.subscribe(isVisible => console.log(isVisible));
     container.sizeChanges.subscribe(size => console.log(size));
   }
 
   private _onMount(element: HTMLElement): void {
-    element.innerHTML = '<div>TEST!!</div>';
-    element.style.backgroundColor = this._color;
   }
 }
 
