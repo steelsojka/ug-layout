@@ -18,6 +18,8 @@ import { TabDragEvent } from './TabDragEvent';
 import { Stack } from './Stack';
 import { StackItemContainer } from './StackItemContainer';
 import { DragHost } from '../DragHost';
+import { get } from '../utils';
+import { TabControl } from './tabControls';
 
 export interface StackTabConfig {
   maxSize: number;
@@ -97,6 +99,12 @@ export class StackTab extends Renderable {
     return this._isDragging;
   }
 
+  get controls(): TabControl[] {
+    const { item } = this;
+    
+    return item ? item.controls : [];
+  }
+
   resize(): void {
     if (this._element) {
       const rect = this._element.getBoundingClientRect();
@@ -107,6 +115,8 @@ export class StackTab extends Renderable {
   }
   
   render(): VNode {
+    const { item } = this;
+    
     return h(`div.ug-layout__stack-tab`, {
       key: this.uid,
       style: this._getStyles(),
@@ -114,7 +124,8 @@ export class StackTab extends Renderable {
         'ug-layout__stack-tab-active': this._container.isTabActive(this),
         'ug-layout__stack-tab-distributed': this._container.isDistributed,
         'ug-layout__stack-tab-x': this._container.isHorizontal,
-        'ug-layout__stack-tab-y': !this._container.isHorizontal
+        'ug-layout__stack-tab-y': !this._container.isHorizontal,
+        'ug-layout__stack-tab-draggable': item ? item.draggable : true
       },
       hook: {
         create: (oldNode, newNode) => this._element = newNode.elm as HTMLElement,
@@ -125,12 +136,8 @@ export class StackTab extends Renderable {
         click: () => this._onClick()
       }
     }, [
-      h('div', this._config.title),
-      h('div.ug-layout__stack-tab-close', {
-        on: {
-          click: e => this._onClose(e)
-        }  
-      }, 'x')
+      h('div', get(item, 'title', '')),
+      h('div.ug-layout__stack-tab-controls', this.controls.filter(c => c.isActive()).map(c => c.render()))
     ]);
   }  
 
@@ -160,6 +167,12 @@ export class StackTab extends Renderable {
   }
 
   private _onMouseDown(e: MouseEvent): void {
+    const { item } = this;
+    
+    if (item && !item.draggable) {
+      return;  
+    }
+    
     this._draggable.startDrag({
       host: this, 
       startX: e.x,
@@ -202,11 +215,6 @@ export class StackTab extends Renderable {
   
   private _onDragHostDropped(): void {
     this._element.classList.remove('ug-layout__tab-drag-enabled');
-  }
-
-  private _onClose(e: MouseEvent): void {
-    e.stopPropagation();
-    this.emit(new TabCloseEvent(this));
   }
 
   private _onClick(): void {

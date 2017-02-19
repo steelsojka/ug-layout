@@ -1,5 +1,5 @@
-import { Renderable } from '../dom';
-import { RenderableArg } from '../common';
+import { Renderable } from '../../dom';
+import { RenderableArg } from '../../common';
 
 export interface StackControlConfig {
   use: RenderableArg<StackControl>

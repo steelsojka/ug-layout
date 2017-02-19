@@ -1,11 +1,11 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
-import { Inject, Injector } from '../di';
-import { ContainerRef } from '../common';
+import { Inject, Injector } from '../../di';
+import { ContainerRef } from '../../common';
 import { StackControl } from './StackControl';
-import { StackHeader } from './StackHeader';
-import { MinimizeCommand } from '../commands';
+import { StackHeader } from '../StackHeader';
+import { MinimizeCommand } from '../../commands';
 
 export class MinimizeStackControl extends StackControl {
   constructor(

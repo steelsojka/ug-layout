@@ -26,26 +26,12 @@ import { StackRegion } from './common';
 import { Row } from '../Row';
 import { Column } from '../Column';
 
-export interface StackItemRemovalOptions {
- destroy?: boolean;
-}
-
 export interface StackConfig {
   children: StackItemContainerConfig[];
   startIndex?: number;
   direction?: XYDirection;
   reverse?: boolean;
   header?: StackHeaderConfigArgs;
-}
-
-export interface StackAddChildOptions {
-  title?: string;
-  index?: number;
-}
-
-export interface StackEntry {
-  item: StackItemContainer;
-  tab: StackTab;
 }
 
 export class Stack extends Renderable {
@@ -238,29 +224,27 @@ export class Stack extends Renderable {
   }
 
   _handleItemDrop(region: StackRegion, item: Renderable): void {
-    
-    if (this._container instanceof XYItemContainer) {
-      if (
-        ((region === StackRegion.EAST || region === StackRegion.WEST) && this._container.isRow)
-        || ((region === StackRegion.NORTH || region === StackRegion.SOUTH) && !this._container.isRow)
-      ) {
-        const containerIndex = this._container.container.getIndexOf(this._container);
-        const index = region === StackRegion.NORTH || region === StackRegion.WEST 
-          ? containerIndex
-          : containerIndex + 1;
-        
-        this._container.addChild(item, { index, render: false, resize: false });
-        this._container.ratio = <number>this._container.ratio * 0.5;
-        this._container.container.resize();
-      } else {
-        const container = this._createContainerFromRegion(region);
-        const index = region === StackRegion.NORTH || region === StackRegion.WEST ? 0 : -1;
-        
-        this._container.replaceChild(this, container, { destroy: false, render: false });
-        
-        container.addChild(this, { render: false });
-        container.addChild(item, { render: false, index });
-      }
+    if (
+      this._container instanceof XYItemContainer
+      && (((region === StackRegion.EAST || region === StackRegion.WEST) && this._container.isRow)
+        || ((region === StackRegion.NORTH || region === StackRegion.SOUTH) && !this._container.isRow))
+    ) {
+      const containerIndex = this._container.container.getIndexOf(this._container);
+      const index = region === StackRegion.NORTH || region === StackRegion.WEST 
+        ? containerIndex
+        : containerIndex + 1;
+      
+      this._container.addChild(item, { index, render: false, resize: false });
+      this._container.ratio = <number>this._container.ratio * 0.5;
+      this._container.container.resize();
+    } else {
+      const container = this._createContainerFromRegion(region);
+      const index = region === StackRegion.NORTH || region === StackRegion.WEST ? 0 : -1;
+      
+      this._container.replaceChild(this, container, { destroy: false, render: false });
+      
+      container.addChild(this, { render: false });
+      container.addChild(item, { render: false, index });
     }
         
     this._renderer.render();

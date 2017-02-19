@@ -2,7 +2,7 @@ import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
 import { Inject, Injector } from '../di'
-import { Renderer, Renderable, RenderableInjector, ConfiguredRenderable, RenderableArea } from '../dom';
+import { Renderer, Renderable, AddChildArgs, RenderableInjector, ConfiguredRenderable, RenderableArea } from '../dom';
 import { BeforeDestroyEvent, Cancellable, Subject, Observable } from '../events';
 import { MakeVisibleCommand } from '../commands';
 import { 
@@ -19,13 +19,21 @@ import { StackTab } from './StackTab';
 import { StackItemCloseEvent } from './StackItemCloseEvent';
 import { XYContainer } from '../XYContainer';
 import { StackRegion } from './common';
+import { get } from '../utils'
+import { TabControl, CloseTabControl } from './tabControls';
 
 export interface StackItemContainerConfig {
   use: RenderableArg<Renderable>;
   title?: string;
+  droppable?: boolean;
+  draggable?: boolean;
+  closable?: boolean;
+  controls?: RenderableArg<TabControl>[];
 }
 
 export class StackItemContainer extends Renderable implements DropTarget {
+  private _controls: TabControl[] = [];
+  
   constructor(
     @Inject(Injector) _injector: Injector,
     @Inject(ConfigurationRef) private _config: StackItemContainerConfig,
@@ -45,11 +53,26 @@ export class StackItemContainer extends Renderable implements DropTarget {
         .get(ConfiguredRenderable)
     ];
 
+    _config.controls = _config.controls || [];
+    _config.controls.push(CloseTabControl);
+
+    for (const control of _config.controls) {
+      this.addControl(control, { resize: false, render: false });
+    }
+
     this.subscribe(MakeVisibleCommand, this.makeVisible.bind(this));
   }
 
   get container(): Stack {
     return this._container as Stack;
+  }
+
+  get controls(): TabControl[] {
+    return [ ...this._controls ];
+  }
+
+  get tab(): StackTab|null {
+    return this._container.getTabAtIndex(this._container.getIndexOf(this));
   }
 
   get width(): number {
@@ -76,6 +99,14 @@ export class StackItemContainer extends Renderable implements DropTarget {
     }
     
     return this.container.offsetX;
+  }
+
+  get draggable(): boolean {
+    return get(this._config, 'draggable', true);
+  }
+  
+  get closable(): boolean {
+    return get(this._config, 'closable', false);
   }
 
   get title(): string {
@@ -161,10 +192,39 @@ export class StackItemContainer extends Renderable implements DropTarget {
   }
 
   isDroppable(): boolean {
-    return true;
+    return get(this._config, 'droppable', true);
   }
 
   onDropHighlightExit(): void {}
+
+  addControl(control: RenderableArg<TabControl>, options: AddChildArgs = {}): void {
+    const { index = -1, render = true, resize = true } = options;
+    const { tab } = this;
+    
+    const newControl = RenderableInjector.fromRenderable(
+      control, 
+      [
+        { provide: ContainerRef, useValue: this },
+        
+      ],
+      this._injector
+    )
+      .get(ConfiguredRenderable) as TabControl;
+
+    if (index !== -1) {
+      this._controls.splice(index, 0, newControl);
+    } else {
+      this._controls.push(newControl);
+    }
+
+    if (tab && resize) {
+      tab.resize();
+    }
+
+    if (render) {
+      this._renderer.render();
+    }
+  }
 
   setContainer(container: Stack): void {
     if (container === this._container) {

@@ -16,14 +16,14 @@ export function isFunction(val: any): val is Function {
   return typeof val === 'function';
 }
 
-export function get<T>(obj: any, path: string, defaultValue?: T): T|undefined {
+export function get<T>(obj: any, path: string, defaultValue?: T): T {
   const pathParts = path.split('.');
 
   let result = obj;
 
   while (pathParts.length) {
     if (!isObject(result) || result === null) {
-      return defaultValue; 
+      return defaultValue as T; 
     }
     
     result = obj[pathParts.shift() as any];

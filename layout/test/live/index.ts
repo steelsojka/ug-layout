@@ -47,37 +47,36 @@ const rootLayout = RootLayout.create({
 })
   .configure({
     use: Layout.configure({
-      child: Row.configure({
+      child: Stack.configure({
         children: [{
-          use: Stack.configure({
-            children: [{
-              title: 'View 1',
-              use: View.configure({
-                useClass: TestView
-              })
-            }, {
-              title: 'View 2',
-              use: View.configure({
-                useClass: TestView
-              })
-            }, {
-              title: 'View 3',
-              use: View.configure({
-                useClass: TestView
-              })
-            }, {
-              title: 'View 4',
-              use: View.configure({
-                useClass: TestView
-              })
-            }, {
-              title: 'View 5',
-              use: View.configure({
-                useClass: TestView
-              })
-            }]
+          title: 'View 1',
+          droppable: false,
+          draggable: false,
+          use: View.configure({
+            useClass: TestView
           })
-        }]  
+        }, {
+          title: 'View 2',
+          closable: true,
+          use: View.configure({
+            useClass: TestView
+          })
+        }, {
+          title: 'View 3',
+          use: View.configure({
+            useClass: TestView
+          })
+        }, {
+          title: 'View 4',
+          use: View.configure({
+            useClass: TestView
+          })
+        }, {
+          title: 'View 5',
+          use: View.configure({
+            useClass: TestView
+          })
+        }]
       })
     })
   })

@@ -27,12 +27,13 @@ import {
   DragEvent
 } from '../common';
 import { Subject, Observable, BeforeDestroyEvent } from '../events';
-import { StackControl, StackControlConfig } from './StackControl';
+import { StackControl, StackControlConfig } from './controls';
 import { StackItemContainer } from './StackItemContainer';
 
 export interface StackHeaderConfig {
   size: number;
   distribute: boolean;
+  droppable: boolean;
   controls: StackControlConfig[];
 }
 
@@ -59,6 +60,7 @@ export class StackHeader extends Renderable implements DropTarget {
     this._config = Object.assign({
       controls: [],
       size: DEFAULT_STACK_HEADER_SIZE,
+      droppable: true,
       distribute: false
     }, _config);
 
