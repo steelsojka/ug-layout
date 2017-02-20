@@ -21,14 +21,16 @@ import { XYContainer } from '../XYContainer';
 import { StackRegion } from './common';
 import { get } from '../utils'
 import { TabControl, CloseTabControl } from './tabControls';
+import { StackControlConfig } from './controls';
 
 export interface StackItemContainerConfig {
   use: RenderableArg<Renderable>;
   title?: string;
   droppable?: boolean;
   draggable?: boolean;
-  closable?: boolean;
-  controls?: RenderableArg<TabControl>[];
+  closeable?: boolean;
+  controls?: StackControlConfig[];
+  tabControls?: RenderableArg<TabControl>[];
 }
 
 export class StackItemContainer extends Renderable implements DropTarget {
@@ -53,10 +55,10 @@ export class StackItemContainer extends Renderable implements DropTarget {
         .get(ConfiguredRenderable)
     ];
 
-    _config.controls = _config.controls || [];
-    _config.controls.push(CloseTabControl);
+    _config.tabControls = _config.tabControls || [];
+    _config.tabControls.push(CloseTabControl);
 
-    for (const control of _config.controls) {
+    for (const control of _config.tabControls) {
       this.addControl(control, { resize: false, render: false });
     }
 
@@ -105,8 +107,8 @@ export class StackItemContainer extends Renderable implements DropTarget {
     return get(this._config, 'draggable', true);
   }
   
-  get closable(): boolean {
-    return get(this._config, 'closable', false);
+  get closeable(): boolean {
+    return get(this._config, 'closeable', false);
   }
 
   get title(): string {
@@ -138,11 +140,6 @@ export class StackItemContainer extends Renderable implements DropTarget {
         width: `${this.width}px`
       }
     }, [ this._item.render() ]);
-  }
-
-  destroy(): void {
-    this._item.destroy();
-    super.destroy();
   }
 
   isVisible(): boolean {

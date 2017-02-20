@@ -21,17 +21,28 @@ import { StackItemCloseEvent } from './StackItemCloseEvent';
 import { StackItemContainer, StackItemContainerConfig } from './StackItemContainer';
 import { RootInjector } from '../RootInjector';
 import { StackTab } from './StackTab';
-import { clamp, get, isNumber } from '../utils';
+import { clamp, get, isNumber, propEq } from '../utils';
 import { StackRegion } from './common';
 import { Row } from '../Row';
 import { Column } from '../Column';
+import { StackControl, CloseStackControl } from './controls';
 
 export interface StackConfig {
+  children: StackItemContainerConfig[];
+  startIndex: number;
+  direction: XYDirection;
+  reverse: boolean;
+  header: StackHeaderConfigArgs;
+  controls: RenderableArg<StackControl>[];
+}
+
+export interface StackConfigArgs {
   children: StackItemContainerConfig[];
   startIndex?: number;
   direction?: XYDirection;
   reverse?: boolean;
   header?: StackHeaderConfigArgs;
+  controls?: RenderableArg<StackControl>[];
 }
 
 export class Stack extends Renderable {
@@ -39,13 +50,23 @@ export class Stack extends Renderable {
   private _header: StackHeader;
   private _activeIndex: number = 0;
   protected _contentItems: StackItemContainer[] = [];
+  protected _config: StackConfig;
   
   constructor(
     @Inject(Injector) _injector: Injector,
-    @Inject(ConfigurationRef) private _config: StackConfig|null,
+    @Inject(ConfigurationRef) _config: StackConfigArgs,
     @Inject(ContainerRef) protected _container: Renderable
   ) {
     super(_injector);
+    
+    this._config = Object.assign({
+      controls: [],
+      header: null,
+      children: [],
+      startIndex: 0,
+      direction: XYDirection.X,
+      reverse: false
+    }, _config);
     
     this._header = Injector.fromInjectable(
       StackHeader, 
@@ -61,14 +82,18 @@ export class Stack extends Renderable {
     this._header.subscribe(TabCloseEvent, this._onTabClose.bind(this));
     this._header.subscribe(TabSelectionEvent, this._onTabSelect.bind(this));
     this._header.subscribe(TabDragEvent, this._onTabDrag.bind(this));
+
     
-    if (this._config) {
-      this._config.children.forEach(child => {
-        this.addChild(this.createChild(child), { render: false, resize: false });
-      });
-      
-      this._setActiveIndex(this._config.startIndex);
+    this._config.children.forEach(child => {
+      this.addChild(this.createChild(child), { render: false, resize: false });
+    });
+
+    if (!ConfiguredRenderable.inList(this._config.controls, CloseStackControl)) {
+      this._config.controls.push(CloseStackControl);
     }
+
+    this._config.controls.forEach(control => this.addControl(control));
+    this._setActiveIndex(this._config.startIndex);
   }
 
   get direction(): XYDirection {
@@ -80,7 +105,7 @@ export class Stack extends Renderable {
   }
 
   get isReversed(): boolean {
-    return Boolean(this._config && this._config.reverse === true);
+    return Boolean(this._config.reverse === true);
   }
 
   get width(): number {
@@ -89,6 +114,10 @@ export class Stack extends Renderable {
 
   get height(): number {
     return this._container.height;
+  }
+
+  get isCloseable(): boolean {
+    return this._contentItems.every(propEq('closeable', true));
   }
 
   get activeIndex(): number {
@@ -122,6 +151,12 @@ export class Stack extends Renderable {
       this._injector
     )
       .get(StackItemContainer) as StackItemContainer
+  }
+
+  addControl(control: RenderableArg<StackControl>): void {
+    if (this._header) {
+      this._header.addControl(control);
+    }
   }
 
   addChild(item: Renderable, options: AddChildArgs = {}): void {
@@ -162,7 +197,7 @@ export class Stack extends Renderable {
     
     super.removeChild(item, Object.assign({}, options, { render: false }));
 
-    this._setActiveIndex(index);
+    this._setActiveIndex(this._activeIndex);
 
     if (render) {
       this._renderer.render();
@@ -185,6 +220,23 @@ export class Stack extends Renderable {
     if (item) {
       this.removeChild(item as StackItemContainer, options);
     }
+  }
+
+  close(): void {
+    if (!this._contentItems.every(propEq('closeable', true))) {
+      return;
+    }
+
+    const event = new BeforeDestroyEvent(this);
+    
+    this.emitDown(event);
+    event.results().subscribe(() => {
+      if (this._container) {
+        this._container.removeChild(this);
+      } else {
+        this.destroy();
+      }
+    });
   }
 
   destroy(): void {
@@ -295,10 +347,10 @@ export class Stack extends Renderable {
       return;
     }
     
-    this._activeIndex = clamp(index, 0, this._contentItems.length - 1);
+    this._activeIndex = clamp(index, 0, Math.max(this._contentItems.length - 1, 0));
   }
 
-  static configure(config: StackConfig): ConfiguredRenderable<Stack> {
+  static configure(config: StackConfigArgs): ConfiguredRenderable<Stack> {
     return new ConfiguredRenderable(Stack, config);
   }
 }

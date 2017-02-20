@@ -16,11 +16,13 @@ export class DragHost {
   dropped: Observable<DropArea>;
   start: Observable<Renderable>;
   fail: Observable<Renderable>;
+  success: Observable<Renderable>;
   
   private _item: Renderable;
   private _dropped: Subject<DropArea> = new Subject();
   private _start: Subject<Renderable> = new Subject();
   private _fail: Subject<Renderable> = new Subject();
+  private _success: Subject<Renderable> = new Subject();
   private _areas: DropArea[]|null = null;
   private _dropArea: DropArea|null = null;
   private _element: HTMLElement = this._document.createElement('div');
@@ -41,6 +43,7 @@ export class DragHost {
     this.dropped = this._dropped.asObservable();
     this.start = this._start.asObservable();
     this.fail = this._fail.asObservable();
+    this.success = this._success.asObservable();
     
     this._element.classList.add('ug-layout__drop-indicator');
     this._element.hidden = true;
@@ -113,14 +116,16 @@ export class DragHost {
 
   private _onDragStop(e: DragEvent<Renderable>): void {
     if (!this._dropArea) {
-      return;
+      this._fail.next(e.host);
+    } else {
+      this._areas = null;
+      this._element.hidden = true;
+      this._item.handleDropCleanup();
+      this._dropArea.item.handleDrop(this._item, this._dropArea, e);
+      this._success.next(e.host);
     }
     
-    this._areas = null;
-    this._element.hidden = true;
-    this._item.handleDropCleanup();
-    this._dropArea.item.handleDrop(this._item, this._dropArea, e);
-    this._dropped.next(this._dropArea);
+    this._dropped.next();
   }
 
   static isDropTarget(item: any): item is RenderableDropTarget {

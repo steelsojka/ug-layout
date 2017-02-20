@@ -6,5 +6,7 @@ export interface StackControlConfig {
 }
 
 export abstract class StackControl extends Renderable {
-  
+  isActive(): boolean {
+    return true;
+  }
 }

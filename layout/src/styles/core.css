@@ -187,3 +187,7 @@
   width: 100%;
   height: 100%;
 }
+
+.ug-layout__close-stack-control {
+  cursor: pointer;
+}

@@ -99,6 +99,10 @@ export class StackTab extends Renderable {
     return this._isDragging;
   }
 
+  get stack(): Stack|null {
+    return (this._container ? this._container.container : null) as Stack|null;
+  }
+
   get controls(): TabControl[] {
     const { item } = this;
     
@@ -184,6 +188,8 @@ export class StackTab extends Renderable {
 
   private _onDragStart(e: DragEvent<StackTab>): void {
     const item = this._container.getItemFromTab(this);
+    const originStack = this.stack;
+    const originIndex = this._container.getIndexOf(this);
     
     this._isDragging = true;
     this.emit(new TabDragEvent(this));
@@ -192,9 +198,17 @@ export class StackTab extends Renderable {
     
     if (item) {
       this._dragHost.initialize(<Renderable>item, this._draggable, this.getArea());
-      this._dragHost.dropped.first().subscribe(() => {
-        this.destroy();  
-      });
+      this._dragHost.fail
+        .takeUntil(this._dragHost.dropped)
+        .subscribe(() => {
+          if (originStack) {
+            originStack.addChild(item, { index: originIndex });
+          }
+        });
+        
+      this._dragHost.dropped
+        .first()
+        .subscribe(() => this.destroy());
     } 
   }
 

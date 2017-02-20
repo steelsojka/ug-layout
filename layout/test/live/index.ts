@@ -52,29 +52,38 @@ const rootLayout = RootLayout.create({
           title: 'View 1',
           droppable: false,
           draggable: false,
+          closeable: true,
           use: View.configure({
             useClass: TestView
           })
         }, {
           title: 'View 2',
-          closable: true,
+          closeable: false,
           use: View.configure({
             useClass: TestView
           })
         }, {
           title: 'View 3',
+          closeable: true,
           use: View.configure({
             useClass: TestView
           })
         }, {
           title: 'View 4',
+          closeable: true,
           use: View.configure({
             useClass: TestView
           })
         }, {
-          title: 'View 5',
-          use: View.configure({
-            useClass: TestView
+          title: 'Nested Stack',
+          closeable: true,
+          use: Stack.configure({
+            children: [{
+              title: 'View 5',
+              use: View.configure({
+                useClass: TestView
+              })
+            }]
           })
         }]
       })

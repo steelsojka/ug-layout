@@ -1,5 +1,6 @@
 import { Type } from '../di';
 import { Renderable } from './Renderable'
+import { RenderableArg } from '../common';
 
 export class ConfiguredRenderable<T extends Renderable> {
   constructor(
@@ -25,5 +26,17 @@ export class ConfiguredRenderable<T extends Renderable> {
     }
 
     return item;
+  }
+
+  static inList(list: RenderableArg<Renderable>[], item: RenderableArg<Renderable>): boolean {
+    const resolved = ConfiguredRenderable.resolve(item);
+    
+    for (const _item of list) {
+      if (ConfiguredRenderable.resolve(_item) === resolved) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }

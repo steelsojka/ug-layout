@@ -31,7 +31,7 @@ export class CloseTabControl extends TabControl {
   }
 
   isActive(): boolean {
-    return this._container.closable;
+    return this._container.closeable;
   }
 
   private _onClick(e: MouseEvent): void {

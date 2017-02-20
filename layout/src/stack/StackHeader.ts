@@ -24,17 +24,17 @@ import {
   DropTarget, 
   DropArea, 
   HighlightCoordinateArgs,
-  DragEvent
+  DragEvent,
+  RenderableArg
 } from '../common';
 import { Subject, Observable, BeforeDestroyEvent } from '../events';
-import { StackControl, StackControlConfig } from './controls';
+import { StackControl } from './controls';
 import { StackItemContainer } from './StackItemContainer';
 
 export interface StackHeaderConfig {
   size: number;
   distribute: boolean;
   droppable: boolean;
-  controls: StackControlConfig[];
 }
 
 export type StackHeaderConfigArgs = {
@@ -71,8 +71,6 @@ export class StackHeader extends Renderable implements DropTarget {
     this._dragHost.dropped
       .takeUntil(this.destroyed)
       .subscribe(this._onDragHostDropped.bind(this));
-      
-    this._config.controls.forEach(control => this.addControl(control));
   } 
 
   get width(): number {
@@ -113,12 +111,13 @@ export class StackHeader extends Renderable implements DropTarget {
     return tab;
   }
 
-  addControl(config: StackControlConfig): void {
+  addControl(_control: RenderableArg<StackControl>): void {
     const control = RenderableInjector.fromRenderable(
-      config.use, 
+      _control, 
       [
         { provide: ContainerRef, useValue: this }
-      ]
+      ],
+      this.injector 
     )
       .get(ConfiguredRenderable);
 
@@ -142,7 +141,7 @@ export class StackHeader extends Renderable implements DropTarget {
     }, 
       [
         h('div.ug-layout__tab-container', this._contentItems.map(tab => tab.render())),
-        h('div.ug-layout__stack-controls', this._controls.map(control => control.render()))
+        h('div.ug-layout__stack-controls', this._controls.filter(c => c.isActive()).map(c => c.render()))
       ]
     );
   }

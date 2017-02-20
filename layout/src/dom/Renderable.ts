@@ -83,7 +83,6 @@ export abstract class Renderable {
     return this._contentItems.length;
   }
 
-
   get injector(): Injector {
     return this._injector;
   }

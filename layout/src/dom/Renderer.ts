@@ -4,6 +4,7 @@ import DOMClass from 'snabbdom/modules/class';
 import DOMStyle from 'snabbdom/modules/style';
 import DOMProps from 'snabbdom/modules/props';
 import DOMEvents from 'snabbdom/modules/eventlisteners';
+import DOMAttrs from 'snabbdom/modules/attributes';
 
 import { Inject } from '../di';
 import { Subject, Observable } from '../events';
@@ -22,7 +23,8 @@ export class Renderer {
     DOMClass,
     DOMStyle,
     DOMProps,
-    DOMEvents
+    DOMEvents,
+    DOMAttrs
   ]);
 
   constructor(
