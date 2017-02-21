@@ -168,7 +168,7 @@
 }
 
 .ug-layout__view-container {
-  overflow: hidden;
+  overflow: auto;
 }
 
 .ug-layout__drop-indicator {

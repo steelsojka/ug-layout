@@ -16,7 +16,7 @@ import {
   DropArea
 } from './common';
 import { XYContainer } from './XYContainer';
-import { DragHost } from './DragHost';
+import { DragHost, DragHostContainer } from './DragHost';
 
 export interface LayoutConfig {
   child: RenderableArg<Renderable>;
@@ -78,8 +78,12 @@ export class Layout extends Renderable {
       });
   }
 
-  private _onDragHostStart(target: Renderable): void {
-    this._dragHost.setDropAreas(this._getDropTargets(target));
+  private _onDragHostStart(container: DragHostContainer): void {
+    const { offsetX, offsetY, height, width } = this;
+    const { dragArea, item } = container;
+    
+    this._dragHost.bounds = new RenderableArea(offsetX, width + offsetX - dragArea.width, offsetY, height + offsetY - dragArea.height);
+    this._dragHost.setDropAreas(this._getDropTargets(item));
   }
 
   private _getDropTargets(target: Renderable): DropArea[] {

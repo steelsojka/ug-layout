@@ -47,42 +47,44 @@ const rootLayout = RootLayout.create({
 })
   .configure({
     use: Layout.configure({
-      child: Stack.configure({
+      child: Column.configure({
         children: [{
-          title: 'View 1',
-          droppable: false,
-          draggable: false,
-          closeable: true,
           use: View.configure({
             useClass: TestView
           })
         }, {
-          title: 'View 2',
-          closeable: false,
-          use: View.configure({
-            useClass: TestView
+          use: Layout.configure({
+            child: Stack.configure({
+              children: [{
+                title: 'Account Positions',
+                use: View.configure({ useClass: TestView })  
+              }, {
+                title: 'Account Summary',
+                use: View.configure({ useClass: TestView })  
+              }, {
+                title: 'Order Activity',
+                use: View.configure({ useClass: TestView })  
+              }, {
+                title: 'Account Activity',
+                use: View.configure({ useClass: TestView })  
+              }, {
+                title: 'Trade',
+                use: View.configure({ useClass: TestView })  
+              }]
+            })
           })
         }, {
-          title: 'View 3',
-          closeable: true,
-          use: View.configure({
-            useClass: TestView
-          })
-        }, {
-          title: 'View 4',
-          closeable: true,
-          use: View.configure({
-            useClass: TestView
-          })
-        }, {
-          title: 'Nested Stack',
-          closeable: true,
+          minSizeY: 200,
           use: Stack.configure({
+            controls: [
+              MinimizeStackControl  
+            ],
             children: [{
-              title: 'View 5',
-              use: View.configure({
-                useClass: TestView
-              })
+              title: 'Order Entry',
+              draggable: false,
+              droppable: false,
+              closeable: false,
+              use: View.configure({ useClass: TestView })
             }]
           })
         }]

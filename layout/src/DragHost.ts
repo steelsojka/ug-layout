@@ -12,15 +12,21 @@ import { Observable, Subject } from './events';
 import { Draggable } from './Draggable';
 import { isObject, isFunction, clamp } from './utils';
 
+export class DragHostContainer {
+  item: Renderable;
+  dragArea: RenderableArea;
+  draggable: Draggable<Renderable>;
+}
+
 export class DragHost {
   dropped: Observable<DropArea>;
-  start: Observable<Renderable>;
+  start: Observable<DragHostContainer>;
   fail: Observable<Renderable>;
   success: Observable<Renderable>;
   
   private _item: Renderable;
   private _dropped: Subject<DropArea> = new Subject();
-  private _start: Subject<Renderable> = new Subject();
+  private _start: Subject<DragHostContainer> = new Subject();
   private _fail: Subject<Renderable> = new Subject();
   private _success: Subject<Renderable> = new Subject();
   private _areas: DropArea[]|null = null;
@@ -50,10 +56,12 @@ export class DragHost {
     this._document.body.appendChild(this._element);
   }
 
-  initialize(item: Renderable, draggable: Draggable<Renderable>, dragArea: RenderableArea): void {
+  initialize(container: DragHostContainer): void {
+    const { item, dragArea, draggable } = container;
+    
     this._item = item;
     this._dragArea = dragArea;
-    this._start.next(item);
+    this._start.next(container);
 
     draggable.drag
       .filter(Draggable.isDraggingEvent)

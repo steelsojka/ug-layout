@@ -159,12 +159,14 @@ export class StackTab extends Renderable {
       }
       
       result['max-height'] = `${this._container.height}px`;
+      result['height'] = this.height;
     } else {
       if (!this._container.isDistributed) {
         result['max-height'] = `${this._config.maxSize}px`;
       }
       
       result['max-width'] = `${this._container.width}px`;
+      result['width'] = this.width;
     }
     
     return result;
@@ -197,7 +199,12 @@ export class StackTab extends Renderable {
     this._document.body.appendChild(this._element);
     
     if (item) {
-      this._dragHost.initialize(<Renderable>item, this._draggable, this.getArea());
+      this._dragHost.initialize({
+        item: <Renderable>item, 
+        draggable: this._draggable, 
+        dragArea: this.getArea()
+      });
+      
       this._dragHost.fail
         .takeUntil(this._dragHost.dropped)
         .subscribe(() => {
@@ -213,7 +220,17 @@ export class StackTab extends Renderable {
   }
 
   private _onDragMove(e: DragEvent<StackTab>): void {
-    this._element.style.transform = `translateX(${e.pageX - this.width / 2}px) translateY(${e.pageY - this.height / 2}px)`;
+    const { bounds } = this._dragHost;
+
+    let x = e.pageX - (this.width / 2);
+    let y = e.pageY - (this.height / 2);
+
+    if (bounds) {
+      x = bounds.clampX(x);
+      y = bounds.clampY(y);
+    }
+    
+    this._element.style.transform = `translateX(${x}px) translateY(${y}px)`;
   }
   
   private _onDragStop(e: DragEvent<StackTab>): void {
