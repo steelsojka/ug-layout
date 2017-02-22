@@ -34,11 +34,11 @@ export class CloseStackControl extends StackControl {
         height: this._container.isHorizontal ? `${this.height}px` : undefined
       }
     }, [
-      h('div', {
+      h('div.ug-icon-close', {
         on: {
           click: e => this._onClick(e)
         }  
-      }, 'x')
+      })
     ]);
   }
 

@@ -10,11 +10,16 @@ export enum ResolverStrategy {
 }
 
 export interface ViewComponentConfig {
-  name?: string;
-  resolution?: ResolverStrategy;
+  name: string;
+  resolution: ResolverStrategy;
+}
+
+export type ViewComponentConfigArgs = {
+  [P in keyof ViewComponentConfig]?: ViewComponentConfig[P];
 }
 
 export interface ViewConfig {
+  lazy?: boolean;
   token?: any;
   useFactory?: () => any;
   useValue?: Function;

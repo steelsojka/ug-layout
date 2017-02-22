@@ -1,5 +1,6 @@
 import 'babel-polyfill';
 import 'reflect-metadata';
+import '../../src/styles/icons.css';
 import '../../src/styles/core.css';
 import './index.css';
 import { Observable } from 'rxjs/Rx';
@@ -56,6 +57,7 @@ const rootLayout = RootLayout.create({
           use: Layout.configure({
             child: Stack.configure({
               children: [{
+                closeable: true,
                 title: 'Account Positions',
                 use: View.configure({ useClass: TestView })  
               }, {

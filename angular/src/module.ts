@@ -7,6 +7,7 @@ import {
   Type,
   ApplicationRef
 } from '@angular/core';
+import { UpgradeModule } from '@angular/upgrade/static'
 import { RootInjector, ViewFactoriesRef } from 'ug-layout';
 
 import { angularRootInjectorFactory } from './AngularRootInjectorFactory';

@@ -17,6 +17,9 @@ module.exports = {
     }, {
       test: /\.css$/,
       use: ['style-loader', 'css-loader']
+    }, {
+      test: /\.(svg|woff|ttf)$/,
+      use: ['file-loader']
     }]
   },
   devtool: 'inline-source-map',

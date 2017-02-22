@@ -23,11 +23,11 @@ export class CloseTabControl extends TabControl {
   }
   
   render(): VNode {
-    return h('div.ug-layout__stack-tab-close', {
+    return h('div.ug-layout__stack-tab-close.ug-icon-close', {
       on: {
         click: e => this._onClick(e)
       }
-    }, 'x');
+    });
   }
 
   isActive(): boolean {

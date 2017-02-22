@@ -3,6 +3,7 @@ import { Row, Layout, ConfiguredRenderable, View, Stack } from 'ug-layout';
 
 import { TestComponent } from './Test.component';
 import { RootLayout, RootLayoutProviders } from '../../src';
+import { Ng1TestComponent } from './Ng1Test.component';
 
 @Component({
   selector: 'app',
@@ -20,11 +21,14 @@ export class AppComponent {
   root: ConfiguredRenderable<Layout>;
   layouts = [
     Layout.configure({
-      child: Stack.configure({
+      child: Row.configure({
         children: [{
-          title: 'Test',
           use: View.configure({
             useClass: TestComponent
+          })
+        }, {
+          use: View.configure({
+            useClass: Ng1TestComponent
           })
         }]
       })

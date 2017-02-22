@@ -56,6 +56,10 @@ export class DragHost {
     this._document.body.appendChild(this._element);
   }
 
+  destroy(): void {
+    this._document.removeChild(this._element);
+  }
+
   initialize(container: DragHostContainer): void {
     const { item, dragArea, draggable } = container;
     

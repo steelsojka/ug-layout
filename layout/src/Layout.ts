@@ -67,6 +67,11 @@ export class Layout extends Renderable {
     );
   }
 
+  destroy(): void {
+    this._dragHost.destroy();
+    super.destroy();
+  }
+
   getItemVisibleAreas(): Array<{ item: Renderable, area: RenderableArea }> {
     return this.getDescendants()
       .filter(item => item.isVisible())

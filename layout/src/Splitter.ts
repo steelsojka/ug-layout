@@ -61,17 +61,17 @@ export class Splitter extends Renderable {
     if (this._isRow) {
       return {
         height: `${this.height}px`,
-        width: `${this.width + 20}px`,
-        left: '${this.x - 10}px',
+        width: `${this.width + 10}px`,
+        left: `${this.x - 5}px`,
         top: 0
       };
     }
     
     return {
-      height: `${this.height + 20}px`,
+      height: `${this.height + 10}px`,
       width: `${this.width}px`,
       left: 0,
-      top: '${this.y - 10}px'
+      top: `${this.y - 5}px`
     };
   }
 

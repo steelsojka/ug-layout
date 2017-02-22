@@ -21,7 +21,6 @@ export class TestComponent {
     @Inject(ViewContainer) private _viewContainer: ViewContainer<TestComponent>
   ) { 
     window['component'] = this;
-    console.log(_viewContainer);
   }
   
   get show(): boolean {

@@ -1,5 +1,5 @@
 {
-  "name": "ug-layout-angular-hybrid",
+  "name": "ug-layout-angular",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -19,6 +19,8 @@
     "@angular/compiler": "^2.4.5",
     "@angular/platform-browser": "^2.4.5",
     "@angular/platform-browser-dynamic": "^2.4.5",
+    "@angular/upgrade": "^2.4.5",
+    "@types/angular": "^1.6.3",
     "@types/reflect-metadata": "0.0.5",
     "angular": "^1.6.2",
     "babel-cli": "^6.22.2",

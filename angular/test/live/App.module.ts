@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { UpgradeModule } from '@angular/upgrade/static';
 import angular from 'angular';
 
 import { UgLayoutModule } from '../../src';
@@ -8,6 +9,7 @@ import { TestComponent } from './Test.component';
 
 @NgModule({
   imports: [
+    UpgradeModule,
     BrowserModule, 
     UgLayoutModule.forRoot({ hybrid: true })
   ],

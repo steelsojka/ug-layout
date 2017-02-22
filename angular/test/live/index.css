@@ -13,3 +13,7 @@ app, .app {
 .ug-layout__root {
   background-color: white;
 }
+
+.ug-layout__view-container {
+  background-color: white;
+}

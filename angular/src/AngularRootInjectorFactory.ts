@@ -23,7 +23,8 @@ export function angularRootInjectorFactory(
       useFactory: factory(
         componentFactoryResolver,
         viewFactories,
-        moduleConfig
+        moduleConfig,
+        ngInjector
       ),
       deps: factoryDeps
     }

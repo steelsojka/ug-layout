@@ -28,7 +28,6 @@ export class RootLayout extends Renderable {
   protected _width: number = 0;
   protected _containerEl: HTMLElement;
   protected _vnode: VNode;
-  protected _layout: Layout;
   protected _isAttached: boolean = false;
   protected _lastVNode: VNode|null = null;
   protected _offsetX: number = 0;
@@ -79,7 +78,7 @@ export class RootLayout extends Renderable {
         height: `${this._height}px`
       }
     }, [
-      this._layout.render()
+      this._contentItems[0].render()
     ]);
   }
 
@@ -98,7 +97,7 @@ export class RootLayout extends Renderable {
       this._offsetY = clientRec.top;
     }
     
-    this._layout.resize();
+    this._contentItems[0].resize();
   }
 
   update(): void {
@@ -120,17 +119,13 @@ export class RootLayout extends Renderable {
       { provide: Layout, useExisting: ConfiguredRenderable }
     ], this._injector);
 
-    this._layout = injector.get(ConfiguredRenderable);
+    this._contentItems = [ injector.get(ConfiguredRenderable) ];
 
     return this;
   }
 
   isVisible(): boolean {
     return true;
-  }
-
-  getChildren(): Renderable[] {
-    return [ this._layout ];
   }
 
   static create<T extends RootLayout>(config: RootLayoutConfig<T>): T {

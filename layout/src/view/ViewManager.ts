@@ -49,10 +49,12 @@ export class ViewManager {
   }
 
   create<T>(config: ViewFactoryArgs): ViewContainer<T> {
-    const container = this._viewFactory.create<T>(config);
     const token = this._viewFactory.getTokenFrom(config.config);
-
+    
     this._assertComponent(token);
+    
+    const container = this._viewFactory.create<T>(config);
+
     this.register(token, container);
     
     container.destroyed.subscribe(() => this.unregister(token, container));
