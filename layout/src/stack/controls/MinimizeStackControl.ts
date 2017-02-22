@@ -6,6 +6,7 @@ import { ContainerRef } from '../../common';
 import { StackControl } from './StackControl';
 import { StackHeader } from '../StackHeader';
 import { MinimizeCommand } from '../../commands';
+import { XYItemContainer } from '../../XYItemContainer';
 
 export class MinimizeStackControl extends StackControl {
   constructor(
@@ -24,17 +25,26 @@ export class MinimizeStackControl extends StackControl {
   }
   
   render(): VNode {
-    return h('div.ug-layout__stack-minimize-control', {
+    const container = this.getParent(XYItemContainer);
+    
+    return h('div.ug-layout__stack-minimize-control.ug-layout__align-center', {
       style: {
         width: this._container.isHorizontal ? undefined : `${this.width}px`,
         height: this._container.isHorizontal ? `${this.height}px` : undefined
       }
     }, [
       h('div', {
+        class: {
+          'ug-icon-chevron-down': container ? !container.isMinimized : true,
+          'ug-icon-chevron-up': container ? container.isMinimized : false,
+        },
+        attrs: {
+          title: container && container.isMinimized ? 'Unminimize' : 'Minimize'
+        },
         on: {
           click: e => this._onClick(e)
         }  
-      }, 'x')
+      })
     ]);
   }
 

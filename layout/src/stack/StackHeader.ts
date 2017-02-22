@@ -229,6 +229,7 @@ export class StackHeader extends Renderable implements DropTarget {
     
     const deltaX = pageX - x;
     const deltaY = pageY - y;
+
     let result = -1;
 
     for (const [ index, tabArea ] of this._tabAreas.entries()) {

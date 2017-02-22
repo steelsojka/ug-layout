@@ -89,16 +89,18 @@ export class DragHost {
       return;
     }
 
-    const { pageX, pageY } = e;
+    const pageX = this._bounds ? this._bounds.clampX(e.pageX) : e.pageX;
+    const pageY = this._bounds ? this._bounds.clampY(e.pageY) : e.pageY;
+    
     let minSurface = Infinity;
     let result: DropArea|null = null;
-    
+
     for (const entry of this._areas) {
       if (
-        pageX > entry.area.x &&
-        pageX < entry.area.x2 &&
-        pageY > entry.area.y &&
-        pageY < entry.area.y2 &&
+        pageX >= entry.area.x &&
+        pageX <= entry.area.x2 &&
+        pageY >= entry.area.y &&
+        pageY <= entry.area.y2 &&
         minSurface > entry.area.surface
       ) {
         minSurface = entry.area.surface;
@@ -114,8 +116,7 @@ export class DragHost {
       this._dropArea = result;
 
       const area = this._dropArea.item.getHighlightCoordinates({
-        pageX: e.pageX, 
-        pageY: e.pageY, 
+        pageX, pageY,
         dropArea: result,
         dragArea: this._dragArea
       });

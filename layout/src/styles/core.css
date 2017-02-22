@@ -167,6 +167,11 @@
   padding: 0 5px;
 }
 
+.ug-layout__align-center {
+  display: flex;
+  align-items: center;
+}
+
 .ug-layout__tab-container {
   display: flex;
   flex-direction: row;
@@ -200,8 +205,17 @@
   display: flex;
   font-size: 14px;
   align-items: center;
-  opacity: 0.5;
+}
+
+[class^="ug-icon-"], [class*=" ug-icon-"] {
+  cursor: pointer;
+  color: #FFFFFF;
+  opacity: 0.5;  
   transition: opacity 0.15s ease-in;
+}
+
+[class^="ug-icon-"]:hover, [class*=" ug-icon-"]:hover {
+  opacity: 1;  
 }
 
 .ug-layout__close-stack-control:hover {

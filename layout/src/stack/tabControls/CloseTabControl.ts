@@ -24,6 +24,9 @@ export class CloseTabControl extends TabControl {
   
   render(): VNode {
     return h('div.ug-layout__stack-tab-close.ug-icon-close', {
+      attrs: {
+        title: 'Close tab'  
+      },
       on: {
         click: e => this._onClick(e)
       }
