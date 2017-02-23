@@ -16,20 +16,64 @@ import { RenderableArea } from './RenderableArea';
 import { Renderer } from './Renderer';
 
 export interface BaseModificationArgs {
+  /**
+   * Whether to invoke the render cycle. This is useful for
+   * delaying the render cycle to a later time.
+   * @type {boolean}
+   */
   render?: boolean;
 }
 
+/**
+ * Args used when removing a child renderable.
+ * @export
+ * @interface RemoveChildArgs
+ * @extends {BaseModificationArgs}
+ */
 export interface RemoveChildArgs extends BaseModificationArgs {
+  /**
+   * Whether to destroy the child being removed.
+   * @type {boolean}
+   */
   destroy?: boolean;
 }
 
+/**
+ * Args used when adding a child renderable.
+ * @export
+ * @interface AddChildArgs
+ * @extends {BaseModificationArgs}
+ */
 export interface AddChildArgs extends BaseModificationArgs {
+  /**
+   * What index to add the child renderable to. If not provided then
+   * it will be pushed.
+   * @type {number}
+   */
   index?: number;
+  /**
+   * Whether to invoke a resize of this renderable.
+   * @type {boolean}
+   */
   resize?: boolean;
 }
 
+/**
+ * The base renderable that all other renderables extend from.
+ * @export
+ * @abstract
+ * @class Renderable
+ */
 export abstract class Renderable {
+  /**
+   * Notifies when this renderable is destroyed.
+   * @type {Observable<this>}
+   */
   destroyed: Observable<this>;
+  /**
+   * Notifies when the container of this renderable changes.
+   * @type {(Observable<Renderable|null>)}
+   */
   containerChange: Observable<Renderable|null>;
   
   protected _eventBus = new EventBus();
@@ -51,58 +95,125 @@ export abstract class Renderable {
     this.setContainer(this._injector.get(ContainerRef, null));
   }
 
+  /**
+   * This renderables container or null if none.
+   * @readonly
+   * @type {(Renderable|null)}
+   */
   get container(): Renderable|null {
     return this._container || null;
   }
 
+  /**
+   * This renderables width in pixels.
+   * @readonly
+   * @type {number}
+   */
   get width(): number {
     return this._width;
   }
 
+  /**
+   * This renderables height in pixels.
+   * @readonly
+   * @type {number}
+   */
   get height(): number {
     return this._width;
   }
 
+  /**
+   * This renderables page offset x.
+   * @readonly
+   * @type {number}
+   */
   get offsetX(): number {
     return this._container ? this._container.offsetX : 0;
   }
 
+  /**
+   * This renderables page offset y.
+   * @readonly
+   * @type {number}
+   */
   get offsetY(): number {
     return this._container ? this._container.offsetY : 0;
   }
 
+  /**
+   * Whether this renderable is destroyed.
+   * @readonly
+   * @type {boolean}
+   */
   get isDestroyed(): boolean {
     return this._isDestroyed;
   }
 
+  /**
+   * A unique identifier for this renderable.
+   * @readonly
+   * @type {number}
+   */
   get uid(): number {
     return this._uid;
   }
 
+  /**
+   * The amount of content items belonging to this renderable.
+   * @readonly
+   * @type {number}
+   */
   get length(): number {
     return this._contentItems.length;
   }
 
+  /**
+   * The injector used to create this renderable.
+   * @readonly
+   * @type {Injector}
+   */
   get injector(): Injector {
     return this._injector;
   }
 
+  /**
+   * Creates this renderables VNode for diffing against the previous VNode state.
+   * @abstract
+   * @returns {VNode} 
+   */
   abstract render(): VNode;
   
+  /**
+   * Sets this components size and triggers it's childrens sizing.
+   */
   resize(): void {
     for (const child of this.getChildren()) {
       child.resize();
     }
   }
   
+  /**
+   * Returns this renderables children renderables. This differs
+   * from content items as children should contain all renderables
+   * we want as part of the render cycle.
+   * @returns {Renderable[]} 
+   */
   getChildren(): Renderable[] {
     return [ ...this._contentItems ];
   }
 
+  /**
+   * Determines whether this renderable is visible.
+   * @returns {boolean} 
+   */
   isVisible(): boolean {
     return Boolean(this._container && this._container.isVisible());
   }
   
+  /**
+   * Destroys this renderable and all it's children.
+   * @returns {void} 
+   */
   destroy(): void {
     if (this._isDestroyed) {
       return;
@@ -117,6 +228,14 @@ export abstract class Renderable {
     this._destroyed.complete();
   }
 
+  /**
+   * Gets this renderables parent or any parent that is
+   * an instance of the passed in constructor. If non is found
+   * then null is returned.
+   * @template T The constructor type.
+   * @param {Type<T>} [Ctor] 
+   * @returns {(T|null)} 
+   */
   getParent<T extends Renderable>(Ctor?: Type<T>): T|null {
     if (this._container) {
       if (!Ctor) {
@@ -133,6 +252,13 @@ export abstract class Renderable {
     return null;
   }
 
+  /**
+   * Gets this renderables parents or any parents that are
+   * an instance of the passed in constructor.    
+   * @template T The constructor type.
+   * @param {Type<T>} [Ctor] 
+   * @returns {(T|null)} 
+   */
   getParents<T extends Renderable>(Ctor?: Type<T>): T[] {
     let parent: Renderable|null = this;
     let result: T[] = [];
@@ -144,6 +270,10 @@ export abstract class Renderable {
     return result;
   }
 
+  /**
+   * Sets the container of this renderable.
+   * @param {(Renderable|null)} container 
+   */
   setContainer(container: Renderable|null): void {
     this._container = container;
 
@@ -154,14 +284,32 @@ export abstract class Renderable {
     this._containerChange.next(container);
   }
 
+  /**
+   * Subscribes to a BusEvent.
+   * @template T The event type.
+   * @param {Type<T>} Event 
+   * @param {(PartialObserver<T>|((event: T) => void))} observer 
+   * @returns {Subscription} 
+   */
   subscribe<T extends BusEvent<any>>(Event: Type<T>, observer: PartialObserver<T>|((event: T) => void)): Subscription {
     return this._eventBus.subscribe(Event, observer);
   }
 
+  /**
+   * Emits a BusEvent on this renderable.
+   * @template T The event type.
+   * @param {T} event 
+   */
   emit<T extends BusEvent<any>>(event: T): void {
     this._eventBus.next(event);
   }
 
+  /**
+   * Emits a BusEvent down to all descendants recursively.
+   * Propagation can be stopped by any descending renderable.
+   * @template T The event type.
+   * @param {T} event 
+   */
   emitDown<T extends BusEvent<any>>(event: T): void {
     for (const child of this.getDescendants()) {
       if (event.isPropagationStopped) {
@@ -172,6 +320,12 @@ export abstract class Renderable {
     }
   }
 
+  /**
+   * Emits a BusEvent up to all parents recursively.
+   * Propagation can be stopped by any parent renderable.
+   * @template T The event type.
+   * @param {T} event 
+   */
   emitUp<T extends BusEvent<any>>(event: T): void {
     for (const parent of this.getParents()) {
       if (event.isPropagationStopped) {
@@ -182,6 +336,10 @@ export abstract class Renderable {
     }
   }
 
+  /**
+   * Gets all descendants of this renderable recursively.
+   * @returns {Renderable[]} 
+   */
   getDescendants(): Renderable[] {
     const children = this.getChildren();
 
@@ -190,6 +348,12 @@ export abstract class Renderable {
     }, children);
   }
 
+  /**
+   * Replaces a content item on this renderable with another content item.
+   * @param {Renderable} item 
+   * @param {Renderable} withItem 
+   * @param {RemoveChildArgs} [options={}] 
+   */
   replaceChild(item: Renderable, withItem: Renderable, options: RemoveChildArgs = {}): void {
     const { destroy = false, render = true } = options;
     const index = this._contentItems.indexOf(item);
@@ -209,6 +373,11 @@ export abstract class Renderable {
     }
   }
 
+  /**
+   * Adds a content item on this renderable.
+   * @param {Renderable} item 
+   * @param {RemoveChildArgs} [options={}] 
+   */
   addChild(item: Renderable, options: AddChildArgs = {}): void {
     const { index = -1, render = true, resize = true } = options;
     
@@ -229,6 +398,11 @@ export abstract class Renderable {
     }
   }
 
+  /**
+   * Removes a content item from this renderable.
+   * @param {Renderable} item 
+   * @param {RemoveChildArgs} [options={}] 
+   */
   removeChild(item: Renderable, options: RemoveChildArgs = {}): void {
     const { destroy = true, render = true } = options;
     const index = this._contentItems.indexOf(item);
@@ -254,6 +428,10 @@ export abstract class Renderable {
     }
   }
 
+  /**
+   * Removes this item from it's parent. If there is no
+   * parent then this renderable will just be destroyed.
+   */
   remove(): void {
     if (this._container) {
       this._container.removeChild(this);
@@ -262,34 +440,72 @@ export abstract class Renderable {
     }
   }
 
+  /**
+   * Gets the index of a content renderable.
+   * @param {Renderable} item 
+   * @returns {number} 
+   */
   getIndexOf(item: Renderable): number {
     return this._contentItems.indexOf(item);
   }
 
+  /**
+   * Gets a content renderable at an index.
+   * @param {number} index 
+   * @returns {(Renderable|null)} 
+   */
   getAtIndex(index: number): Renderable|null {
     return this._contentItems[index] || null;
   }
 
+  /**
+   * Creates an Observable scoped to a specific event type. 
+   * @template T The event type.
+   * @param {Type<T>} Event 
+   * @returns {Observable<T>} 
+   */
   scope<T extends BusEvent<any>>(Event: Type<T>): Observable<T> {
     return this._eventBus.scope(Event);
   }
 
+  /**
+   * Whether a renderable is a descendant of this renderable.
+   * @param {Renderable} item 
+   * @returns {boolean} 
+   */
   contains(item: Renderable): boolean {
     return this.getDescendants().indexOf(item) !== -1;
   }
   
+  /**
+   * Whether this renderable is a descendant of another renderable.
+   * @param {Renderable} item 
+   * @returns {boolean} 
+   */
   isContainedWithin(item: Renderable): boolean {
     return item.getDescendants().indexOf(this) !== -1;
   }
 
+  /**
+   * Gets the renderable area of this renderable.
+   * @returns {RenderableArea} 
+   */
   getArea(): RenderableArea {
     const { height, width, offsetX, offsetY } = this;
     
     return new RenderableArea(offsetX, offsetX + width, offsetY, offsetY + height);
   }
 
+  /**
+   * Handles any cleanup from a drop.
+   */
   handleDropCleanup(): void {}
 
+  /**
+   * Whether this renderable can be dropped on.
+   * @param {Renderable} target 
+   * @returns {boolean} 
+   */
   isDroppable(target: Renderable): boolean {
     return false;
   }

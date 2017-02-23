@@ -22,6 +22,12 @@ export interface LayoutConfig {
   child: RenderableArg<Renderable>;
 }
 
+/**
+ * A layout is a set of renderables scoped to a drag host.
+ * @export
+ * @class Layout
+ * @extends {Renderable}
+ */
 @Injectable({
   providers: [ DragHost ]
 })
@@ -48,14 +54,28 @@ export class Layout extends Renderable {
     this._dragHost.start.subscribe(this._onDragHostStart.bind(this));
   }  
 
+  /**
+   * The height of the layout in pixels.
+   * @readonly
+   * @type {number}
+   */
   get height(): number {
     return this._container.height;
   }
 
+  /**
+   * The width of the layout in pixels.
+   * @readonly
+   * @type {number}
+   */
   get width(): number {
     return this._container.width;
   }
   
+  /**
+   * Creates this renderables virtual node.
+   * @returns {VNode} 
+   */
   render(): VNode {
     return h('div.ug-layout__layout', {
       style: {
@@ -67,6 +87,9 @@ export class Layout extends Renderable {
     );
   }
 
+  /**
+   * Destroys this renderable.
+   */
   destroy(): void {
     this._dragHost.destroy();
     super.destroy();
