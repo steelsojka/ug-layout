@@ -15,6 +15,8 @@ import { ContainerRef } from '../common';
 import { RenderableArea } from './RenderableArea';
 import { Renderer } from './Renderer';
 
+const animate = true;
+
 export interface BaseModificationArgs {
   /**
    * Whether to invoke the render cycle. This is useful for

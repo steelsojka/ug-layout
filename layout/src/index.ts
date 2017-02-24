@@ -12,3 +12,4 @@ export * from './Column';
 export * from './XYContainer';
 export * from './XYItemContainer';
 export * from './Splitter';
+export * from './Crawler';

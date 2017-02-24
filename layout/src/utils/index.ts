@@ -54,6 +54,37 @@ export function isPromise<T>(value: any): value is Promise<T> {
   return isObject(value) && isFunction(value.then) && isFunction(value.catch);
 }
 
+export function partition<T>(list: T[], predicate: (v: T) => boolean): [T[], T[]] {
+  const pass: T[] = [];  
+  const fail: T[] = [];  
+
+  for (const item of list) {
+    if (predicate(item)) {
+      pass.push(item);
+    } else {
+      fail.push(item);
+    }
+  }
+
+  return [ pass, fail ];
+}
+
+export function defaults<T>(dest: T, src: T|object|null): T {
+  if (!dest) {
+    return (src || {}) as T;
+  }
+  
+  if (src) {
+    for (const key of Object.keys(src)) {
+      if (dest[key] === undefined) {
+        dest[key] = src[key];
+      }
+    }
+  }
+
+  return dest;
+}
+
 export const uid: () => number = (() => {
   let uid = 0;
   

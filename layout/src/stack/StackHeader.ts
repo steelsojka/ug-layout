@@ -17,7 +17,7 @@ import { StackTab, StackTabConfigArgs } from './StackTab';
 import { TabCloseEvent } from './TabCloseEvent';
 import { TabSelectionEvent } from './TabSelectionEvent';
 import { TabDragEvent } from './TabDragEvent';
-import { isNumber } from '../utils';
+import { isNumber, partition, propEq } from '../utils';
 import { 
   ConfigurationRef, 
   ContainerRef, 
@@ -28,7 +28,7 @@ import {
   RenderableArg
 } from '../common';
 import { Subject, Observable, BeforeDestroyEvent } from '../events';
-import { StackControl } from './controls';
+import { StackControl, StackControlPosition } from './controls';
 import { StackItemContainer } from './StackItemContainer';
 
 export interface StackHeaderConfig {
@@ -133,6 +133,11 @@ export class StackHeader extends Renderable implements DropTarget {
   }
 
   render(): VNode {
+    const [ postTabControls, preTabControls ] = partition(
+      this._controls.filter(c => c.isActive()),
+      propEq('position', StackControlPosition.POST_TAB)
+    );
+
     return h('div.ug-layout__stack-header', {
       style: {
         height: `${this.height}px`,
@@ -140,8 +145,9 @@ export class StackHeader extends Renderable implements DropTarget {
       }
     }, 
       [
+        h('div.ug-layout__stack-controls', preTabControls.map(c => c.render())),
         h('div.ug-layout__tab-container', this._contentItems.map(tab => tab.render())),
-        h('div.ug-layout__stack-controls', this._controls.filter(c => c.isActive()).map(c => c.render()))
+        h('div.ug-layout__stack-controls', postTabControls.map(c => c.render()))
       ]
     );
   }
@@ -160,12 +166,9 @@ export class StackHeader extends Renderable implements DropTarget {
   handleDrop(item: Renderable, dropArea: DropArea, e: DragEvent<Renderable>): void {
     const index = this._getIndexFromArea(e.pageX, e.pageY, dropArea.area) + 1;
     
-    if (item instanceof StackItemContainer) {
-      if (this._container.getIndexOf(item) === -1) {
-        this._container.addChild(item, { index });
-        this._container.setActiveIndex(index);
-      } else {
-      }
+    if (item instanceof StackItemContainer && this._container.getIndexOf(item) === -1) {
+      this._container.addChild(item, { index });
+      this._container.setActiveIndex(index);
     } 
 
     this.onDropHighlightExit();

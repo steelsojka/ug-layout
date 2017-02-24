@@ -18,7 +18,8 @@ import {
   ElementRef,
   ViewComponent,
   CancelAction,
-  MinimizeStackControl
+  MinimizeStackControl,
+  StackControlPosition
 } from '../../src';
 
 const colors = [ 'red', 'blue', 'white', 'cyan', 'yellow' ];
@@ -79,13 +80,15 @@ const rootLayout = RootLayout.create({
           minSizeY: 200,
           use: Stack.configure({
             controls: [
-              MinimizeStackControl  
+              MinimizeStackControl.configure({
+                position: StackControlPosition.PRE_TAB
+              })
             ],
             children: [{
               title: 'Order Entry',
               draggable: false,
               droppable: false,
-              closeable: false,
+              closeable: true,
               use: View.configure({ useClass: TestView })
             }]
           })
