@@ -2,9 +2,9 @@ import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
 import { Injector, Inject, Optional, forwardRef, ProviderArg } from './di';
-import { Plugin } from './plugins';
 import { RootInjector } from './RootInjector';
 import { Layout } from './Layout';
+import { Serialized, Serializable } from './serialization';
 import { Renderer, Renderable, ConfiguredRenderable, RenderableInjector } from './dom';
 import { 
   ConfigurationRef, 
@@ -15,9 +15,7 @@ import {
 
 export interface RootLayoutConfig<T> {
   use?: T;
-  plugins?: Plugin[];
   container: HTMLElement;
-  manualOffset?: boolean;
   providers?: ProviderArg[];
 }
 
@@ -126,6 +124,10 @@ export class RootLayout extends Renderable {
 
   isVisible(): boolean {
     return true;
+  }
+
+  serialize(): Serialized {
+    return {};
   }
 
   static create<T extends RootLayout>(config: RootLayoutConfig<T>): T {

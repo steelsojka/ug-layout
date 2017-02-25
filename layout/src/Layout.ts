@@ -15,12 +15,15 @@ import {
   RenderableArg,
   DropArea
 } from './common';
+import { Serializable, Serialized } from './serialization';
 import { XYContainer } from './XYContainer';
 import { DragHost, DragHostContainer } from './DragHost';
 
 export interface LayoutConfig {
   child: RenderableArg<Renderable>;
 }
+
+export interface SerializedLayoutConfig extends Serialized {}
 
 /**
  * A layout is a set of renderables scoped to a drag host.
@@ -104,6 +107,10 @@ export class Layout extends Renderable {
           area: item.getArea()
         };
       });
+  }
+
+  serialize(): SerializedLayoutConfig {
+    return {};
   }
 
   private _onDragHostStart(container: DragHostContainer): void {

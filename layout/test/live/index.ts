@@ -19,10 +19,13 @@ import {
   ViewComponent,
   CancelAction,
   MinimizeStackControl,
-  StackControlPosition
+  StackControlPosition,
+  Crawler
 } from '../../src';
 
 const colors = [ 'red', 'blue', 'white', 'cyan', 'yellow' ];
+
+const crawler = new Crawler();
 
 @ViewComponent()
 class TestView {
@@ -39,10 +42,9 @@ class TestView {
     container.visibilityChanges.subscribe(isVisible => console.log(isVisible));
     container.sizeChanges.subscribe(size => console.log(size));
   }
-
-  private _onMount(element: HTMLElement): void {
-  }
 }
+
+
 
 const rootLayout = RootLayout.create({
   container: document.body
@@ -98,7 +100,6 @@ const rootLayout = RootLayout.create({
   })
   .initialize();
   
-
 window.addEventListener('resize', () => {
   rootLayout.resize({
     height: window.innerHeight,
@@ -109,5 +110,7 @@ window.addEventListener('resize', () => {
   
   rootLayout.update();
 }, false);
+
+crawler.crawl(rootLayout).subscribe(x => console.log(x));
 
 (<any>window).rootLayout = rootLayout;
