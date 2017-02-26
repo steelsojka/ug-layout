@@ -32,15 +32,19 @@ export class Injector {
     providers: ProviderArg[] = [],
     private _parent: Injector|null = null
   ) {
-    this._providers.set(Injector, { provide: Injector, useValue: this });
+    this.registerProvider({ provide: Injector, useValue: this });
 
-    providers
-      .map(p => this._normalizeProvider(p))
-      .forEach(p => this._providers.set(p.provide, p));
+    providers.forEach(p => this.registerProvider(p));
   }
 
   get parent(): Injector|null {
     return this._parent;
+  }
+
+  registerProvider(provider: ProviderArg): void {
+    const _provider = this._normalizeProvider(provider);
+
+    this._providers.set(_provider.provide, _provider);
   }
 
   get(token: any, defaultValue?: any, metadata: InjectionMetadata = {}): any {
