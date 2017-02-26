@@ -7,8 +7,8 @@ import {
   ConfiguredRenderable,
   Renderer,
   AddChildArgs
-} from './dom';
-import { Inject, Injector, Optional } from './di';
+} from '../dom';
+import { Inject, Injector, Optional } from '../di';
 import { 
   ContainerRef, 
   XYDirectionRef, 
@@ -19,13 +19,13 @@ import {
   UNALLOCATED,
   DragStatus,
   DragEvent
-} from './common';
+} from '../common';
 import { XYItemContainer, XYItemContainerConfig } from './XYItemContainer';
-import { Draggable } from './Draggable';
-import { BeforeDestroyEvent } from './events';
+import { Draggable } from '../Draggable';
+import { BeforeDestroyEvent } from '../events';
 import { Splitter, SPLITTER_SIZE } from './Splitter';
-import { isNumber, clamp, round } from './utils';
-import { Stack, StackItemContainer } from './stack';
+import { get, isNumber, clamp, round } from '../utils';
+import { Stack, StackItemContainer } from '../stack';
 
 export interface XYContainerConfig {
   splitterSize?: number;
@@ -87,6 +87,10 @@ export class XYContainer extends Renderable {
 
   get splitters(): Splitter[] {
     return this._splitters;
+  }
+
+  get splitterSize(): number {
+    return get(this._config, 'splitterSize', SPLITTER_SIZE);
   }
 
   protected get _totalSplitterSize(): number {

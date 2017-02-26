@@ -1,25 +1,25 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
-import { Inject, Injector } from './di'
+import { Inject, Injector } from '../di'
 import { 
   Renderer, 
   Renderable, 
   RenderableInjector, 
   ConfiguredRenderable,
   AddChildArgs
-} from './dom';
+} from '../dom';
 import { 
   ConfigurationRef, 
   ContainerRef, 
   XYDirection, 
   UNALLOCATED,
   RenderableArg
-} from './common';
-import { isNumber } from './utils';
-import { BeforeDestroyEvent } from './events';
+} from '../common';
+import { isNumber } from '../utils';
+import { BeforeDestroyEvent } from '../events';
 import { XYContainer } from './XYContainer';
-import { MinimizeCommand } from './commands';
+import { MinimizeCommand } from '../commands';
 import { Splitter } from './Splitter';
 
 export interface XYItemContainerConfig {

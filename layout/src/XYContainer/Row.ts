@@ -1,12 +1,12 @@
-import { Inject, Injector } from './di';
+import { Inject, Injector } from '../di';
 import { XYContainer, XYContainerConfig } from './XYContainer';
-import { Renderable, ConfiguredRenderable, Renderer } from './dom';
+import { Renderable, ConfiguredRenderable, Renderer } from '../dom';
 import { 
   XYDirection, 
   ContainerRef, 
   ConfigurationRef, 
   RenderableConfig 
-} from './common';
+} from '../common';
 
 export interface RowConfig extends XYContainerConfig {}
 

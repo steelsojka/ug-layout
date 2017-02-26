@@ -1,12 +1,12 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
-import { Inject, Injector } from './di';
-import { Renderable, Renderer } from './dom';
-import { DocumentRef, ContainerRef, XYDirection, ConfigurationRef, DragEvent } from './common';
+import { Inject, Injector } from '../di';
+import { Renderable, Renderer } from '../dom';
+import { DocumentRef, ContainerRef, XYDirection, ConfigurationRef, DragEvent } from '../common';
 import { XYContainer } from './XYContainer';
-import { Observable, ReplaySubject } from './events';
-import { Draggable } from './Draggable';
+import { Observable, ReplaySubject } from '../events';
+import { Draggable } from '../Draggable';
 
 export const SPLITTER_SIZE = 5;
 
