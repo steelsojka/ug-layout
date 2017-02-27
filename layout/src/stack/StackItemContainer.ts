@@ -56,7 +56,10 @@ export class StackItemContainer extends Renderable implements DropTarget {
     ];
 
     _config.tabControls = _config.tabControls || [];
-    _config.tabControls.push(CloseTabControl);
+
+    if (!ConfiguredRenderable.inList(_config.tabControls, CloseTabControl)) {
+      _config.tabControls.push(CloseTabControl);
+    }
 
     for (const control of _config.tabControls) {
       this.addControl(control, { resize: false, render: false });
@@ -105,6 +108,10 @@ export class StackItemContainer extends Renderable implements DropTarget {
 
   get draggable(): boolean {
     return get(this._config, 'draggable', true);
+  }
+  
+  get droppable(): boolean {
+    return get(this._config, 'droppable', true);
   }
   
   get closeable(): boolean {
@@ -189,7 +196,7 @@ export class StackItemContainer extends Renderable implements DropTarget {
   }
 
   isDroppable(): boolean {
-    return get(this._config, 'droppable', true);
+    return this.droppable;
   }
 
   onDropHighlightExit(): void {}

@@ -57,7 +57,7 @@ export class DragHost {
   }
 
   destroy(): void {
-    this._document.removeChild(this._element);
+    this._document.body.removeChild(this._element);
   }
 
   initialize(container: DragHostContainer): void {

@@ -12,6 +12,7 @@ export const SPLITTER_SIZE = 5;
 
 export interface SplitterConfig {
   size: number;
+  disabler?: (splitter: Splitter) => boolean;
 }
 
 export class Splitter extends Renderable {
@@ -54,7 +55,7 @@ export class Splitter extends Renderable {
   }
 
   get isDisabled(): boolean {
-    return this._isDisabled;
+    return this._isDisabled || Boolean(this._config.disabler && this._config.disabler(this));
   }
 
   private get handleStyles(): { [key:string]: any } {

@@ -58,6 +58,7 @@ export class Renderer {
   }
 
   destroy(): void {
+    this.detach();
     this._rendered.complete();
   }
 

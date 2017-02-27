@@ -4,3 +4,4 @@ export * from './common';
 export * from './decorators';
 export * from './ViewFactory';
 export * from './ViewManager';
+export * from './ViewSerializer';

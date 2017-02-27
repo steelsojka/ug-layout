@@ -267,7 +267,8 @@ export class XYContainer extends Renderable {
 
   private _createSplitter(): Splitter {
     const splitterConfig = {
-      size: this._config && this._config.splitterSize ? this._config.splitterSize : SPLITTER_SIZE
+      size: this._config && this._config.splitterSize ? this._config.splitterSize : SPLITTER_SIZE,
+      disabler: this._isSplitterDisabled.bind(this)
     };
   
     const splitter = Injector.fromInjectable(
@@ -285,6 +286,12 @@ export class XYContainer extends Renderable {
     splitter.dragStatus.subscribe(this._dragStatusChanged.bind(this));
 
     return splitter;
+  }
+
+  private _isSplitterDisabled(splitter: Splitter): boolean {
+    const { before, after } = this._getSplitterItems(splitter);
+
+    return before.isMinimized || after.isMinimized;
   }
 
   private _dragStatusChanged(event: DragEvent<Splitter>): void {

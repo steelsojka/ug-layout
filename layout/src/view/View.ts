@@ -10,6 +10,8 @@ import { ViewConfig } from './common';
 import { Subject, Observable, BeforeDestroyEvent } from '../events';
 import { MakeVisibleCommand, MinimizeCommand } from '../commands';
 import { ViewManager } from './ViewManager';
+import { ViewFactory } from './ViewFactory';
+import { get } from '../utils';
 
 export class View extends Renderable {
   visibilityChanges: Observable<boolean>;
@@ -33,6 +35,7 @@ export class View extends Renderable {
     @Inject(Injector) protected _injector: Injector,
     @Inject(ConfigurationRef) private _configuration: ViewConfig,
     @Inject(ViewManager) private _viewManager: ViewManager,
+    @Inject(ViewFactory) private _viewFactory: ViewFactory,
     @Inject(DocumentRef) private _document: Document
   ) {
     super(_injector);
@@ -54,6 +57,14 @@ export class View extends Renderable {
 
   get height(): number {
     return this._container.height;
+  }
+
+  get lazy(): boolean {
+    return get(this._configuration, 'lazy', false);
+  }
+  
+  get token(): any|null {
+    return this._viewFactory.getTokenFrom(this._configuration);
   }
 
   render(): VNode {

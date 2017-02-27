@@ -30,6 +30,7 @@ export interface XYItemContainerConfig {
   minSizeY?: number;
   maxSizeY?: number;
   fixed?: boolean;
+  minimized?: boolean;
 }
 
 export class XYItemContainer extends Renderable {
@@ -64,6 +65,8 @@ export class XYItemContainer extends Renderable {
       )
         .get(ConfiguredRenderable)
     ];
+
+    this._isMinimized = Boolean(this._config.minimized);
 
     this.subscribe(MinimizeCommand, this._minimize.bind(this));
   }
@@ -189,7 +192,6 @@ export class XYItemContainer extends Renderable {
 
   private _minimize(e: MinimizeCommand<Renderable>): void {
     const minimize = e.minimize == null ? !this._isMinimized : e.minimize;
-    const splitter = this._container.getSplitterFromItem(this);
     let size: number|null = null;
     
     e.stopPropagation();
@@ -198,18 +200,10 @@ export class XYItemContainer extends Renderable {
       size = e.size;
       this._lastSize = this.size;
       this._isMinimized = true;
-
-      if (splitter) {
-        splitter.disable();
-      }
     } else if (!minimize && this._isMinimized && this._lastSize != null) {
       size = this._lastSize;
       this._isMinimized = false;
       this._lastSize = null;
-      
-      if (splitter) {
-        splitter.enable();
-      }
     }
 
     if (size != null) {

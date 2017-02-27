@@ -1,29 +1,26 @@
 import h from 'snabbdom/h';
 import { VNode } from 'snabbdom/vnode';
 
-import { Injector, Inject, Optional, Injectable } from './di';
+import { Injector, Inject, Optional, Injectable } from '../di';
 import { 
   Renderable, 
   RenderableInjector,
   ConfiguredRenderable,
   RenderableArea
-} from './dom';
+} from '../dom';
 import { 
   ContainerRef, 
   ConfigurationRef,
   RenderableConfig,
   RenderableArg,
   DropArea
-} from './common';
-import { Serializable, Serialized } from './serialization';
-import { XYContainer } from './XYContainer';
-import { DragHost, DragHostContainer } from './DragHost';
+} from '../common';
+import { XYContainer } from '../XYContainer';
+import { DragHost, DragHostContainer } from '../DragHost';
 
 export interface LayoutConfig {
   child: RenderableArg<Renderable>;
 }
-
-export interface SerializedLayoutConfig extends Serialized {}
 
 /**
  * A layout is a set of renderables scoped to a drag host.
@@ -107,10 +104,6 @@ export class Layout extends Renderable {
           area: item.getArea()
         };
       });
-  }
-
-  serialize(): SerializedLayoutConfig {
-    return {};
   }
 
   private _onDragHostStart(container: DragHostContainer): void {

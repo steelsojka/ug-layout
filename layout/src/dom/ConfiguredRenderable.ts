@@ -28,6 +28,14 @@ export class ConfiguredRenderable<T extends Renderable> {
     return item;
   }
 
+  static resolveConfiguration(item: ConfiguredRenderable<any>|any): any {
+    if (item instanceof ConfiguredRenderable) {
+      return item.config;
+    }
+
+    return item;
+  }
+
   static inList(list: RenderableArg<Renderable>[], item: RenderableArg<Renderable>): boolean {
     const resolved = ConfiguredRenderable.resolve(item);
     

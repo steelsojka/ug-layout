@@ -20,12 +20,11 @@ import {
   CancelAction,
   MinimizeStackControl,
   StackControlPosition,
-  Crawler
+  RootSerializer,
+  ConfiguredRenderable
 } from '../../src';
 
 const colors = [ 'red', 'blue', 'white', 'cyan', 'yellow' ];
-
-const crawler = new Crawler();
 
 @ViewComponent()
 class TestView {
@@ -43,62 +42,6 @@ class TestView {
     container.sizeChanges.subscribe(size => console.log(size));
   }
 }
-
-
-
-const rootLayout = RootLayout.create({
-  container: document.body
-})
-  .configure({
-    use: Layout.configure({
-      child: Column.configure({
-        children: [{
-          use: View.configure({
-            useClass: TestView
-          })
-        }, {
-          use: Layout.configure({
-            child: Stack.configure({
-              children: [{
-                closeable: true,
-                title: 'Account Positions',
-                use: View.configure({ useClass: TestView })  
-              }, {
-                title: 'Account Summary',
-                use: View.configure({ useClass: TestView })  
-              }, {
-                title: 'Order Activity',
-                use: View.configure({ useClass: TestView })  
-              }, {
-                title: 'Account Activity',
-                use: View.configure({ useClass: TestView })  
-              }, {
-                title: 'Trade',
-                use: View.configure({ useClass: TestView })  
-              }]
-            })
-          })
-        }, {
-          minSizeY: 200,
-          use: Stack.configure({
-            controls: [
-              MinimizeStackControl.configure({
-                position: StackControlPosition.PRE_TAB
-              })
-            ],
-            children: [{
-              title: 'Order Entry',
-              draggable: false,
-              droppable: false,
-              closeable: true,
-              use: View.configure({ useClass: TestView })
-            }]
-          })
-        }]
-      })
-    })
-  })
-  .initialize();
   
 window.addEventListener('resize', () => {
   rootLayout.resize({
@@ -111,6 +54,81 @@ window.addEventListener('resize', () => {
   rootLayout.update();
 }, false);
 
-crawler.crawl(rootLayout).subscribe(x => console.log(x));
+const initialLayout = RootLayout.configure({
+  use: Layout.configure({
+    child: Column.configure({
+      children: [{
+        use: View.configure({
+          useClass: TestView
+        })
+      }, {
+        use: Layout.configure({
+          child: Stack.configure({
+            children: [{
+              closeable: true,
+              title: 'Account Positions',
+              use: View.configure({ useClass: TestView })  
+            }, {
+              title: 'Account Summary',
+              use: View.configure({ useClass: TestView })  
+            }, {
+              title: 'Order Activity',
+              use: View.configure({ useClass: TestView })  
+            }, {
+              title: 'Account Activity',
+              use: View.configure({ useClass: TestView })  
+            }, {
+              title: 'Trade',
+              use: View.configure({ useClass: TestView })  
+            }]
+          })
+        })
+      }, {
+        minSizeY: 200,
+        use: Stack.configure({
+          controls: [
+            MinimizeStackControl.configure({
+              position: StackControlPosition.PRE_TAB
+            })
+          ],
+          children: [{
+            title: 'Order Entry',
+            draggable: false,
+            droppable: false,
+            closeable: true,
+            use: View.configure({ useClass: TestView })
+          }]
+        })
+      }]
+    })
+  })
+});
 
-(<any>window).rootLayout = rootLayout;
+const rootLayout = window['rootLayout'] = RootLayout
+  .create({
+    container: document.body  
+  })
+  .initialize();
+  
+const serializer = RootSerializer.fromRoot(rootLayout);
+
+serializer.registerClasses({
+  TestView
+});
+
+rootLayout.load(initialLayout);
+
+window['layouts'] = {};
+
+function saveLayout(name: string): void {
+  window['layouts'][name] = serializer.serialize(rootLayout);
+}
+
+function loadLayout(name: string): void {
+  if (window['layouts'][name]) {
+    rootLayout.load(serializer.deserialize(window['layouts'][name]) as ConfiguredRenderable<RootLayout>);
+  }
+}
+
+window['saveLayout'] = saveLayout;
+window['loadLayout'] = loadLayout;

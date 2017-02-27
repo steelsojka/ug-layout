@@ -4,6 +4,10 @@ export function isNumber(val: any): val is number {
   return typeof val === 'number';
 }
 
+export function isString(val: any): val is string {
+  return typeof val === 'string';
+}
+
 export function clamp(val, min, max): number {
   return Math.min(max, Math.max(min, val));
 }

@@ -12,7 +12,7 @@ import {
 } from '../dom';
 import { BeforeDestroyEvent, BusEvent, Subject, Observable } from '../events';
 import { ConfigurationRef, ContainerRef, RenderableArg, XYDirection } from '../common';
-import { XYItemContainer, XYItemContainerConfig } from '../XYItemContainer';
+import { XYItemContainer, XYItemContainerConfig, Row, Column } from '../XYContainer';
 import { StackHeader, StackHeaderConfigArgs } from './StackHeader';
 import { TabCloseEvent } from './TabCloseEvent';
 import { TabSelectionEvent } from './TabSelectionEvent';
@@ -23,8 +23,6 @@ import { RootInjector } from '../RootInjector';
 import { StackTab } from './StackTab';
 import { clamp, get, isNumber, propEq } from '../utils';
 import { StackRegion } from './common';
-import { Row } from '../Row';
-import { Column } from '../Column';
 import { StackControl, CloseStackControl } from './controls';
 
 export interface StackConfig {
@@ -126,6 +124,10 @@ export class Stack extends Renderable {
 
   get header(): StackHeader {
     return this._header;
+  }
+
+  get items(): StackItemContainer[] {
+    return this._contentItems;
   }
 
   render(): VNode {

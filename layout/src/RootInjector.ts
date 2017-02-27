@@ -1,9 +1,9 @@
 import { Injector, ProviderArg, forwardRef } from './di';
-import { Renderer } from './dom';
+import { Renderer, RenderableInjector } from './dom';
 import { ViewFactory, ViewManager } from './view';
 import { DocumentRef } from './common';
 
-export class RootInjector extends Injector {
+export class RootInjector extends RenderableInjector {
   constructor(providers: ProviderArg[] = []) {
     super([
       Renderer,

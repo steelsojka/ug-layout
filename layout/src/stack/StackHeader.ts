@@ -17,7 +17,7 @@ import { StackTab, StackTabConfigArgs } from './StackTab';
 import { TabCloseEvent } from './TabCloseEvent';
 import { TabSelectionEvent } from './TabSelectionEvent';
 import { TabDragEvent } from './TabDragEvent';
-import { isNumber, partition, propEq } from '../utils';
+import { get, isNumber, partition, propEq } from '../utils';
 import { 
   ConfigurationRef, 
   ContainerRef, 
@@ -81,12 +81,24 @@ export class StackHeader extends Renderable implements DropTarget {
     return this._container.isHorizontal ? this._config.size : this._container.height;
   }
 
+  get size(): number {
+    return get(this._config, 'size', DEFAULT_STACK_HEADER_SIZE);
+  }
+
+  get droppable(): boolean {
+    return get(this._config, 'droppable', true);
+  }
+
   get isHorizontal(): boolean {
     return this._container.isHorizontal;
   }
 
   get isDistributed(): boolean {
-    return Boolean(this._config.distribute);
+    return get(this._config, 'distribute', false);
+  }
+
+  get controls(): StackControl[] {
+    return this._controls.slice(0);
   }
 
   addTab(config: StackTabConfigArgs, options: AddChildArgs = {}): StackTab {
@@ -153,7 +165,7 @@ export class StackHeader extends Renderable implements DropTarget {
   }
 
   isDroppable(): boolean {
-    return true;
+    return this.droppable;
   }
 
   getChildren(): Renderable[] {

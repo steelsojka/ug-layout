@@ -6,7 +6,7 @@ import { ContainerRef } from '../../common';
 import { StackControl } from './StackControl';
 import { StackHeader } from '../StackHeader';
 import { MinimizeCommand } from '../../commands';
-import { XYItemContainer } from '../../XYItemContainer';
+import { XYItemContainer } from '../../XYContainer';
 
 export class MinimizeStackControl extends StackControl {
   constructor(
