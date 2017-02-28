@@ -18,39 +18,43 @@ import { Ng1TestComponent } from './Ng1Test.component';
   `
 })
 export class AppComponent {
-  root: ConfiguredRenderable<Layout>;
+  root: ConfiguredRenderable<RootLayout>;
   layouts = [
-    Layout.configure({
-      child: Row.configure({
-        children: [{
-          use: View.configure({
-            useClass: TestComponent
-          })
-        }, {
-          use: View.configure({
-            useClass: Ng1TestComponent
-          })
-        }]
+    RootLayout.configure({
+      use: Layout.configure({
+        child: Row.configure({
+          children: [{
+            use: View.configure({
+              useClass: TestComponent
+            })
+          }, {
+            use: View.configure({
+              useClass: Ng1TestComponent
+            })
+          }]
+        })
       })
     }),
-    Layout.configure({
-      child: Stack.configure({
-        children: [{
-          title: 'Test',
-          use: Row.configure({
-            children: [{
-              use: View.configure({
-                useClass: TestComponent
-              })
-            }, {
-              use: View.configure({
-                useClass: TestComponent
-              })
-            }]
-          })
-        }]
+    RootLayout.configure({
+      use: Layout.configure({
+        child: Stack.configure({
+          children: [{
+            title: 'Test',
+            use: Row.configure({
+              children: [{
+                use: View.configure({
+                  useClass: TestComponent
+                })
+              }, {
+                use: View.configure({
+                  useClass: TestComponent
+                })
+              }]
+            })
+          }]
+        })
       })
-    }),
+    })
   ]
   
   ngOnInit(): void {

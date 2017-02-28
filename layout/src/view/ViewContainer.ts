@@ -4,7 +4,8 @@ import { ReplaySubject, Observable, Subject, BeforeDestroyEvent, BehaviorSubject
 import { ContainerRef, ConfigurationRef, DocumentRef } from '../common';
 import { View } from './View';
 import { ViewFactoriesRef, ViewComponentRef } from './common';
-import { get, uid, eq, isPromise, isObject } from '../utils';
+import { CustomViewHookCommand } from './CustomViewHookCommand';
+import { isFunction, get, uid, eq, isPromise, isObject } from '../utils';
 
 export enum ViewContainerStatus {
   READY,
@@ -87,6 +88,12 @@ export class ViewContainer<T> {
     this.status = this._status.asObservable();  
     this.statusReady = this.status.filter(eq(ViewContainerStatus.READY));
     this._element.classList.add('ug-layout__view-container-mount');
+
+    this.attached.subscribe(() => this._executeHook('ugOnAttach', this._container));
+    this.detached.subscribe(() => this._executeHook('ugOnDetach'));
+    this.sizeChanges.subscribe(dimensions => this._executeHook('ugOnResize', dimensions));
+    this.visibilityChanges.subscribe(isVisible => this._executeHook('ugOnVisibilityChange', isVisible));
+    this.beforeDestroy.subscribe(event => this._executeHook('ugOnBeforeDestroy', event));
   }
 
   get ready(): Promise<ViewContainer<T>> {
@@ -163,6 +170,11 @@ export class ViewContainer<T> {
       this._container.sizeChanges
         .takeUntil(this._containerChange)
         .subscribe(e => this._sizeChanges.next(e));
+
+      this._container
+        .scope(CustomViewHookCommand)
+        .takeUntil(this._containerChange)
+        .subscribe(event => this._executeHook(event.name, ...event.args));
     }
 
     this._attached.next(Boolean(this._container));
@@ -211,6 +223,12 @@ export class ViewContainer<T> {
       this.detach();
     } else {
       this.destroy();
+    }
+  }
+
+  private _executeHook(name: string, ...args: any[]): void {
+    if (isObject(this._component) && isFunction(this._component[name])) {
+      this._component[name].apply(this._component, args);
     }
   }
 

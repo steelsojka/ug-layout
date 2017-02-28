@@ -49,7 +49,8 @@ export class ViewFactory {
 
     const viewInjector = Injector.fromInjectable(ViewContainer, providers, injector);
     const viewContainer = viewInjector.get(ViewContainer) as ViewContainer<any>;
-
+    
+    viewInjector.registerProvider({ provide: ElementRef, useValue: viewContainer.element });
     viewContainer.initialize();
      
     return viewContainer;

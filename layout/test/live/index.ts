@@ -22,7 +22,9 @@ import {
   StackControlPosition,
   RootSerializer,
   ConfiguredRenderable,
-  ResolverStrategy
+  ResolverStrategy,
+  OnBeforeDestroy,
+  BeforeDestroyEvent
 } from '../../src';
 
 const colors = [ 'red', 'blue', 'white', 'cyan', 'yellow' ];
@@ -31,23 +33,25 @@ const colors = [ 'red', 'blue', 'white', 'cyan', 'yellow' ];
   cacheable: true,
   resolution: ResolverStrategy.REF
 })
-class TestView {
+class TestView implements OnBeforeDestroy {
   private _color: string = colors.shift() as string;
   
   constructor(
-    @Inject(ViewContainer) private container: ViewContainer<TestView>
+    @Inject(ElementRef) private element: HTMLElement
   ) {
     (<any>window).testComp = this;
-
-    const { element } = container;
 
     element.innerHTML = '<div>TEST!!</div>';
     element.style.backgroundColor = this._color;
     // container.visibilityChanges.subscribe(isVisible => console.log(isVisible));
     // container.sizeChanges.subscribe(size => console.log(size));
-    
-    container.detached.subscribe(() => console.log('detached'));
-    container.attached.subscribe(() => console.log('attached'));
+  }
+
+  ugOnBeforeDestroy(event: BeforeDestroyEvent<any>): void {
+  }
+
+  ugOnResize(dimensions): void {
+    console.log(dimensions);
   }
 }
   

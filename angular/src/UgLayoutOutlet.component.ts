@@ -9,7 +9,7 @@ import {
   SimpleChanges,
   ViewChild
 } from '@angular/core';
-import { ProviderArg, Renderable, ConfiguredRenderable, Layout } from 'ug-layout';
+import { RootLayout, ProviderArg, Renderable, ConfiguredRenderable, Layout } from 'ug-layout';
 
 import { RootLayoutProviders } from './common';
 import { AngularRootLayout } from './RootLayout';
@@ -25,36 +25,42 @@ import { AngularRootLayout } from './RootLayout';
   `]
 })
 export class UgLayoutOutletComponent implements OnChanges {
-  @Input() root?: Renderable;
+  @Input() root?: ConfiguredRenderable<RootLayout>;
 
   @ViewChild('container', { read: ViewContainerRef })
   private _viewContainerRef: ViewContainerRef;
   private _rootLayout: AngularRootLayout;
+  private _isInitialized: boolean = false;
 
   constructor(
     @Inject(RootLayoutProviders) private _layoutProviders: ProviderArg[],
     @Inject(Injector) private _injector: Injector
   ) {}
 
+  ngOnInit(): void {
+    this._rootLayout = AngularRootLayout.create({
+      ngInjector: this._injector,
+      viewContainerRef: this._viewContainerRef,
+      container: this._viewContainerRef.element.nativeElement,
+      providers: this._layoutProviders
+    });
+
+    this._rootLayout.initialize();
+
+    if (this.root) {
+      this._construct(this.root);
+    }
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['root'] && changes['root'].currentValue instanceof ConfiguredRenderable) {
+    if (changes['root'] 
+      && changes['root'].currentValue instanceof ConfiguredRenderable
+      && !changes['root'].isFirstChange()) {
       this._construct(changes['root'].currentValue);
     }
   }
 
-  private _construct(root: ConfiguredRenderable<Layout>): void {
-    if (this._rootLayout) {
-      this._rootLayout.destroy();
-    }
-    
-    this._rootLayout = AngularRootLayout
-      .create({
-        ngInjector: this._injector,
-        viewContainerRef: this._viewContainerRef,
-        container: this._viewContainerRef.element.nativeElement,
-        providers: this._layoutProviders
-      })
-      .configure({ use: root })
-      .initialize();
+  private _construct(root: ConfiguredRenderable<RootLayout>): void {
+    this._rootLayout.load(root);
   }
 }

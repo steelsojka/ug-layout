@@ -91,7 +91,7 @@ export class AngularViewFactory extends ViewFactory {
     }
   }
 
-  private async _factory<T>(config: ViewConfig, elementRef: HTMLElement, viewContainer: ViewContainer<T>): Promise<T> {
+  private async _factory<T>(config: ViewConfig, viewContainer: ViewContainer<T>): Promise<T> {
     const token = this.getTokenFrom(config);
     
     const metadata = Reflect.getOwnMetadata(VIEW_CONFIG_KEY, token) as ViewComponentConfig;
