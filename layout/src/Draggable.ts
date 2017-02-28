@@ -56,8 +56,8 @@ export class Draggable<T> {
     if (this._pastThreshold) {
       this._drag.next({
         status: DragStatus.STOP,
-        x: e.x - this._startX,
-        y: e.y - this._startY,
+        x: e.pageX - this._startX,
+        y: e.pageY - this._startY,
         pageY: e.pageY,
         pageX: e.pageX,
         host: this._host
@@ -73,8 +73,8 @@ export class Draggable<T> {
     e.preventDefault();
     e.stopPropagation();
 
-    const deltaX = e.x - this._startX;
-    const deltaY = e.y - this._startY;
+    const deltaX = e.pageX - this._startX;
+    const deltaY = e.pageY - this._startY;
 
     if (!this._pastThreshold && (Math.abs(deltaX) >= this._threshold || Math.abs(deltaY) >= this._threshold)) {
       this._pastThreshold = true;  

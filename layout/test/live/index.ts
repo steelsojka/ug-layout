@@ -21,25 +21,33 @@ import {
   MinimizeStackControl,
   StackControlPosition,
   RootSerializer,
-  ConfiguredRenderable
+  ConfiguredRenderable,
+  ResolverStrategy
 } from '../../src';
 
 const colors = [ 'red', 'blue', 'white', 'cyan', 'yellow' ];
 
-@ViewComponent()
+@ViewComponent({
+  cacheable: true,
+  resolution: ResolverStrategy.REF
+})
 class TestView {
   private _color: string = colors.shift() as string;
   
   constructor(
-    @Inject(ViewContainer) private container: ViewContainer<TestView>,
-    @Inject(ElementRef) private element: HTMLElement
+    @Inject(ViewContainer) private container: ViewContainer<TestView>
   ) {
     (<any>window).testComp = this;
 
+    const { element } = container;
+
     element.innerHTML = '<div>TEST!!</div>';
     element.style.backgroundColor = this._color;
-    container.visibilityChanges.subscribe(isVisible => console.log(isVisible));
-    container.sizeChanges.subscribe(size => console.log(size));
+    // container.visibilityChanges.subscribe(isVisible => console.log(isVisible));
+    // container.sizeChanges.subscribe(size => console.log(size));
+    
+    container.detached.subscribe(() => console.log('detached'));
+    container.attached.subscribe(() => console.log('attached'));
   }
 }
   
@@ -59,6 +67,8 @@ const initialLayout = RootLayout.configure({
     child: Column.configure({
       children: [{
         use: View.configure({
+          cacheable: true,
+          ref: 'Account Summary',
           useClass: TestView
         })
       }, {
@@ -67,19 +77,19 @@ const initialLayout = RootLayout.configure({
             children: [{
               closeable: true,
               title: 'Account Positions',
-              use: View.configure({ useClass: TestView })  
+              use: View.configure({ useClass: TestView, cacheable: false, ref: 'Account Positions' })  
             }, {
-              title: 'Account Summary',
-              use: View.configure({ useClass: TestView })  
+              title: 'Account Balances',
+              use: View.configure({ useClass: TestView, ref: 'Account Balances' })  
             }, {
               title: 'Order Activity',
-              use: View.configure({ useClass: TestView })  
+              use: View.configure({ useClass: TestView, ref: 'Order Activity' })  
             }, {
               title: 'Account Activity',
-              use: View.configure({ useClass: TestView })  
+              use: View.configure({ useClass: TestView, ref: 'Account Activity' })  
             }, {
               title: 'Trade',
-              use: View.configure({ useClass: TestView })  
+              use: View.configure({ useClass: TestView, ref: 'Trade' })  
             }]
           })
         })
@@ -96,7 +106,7 @@ const initialLayout = RootLayout.configure({
             draggable: false,
             droppable: false,
             closeable: true,
-            use: View.configure({ useClass: TestView })
+            use: View.configure({ useClass: TestView, ref: 'Order Entry' })
           }]
         })
       }]

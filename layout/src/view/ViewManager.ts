@@ -4,7 +4,8 @@ import { ViewContainer } from './ViewContainer';
 import { VIEW_CONFIG_KEY, ViewConfig, ViewComponentConfig, ResolverStrategy } from './common';
 
 export class ViewManager {
-  private _views: Map<any, { [key:number]: ViewContainer<any> }> = new Map();
+  private _views: Map<any, { [key: string]: ViewContainer<any> }> = new Map();
+  private _refs: Map<string, ViewContainer<any>> = new Map();
   
   constructor(
     @Inject(ViewFactory) private _viewFactory: ViewFactory
@@ -38,31 +39,69 @@ export class ViewManager {
     return this._views.get(token) || null;
   }
 
-  resolve<T>(args: ViewFactoryArgs): ViewContainer<T> {
-    const token = this._viewFactory.getTokenFrom(args.config);
-    
-    const metadata = Reflect.getOwnMetadata(VIEW_CONFIG_KEY, token) as ViewComponentConfig|undefined;
+  destroy() {
+    for (const views of this._views.values()) {
+      for (const key of Object.keys(views)) {
+        const view = views[key] as ViewContainer<any>|null;
 
-    this._assertComponent(token);
-
-    return this._resolve<T>(args, metadata as ViewComponentConfig);
+        if (view) {
+          view.destroy();  
+        }
+      }
+    }      
   }
 
-  create<T>(config: ViewFactoryArgs): ViewContainer<T> {
-    const token = this._viewFactory.getTokenFrom(config.config);
-    
-    this._assertComponent(token);
-    
-    const container = this._viewFactory.create<T>(config);
+  getRef<T>(ref: string): ViewContainer<T>|null {
+    return this._refs.get(ref) || null;
+  }
 
-    this.register(token, container);
-    
-    container.destroyed.subscribe(() => this.unregister(token, container));
+  resolve<T>(config: ViewConfig): ViewContainer<T>|null {
+    const token = this._viewFactory.getTokenFrom(config);
+    const metadata = this._assertAndReadComponent(token);
 
+    return this._resolve<T>(config, metadata);
+  }
+  
+  resolveOrCreate<T>(args: ViewFactoryArgs): ViewContainer<T> {
+    return this.resolveOrCreateWith<T>(args.config, (): ViewContainer<T> => {
+      return this._viewFactory.create<T>(args);
+    });
+  }
+  
+  resolveOrCreateWith<T>(config: ViewConfig, factory: (viewFactory: ViewFactory) => ViewContainer<T>): ViewContainer<T> {
+    const token = this._viewFactory.getTokenFrom(config);
+    const metadata = this._assertAndReadComponent(token);
+
+    const container = this._resolve<T>(config, metadata);
+
+    if (container) {
+      return container;
+    }
+
+    return this.createWith<T>(config, factory);
+  }
+
+  create<T>(args: ViewFactoryArgs): ViewContainer<T> {
+    return this.createWith(args.config, (): ViewContainer<T> => {
+      return this._viewFactory.create<T>(args);
+    })
+  }
+  
+  createWith<T>(config: ViewConfig, factory: (viewFactory: ViewFactory) => ViewContainer<T>): ViewContainer<T> {
+    const token = this._viewFactory.getTokenFrom(config);
+    
+    this._assertAndReadComponent(token);
+    
+    const container = factory(this._viewFactory);
+
+    this.register(token, container, { ref: config.ref });
+    
     return container;
   }
 
-  register(token: any, container: ViewContainer<any>): void {
+  register(token: any, container: ViewContainer<any>, options: { ref?: string|null } = {}): void {
+    const { ref } = options;
+    
     if (!this._views.has(token)) {
       this._views.set(token, {});
     }
@@ -76,9 +115,20 @@ export class ViewManager {
     map[container.id] = container;
 
     this._views.set(token, map);
+
+    container.destroyed.subscribe(() => this.unregister(token, container, { ref }));
+
+    if (ref) {
+      if (this._refs.has(ref)) {
+        throw new Error(`Ref '${ref}' already exists.`);
+      }
+      
+      this._refs.set(ref, container);
+    }
   }
   
-  unregister(token: any, container: ViewContainer<any>): void {
+  unregister(token: any, container: ViewContainer<any>, options: { ref?: string|null } = {}): void {
+    const { ref } = options;
     const map = this._views.get(token) as { [key:number]: ViewContainer<any> };
 
     if (!map) {
@@ -94,32 +144,44 @@ export class ViewManager {
     if (Object.keys(map).length === 0) {
       this._views.delete(token);
     }
+
+    if (ref && this._refs.has(ref)) {
+      this._refs.delete(ref);
+    }
   }
 
-  private _resolve<T>(factoryArgs: ViewFactoryArgs, metadata: ViewComponentConfig): ViewContainer<T> {
-    if (metadata.resolution === ResolverStrategy.TRANSIENT) {
-      return this.create<T>(factoryArgs);
-    }
+  private _resolve<T>(config: ViewConfig, metadata: ViewComponentConfig): ViewContainer<T>|null {
+    const resolution = this._viewFactory.resolveConfigProperty(config, 'resolution');
+      
+    // REF
+    if (resolution === ResolverStrategy.REF) {
+      if (config.ref && this._refs.has(config.ref)) {
+        return this.getRef(config.ref) as ViewContainer<T>;
+      }
+    } else {
+      // SINGLETON
+      const token = this._viewFactory.getTokenFrom(config);
+      const views = this.getAll(token);
 
-    const token = this._viewFactory.getTokenFrom(factoryArgs.config);
-    const views = this.getAll(token);
+      if (views) {
+        const keys = Object.keys(views);
 
-    if (views) {
-      const keys = Object.keys(views);
-
-      if (keys.length) {
-        return views[keys[0]];
+        if (keys.length) {
+          return views[keys[0]];
+        }
       }
     }
-
-    return this.create<T>(factoryArgs);
+    
+    return null;
   }
 
-  private _assertComponent(token: any): void {
+  private _assertAndReadComponent(token: any): ViewComponentConfig {
     const metadata = Reflect.getOwnMetadata(VIEW_CONFIG_KEY, token) as ViewComponentConfig|undefined;
 
     if (!metadata) {
       throw new Error(`The given token is not a registered ViewComponent.`);
     }
+
+    return metadata;
   }
 }

@@ -7,6 +7,8 @@ import {
 export function ViewComponent(config: ViewComponentConfigArgs = {}): ClassDecorator {
   return (target: Function): void => {
     config = Object.assign({
+      cacheable: false,
+      lazy: false,
       resolution: ResolverStrategy.SINGLETON,
       name: null
     }, config);

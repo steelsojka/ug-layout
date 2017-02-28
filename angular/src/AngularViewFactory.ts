@@ -4,10 +4,10 @@ import {
   Injector, 
   ComponentRef, 
   Input,
-  ApplicationRef
+  ApplicationRef,
+  ElementRef
 } from '@angular/core';
 import { 
-  ElementRef, 
   ViewFactory, 
   ViewContainer, 
   ViewFactoryArgs, 
@@ -47,18 +47,18 @@ export class AngularViewFactory extends ViewFactory {
   }
   
   create<T>(args: ViewFactoryArgs): ViewContainer<T> {
-    const { injector, config, element, container } = args;
+    const { injector, config, container } = args;
 
     if (!this._isInitialized) {
       throw new Error('AngularViewFactory needs to be initialized prior to using');
     }
 
     return super.create<T>({
-      injector, element, container,
+      injector, container,
       config: {
         token: this.getTokenFrom(config),
         useFactory: this._factory.bind(this, config),
-        deps: [ ElementRef, ViewContainer ]
+        deps: [ ViewContainer ]
       }
     });
   }
@@ -99,13 +99,13 @@ export class AngularViewFactory extends ViewFactory {
     // TODO: Add interceptor logic here
 
     if (metadata.upgrade) {
-      return await this._ng1Factory(config, elementRef, viewContainer);
+      return await this._ng1Factory(config, viewContainer);
     }
 
-    return await this._ng2Factory(config, elementRef, viewContainer);
+    return await this._ng2Factory(config, viewContainer);
   }
 
-  private async _ng1Factory<T>(config: ViewConfig, elementRef: HTMLElement, viewContainer: ViewContainer<T>): Promise<T> {
+  private async _ng1Factory<T>(config: ViewConfig, viewContainer: ViewContainer<T>): Promise<T> {
     if (!this._isNg1Bootstrapped) {
       if (!this._isCheckingForNg1) {
         this._checkForNg1Init();
@@ -138,7 +138,7 @@ export class AngularViewFactory extends ViewFactory {
     }
 
     // Instaniate our controller for the component.
-    const ctrl = ng1Injector.instantiate(token, this._getNg1Providers(config, elementRef, viewContainer)) as T;
+    const ctrl = ng1Injector.instantiate(token, this._getNg1Providers(config, viewContainer.element, viewContainer)) as T;
 
     // Assign it to scope.
     scope[metadata.controllerAs || '$ctrl'] = ctrl;
@@ -151,7 +151,7 @@ export class AngularViewFactory extends ViewFactory {
     // Link the view to the controller.
     const $el = linkFn(scope);
 
-    elementRef.appendChild($el[0]);
+    viewContainer.mount($el[0]);
     viewContainer.destroyed.subscribe(() => this._onNg1ComponentDestroyed(scope, viewContainer));
 
     if (typeof ctrl['$postLink'] === 'function') {
@@ -161,11 +161,12 @@ export class AngularViewFactory extends ViewFactory {
     return ctrl;
   }
 
-  private async _ng2Factory<T>(config: ViewConfig, elementRef: HTMLElement, viewContainer: ViewContainer<T>): Promise<T> {
+  private async _ng2Factory<T>(config: ViewConfig, viewContainer: ViewContainer<T>): Promise<T> {
     const token = this.getTokenFrom(config);
     
     const componentFactory = this._componentFactoryResolver.resolveComponentFactory<T>(token);
     const injector = ReflectiveInjector.resolveAndCreate([
+      { provide: ElementRef, useValue: new ElementRef(viewContainer.element) },
       { provide: ViewContainer, useValue: viewContainer }
     ], this._rootConfig.ngInjector);
     
@@ -177,8 +178,10 @@ export class AngularViewFactory extends ViewFactory {
     
     componentRef.instance[COMPONENT_REF_KEY] = componentRef;
     
-    elementRef.appendChild(componentRef.location.nativeElement);
+    viewContainer.mount(componentRef.location.nativeElement);
     viewContainer.destroyed.subscribe(this._onComponentDestroy.bind(this, componentRef));
+    viewContainer.attached.subscribe(this._onAttachChange.bind(this, true, componentRef));
+    viewContainer.detached.subscribe(this._onAttachChange.bind(this, false, componentRef));
     componentRef.changeDetectorRef.detectChanges();
     
     return componentRef.instance;
@@ -190,6 +193,14 @@ export class AngularViewFactory extends ViewFactory {
     }
 
     scope.$destroy();
+  }
+
+  private _onAttachChange<T>(isAttached: boolean, componentRef: ComponentRef<T>): void {
+    if (isAttached) {
+      componentRef.changeDetectorRef.reattach();
+    } else {
+      componentRef.changeDetectorRef.detach();
+    }
   }
 
   private _onComponentDestroy<T>(componentRef: ComponentRef<T>): void {

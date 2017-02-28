@@ -1,46 +1,46 @@
 import { Injector, Type, Inject, Optional } from '../di';
 import { Renderable } from '../dom';
-import { ReplaySubject, Observable, BeforeDestroyEvent, BehaviorSubject } from '../events';
-import { ContainerRef, ConfigurationRef } from '../common';
+import { ReplaySubject, Observable, Subject, BeforeDestroyEvent, BehaviorSubject } from '../events';
+import { ContainerRef, ConfigurationRef, DocumentRef } from '../common';
 import { View } from './View';
 import { ViewFactoriesRef, ViewComponentRef } from './common';
-import { uid, eq, isPromise, isObject } from '../utils';
+import { get, uid, eq, isPromise, isObject } from '../utils';
 
 export enum ViewContainerStatus {
   READY,
   PENDING
 }
 
+export enum ViewContainerAttachedStatus {
+  ATTACHED,
+  DETACHED
+}
+
 export class ViewContainer<T> {
   readonly id: number = uid();
   
-  getParent: <T>(Ctor: Type<T>) => T|null = this._container.getParent.bind(this._container);
-  getParents: <T>(Ctor: Type<T>) => T[] = this._container.getParents.bind(this._container);
-  makeVisible: () => void = this._container.makeVisible.bind(this._container);
-  isVisible: () => void = this._container.isVisible.bind(this._container);
-  close: (args: { silent?: boolean }) => Promise<void> = this._container.close.bind(this._container);
   /**
    * Notifies that the view is being destroyed. This action is cancellable or can be halted until
    * an async action is complete.
    * @see Cancellable
    * @type {Observable<BeforeDestroyEvent<Renderable>>}
    */
-  beforeDestroy: Observable<BeforeDestroyEvent<Renderable>> = this._container.scope(BeforeDestroyEvent);
+  beforeDestroy: Observable<BeforeDestroyEvent<Renderable>>;
   /**
    * Notifies when the view is destroyed.
-   * @type {Observable<Renderable>}
+   * @type {Observable<ViewContainer<T>>}
    */
-  destroyed: Observable<Renderable> = this._container.destroyed;
+  destroyed: Observable<ViewContainer<T>>;
   /**
    * Notifies when the visibility of this view changes.
    * @type {Observable<boolean>}
    */
-  visibilityChanges: Observable<boolean> = this._container.visibilityChanges;
+  visibilityChanges: Observable<boolean>;
   /**
    * Notifies when the dimensions of this views container has changed.
    * @type {Observable<{ width: number, height: number }>}
    */
-  sizeChanges: Observable<{ width: number, height: number }> = this._container.sizeChanges;
+  sizeChanges: Observable<{ width: number, height: number }>;
   /**
    * Notifies when the status of this component changes.
    * @type {Observable<ViewContainerStatus>}
@@ -51,16 +51,42 @@ export class ViewContainer<T> {
    * @type {Observable<ViewContainerStatus>}
    */
   statusReady: Observable<ViewContainerStatus>;
+  containerChange: Observable<View|null>;
+  attached: Observable<boolean>;
+  detached: Observable<boolean>;
 
+  /**
+   * This element is the mount point that views can mount to.
+   * The node created by the render method gets recreated when moved
+   * somewhere else in the tree. This element is constant.
+   * @private
+   * @type {HTMLElement}
+   */
+  private _element: HTMLElement = this._document.createElement('div');
   private _component: T;
+  private _container: View|null;
   private _status: BehaviorSubject<ViewContainerStatus> = new BehaviorSubject(ViewContainerStatus.PENDING);
+  private _destroyed: Subject<ViewContainer<T>> = new Subject();
+  private _beforeDestroy: Subject<BeforeDestroyEvent<Renderable>> = new Subject();
+  private _containerChange: Subject<View|null> = new Subject<View|null>();
+  private _visibilityChanges: Subject<boolean> = new Subject();
+  private _sizeChanges: Subject<{ width: number, height: number }> = new Subject();
+  private _attached: Subject<boolean> = new Subject();
   
   constructor(
-    @Inject(ContainerRef) protected _container: View,
+    @Inject(DocumentRef) protected _document: Document,
     @Inject(Injector) protected _injector: Injector
   ) {
+    this.destroyed = this._destroyed.asObservable();
+    this.beforeDestroy = this._beforeDestroy.asObservable();
+    this.visibilityChanges = this._visibilityChanges.asObservable();
+    this.sizeChanges = this._sizeChanges.asObservable();
+    this.containerChange = this._containerChange.asObservable();
+    this.attached = this._attached.asObservable().filter(eq(true));
+    this.detached = this._attached.asObservable().filter(eq(false));
     this.status = this._status.asObservable();  
     this.statusReady = this.status.filter(eq(ViewContainerStatus.READY));
+    this._element.classList.add('ug-layout__view-container-mount');
   }
 
   get ready(): Promise<ViewContainer<T>> {
@@ -68,15 +94,23 @@ export class ViewContainer<T> {
   }
 
   get width(): number {
-    return this._container.width;
+    return get(this._container, 'width', 0);
   }
   
   get height(): number {
-    return this._container.height;
+    return get(this._container, 'height', 0);
   }
 
   get component(): T {
     return this._component;
+  }
+
+  get isCacheable(): boolean {
+    return this._container ? Boolean(this._container.resolveConfigProperty('cacheable')) : false;
+  }
+
+  get element(): HTMLElement {
+    return this._element;
   }
 
   get(token: any): any {
@@ -84,7 +118,14 @@ export class ViewContainer<T> {
   }
 
   destroy(): void {
+    this._destroyed.next();
+    
+    this._destroyed.complete();
     this._status.complete();
+    this._beforeDestroy.complete();
+    this._containerChange.complete();
+    this._visibilityChanges.complete();
+    this._sizeChanges.complete();
   }
 
   initialize(): void {
@@ -94,6 +135,82 @@ export class ViewContainer<T> {
       component.then(val => this._onComponentReady(val));
     } else {
       this._onComponentReady(component);
+    }
+  }
+
+  setView(container: View|null): void {
+    if (container === this._container) {
+      return;
+    }
+    
+    this._container = container;
+    this._containerChange.next(container);
+
+    if (this._container) {
+      this._container.destroyed
+        .takeUntil(this._containerChange)
+        .subscribe(() => this._onViewDestroy());
+      
+      this._container
+        .scope(BeforeDestroyEvent)
+        .takeUntil(this._containerChange)
+        .subscribe(e => this._beforeDestroy.next(e));
+      
+      this._container.visibilityChanges
+        .takeUntil(this._containerChange)
+        .subscribe(e => this._visibilityChanges.next(e));
+      
+      this._container.sizeChanges
+        .takeUntil(this._containerChange)
+        .subscribe(e => this._sizeChanges.next(e));
+    }
+
+    this._attached.next(Boolean(this._container));
+  }
+
+  getParent<U extends Renderable>(Ctor: Type<U>): U|null {
+    return this._container ? this._container.getParent(Ctor) : null;
+  }
+  
+  getParents<U extends Renderable>(Ctor: Type<U>): U[] {
+    return this._container ? this._container.getParents(Ctor) : [];
+  }
+  
+  makeVisible(): void {
+    if (this._container) {
+      this._container.makeVisible();
+    }
+  }
+  
+  isVisible(): boolean {
+    return this._container ? this._container.isVisible() : false;
+  }
+  
+  close(args: { silent?: boolean }): void {
+    if (this._container) {
+      this._container.close(args);
+    }
+  }
+
+  mountTo(element: HTMLElement): void {
+    if (Array.prototype.indexOf.call(element.children, this._element) === -1) {
+      element.appendChild(this._element);
+    }
+  }
+  
+  mount(element: HTMLElement): void {
+    this._element.appendChild(element);
+  }
+
+  detach(): void {
+    this.setView(null);
+  }
+
+  private _onViewDestroy(): void {
+    if (this.isCacheable) {
+      this.detach();
+    } else {
+      this.destroy();
     }
   }
 

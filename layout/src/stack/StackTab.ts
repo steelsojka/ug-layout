@@ -181,10 +181,8 @@ export class StackTab extends Renderable {
     
     this._draggable.startDrag({
       host: this, 
-      startX: e.x,
-      startY: e.y,
-      pageX: e.pageX,
-      pageY: e.pageY
+      startX: e.pageX,
+      startY: e.pageY
     });
   }
 

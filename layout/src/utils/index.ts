@@ -20,6 +20,10 @@ export function isFunction(val: any): val is Function {
   return typeof val === 'function';
 }
 
+export function isBoolean(val: any): val is boolean {
+  return typeof val === 'boolean';
+}
+
 export function get<T>(obj: any, path: string, defaultValue?: T): T {
   const pathParts = path.split('.');
 

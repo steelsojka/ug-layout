@@ -131,10 +131,8 @@ export class Splitter extends Renderable {
     if (!this.isDisabled) {
       this._draggable.startDrag({
         host: this, 
-        startX: e.x, 
-        startY: e.y,
-        pageX: e.pageX,
-        pageY: e.pageY,
+        startX: e.pageX, 
+        startY: e.pageY,
         threshold: 1
       });
     }

@@ -6,7 +6,7 @@ import { Renderer, Renderable, ConfiguredRenderable } from '../dom';
 import { ContainerRef, ConfigurationRef, ElementRef, DocumentRef } from '../common';
 import { Stack } from '../stack';
 import { ViewContainer } from './ViewContainer';
-import { ViewConfig } from './common';
+import { ViewConfig, ResolverStrategy } from './common';
 import { Subject, Observable, BeforeDestroyEvent } from '../events';
 import { MakeVisibleCommand, MinimizeCommand } from '../commands';
 import { ViewManager } from './ViewManager';
@@ -20,15 +20,6 @@ export class View extends Renderable {
   private _viewContainer: ViewContainer<any>;
   private _visiblityChanges: Subject<boolean> = new Subject();
   private _sizeChanges: Subject<{ width: number, height: number }> = new Subject();
-
-  /**
-   * This element is the mount point that views can mount to.
-   * The node created by the render method gets recreated when moved
-   * somewhere else in the tree. This element is constant.
-   * @private
-   * @type {HTMLElement}
-   */
-  private _element: HTMLElement = this._document.createElement('div');
   
   constructor(
     @Inject(ContainerRef) protected _container: Renderable,
@@ -39,8 +30,7 @@ export class View extends Renderable {
     @Inject(DocumentRef) private _document: Document
   ) {
     super(_injector);
-
-    this._element.classList.add('ug-layout__view-container-mount');
+    
     this.visibilityChanges = this._visiblityChanges.asObservable().distinctUntilChanged();
     this.sizeChanges = this._sizeChanges.asObservable().distinctUntilChanged((p, c) => {
       return p.width === c.width && p.height === c.height;
@@ -59,8 +49,20 @@ export class View extends Renderable {
     return this._container.height;
   }
 
-  get lazy(): boolean {
-    return get(this._configuration, 'lazy', false);
+  get lazy(): boolean|null {
+    return get(this._configuration, 'lazy', null);
+  }
+  
+  get isCacheable(): boolean|null {
+    return get(this._configuration, 'cacheable', null);
+  }
+  
+  get ref(): string|null {
+    return get(this._configuration, 'ref', null);
+  }
+  
+  get resolution(): ResolverStrategy|null {
+    return get(this._configuration, 'resolution', null);
   }
   
   get token(): any|null {
@@ -108,6 +110,10 @@ export class View extends Renderable {
     this.emitUp(new MinimizeCommand(this));
   }
 
+  resolveConfigProperty<T>(path: string): T|null {
+    return this._viewFactory.resolveConfigProperty<T>(this._configuration, path);
+  }
+
   private _postRender(): void {
     this._visiblityChanges.next(this.isVisible());
     this._sizeChanges.next({ width: this.width, height: this.height });
@@ -115,15 +121,15 @@ export class View extends Renderable {
 
   private _onCreate(element: HTMLElement): void {
     if (!this._viewContainer) {
-      this._viewContainer = this._viewManager.create<any>({
-        element: this._element,
+      this._viewContainer = this._viewManager.resolveOrCreate<any>({
         config: this._configuration,
         injector: this._injector,
         container: this
       });
     }
 
-    element.appendChild(this._element);
+    this._viewContainer.setView(this);
+    this._viewContainer.mountTo(element);
   }
 
   static configure(config: ViewConfig): ConfiguredRenderable<View> {

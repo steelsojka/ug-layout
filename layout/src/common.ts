@@ -34,8 +34,6 @@ export interface DragOptions<T> {
   host: T;
   startX: number;
   startY: number;
-  pageX: number;
-  pageY: number;
   threshold?: number;
 }
 

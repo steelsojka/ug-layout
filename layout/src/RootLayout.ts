@@ -5,6 +5,7 @@ import { Injector, Inject, Optional, forwardRef, ProviderArg } from './di';
 import { RootInjector } from './RootInjector';
 import { Layout } from './Layout';
 import { Serialized } from './serialization';
+import { ViewManager } from './view';
 import { Renderer, Renderable, ConfiguredRenderable, RenderableInjector } from './dom';
 import { 
   ConfigurationRef, 
@@ -37,6 +38,7 @@ export class RootLayout extends Renderable {
     @Inject(ConfigurationRef) protected _config: RootLayoutConfig,
     @Inject(Renderer) protected _renderer: Renderer,
     @Inject(ElementRef) protected _containerEl: HTMLElement,
+    @Inject(ViewManager) protected _viewManager: ViewManager,
     @Inject(Injector) _injector: Injector
   ) {
     super(_injector);
@@ -127,8 +129,10 @@ export class RootLayout extends Renderable {
   }
 
   destroy(): void {
-    this._renderer.destroy();
     super.destroy();
+    
+    this._viewManager.destroy();
+    this._renderer.destroy();
   }
 
   isVisible(): boolean {

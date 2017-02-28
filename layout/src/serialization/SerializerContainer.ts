@@ -4,11 +4,11 @@ import { Serializer, Serialized } from './common';
 import { isFunction, isString } from '../utils';
 import { RenderableArg } from '../common';
 
-interface Constructable<T> {
+export interface Constructable<T> {
   constructor: Function;
 }
 
-type BaseSerializer = Serializer<Renderable, Serialized>;
+export type BaseSerializer = Serializer<Renderable, Serialized>;
 
 export interface SerializerContainerConfig {
   injector?: Injector;

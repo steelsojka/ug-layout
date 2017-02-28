@@ -1,14 +1,14 @@
-import { ViewConfig, ViewFactoriesRef, ViewComponentRef } from './common';
+import { ViewComponentConfig, ViewConfig, ViewFactoriesRef, ViewComponentRef, VIEW_CONFIG_KEY } from './common';
 import { Injector, Inject, Optional, ProviderArg } from '../di';
 import { View } from './View';
 import { ViewContainer } from './ViewContainer';
 import { ElementRef, ContainerRef } from '../common';
+import { get } from '../utils';
 
 export interface ViewFactoryArgs {
   config: ViewConfig;
   injector: Injector;
   container: View;
-  element: HTMLElement;
 }
 
 export type FactoryMap = Map<string, ViewFactory>;
@@ -19,10 +19,9 @@ export class ViewFactory {
   ) {}
   
   create<T>(args: ViewFactoryArgs): ViewContainer<T> {
-    const { config, injector, container, element } = args;
+    const { config, injector, container } = args;
     
     const providers: ProviderArg[] = [
-      { provide: ElementRef, useValue: element },
       { provide: ContainerRef, useValue: container },
       ViewContainer
     ];
@@ -74,6 +73,25 @@ export class ViewFactory {
     }
 
     throw new Error('Can not resolve token from config.');
+  }
+
+  resolveConfigProperty<T>(config: ViewConfig, path: string): T|null {
+    const token = this.getTokenFrom(config);
+    let result = get(config, path);
+
+    if (result !== undefined) {
+      return result as T;
+    }
+
+    const metadata = Reflect.getOwnMetadata(VIEW_CONFIG_KEY, token) as ViewComponentConfig|undefined;
+
+    result = get(metadata, path);
+
+    if (result !== undefined) {
+      return result as T;
+    }
+
+    return null;
   }
 
   destroy(): void {}

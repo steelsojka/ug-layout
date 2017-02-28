@@ -6,11 +6,15 @@ export const VIEW_CONFIG_KEY = 'ugLayout:viewConfig';
 
 export enum ResolverStrategy {
   SINGLETON,
-  TRANSIENT
+  TRANSIENT,
+  REF
 }
 
 export interface ViewComponentConfig {
   name: string;
+  ref: string|null;
+  cacheable: boolean;
+  lazy: boolean;
   resolution: ResolverStrategy;
 }
 
@@ -20,7 +24,10 @@ export type ViewComponentConfigArgs = {
 
 export interface ViewConfig {
   lazy?: boolean;
+  cacheable?: boolean;
   token?: any;
+  ref?: string|null;
+  resolution?: ResolverStrategy;
   useFactory?: () => any;
   useValue?: Function;
   useName?: string;
