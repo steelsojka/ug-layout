@@ -3,7 +3,9 @@
   "compilerOptions": {
     "skipLibCheck": true,
     "types": [
-      "reflect-metadata"
+      "reflect-metadata",
+      "sinon",
+      "node"
     ]
   },
   "include": [

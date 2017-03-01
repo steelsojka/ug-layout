@@ -375,11 +375,6 @@ export abstract class Renderable {
     }
   }
 
-  /**
-   * Adds a content item on this renderable.
-   * @param {Renderable} item 
-   * @param {RemoveChildArgs} [options={}] 
-   */
   addChild(item: Renderable, options: AddChildArgs = {}): void {
     const { index = -1, render = true, resize = true } = options;
     
