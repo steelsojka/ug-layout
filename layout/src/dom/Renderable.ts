@@ -375,6 +375,11 @@ export abstract class Renderable {
     }
   }
 
+  /**
+   * Adds a child item to this renderable.
+   * @param {Renderable} item 
+   * @param {AddChildArgs} [options={}] 
+   */
   addChild(item: Renderable, options: AddChildArgs = {}): void {
     const { index = -1, render = true, resize = true } = options;
     
@@ -417,6 +422,7 @@ export abstract class Renderable {
     if (this._contentItems.length) {
       this.resize();
     } else {
+      // If there are no more content items remove this item from the parent.
       this.remove();
     }
 
@@ -480,7 +486,7 @@ export abstract class Renderable {
    * @returns {boolean} 
    */
   isContainedWithin(item: Renderable): boolean {
-    return item.getDescendants().indexOf(this) !== -1;
+    return item.contains(this);
   }
 
   /**

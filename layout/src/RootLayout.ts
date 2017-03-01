@@ -3,7 +3,7 @@ import h from 'snabbdom/h';
 
 import { Injector, Inject, Optional, forwardRef, ProviderArg } from './di';
 import { RootInjector } from './RootInjector';
-import { Layout } from './Layout';
+import { Layout } from './layout';
 import { Serialized } from './serialization';
 import { ViewManager } from './view';
 import { Renderer, Renderable, ConfiguredRenderable, RenderableInjector } from './dom';

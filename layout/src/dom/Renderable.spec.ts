@@ -4,6 +4,7 @@ import { spy, stub } from 'sinon';
 import { Injector } from '../di';
 import { Renderable } from './Renderable';
 import { Renderer } from './Renderer';
+import { RenderableArea } from './RenderableArea';
 import { BusEvent } from '../events';
 
 class MyEvent extends BusEvent<any> {}
@@ -364,4 +365,141 @@ test('adding a child', t => {
   t.false(renderer.render.called);
   t.is(children[0], item);
   t.is(children[1], otherItem);
+});
+
+test('removing a child', t => {
+  const renderer = {} as any;
+  const myClass = new MyClass({ renderer });
+  const item = new MyClass();
+  const otherItem = new MyClass();
+
+  let destroy = stub(item, 'destroy');
+  const resize = stub(myClass, 'resize');
+  const remove = stub(myClass, 'remove');
+  renderer.render = spy();
+
+  (<any>myClass)._contentItems = [ item, otherItem ];
+  myClass.removeChild(item);
+
+  let children = myClass.getChildren();
+
+  t.is(children.length, 1);
+  t.is(children[0], otherItem);
+  t.true(destroy.called);
+  t.true(resize.called);
+  t.true(renderer.render.called);
+  t.false(remove.called);
+
+  (<any>myClass)._contentItems = [ otherItem ];
+  
+  renderer.render.reset();
+  resize.reset();
+  myClass.removeChild(otherItem, { render: false, destroy: false });
+  
+  children = myClass.getChildren();
+  
+  t.false(resize.called);
+  t.false(renderer.render.called);
+  t.true(remove.called);
+});
+
+test('remove item', t => {
+  const myClass = new MyClass();  
+  const parent = new MyClass();
+  const removeChildStub = stub(parent, 'removeChild');
+  const destroyStub = stub(myClass, 'destroy');
+
+  (<any>myClass)._container = parent;
+
+  myClass.remove();
+  t.true(removeChildStub.called);
+  t.false(destroyStub.called);
+
+  removeChildStub.reset();
+  
+  (<any>myClass)._container = null;
+  
+  myClass.remove();
+  t.false(removeChildStub.called);
+  t.true(destroyStub.called);
+});
+
+test('get index of item', t => {
+  const item = new MyClass();
+  const myClass = new MyClass();
+
+  t.is(myClass.getIndexOf(item), -1);
+  
+  (<any>myClass)._contentItems = [ item ];
+
+  t.is(myClass.getIndexOf(item), 0);
+});
+
+test('get item at index', t => {
+  const item = new MyClass();
+  const myClass = new MyClass();
+
+  t.is(myClass.getAtIndex(0), null);
+  
+  (<any>myClass)._contentItems = [ item ];
+
+  t.is<any>(myClass.getAtIndex(0), item);
+});
+
+test('scoping events', t => {
+  t.plan(1);
+  class OtherEvent extends BusEvent<any> {}
+  
+  const myClass = new MyClass();
+  myClass.scope(MyEvent).subscribe(() => t.pass());
+
+  myClass.emit(new MyEvent(null));
+  myClass.emit(new OtherEvent(null));
+});
+
+test('contains item', t => {
+  const item = new MyClass();
+  const myClass = new MyClass();
+
+  (<any>myClass)._contentItems = [ item ];
+
+  t.true(myClass.contains(item));
+  t.false(item.contains(myClass));
+});
+
+test('is contained within item', t => {
+  const item = new MyClass();
+  const myClass = new MyClass();
+
+  (<any>myClass)._contentItems = [ item ];
+
+  t.false(myClass.isContainedWithin(item));
+  t.true(item.isContainedWithin(myClass));
+});
+
+test('is contained within item', t => {
+  const myClass = new MyClass();
+
+  Object.assign(myClass, {
+    _width: 20,
+    _height: 10,
+    _container: {
+      offsetX: 50,
+      offsetY: 50
+    }
+  });
+
+  const area = myClass.getArea();
+
+  t.true(area instanceof RenderableArea);
+  t.is(area.x, 50);
+  t.is(area.x2, 70);
+  t.is(area.y, 50);
+  t.is(area.y2, 60);
+});
+
+test('is droppable', t => {
+  const myClass = new MyClass();  
+
+  t.false(myClass.isDroppable({} as any));
 });

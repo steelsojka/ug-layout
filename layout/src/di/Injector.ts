@@ -12,13 +12,29 @@ import {
   ExistingProvider
 } from './common';
 
+/**
+ * An instance of a forward ref function.
+ * @export
+ * @class ForwardRef
+ */
 export class ForwardRef {
   constructor(private fn: Function) {}
 
+  /**
+   * The reference invoked reference function result.
+   * @readonly
+   * @type {*}
+   */
   get ref(): any {
     return this.fn();
   }
 
+  /**
+   * Resolves a potential forward reference.
+   * @static
+   * @param {*} val 
+   * @returns {*} 
+   */
   static resolve(val: any): any {
     if (val instanceof ForwardRef) {
       return val.ref;
@@ -28,14 +44,30 @@ export class ForwardRef {
   }
 }
 
-export function forwardRef(fn: Function) {
+/**
+ * A factory that creates a ForwardRef.
+ * @export
+ * @param {Function} fn 
+ * @returns {ForwardRef}
+ */
+export function forwardRef(fn: Function): ForwardRef {
   return new ForwardRef(fn);
 }
 
+/**
+ * A dependency injector for resolving dependencies. Injectors are hierarchicle.
+ * @export
+ * @class Injector
+ */
 export class Injector {
   private _providers: Map<any, Provider> = new Map();
   private _cache: Map<any, any> = new Map();
   
+  /**
+   * Creates an instance of Injector.
+   * @param {ProviderArg[]} [providers=[]] List of providers for this injector.
+   * @param {(Injector|null)} [_parent=null] A parent injector.
+   */
   constructor(
     providers: ProviderArg[] = [],
     private _parent: Injector|null = null
@@ -45,16 +77,32 @@ export class Injector {
     providers.forEach(p => this.registerProvider(p));
   }
 
+  /**
+   * The parent injector if it is set.
+   * @readonly
+   * @type {(Injector|null)}
+   */
   get parent(): Injector|null {
     return this._parent;
   }
 
+  /**
+   * Registers a provider with the injector.
+   * @param {ProviderArg} provider 
+   */
   registerProvider(provider: ProviderArg): void {
     const _provider = this._normalizeProvider(provider);
 
     this._providers.set(_provider.provide, _provider);
   }
 
+  /**
+   * Gets a dependecy from the provided token.
+   * @param {*} token 
+   * @param {*} [defaultValue] 
+   * @param {InjectionMetadata} [metadata={}] 
+   * @returns {*} 
+   */
   get(token: any, defaultValue?: any, metadata: InjectionMetadata = {}): any {
     let resource;
     let { optional = false, lazy = false } = metadata;
@@ -91,14 +139,30 @@ export class Injector {
     return resource;
   }
   
+  /**
+   * Creates a new injector with the given providers and sets
+   * this injector as it's parent.
+   * @param {ProviderArg[]} [providers=[]] 
+   * @returns {Injector} 
+   */
   resolveAndCreateChild(providers: ProviderArg[] = []): Injector {
     return new Injector(providers, this);    
   }
 
+  /**
+   * Programmatically set the parent injector.
+   * @param {Injector} parent 
+   */
   setParent(parent: Injector): void {
     this._parent = parent;
   }
 
+  /**
+   * Resolves the given provider with this injector.
+   * @template T The return type.
+   * @param {*} provider 
+   * @returns {T} 
+   */
   resolveAndInstantiate<T>(provider: any): T {
     return this._resolve(provider);
   }
@@ -182,6 +246,14 @@ export class Injector {
     return _provider;
   }
 
+  /**
+   * Creates a new injector from an annotated injectable Class.
+   * @static
+   * @param {Type<any>} injectable 
+   * @param {ProviderArg[]} [providers=[]] 
+   * @param {Injector} [parent] 
+   * @returns {Injector} 
+   */
   static fromInjectable(injectable: Type<any>, providers: ProviderArg[] = [], parent?: Injector): Injector {
     const metadata = Reflect.getOwnMetadata(INJECTABLE_META_KEY, injectable);
 
