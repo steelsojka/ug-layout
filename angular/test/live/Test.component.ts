@@ -3,17 +3,20 @@ import { ViewComponent, ViewContainer } from 'ug-layout';
 
 import { Detect } from '../../src/decorators';
 
-@ViewComponent()
+@ViewComponent({
+  cacheable: true
+})
 @Component({
   selector: 'test',
   template: `
     <div>
-      <div *ngIf="show">Hello</div>
+      <div *ngIf="show">{{ number }}</div>
     </div>
   `
 })
 export class TestComponent {
   private _show: boolean = true;
+  private number: number = Math.random();
 
   @Detect() test: number = 0;
 

@@ -5,7 +5,10 @@
   "main": "dist/es5/index.js",
   "typings": "dist/es5/index.d.ts",
   "scripts": {
-    "test": "ts-node test/index.ts",
+    "pretest": "npm run build:es2015",
+    "test": "ava",
+    "test:coverage": "nyc ava",
+    "test:watch": "chokidar 'src/**/*.ts' -c 'npm test' --initial -d 1000 --silent",
     "clean": "rm -rf dist",
     "prebuild": "npm run clean",
     "build": "npm run build:es2015 && npm run build:es5",
@@ -17,16 +20,19 @@
   "license": "ISC",
   "devDependencies": {
     "@types/reflect-metadata": "0.0.5",
+    "ava": "^0.18.2",
     "babel-cli": "^6.22.2",
     "babel-core": "^6.22.1",
     "babel-loader": "^6.2.10",
     "babel-preset-es2015": "^6.22.0",
+    "chokidar-cli": "^1.2.0",
     "css-loader": "^0.26.1",
     "file-loader": "^0.10.0",
+    "nyc": "^10.1.2",
     "reflect-metadata": "^0.1.9",
     "style-loader": "^0.13.1",
     "ts-loader": "^2.0.0",
-    "ts-node": "^2.0.0",
+    "ts-node": "^2.1.0",
     "typescript": "^2.2.1",
     "webpack": "^2.2.1",
     "webpack-dev-server": "^2.2.1"
@@ -35,5 +41,19 @@
     "rxjs": "^5.1.0",
     "snabbdom": "^0.6.3",
     "tslib": "^1.5.0"
+  },
+  "ava": {
+    "babel": "inherit",
+    "files": [
+      "dist/es2015/**/*.spec.js"
+    ],
+    "source": [
+      "dist/es2015/**/*.ts",
+      "!dist/es2015/**/*.spec.ts"
+    ],
+    "require": [
+      "babel-register",
+      "./test/unit/setup.ts"
+    ]
   }
 }

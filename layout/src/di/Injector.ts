@@ -18,6 +18,14 @@ export class ForwardRef {
   get ref(): any {
     return this.fn();
   }
+
+  static resolve(val: any): any {
+    if (val instanceof ForwardRef) {
+      return val.ref;
+    }
+
+    return val;
+  }
 }
 
 export function forwardRef(fn: Function) {
@@ -101,29 +109,21 @@ export class Injector {
     if (this._isClassProvider(provider)) {
       const injections = Reflect.getOwnMetadata(INJECT_PARAM_KEY, provider.useClass, (<any>undefined)) || [];
       const resolved = this.getDependencies(injections);
-      const ref = this.resolveRef(provider.useClass);
+      const ref = ForwardRef.resolve(provider.useClass);
 
       return this.instantiate(ref, ...resolved);
     } else if (this._isFactoryProvider(provider)) {
       const resolved = this.getDependencies((provider.deps || []).map(token => ({ token })));
-      const ref = this.resolveRef(provider.useFactory);
+      const ref = ForwardRef.resolve(provider.useFactory);
 
       return ref(...resolved);
     } else if (this._isValueProvider(provider)) {
-      return this.resolveRef(provider.useValue);
+      return ForwardRef.resolve(provider.useValue);
     } else if (this._isExistingProvider(provider)) {
-      return this.get(this.resolveRef(provider.useExisting));
+      return this.get(ForwardRef.resolve(provider.useExisting));
     }
 
     throw new Error('Injector -> could not resolve provider ${provider.provide}');
-  }
-      
-  private resolveRef(value: any): any {
-    if (value instanceof ForwardRef) {
-      return value.ref;
-    }
-
-    return value;
   }
       
   private getDependencies(metadata: any[]): any[] {

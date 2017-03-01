@@ -1,17 +1,13 @@
 import { 
-  Inject, 
   RootLayout, 
   RootLayoutCreationConfig,
-  RootConfigRef,
-  Renderer,
-  Injector,
-  ConfiguredRenderable
+  RootConfigRef
 } from 'ug-layout';
-import { ViewContainerRef, Injector as NgInjector } from '@angular/core';
+import { ViewContainerRef, Injector } from '@angular/core';
 
 export interface AngularRootLayoutConfig extends RootLayoutCreationConfig {
   viewContainerRef: ViewContainerRef;
-  ngInjector: NgInjector;
+  ngInjector: Injector;
 }
 
 export class AngularRootLayout extends RootLayout {

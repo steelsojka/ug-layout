@@ -10,7 +10,7 @@ import {
   EventBus,
   BusEvent
 } from '../events';
-import { uid, isNumber } from '../utils';
+import { negate, uid, isNumber, get } from '../utils';
 import { ContainerRef } from '../common';
 import { RenderableArea } from './RenderableArea';
 import { Renderer } from './Renderer';
@@ -121,7 +121,7 @@ export abstract class Renderable {
    * @type {number}
    */
   get height(): number {
-    return this._width;
+    return this._height;
   }
 
   /**
@@ -130,7 +130,7 @@ export abstract class Renderable {
    * @type {number}
    */
   get offsetX(): number {
-    return this._container ? this._container.offsetX : 0;
+    return get(this._container, 'offsetX', 0, negate(isNumber));
   }
 
   /**
@@ -139,7 +139,7 @@ export abstract class Renderable {
    * @type {number}
    */
   get offsetY(): number {
-    return this._container ? this._container.offsetY : 0;
+    return get(this._container, 'offsetY', 0, negate(isNumber));
   }
 
   /**

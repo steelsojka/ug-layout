@@ -4,7 +4,7 @@ import { ReplaySubject, Observable, Subject, BeforeDestroyEvent, BehaviorSubject
 import { ContainerRef, ConfigurationRef, DocumentRef } from '../common';
 import { View } from './View';
 import { ViewFactoriesRef, ViewComponentRef } from './common';
-import { CustomViewHookCommand } from './CustomViewHookCommand';
+import { CustomViewHookEvent } from './CustomViewHookEvent';
 import { isFunction, get, uid, eq, isPromise, isObject } from '../utils';
 
 export enum ViewContainerStatus {
@@ -172,7 +172,7 @@ export class ViewContainer<T> {
         .subscribe(e => this._sizeChanges.next(e));
 
       this._container
-        .scope(CustomViewHookCommand)
+        .scope(CustomViewHookEvent)
         .takeUntil(this._containerChange)
         .subscribe(event => this._executeHook(event.name, ...event.args));
     }

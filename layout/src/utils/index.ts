@@ -24,7 +24,14 @@ export function isBoolean(val: any): val is boolean {
   return typeof val === 'boolean';
 }
 
-export function get<T>(obj: any, path: string, defaultValue?: T): T {
+export function isUndefined(val: any): val is undefined {
+  return val === undefined;
+}
+export function negate(fn: (...args: any[]) => any): (...args: any[]) => boolean {
+  return (...args: any[]) => !fn(...args);
+}
+
+export function get<T>(obj: any, path: string, defaultValue?: T, comparer: (v) => boolean = isUndefined): T {
   const pathParts = path.split('.');
 
   let result = obj;
@@ -37,7 +44,7 @@ export function get<T>(obj: any, path: string, defaultValue?: T): T {
     result = obj[pathParts.shift() as any];
   }
 
-  return result === undefined ? defaultValue : result;
+  return comparer(result) ? defaultValue : result;
 }
 
 export function propEq(prop: string, value: any): (obj: any) => boolean {

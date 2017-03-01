@@ -5,4 +5,4 @@ export * from './decorators';
 export * from './ViewFactory';
 export * from './ViewManager';
 export * from './ViewSerializer';
-export * from './CustomViewHookCommand';
+export * from './CustomViewHookEvent';
