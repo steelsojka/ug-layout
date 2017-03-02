@@ -24,7 +24,7 @@ export class RenderableInjector extends Injector {
     renderable: Type<Renderable>|ConfiguredRenderable<Renderable>|Renderable, 
     providers: Provider[] = [],
     parent?: Injector
-  ): RenderableInjector {
+  ): Injector {
     let Ctor = renderable;
     let config: any = null;
     

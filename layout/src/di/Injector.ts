@@ -255,12 +255,16 @@ export class Injector {
    * @returns {Injector} 
    */
   static fromInjectable(injectable: Type<any>, providers: ProviderArg[] = [], parent?: Injector): Injector {
+    return new Injector([ ...Injector.resolveInjectables(injectable), ...providers ], parent);
+  }
+
+  static resolveInjectables(injectable: Type<any>): ProviderArg[] {
     const metadata = Reflect.getOwnMetadata(INJECTABLE_META_KEY, injectable);
 
     if (metadata) {
-      providers = [...providers, ...(<InjectableConfig>metadata).providers];
+      return (<InjectableConfig>metadata).providers;
     }
-
-    return new Injector(providers, parent);
+    
+    return [];
   }
 }

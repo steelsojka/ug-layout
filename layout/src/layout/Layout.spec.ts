@@ -7,7 +7,7 @@ import { Layout } from './Layout';
 import { ConfigurationRef, ContainerRef } from '../common';
 import { DragHost } from '../DragHost';
 import { Renderable, RenderableInjector, ConfiguredRenderable, Renderer } from '../dom';
-import { createRenderableInjector } from '../../test/unit/helpers';
+import { createRenderableInjector, getRenderableClass } from '../../test/unit/helpers';
 
 let stubs;
 
@@ -155,4 +155,56 @@ test('when dragging starts', t => {
   
   t.true(stubs.dragHost.setDropAreas.called);
   t.is(stubs.dragHost.setDropAreas.firstCall.args[0], dropTargets);
+});
+
+test('getting drop targets', t => {
+  const layout = getLayout();
+  const MockRenderable = getRenderableClass();
+  const target = new MockRenderable();
+  const item = new MockRenderable();
+  const containsStub = stub(target, 'contains').returns(false);
+  const isContainedWithinStub = stub(target, 'isContainedWithin').returns(false);
+  let isDroppable = true;
+
+  function run() {
+    return (<any>layout)._getDropTargets(target);
+  }
+
+  const isDropTargetStub = stub(DragHost, 'isDropTarget').returns(true);
+
+  Object.assign(item, {
+    isDroppable: () => isDroppable,
+  });
+
+  layout.getItemVisibleAreas = () => [ { item } ] as any;
+
+  let results = run();
+  t.is(results.length, 1);
+
+  containsStub.returns(true);
+  results = run();
+  t.is(results.length, 0);
+  
+  containsStub.returns(false);
+  isContainedWithinStub.returns(true);
+  results = run();
+  t.is(results.length, 0);
+  
+  isContainedWithinStub.returns(false);
+  isDroppable = false;
+  results = run();
+  t.is(results.length, 0);
+  
+  isDroppable = true;
+  isDropTargetStub.returns(false);
+  results = run();
+  t.is(results.length, 0);
+});
+
+test('configuring', t => {
+  const config = {};
+  const configured = Layout.configure(config as any);
+
+  t.is(configured.renderable, Layout);
+  t.is(configured.config, config);
 });
