@@ -8,7 +8,6 @@ import DOMAttrs from 'snabbdom/modules/attributes';
 
 import { Inject } from '../di';
 import { Subject, Observable } from '../events';
-import { Deferred } from '../utils';
 import { DocumentRef } from '../common';
 
 export class Renderer {
