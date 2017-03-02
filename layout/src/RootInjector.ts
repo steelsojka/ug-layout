@@ -1,7 +1,22 @@
+import * as snabbdom from 'snabbdom';
+import DOMClass from 'snabbdom/modules/class';
+import DOMStyle from 'snabbdom/modules/style';
+import DOMProps from 'snabbdom/modules/props';
+import DOMEvents from 'snabbdom/modules/eventlisteners';
+import DOMAttrs from 'snabbdom/modules/attributes';
+
 import { Injector, ProviderArg, forwardRef } from './di';
 import { Renderer, RenderableInjector } from './dom';
 import { ViewFactory, ViewManager } from './view';
-import { DocumentRef } from './common';
+import { DocumentRef, PatchRef } from './common';
+
+const patch = snabbdom.init([
+  DOMClass,
+  DOMStyle,
+  DOMProps,
+  DOMEvents,
+  DOMAttrs
+]);
 
 export class RootInjector extends RenderableInjector {
   constructor(providers: ProviderArg[] = []) {
@@ -9,6 +24,7 @@ export class RootInjector extends RenderableInjector {
       Renderer,
       ViewFactory,
       ViewManager,
+      { provide: PatchRef, useValue: patch },
       { provide: DocumentRef, useValue: document },
       { provide: RootInjector, useValue: forwardRef(() => this) },
       ...providers

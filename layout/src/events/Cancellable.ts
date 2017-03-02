@@ -1,8 +1,7 @@
 import { Observable } from 'rxjs/Observable';
 import { Subscriber } from 'rxjs/Subscriber';
-import { Subject } from 'rxjs/Subject';
 
-import { BusEvent, BusEventOptions } from './BusEvent';
+import { BusEvent } from './BusEvent';
 import { CancelAction } from './CancelAction';
 
 export class Cancellable<T> extends BusEvent<T> {

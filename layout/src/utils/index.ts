@@ -13,7 +13,7 @@ export function clamp(val, min, max): number {
 }
 
 export function isObject(val: any): boolean {
-  return typeof val === 'object';
+  return typeof val === 'object' && val !== null;
 }
 
 export function isFunction(val: any): val is Function {
@@ -37,11 +37,11 @@ export function get<T>(obj: any, path: string, defaultValue?: T, comparer: (v) =
   let result = obj;
 
   while (pathParts.length) {
-    if (!isObject(result) || result === null) {
+    if (!isObject(result)) {
       return defaultValue as T; 
     }
     
-    result = obj[pathParts.shift() as any];
+    result = result[pathParts.shift() as any];
   }
 
   return comparer(result) ? defaultValue : result;
