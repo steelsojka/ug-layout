@@ -168,10 +168,6 @@ export class StackItemContainer extends Renderable implements DropTarget {
     this._renderer.render();
   }
 
-  handleDropCleanup(): void {
-    // this._container.removeContainer(this, { destroy: false });
-  }
-
   getHighlightCoordinates(args: HighlightCoordinateArgs): RenderableArea {
     const { pageX, pageY, dropArea: { area: { x, x2, y, y2 } } } = args
     const highlightArea = new RenderableArea(x, x2, y, y2);

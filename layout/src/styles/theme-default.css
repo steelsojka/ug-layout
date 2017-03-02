@@ -1,0 +1,45 @@
+.ug-layout__root {
+  background-color: #000000;
+}
+
+.ug-layout__splitter {
+  background-color: #444444;
+  opacity: 0.001;
+  transition: opacity 200ms ease;
+}
+
+.ug-layout__splitter:hover, .ug-layout__splitter-dragging {
+  opacity: 1;
+} 
+
+.ug-layout__xy-item-container {
+  background-color: rgb(25, 25, 25);
+}
+
+.ug-layout__stack-header {
+  background-color: rgb(37, 37, 38);
+}
+
+.ug-layout__stack-tab {
+  background-color: rgb(45, 45, 45);
+  color: rgb(142, 142, 142);
+  border-right: 1px solid rgb(37, 37, 38);
+} 
+
+.ug-layout__stack-tab-active {
+  background-color: rgb(27, 43, 52);
+  color: white;
+}
+
+.ug-layout__drop-indicator {
+  box-shadow: inset 0 0 30px #000000;
+  background-color: rgba(0, 0, 0, 0.75);
+}
+
+.ug-layout__close-stack-control {
+  color: #FFFFFF;
+}
+
+[class^="ug-icon-"], [class*=" ug-icon-"] {
+  color: #FFFFFF;
+}

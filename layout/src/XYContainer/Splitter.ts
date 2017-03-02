@@ -36,6 +36,14 @@ export class Splitter extends Renderable {
     super(_injector);
     
     this.dragStatus = this._draggable.drag;
+      
+    this._draggable.drag
+      .filter(Draggable.isDragStopEvent)
+      .subscribe(() => this._isDragging = false);
+    
+    this._draggable.drag
+      .filter(Draggable.isDragStartEvent)
+      .subscribe(this._onDragStart.bind(this));
   }
   
   get height(): number {
@@ -93,6 +101,7 @@ export class Splitter extends Renderable {
         'ug-layout__splitter-disabled': this.isDisabled,
         'ug-layout__splitter-x': this._isRow,
         'ug-layout__splitter-y': !this._isRow,
+        'ug-layout__splitter-dragging': this._isDragging
       },
       style: {
         height: this.height,
@@ -136,5 +145,10 @@ export class Splitter extends Renderable {
         threshold: 1
       });
     }
+  }
+
+  private _onDragStart(): void {
+    this._isDragging = true;
+    this._renderer.render();
   }
 }

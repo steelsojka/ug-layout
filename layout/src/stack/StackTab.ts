@@ -9,7 +9,7 @@ import {
   BeforeDestroyEvent
 } from '../events';
 import { TabSelectionEvent } from './TabSelectionEvent';
-import { Renderable, ConfiguredRenderable } from '../dom';
+import { Renderable, ConfiguredRenderable, MemoizeFrom } from '../dom';
 import { Draggable } from '../Draggable';
 import { ContainerRef, ConfigurationRef, DocumentRef, DragEvent, DragStatus } from '../common';
 import { StackHeader } from './StackHeader';
@@ -109,6 +109,15 @@ export class StackTab extends Renderable {
     return item ? item.controls : [];
   }
 
+  private get _resizeHashId(): string {
+    return [
+      get(this.item, 'title'),
+      this._element ? 1 : 0,
+      this.controls.map(c => c.isActive() ? c.uid : '').join('')
+    ].join(':');
+  }
+
+  @MemoizeFrom('_resizeHashId')
   resize(): void {
     if (this._element) {
       const rect = this._element.getBoundingClientRect();

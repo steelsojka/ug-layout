@@ -11,6 +11,7 @@
     "test:watch": "chokidar 'src/**/*.ts' -c 'npm test' --initial -d 1000 --silent",
     "clean": "rm -rf dist",
     "prebuild": "npm run clean",
+    "prebuild:es2015": "npm run clean",
     "build": "npm run build:es2015 && npm run build:es5",
     "build:es2015": "tsc -p tsconfig.es2015.json",
     "build:es5": "babel dist/es2015 --copy-files --ignore .map --out-dir dist/es5 --source-maps",

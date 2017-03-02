@@ -5,10 +5,6 @@
   width: 100%;
 }
 
-.ug-layout__root {
-  background-color: #000000;
-}
-
 .ug-layout__row {
   display: flex;
   flex-direction: row;
@@ -20,14 +16,13 @@
 }
 
 .ug-layout__splitter {
-  background-color: black;
   position: relative;
+  z-index: 200;
 }
 
 .ug-layout__xy-item-container {
   width: 100%;
   height: 100%;
-  background-color: rgb(25, 25, 25);
 }
 
 .ug-layout__drag-handle {
@@ -36,7 +31,7 @@
   width: 100%;
   top: 0;
   left: 0;
-  z-index: 100;
+  z-index: 250;
 }
 
 .ug-layout__splitter-x {
@@ -85,7 +80,6 @@
 .ug-layout__stack-header {
   display: flex;
   flex-direction: row;
-  background-color: rgb(37, 37, 38)
 }
 
 .ug-layout__stack-y .ug-layout__stack-header {
@@ -109,9 +103,6 @@
   position: relative;
   align-items: center;
   cursor: pointer;
-  background-color: rgb(45, 45, 45);
-  color: rgb(142, 142, 142);
-  border-right: 1px solid rgb(37, 37, 38);
   z-index: 150;
 } 
 
@@ -157,11 +148,6 @@
   opacity: 1;
 }
 
-.ug-layout__stack-tab-active {
-  background-color: rgb(27, 43, 52);
-  color: white;
-}
-
 .ug-layout__stack-controls {
   flex-grow: 0;
   display: flex;
@@ -196,8 +182,6 @@
   top: 0;
   left: 0;
   z-index: 1000;
-  box-shadow: inset 0 0 30px #000000;
-  background-color: rgba(0, 0, 0, 0.75);
   transform-origin: top left;
   transform: translate(0, 0);
   transition: all 0.15s ease-in;
@@ -210,7 +194,6 @@
 
 .ug-layout__close-stack-control {
   cursor: pointer;
-  color: #FFFFFF;
   display: flex;
   font-size: 14px;
   align-items: center;
@@ -218,7 +201,6 @@
 
 [class^="ug-icon-"], [class*=" ug-icon-"] {
   cursor: pointer;
-  color: #FFFFFF;
   opacity: 0.5;  
   transition: opacity 0.15s ease-in;
 }

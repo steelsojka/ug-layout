@@ -1,0 +1,44 @@
+.ug-layout__root {
+  background-color: #000000;
+}
+
+.ug-layout__splitter {
+  background-color: #444444;
+  opacity: 0.001;
+  transition: opacity 200ms ease;
+}
+
+.ug-layout__splitter:hover, .ug-layout__splitter-dragging {
+  opacity: 1;
+} 
+
+.ug-layout__stack-tab {
+  background-color: #111111; 
+  color: #999999;
+  font-size: 12px;
+  margin-right: 2px;
+  box-shadow: 2px -2px 2px rgba(0, 0, 0, 0.3);
+} 
+
+.ug-layout__stack-tab-active, .ug-layout__stack-tab:hover {
+  background-color: #222222;
+  color: #DDDDDD;
+}
+
+.ug-layout__drop-indicator {
+  box-shadow: inset 0 0 30px #000000;
+  background-color: rgba(0, 0, 0, 0.75);
+  outline: 1px dashed  #CCCCCC;
+}
+
+.ug-layout__close-stack-control {
+  color: #FFFFFF;
+}
+
+[class^="ug-icon-"], [class*=" ug-icon-"] {
+  color: #FFFFFF;
+}
+
+.ug-layout__view-container {
+  background: #222222;
+}

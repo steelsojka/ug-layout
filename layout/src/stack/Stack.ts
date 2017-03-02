@@ -132,6 +132,7 @@ export class Stack extends Renderable {
 
   render(): VNode {
     return h(`div.ug-layout__stack`, {
+      key: this.uid,
       class: {
         'ug-layout__stack-y': !this.isHorizontal,
         'ug-layout__stack-reverse': this.isReversed
