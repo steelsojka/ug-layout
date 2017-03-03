@@ -19,7 +19,6 @@ export function MemoizeFrom(...properties: string[]): MethodDecorator {
         const result = get(this, prop);
         
         if (result !== props[prop]) {
-          console.log(result, props[prop]);
           hasChanged = true;
         } 
         

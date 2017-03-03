@@ -11,12 +11,6 @@ import { createRenderableInjector, getRenderableClass } from '../../test/unit/he
 
 let stubs;
 
-RenderableInjector.fromRenderable = () => {
-  return new Injector([
-    { provide: ConfiguredRenderable, useValue: stubs.contentItem }
-  ]);
-};
-
 function getInjector(config = {}): Injector {
   return createRenderableInjector([
     { provide: DragHost, useValue: stubs.dragHost },
@@ -48,10 +42,10 @@ test('throw an error if missing config', t => {
   const injector = getInjector();
 
   injector.registerProvider({ provide: ConfigurationRef, useValue: null });
-  t.throws(() => getLayout(injector));
+  t.throws(() => getLayout(injector).initialize());
   
   injector.registerProvider({ provide: ConfigurationRef, useValue: {} });
-  t.throws(() => getLayout(injector));
+  t.throws(() => getLayout(injector).initialize());
 });
 
 test('create the layout', t => {
@@ -60,6 +54,11 @@ test('create the layout', t => {
 
 test('create configured content item', t => {
   const layout = getLayout();
+
+  stub(layout, 'createChild').returns(stubs.contentItem);
+  stub(Renderable.prototype, 'initialize');
+  
+  layout.initialize();
   
   t.is((<any>layout)._contentItems[0], stubs.contentItem);
 });
@@ -82,6 +81,7 @@ test('rendering', t => {
   const layout = getLayout();
 
   Object.assign(layout, {
+    _contentItems: [ { render: () => {} } ],
     _container: {
       height: 25,
       width: 50

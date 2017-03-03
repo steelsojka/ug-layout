@@ -56,17 +56,9 @@ export class XYContainer extends Renderable {
   protected _container: Renderable|null;
 
   constructor(
-    @Inject(ConfigurationRef) @Optional() protected _config: XYContainerConfig|null,
-    @Inject(Injector) protected _injector: Injector,
-    @Inject(ContainerRef) _container: Renderable
+    @Inject(ConfigurationRef) @Optional() protected _config: XYContainerConfig|null
   ) {
-    super(_injector);
-    
-    const children = this._config && this._config.children ? this._config.children : [];
-    
-    children.forEach(config => {
-      return this.addChild(this.createChild(config), { render: false, resize: false });
-    });
+    super();
   }
 
   get height(): number {
@@ -107,18 +99,18 @@ export class XYContainer extends Renderable {
       : this._container.height - this._totalSplitterSize;
   }
 
-  createChild(config: XYItemContainerConfig, options: { index?: number } = {}): XYItemContainer {
-    return Injector.fromInjectable(
-      XYItemContainer, 
-      [
-        { provide: ContainerRef, useValue: this },
-        { provide: XYContainer, useValue: this },
-        { provide: ConfigurationRef, useValue: config },
-        XYItemContainer
-      ],
-      this._injector
-    )
-      .get(XYItemContainer);
+  initialize(): void {
+    super.initialize();
+    
+    const children = this._config && this._config.children ? this._config.children : [];
+    
+    children.forEach(config => {
+      return this.addChild(this.createChildItem(config), { render: false, resize: false });
+    });
+  }
+
+  createChildItem(config: XYItemContainerConfig, options: { index?: number } = {}): XYItemContainer {
+    return this.createChild(new ConfiguredRenderable(XYItemContainer, config));
   }
 
   addChild(item: Renderable, options: ContainerAddChildArgs = {}): void {
@@ -132,7 +124,7 @@ export class XYContainer extends Renderable {
         item = this._createStackWrapper(item);
       }
       
-      container = this.createChild({ use: item }, childArgs);
+      container = this.createChildItem({ use: item }, childArgs);
 
       item.setContainer(container);
     } else {
@@ -270,18 +262,8 @@ export class XYContainer extends Renderable {
       size: this._config && this._config.splitterSize ? this._config.splitterSize : SPLITTER_SIZE,
       disabler: this._isSplitterDisabled.bind(this)
     };
-  
-    const splitter = Injector.fromInjectable(
-      Splitter,
-      [
-        { provide: ContainerRef, useValue: this },
-        { provide: ConfigurationRef, useValue: splitterConfig },
-        Draggable,
-        Splitter
-      ],
-      this._injector
-    )
-      .get(Splitter) as Splitter;
+
+    const splitter = this.createChild(new ConfiguredRenderable(Splitter, splitterConfig), [ Draggable ]);
 
     splitter.dragStatus.subscribe(this._dragStatusChanged.bind(this));
 
@@ -474,16 +456,7 @@ export class XYContainer extends Renderable {
   }
 
   private _createStackWrapper(item: Renderable): Stack {
-    const stack = Injector.fromInjectable(
-      Stack, 
-      [
-        { provide: ContainerRef, useValue: this },
-        { provide: ConfigurationRef, useValue: null },
-        Stack
-      ], 
-      this._injector
-    )
-    .get(Stack) as Stack;
+    const stack = this.createChild(new ConfiguredRenderable(Stack, null));
 
     stack.addChild(item, { render: false });
 

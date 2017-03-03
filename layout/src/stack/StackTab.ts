@@ -40,35 +40,14 @@ export class StackTab extends Renderable {
     @Inject(ConfigurationRef) private _config: StackTabConfig,
     @Inject(Draggable) private _draggable: Draggable<StackTab>,
     @Inject(DragHost) private _dragHost: DragHost,
-    @Inject(DocumentRef) private _document: Document,
-    @Inject(Injector) _injector: Injector
+    @Inject(DocumentRef) private _document: Document
   ) {
-    super(_injector);
+    super();
     
     this._config = Object.assign({
       maxSize: 150,
       title: ''   
     }, this._config || {});
-
-    this._draggable.drag
-      .filter(Draggable.isDraggingEvent)
-      .subscribe(this._onDragMove.bind(this));
-    
-    this._draggable.drag
-      .filter(Draggable.isDragStopEvent)
-      .subscribe(this._onDragStop.bind(this));
-      
-    this._draggable.drag
-      .filter(Draggable.isDragStartEvent)
-      .subscribe(this._onDragStart.bind(this));
-
-    this._dragHost.start
-      .takeUntil(this.destroyed)
-      .subscribe(this._onDragHostStart.bind(this));
-    
-    this._dragHost.dropped
-      .takeUntil(this.destroyed)
-      .subscribe(this._onDragHostDropped.bind(this));
   }
   
   get width(): number {
@@ -115,6 +94,30 @@ export class StackTab extends Renderable {
       this._element ? 1 : 0,
       this.controls.map(c => c.isActive() ? c.uid : '').join('')
     ].join(':');
+  }
+
+  initialize(): void {
+    super.initialize();
+    
+    this._draggable.drag
+      .filter(Draggable.isDraggingEvent)
+      .subscribe(this._onDragMove.bind(this));
+    
+    this._draggable.drag
+      .filter(Draggable.isDragStopEvent)
+      .subscribe(this._onDragStop.bind(this));
+      
+    this._draggable.drag
+      .filter(Draggable.isDragStartEvent)
+      .subscribe(this._onDragStart.bind(this));
+
+    this._dragHost.start
+      .takeUntil(this.destroyed)
+      .subscribe(this._onDragHostStart.bind(this));
+    
+    this._dragHost.dropped
+      .takeUntil(this.destroyed)
+      .subscribe(this._onDragHostDropped.bind(this));
   }
 
   @MemoizeFrom('_resizeHashId')

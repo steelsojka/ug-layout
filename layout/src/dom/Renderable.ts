@@ -2,7 +2,7 @@ import { VNode } from 'snabbdom/vnode';
 import { PartialObserver } from 'rxjs/Observer';
 import { Subscription } from 'rxjs/Subscription';
 
-import { Type, Injector } from '../di';
+import { Type, Injector, ProviderArg } from '../di';
 import { 
   Observable, 
   Subject, 
@@ -11,11 +11,11 @@ import {
   BusEvent
 } from '../events';
 import { negate, uid, isNumber, get } from '../utils';
-import { ContainerRef } from '../common';
+import { ContainerRef, RenderableArg } from '../common';
 import { RenderableArea } from './RenderableArea';
 import { Renderer } from './Renderer';
-
-const animate = true;
+import { INJECTOR_KEY, RenderableInjector } from './RenderableInjector';
+import { ConfiguredRenderable } from './ConfiguredRenderable';
 
 export interface BaseModificationArgs {
   /**
@@ -89,12 +89,9 @@ export abstract class Renderable {
   protected _contentItems: Renderable[] = [];
   protected _renderer: Renderer;
 
-  constructor(protected _injector: Injector) {
+  constructor() {
     this.destroyed = this._destroyed.asObservable();
     this.containerChange = this._containerChange.asObservable();
-
-    this._renderer = this._injector.get(Renderer);
-    this.setContainer(this._injector.get(ContainerRef, null));
   }
 
   /**
@@ -175,15 +172,27 @@ export abstract class Renderable {
    * @type {Injector}
    */
   get injector(): Injector {
-    return this._injector;
+    if (!this[INJECTOR_KEY]) {
+      throw new Error('Trying to access injector before it is set. Did you create his renderable through a RenderableInjector?');
+    }
+    
+    return this[INJECTOR_KEY];
   }
-
+  
   /**
    * Creates this renderables VNode for diffing against the previous VNode state.
    * @abstract
    * @returns {VNode} 
    */
   abstract render(): VNode;
+
+  /**
+   * Invoked when the Injector has been assigned and ready for use.
+   */
+  initialize(): void {
+    this._renderer = this.injector.get(Renderer);
+    this.setContainer(this.injector.get(ContainerRef, null));
+  }
   
   /**
    * Sets this components size and triggers it's childrens sizing.
@@ -280,7 +289,7 @@ export abstract class Renderable {
     this._container = container;
 
     if (this._container) {
-      this._injector.setParent(this._container._injector);
+      this.injector.setParent(this._container.injector);
     }
     
     this._containerChange.next(container);
@@ -497,6 +506,25 @@ export abstract class Renderable {
     const { height, width, offsetX, offsetY } = this;
     
     return new RenderableArea(offsetX, offsetX + width, offsetY, offsetY + height);
+  }
+
+  /**
+   * Creates a child renderable using this renderable as it's container.
+   * @template T 
+   * @param {RenderableArg<T>} renderable 
+   * @param {ProviderArg[]} [providers=[]] 
+   * @returns {T} 
+   */
+  createChild<T extends Renderable>(renderable: RenderableArg<T>, providers: ProviderArg[] = []): T {
+    return RenderableInjector.fromRenderable(
+      renderable,
+      [
+        { provide: ContainerRef, useValue: this },
+        ...providers
+      ],
+      this.injector
+    )
+      .get(ConfiguredRenderable) as T;
   }
 
   /**

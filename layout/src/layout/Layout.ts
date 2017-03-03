@@ -33,25 +33,11 @@ export interface LayoutConfig {
 })
 export class Layout extends Renderable {
   constructor(
-    @Inject(Injector) _injector: Injector,
     @Inject(ConfigurationRef) private _config: LayoutConfig|null,
     @Inject(ContainerRef) protected _container: Renderable,
     @Inject(DragHost) protected _dragHost: DragHost
   ) {
-    super(_injector);
-    
-    if (!this._config || !this._config.child) {
-      throw new Error('A layout requires a child renderable.');
-    }
-
-    const config = this._config.child;
-    const injector = RenderableInjector.fromRenderable(config, [
-      { provide: ContainerRef, useValue: this },
-    ], this._injector);
-
-    this._contentItems.push(injector.get(ConfiguredRenderable));
-
-    this._dragHost.start.subscribe(this._onDragHostStart.bind(this));
+    super();
   }  
 
   /**
@@ -70,6 +56,17 @@ export class Layout extends Renderable {
    */
   get width(): number {
     return this._container.width;
+  }
+
+  initialize(): void {
+    super.initialize();
+    
+    if (!this._config || !this._config.child) {
+      throw new Error('A layout requires a child renderable.');
+    }
+
+    this._contentItems.push(this.createChild(this._config.child));
+    this._dragHost.start.subscribe(this._onDragHostStart.bind(this));
   }
   
   /**

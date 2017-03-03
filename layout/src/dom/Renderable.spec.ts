@@ -3,30 +3,18 @@ import { spy, stub } from 'sinon';
 
 import { Injector } from '../di';
 import { Renderable } from './Renderable';
-import { Renderer } from './Renderer';
 import { RenderableArea } from './RenderableArea';
+import { RenderableInjector } from './RenderableInjector';
+import { ConfiguredRenderable } from './ConfiguredRenderable';
 import { BusEvent } from '../events';
+import { getRenderable, getRenderableClass } from '../../test/unit/helpers';
 
 class MyEvent extends BusEvent<any> {}
-  
-class MyClass extends Renderable {
-  constructor(stubs: any = { renderer: {} }) {
-    super(new Injector([
-      { provide: Renderer, useValue: stubs.renderer }
-    ]));
-  }
-  
-  render(): any {}
-}
 
-function getRenderable(): typeof MyClass {
-  class OtherClass extends MyClass {};
-  
-  return OtherClass;
-}
+const MyClass = getRenderableClass();
 
 test('should get the container', t => {
-  const myClass = new MyClass();
+  const myClass = getRenderable(MyClass);
   const container = {};
   
   t.is(myClass.container, null);
@@ -37,7 +25,7 @@ test('should get the container', t => {
 });
 
 test('should get the width', t => {
-  const myClass = new MyClass();
+  const myClass = getRenderable(MyClass);
 
   (<any>myClass)._width = 10
   
@@ -45,7 +33,7 @@ test('should get the width', t => {
 });
 
 test('should get the height', t => {
-  const myClass = new MyClass();
+  const myClass = getRenderable(MyClass);
 
   (<any>myClass)._height = 10
   
@@ -53,7 +41,7 @@ test('should get the height', t => {
 });
 
 test('should get the offsetX', t => {
-  const myClass = new MyClass();
+  const myClass = getRenderable(MyClass);
 
   (<any>myClass)._container = { offsetX: 15 };
   
@@ -65,7 +53,7 @@ test('should get the offsetX', t => {
 });
 
 test('should get the offsetY', t => {
-  const myClass = new MyClass();
+  const myClass = getRenderable(MyClass);
 
   (<any>myClass)._container = { offsetY: 15 };
   
@@ -78,7 +66,7 @@ test('should get the offsetY', t => {
 
 test('should resize all children', t => {
   t.plan(2);
-  const myClass = new MyClass();  
+  const myClass = getRenderable(MyClass);  
 
   myClass.getChildren = () => [{
     resize: () => t.pass()
@@ -90,7 +78,7 @@ test('should resize all children', t => {
 });
 
 test('should get all children', t => {
-  const myClass = new MyClass();  
+  const myClass = getRenderable(MyClass);  
   const item = {};
 
   (<any>myClass)._contentItems = [ item ];
@@ -102,7 +90,7 @@ test('should get all children', t => {
 
 test('should query the visibility from the parent', t => {
   let isVisible = true;
-  const myClass = new MyClass();  
+  const myClass = getRenderable(MyClass);  
   const parent = { isVisible: () => isVisible };
 
   (<any>myClass)._container = parent;
@@ -118,7 +106,7 @@ test('should query the visibility from the parent', t => {
 
 test('should destroy all content items', t => {
   t.plan(1);
-  const myClass = new MyClass();  
+  const myClass = getRenderable(MyClass);  
 
   (<any>myClass)._contentItems = [ { destroy: () => t.pass() } ];
 
@@ -126,7 +114,7 @@ test('should destroy all content items', t => {
 });
 
 test('should set the isDestroyed flag to true', t => {
-  const myClass = new MyClass();  
+  const myClass = getRenderable(MyClass);  
 
   myClass.destroy();
 
@@ -135,14 +123,14 @@ test('should set the isDestroyed flag to true', t => {
 
 test('should set notify the destroy', t => {
   t.plan(1);
-  const myClass = new MyClass();  
+  const myClass = getRenderable(MyClass);  
 
   myClass.destroyed.subscribe(() => t.pass());
   myClass.destroy();
 });
 
 test('should get the immediate parent', t => {
-  const myClass = new MyClass();  
+  const myClass = getRenderable(MyClass);  
   const parent = {};
 
   (<any>myClass)._container = parent;
@@ -151,7 +139,7 @@ test('should get the immediate parent', t => {
 });
 
 test('should get null if no parent', t => {
-  const myClass = new MyClass();  
+  const myClass = getRenderable(MyClass);  
   
   t.is<any>(myClass.getParent(), null);
 });
@@ -159,7 +147,7 @@ test('should get null if no parent', t => {
 test('should the first parent that matches the selector', t => {
   class Parent {}
   
-  const myClass = new MyClass();  
+  const myClass = getRenderable(MyClass);  
   const parent = new Parent();
   (<any>myClass)._container = parent;
   
@@ -167,12 +155,12 @@ test('should the first parent that matches the selector', t => {
 });
 
 test('should get the parents', t => {
-  const Parent = getRenderable();
-  const GrandParent = getRenderable();
+  const Parent = getRenderableClass();
+  const GrandParent = getRenderableClass();
   
-  const myClass = new MyClass();  
-  const parent = new Parent();
-  const grandParent = new GrandParent();
+  const myClass = getRenderable(MyClass);  
+  const parent = getRenderable(Parent);
+  const grandParent = getRenderable(GrandParent);
   
   (<any>parent)._container = grandParent;
   (<any>myClass)._container = parent;
@@ -196,9 +184,9 @@ test('should get the parents', t => {
 
 test('should set the container', t => {
   t.plan(3);
-  const myClass = new MyClass();    
-  const Parent = getRenderable();
-  const parent = new Parent();
+  const myClass = getRenderable(MyClass);    
+  const Parent = getRenderableClass();
+  const parent = getRenderable(Parent);
 
   myClass.containerChange.subscribe(() => t.pass());
   myClass.setContainer(parent);
@@ -209,7 +197,7 @@ test('should set the container', t => {
 
 test('should subscribe to the event bus', t => {
   t.plan(2);
-  const myClass = new MyClass();    
+  const myClass = getRenderable(MyClass);    
   const event = {};
   const observer = {};
 
@@ -225,7 +213,7 @@ test('should subscribe to the event bus', t => {
 
 test('should emit an event', t => {
   t.plan(1);
-  const myClass = new MyClass();    
+  const myClass = getRenderable(MyClass);    
 
   myClass.subscribe(MyEvent, () => t.pass());
   myClass.emit(new MyEvent(null));
@@ -233,9 +221,9 @@ test('should emit an event', t => {
 
 test('should emit on the child', t => {
   t.plan(1);
-  const Child = getRenderable();
-  const myClass = new MyClass();    
-  const child = new Child();
+  const Child = getRenderableClass();
+  const myClass = getRenderable(MyClass);    
+  const child = getRenderable(Child);
   
   (<any>myClass)._contentItems = [ child ];
   
@@ -244,7 +232,7 @@ test('should emit on the child', t => {
 });
 
 test('should not emit on the child when propagation is stopped', t => {
-  const Child = getRenderable();
+  const Child = getRenderableClass();
   const myClass = new MyClass();    
   const child = new Child();
   
@@ -259,9 +247,9 @@ test('should not emit on the child when propagation is stopped', t => {
 
 test('should emit on the parent', t => {
   t.plan(1);
-  const Child = getRenderable();
-  const myClass = new MyClass();    
-  const child = new Child();
+  const Child = getRenderableClass();
+  const myClass = getRenderable(MyClass);    
+  const child = getRenderable(Child);
   
   (<any>myClass)._contentItems = [ child ];
   (<any>child)._container = myClass;
@@ -271,9 +259,9 @@ test('should emit on the parent', t => {
 });
 
 test('should not emit on the child when propagation is stopped', t => {
-  const Child = getRenderable();
-  const myClass = new MyClass();    
-  const child = new Child();
+  const Child = getRenderableClass();
+  const myClass = getRenderable(MyClass);    
+  const child = getRenderable(Child);
   
   (<any>myClass)._contentItems = [ child ];
   (<any>child)._container = myClass;
@@ -286,9 +274,9 @@ test('should not emit on the child when propagation is stopped', t => {
 });
 
 test('should get all descendants', t => {
-  const myClass = new MyClass();    
-  const child = new MyClass();
-  const grandChild = new MyClass();
+  const myClass = getRenderable(MyClass);    
+  const child = getRenderable(MyClass);
+  const grandChild = getRenderable(MyClass);
   
   (<any>myClass)._contentItems = [ child ];
   (<any>child)._contentItems = [ grandChild ];
@@ -302,15 +290,16 @@ test('should get all descendants', t => {
 
 test('replacing a child', t => {
   const renderer = {} as any;
-  const myClass = new MyClass({ renderer });
-  const item = new MyClass();
-  const otherItem = new MyClass();
+  const myClass = getRenderable(MyClass);
+  const item = getRenderable(MyClass);
+  const otherItem = getRenderable(MyClass);
 
   const setContainer = stub(otherItem, 'setContainer');
   const destroy = stub(item, 'destroy');
   const resize = stub(myClass, 'resize');
   renderer.render = spy();
 
+  (<any>myClass)._renderer = renderer;
   (<any>myClass)._contentItems = [ item ];
   myClass.replaceChild(item, otherItem);
 
@@ -332,14 +321,15 @@ test('replacing a child', t => {
 
 test('adding a child', t => {
   const renderer = {} as any;
-  const myClass = new MyClass({ renderer });
-  const item = new MyClass();
-  const otherItem = new MyClass();
+  const myClass = getRenderable(MyClass);
+  const item = getRenderable(MyClass);
+  const otherItem = getRenderable(MyClass);
 
   const setContainer = stub(item, 'setContainer');
   const resize = stub(myClass, 'resize');
   renderer.render = spy();
 
+  (<any>myClass)._renderer = renderer;
   (<any>myClass)._contentItems = [ otherItem ];
   myClass.addChild(item);
 
@@ -369,15 +359,16 @@ test('adding a child', t => {
 
 test('removing a child', t => {
   const renderer = {} as any;
-  const myClass = new MyClass({ renderer });
-  const item = new MyClass();
-  const otherItem = new MyClass();
+  const myClass = getRenderable(MyClass);
+  const item = getRenderable(MyClass);
+  const otherItem = getRenderable(MyClass);
 
   let destroy = stub(item, 'destroy');
   const resize = stub(myClass, 'resize');
   const remove = stub(myClass, 'remove');
   renderer.render = spy();
 
+  (<any>myClass)._renderer = renderer;
   (<any>myClass)._contentItems = [ item, otherItem ];
   myClass.removeChild(item);
 
@@ -404,8 +395,8 @@ test('removing a child', t => {
 });
 
 test('remove item', t => {
-  const myClass = new MyClass();  
-  const parent = new MyClass();
+  const myClass = getRenderable(MyClass);  
+  const parent = getRenderable(MyClass);
   const removeChildStub = stub(parent, 'removeChild');
   const destroyStub = stub(myClass, 'destroy');
 
@@ -425,8 +416,8 @@ test('remove item', t => {
 });
 
 test('get index of item', t => {
-  const item = new MyClass();
-  const myClass = new MyClass();
+  const item = getRenderable(MyClass);
+  const myClass = getRenderable(MyClass);
 
   t.is(myClass.getIndexOf(item), -1);
   
@@ -436,8 +427,8 @@ test('get index of item', t => {
 });
 
 test('get item at index', t => {
-  const item = new MyClass();
-  const myClass = new MyClass();
+  const item = getRenderable(MyClass);
+  const myClass = getRenderable(MyClass);
 
   t.is(myClass.getAtIndex(0), null);
   
@@ -458,8 +449,8 @@ test('scoping events', t => {
 });
 
 test('contains item', t => {
-  const item = new MyClass();
-  const myClass = new MyClass();
+  const item = getRenderable(MyClass);
+  const myClass = getRenderable(MyClass);
 
   (<any>myClass)._contentItems = [ item ];
 
@@ -468,8 +459,8 @@ test('contains item', t => {
 });
 
 test('is contained within item', t => {
-  const item = new MyClass();
-  const myClass = new MyClass();
+  const item = getRenderable(MyClass);
+  const myClass = getRenderable(MyClass);
 
   (<any>myClass)._contentItems = [ item ];
 
@@ -478,7 +469,7 @@ test('is contained within item', t => {
 });
 
 test('is contained within item', t => {
-  const myClass = new MyClass();
+  const myClass = getRenderable(MyClass);
 
   Object.assign(myClass, {
     _width: 20,
@@ -499,7 +490,7 @@ test('is contained within item', t => {
 });
 
 test('is droppable', t => {
-  const myClass = new MyClass();  
+  const myClass = getRenderable(MyClass);  
 
   t.false(myClass.isDroppable({} as any));
 });

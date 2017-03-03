@@ -122,8 +122,8 @@ const initialLayout = RootLayout.configure({
 const rootLayout = window['rootLayout'] = RootLayout
   .create({
     container: document.body  
-  })
-  .initialize();
+  });
+  
   
 const serializer = RootSerializer.fromRoot(rootLayout);
 

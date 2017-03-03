@@ -23,22 +23,17 @@ export class View extends Renderable {
   
   constructor(
     @Inject(ContainerRef) protected _container: Renderable,
-    @Inject(Injector) protected _injector: Injector,
     @Inject(ConfigurationRef) private _configuration: ViewConfig,
     @Inject(ViewManager) private _viewManager: ViewManager,
     @Inject(ViewFactory) private _viewFactory: ViewFactory,
     @Inject(DocumentRef) private _document: Document
   ) {
-    super(_injector);
+    super();
     
     this.visibilityChanges = this._visiblityChanges.asObservable().distinctUntilChanged();
     this.sizeChanges = this._sizeChanges.asObservable().distinctUntilChanged((p, c) => {
       return p.width === c.width && p.height === c.height;
     });
-
-    this._renderer.rendered
-      .takeUntil(this.destroyed)
-      .subscribe(this._postRender.bind(this));
   }
 
   get width(): number {
@@ -67,6 +62,14 @@ export class View extends Renderable {
   
   get token(): any|null {
     return this._viewFactory.getTokenFrom(this._configuration);
+  }
+
+  initialize(): void {
+    super.initialize();
+    
+    this._renderer.rendered
+      .takeUntil(this.destroyed)
+      .subscribe(this._postRender.bind(this));
   }
 
   render(): VNode {
@@ -123,7 +126,7 @@ export class View extends Renderable {
     if (!this._viewContainer) {
       this._viewContainer = this._viewManager.resolveOrCreate<any>({
         config: this._configuration,
-        injector: this._injector,
+        injector: this.injector,
         container: this
       });
     }

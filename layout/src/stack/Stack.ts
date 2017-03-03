@@ -1,7 +1,7 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
-import { Inject, Injector } from '../di';
+import { Type, Inject, Injector } from '../di';
 import { 
   RenderableInjector, 
   Renderable, 
@@ -51,11 +51,10 @@ export class Stack extends Renderable {
   protected _config: StackConfig;
   
   constructor(
-    @Inject(Injector) _injector: Injector,
     @Inject(ConfigurationRef) _config: StackConfigArgs,
     @Inject(ContainerRef) protected _container: Renderable
   ) {
-    super(_injector);
+    super();
     
     this._config = Object.assign({
       controls: [],
@@ -65,33 +64,6 @@ export class Stack extends Renderable {
       direction: XYDirection.X,
       reverse: false
     }, _config);
-    
-    this._header = Injector.fromInjectable(
-      StackHeader, 
-      [
-        { provide: ContainerRef, useValue: this },
-        { provide: ConfigurationRef, useValue: this._config ? this._config.header : null },
-        StackHeader 
-      ], 
-      this._injector
-    )
-      .get(StackHeader);
-
-    this._header.subscribe(TabCloseEvent, this._onTabClose.bind(this));
-    this._header.subscribe(TabSelectionEvent, this._onTabSelect.bind(this));
-    this._header.subscribe(TabDragEvent, this._onTabDrag.bind(this));
-
-    
-    this._config.children.forEach(child => {
-      this.addChild(this.createChild(child), { render: false, resize: false });
-    });
-
-    if (!ConfiguredRenderable.inList(this._config.controls, CloseStackControl)) {
-      this._config.controls.push(CloseStackControl);
-    }
-
-    this._config.controls.forEach(control => this.addControl(control));
-    this._setActiveIndex(this._config.startIndex);
   }
 
   get direction(): XYDirection {
@@ -130,6 +102,26 @@ export class Stack extends Renderable {
     return this._contentItems;
   }
 
+  initialize(): void {
+    super.initialize();
+    
+    this._header = this.createChild(new ConfiguredRenderable(StackHeader, this._config ? this._config.header : null));
+    this._header.subscribe(TabCloseEvent, this._onTabClose.bind(this));
+    this._header.subscribe(TabSelectionEvent, this._onTabSelect.bind(this));
+    this._header.subscribe(TabDragEvent, this._onTabDrag.bind(this));
+    
+    this._config.children.forEach(child => {
+      this.addChild(this.createChildItem(child), { render: false, resize: false });
+    });
+
+    if (!ConfiguredRenderable.inList(this._config.controls, CloseStackControl)) {
+      this._config.controls.push(CloseStackControl);
+    }
+
+    this._config.controls.forEach(control => this.addControl(control));
+    this._setActiveIndex(this._config.startIndex);
+  }
+
   render(): VNode {
     return h(`div.ug-layout__stack`, {
       key: this.uid,
@@ -143,17 +135,8 @@ export class Stack extends Renderable {
     ]);
   }
 
-  createChild(config: StackItemContainerConfig): StackItemContainer {
-    return Injector.fromInjectable(
-      StackItemContainer, 
-      [
-        { provide: ContainerRef, useValue: this },
-        { provide: ConfigurationRef, useValue: config },
-        StackItemContainer
-      ],
-      this._injector
-    )
-      .get(StackItemContainer) as StackItemContainer
+  createChildItem(config: StackItemContainerConfig): StackItemContainer {
+    return this.createChild(new ConfiguredRenderable(StackItemContainer, config));
   }
 
   addControl(control: RenderableArg<StackControl>): void {
@@ -167,7 +150,7 @@ export class Stack extends Renderable {
     let container: StackItemContainer;
 
     if (!(item instanceof StackItemContainer)) {
-      container = this.createChild({ use: item });
+      container = this.createChildItem({ use: item });
     } else {
       container = item;
     }
@@ -308,11 +291,9 @@ export class Stack extends Renderable {
   private _createContainerFromRegion(region: StackRegion): Row|Column {
     const RowOrColumn = this._getContainerDropType(region);
 
-    return Injector.fromInjectable(RowOrColumn, [
-      { provide: ContainerRef, useValue: null },
-      { provide: ConfigurationRef, useValue: {} },
-      RowOrColumn
-    ], this._container.injector).get(RowOrColumn);
+    return this.createChild<Row|Column>(new ConfiguredRenderable(RowOrColumn as Type<Row|Column>, {}), [
+      { provide: ContainerRef, useValue: null }
+    ]);
   }
 
   private _getContainerDropType(region: StackRegion): typeof Row|typeof Column {

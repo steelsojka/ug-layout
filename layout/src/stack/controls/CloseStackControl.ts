@@ -9,19 +9,12 @@ import { Stack } from '../Stack';
 import { StackItemContainer } from '../StackItemContainer';
 
 export class CloseStackControl extends StackControl {
-  constructor(
-    @Inject(ContainerRef) protected _container: StackHeader,
-    @Inject(Injector) protected _injector: Injector
-  ) {
-    super(_injector);
-  }
-
   get width(): number {
-    return this._container.width;
+    return this.container.width;
   }
 
   get height(): number {
-    return this._container.height;
+    return this.container.height;
   }
   
   render(): VNode {
@@ -30,8 +23,8 @@ export class CloseStackControl extends StackControl {
         title: 'Close stack'  
       },
       style: {
-        width: this._container.isHorizontal ? undefined : `${this.width}px`,
-        height: this._container.isHorizontal ? `${this.height}px` : undefined
+        width: this.container.isHorizontal ? undefined : `${this.width}px`,
+        height: this.container.isHorizontal ? `${this.height}px` : undefined
       }
     }, [
       h('div.ug-icon-close', {
@@ -43,7 +36,7 @@ export class CloseStackControl extends StackControl {
   }
 
   isActive(): boolean {
-    const stack = this._container.container as Stack|null;
+    const stack = this.container.container as Stack|null;
 
     if (stack) {
       return stack.isCloseable;
@@ -56,7 +49,7 @@ export class CloseStackControl extends StackControl {
     e.stopPropagation();
     e.preventDefault();
     
-    const stack = this._container.container as Stack|null;
+    const stack = this.container.container as Stack|null;
     
     if (stack) {
       stack.close();

@@ -1,5 +1,5 @@
-import { Injector, ProviderArg } from '../../src/di';
-import { Renderer, Renderable } from '../../src/dom';
+import { Type, Injector, ProviderArg } from '../../src/di';
+import { ConfiguredRenderable, Renderer, Renderable, RenderableInjector } from '../../src/dom';
 
 export function createRenderableInjector(providers: ProviderArg[] = []): Injector {
   return new Injector([
@@ -8,12 +8,18 @@ export function createRenderableInjector(providers: ProviderArg[] = []): Injecto
   ]);
 }
 
-export function getRenderableClass(providers: ProviderArg[] = []): { new (): Renderable } {
-  class MockRenderable extends Renderable {
-    constructor() {
-      super(createRenderableInjector(providers));
-    }
+export function getRenderable<T>(Ctor: Type<T>, providers: ProviderArg[] = []): T {
+  return RenderableInjector.fromRenderable(
+    Ctor as any,
+    [],
+    undefined,
+    { skipInit: true }
+  )
+    .get(ConfiguredRenderable);
+}
 
+export function getRenderableClass(): { new (): Renderable } {
+  class MockRenderable extends Renderable {
     render(): any {}
   }
 

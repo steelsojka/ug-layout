@@ -38,10 +38,9 @@ export class RootLayout extends Renderable {
     @Inject(ConfigurationRef) protected _config: RootLayoutConfig,
     @Inject(Renderer) protected _renderer: Renderer,
     @Inject(ElementRef) protected _containerEl: HTMLElement,
-    @Inject(ViewManager) protected _viewManager: ViewManager,
-    @Inject(Injector) _injector: Injector
+    @Inject(ViewManager) protected _viewManager: ViewManager
   ) {
-    super(_injector);
+    super();
   }
 
   get height(): number {
@@ -105,12 +104,10 @@ export class RootLayout extends Renderable {
     this._renderer.render();
   }
 
-  initialize(): this {
+  initialize(): void {
     this._renderer.initialize(this._containerEl);
     this._renderer.useNodeGenerator(() => this.render());
     this._isInitialized = true;
-
-    return this;
   }
 
   load(config: ConfiguredRenderable<RootLayout>|RootLayoutConfig): void {
@@ -118,11 +115,7 @@ export class RootLayout extends Renderable {
     
     this._config = ConfiguredRenderable.resolveConfiguration(config);
 
-    const injector = RenderableInjector.fromRenderable(this._config.use, [
-      { provide: ContainerRef, useValue: this }
-    ], this._injector);
-
-    this._contentItems = [ injector.get(ConfiguredRenderable) ];
+    this._contentItems = [ this.createChild(this._config.use) ];
     
     this.resize();
     this._renderer.render();

@@ -5,6 +5,7 @@ import { Type, Injector } from '../../di';
 import { Renderable, ConfiguredRenderable } from '../../dom';
 import { RenderableArg, ConfigurationRef } from '../../common';
 import { defaults } from '../../utils';
+import { StackHeader } from '../StackHeader';
 
 export enum StackControlPosition {
   PRE_TAB,
@@ -26,18 +27,20 @@ export type StackControlConfigArgs = {
  * @extends {Renderable}
  */
 export class StackControl extends Renderable {
+  container: StackHeader;
+  
   protected _config: StackControlConfig;
-  
-  constructor(_injector: Injector) {
-    super(_injector);
 
-    this._config = defaults(_injector.get(ConfigurationRef, {}), {
-      position: StackControlPosition.POST_TAB  
-    });
-  }
-  
   get position(): StackControlPosition {
     return this._config.position;
+  }
+  
+  initialize(): void {
+    super.initialize();
+    
+    this._config = defaults(this.injector.get(ConfigurationRef, {}), {
+      position: StackControlPosition.POST_TAB  
+    });
   }
   
   isActive(): boolean {

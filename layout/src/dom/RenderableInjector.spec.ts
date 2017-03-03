@@ -1,4 +1,5 @@
 import test from 'ava';
+import { spy } from 'sinon';
 
 import { Injector } from '../di';
 import { ConfiguredRenderable } from './ConfiguredRenderable';
@@ -8,22 +9,28 @@ import { Renderer } from './Renderer';
 import { ConfigurationRef } from '../common';
 
 test('creating from a configured renderable', t => {
-  class MyClass {};
+  const initSpy = spy();
+  class MyClass extends Renderable {
+    render(): any {}
+    initialize(): any { initSpy() }
+  };
   
   const config = {};
-  const configured = new ConfiguredRenderable(MyClass as any, config);
+  const configured = new ConfiguredRenderable(MyClass, config);
   const injector = RenderableInjector.fromRenderable(configured);
 
   t.true(injector.get(ConfiguredRenderable) instanceof MyClass);
   t.is(injector.get(ConfigurationRef), config);
+  t.is(initSpy.callCount, 1);
 });
 
 test('creating from a renderable', t => {
   class MyClass extends Renderable {
     render(): any {}
+    initialize(): any {}
   };
 
-  const renderable = new MyClass(new Injector([ { provide: Renderer, useValue: {} } ]));
+  const renderable = new MyClass();
   const injector = RenderableInjector.fromRenderable(renderable);
 
   t.is(injector.get(ConfiguredRenderable), renderable);
@@ -32,11 +39,8 @@ test('creating from a renderable', t => {
 
 test('creating from a renderable constructor', t => {
   class MyClass extends Renderable {
-    constructor() {
-      super(new Injector([ { provide: Renderer, useValue: {} } ]));
-    }
-    
     render(): any {}
+    initialize(): any {}
   };
 
   const injector = RenderableInjector.fromRenderable(MyClass);

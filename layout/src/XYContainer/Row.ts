@@ -15,11 +15,9 @@ export class Row extends XYContainer {
   protected _className: string = 'ug-layout__row';
 
   constructor(
-    @Inject(ContainerRef) container: Renderable,
-    @Inject(ConfigurationRef) config: RowConfig|null,
-    @Inject(Injector) injector: Injector
+    @Inject(ConfigurationRef) config: RowConfig|null
   ) {
-    super(config, injector, container);
+    super(config);
   }
 
   static configure(config: RowConfig): ConfiguredRenderable<Row> {

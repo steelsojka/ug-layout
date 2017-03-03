@@ -15,13 +15,6 @@ import { TabCloseEvent } from '../TabCloseEvent';
  * @extends {TabControl}
  */
 export class CloseTabControl extends TabControl {
-  constructor(
-    @Inject(ContainerRef) protected _container: StackItemContainer,
-    @Inject(Injector) _injector: Injector
-  ) {
-    super(_injector);
-  }
-  
   render(): VNode {
     return h('div.ug-layout__stack-tab-close.ug-icon-close', {
       attrs: {
@@ -34,11 +27,11 @@ export class CloseTabControl extends TabControl {
   }
 
   isActive(): boolean {
-    return this._container.closeable;
+    return this.container.closeable;
   }
 
   private _onClick(e: MouseEvent): void {
-    const tab = this._container.tab as StackTab;
+    const tab = this.container.tab as StackTab;
     
     e.stopPropagation();
     tab.emitUp(new TabCloseEvent(tab));

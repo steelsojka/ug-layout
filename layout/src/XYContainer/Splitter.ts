@@ -30,20 +30,11 @@ export class Splitter extends Renderable {
     @Inject(ConfigurationRef) private _config: SplitterConfig,
     @Inject(DocumentRef) private _document: Document,
     @Inject(ContainerRef) protected _container: XYContainer,
-    @Inject(Draggable) protected _draggable: Draggable<Splitter>,
-    @Inject(Injector) protected _injector: Injector
+    @Inject(Draggable) protected _draggable: Draggable<Splitter>
   ) {
-    super(_injector);
+    super();
     
     this.dragStatus = this._draggable.drag;
-      
-    this._draggable.drag
-      .filter(Draggable.isDragStopEvent)
-      .subscribe(() => this._isDragging = false);
-    
-    this._draggable.drag
-      .filter(Draggable.isDragStartEvent)
-      .subscribe(this._onDragStart.bind(this));
   }
   
   get height(): number {
@@ -86,6 +77,18 @@ export class Splitter extends Renderable {
 
   private get _isRow(): boolean {
     return this._container.isRow;
+  }
+
+  initialize(): void {
+    super.initialize();
+    
+    this._draggable.drag
+      .filter(Draggable.isDragStopEvent)
+      .subscribe(() => this._isDragging = false);
+    
+    this._draggable.drag
+      .filter(Draggable.isDragStartEvent)
+      .subscribe(this._onDragStart.bind(this));
   }
 
   dragTo(x = this.x, y = this.y): void {

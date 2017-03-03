@@ -1,7 +1,10 @@
-import { Provider, Injector, Type } from '../di';
+import { ProviderArg, Injector, Type } from '../di';
 import { ConfiguredRenderable } from './ConfiguredRenderable';
 import { ConfigurationRef } from '../common';
 import { Renderable } from './Renderable';
+import { isFunction } from '../utils';
+
+export const INJECTOR_KEY = '__injector';
 
 /**
  * An injector created for renderables.
@@ -22,11 +25,24 @@ export class RenderableInjector extends Injector {
    */
   static fromRenderable(
     renderable: Type<Renderable>|ConfiguredRenderable<Renderable>|Renderable, 
-    providers: Provider[] = [],
-    parent?: Injector
+    providers: ProviderArg[] = [],
+    parent?: Injector,
+    options: { skipInit?: boolean } = {}
   ): Injector {
+    const { skipInit = false } = options;
     let Ctor = renderable;
     let config: any = null;
+    let factory = (injector: Injector) => {
+      const instance = injector.resolveAndInstantiate(Ctor) as Renderable;
+
+      instance[INJECTOR_KEY] = injector;
+
+      if (isFunction(instance.initialize) && skipInit !== true) {
+        instance.initialize();
+      }
+
+      return instance;
+    };
     
     if (renderable instanceof ConfiguredRenderable) {
       Ctor = renderable.renderable;
@@ -40,7 +56,7 @@ export class RenderableInjector extends Injector {
     }
 
     return Injector.fromInjectable(Ctor as Type<Renderable>, [
-      { provide: ConfiguredRenderable, useClass: Ctor },
+      { provide: ConfiguredRenderable, useFactory: factory, deps: [ Injector ] },
       { provide: ConfigurationRef, useValue: config },
       ...providers
     ], parent);

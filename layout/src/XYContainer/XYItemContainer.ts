@@ -44,31 +44,9 @@ export class XYItemContainer extends Renderable {
   private _isMinimized: boolean = false;
 
   constructor(
-    @Inject(Injector) _injector: Injector,
-    @Inject(ConfigurationRef) private _config: XYItemContainerConfig,
-    @Inject(ContainerRef) _container: XYContainer
+    @Inject(ConfigurationRef) private _config: XYItemContainerConfig
   ) {
-    super(_injector);
-    
-    if (this._config) {
-      this.ratio = isNumber(this._config.ratio) ? this._config.ratio : UNALLOCATED;
-    }
-
-    this._contentItems = [
-      RenderableInjector.fromRenderable(
-        this._config.use, 
-        [
-          { provide: XYItemContainer, useValue: this },
-          { provide: ContainerRef, useValue: this }
-        ], 
-        this._injector
-      )
-        .get(ConfiguredRenderable)
-    ];
-
-    this._isMinimized = Boolean(this._config.minimized);
-
-    this.subscribe(MinimizeCommand, this._minimize.bind(this));
+    super();
   }
 
   get size(): number {
@@ -163,6 +141,30 @@ export class XYItemContainer extends Renderable {
 
   protected get _item(): Renderable {
     return this._contentItems[0];
+  }
+
+  initialize(): void {
+    super.initialize();
+    
+    if (this._config) {
+      this.ratio = isNumber(this._config.ratio) ? this._config.ratio : UNALLOCATED;
+    }
+
+    this._contentItems = [
+      RenderableInjector.fromRenderable(
+        this._config.use, 
+        [
+          { provide: XYItemContainer, useValue: this },
+          { provide: ContainerRef, useValue: this }
+        ], 
+        this.injector
+      )
+        .get(ConfiguredRenderable)
+    ];
+
+    this._isMinimized = Boolean(this._config.minimized);
+
+    this.subscribe(MinimizeCommand, this._minimize.bind(this));
   }
 
   render(): VNode {

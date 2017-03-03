@@ -5,12 +5,6 @@ import { Renderer } from './Renderer';
 import test from 'ava';
 
 class MyClass extends Renderable {
-  constructor() {
-    super(new Injector([
-      { provide: Renderer, useValue: {} }
-    ]));
-  }
-  
   render(): any {}
 }
 

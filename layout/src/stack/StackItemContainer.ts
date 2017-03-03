@@ -37,35 +37,10 @@ export class StackItemContainer extends Renderable implements DropTarget {
   private _controls: TabControl[] = [];
   
   constructor(
-    @Inject(Injector) _injector: Injector,
     @Inject(ConfigurationRef) private _config: StackItemContainerConfig,
     @Inject(ContainerRef) protected _container: Stack
   ) {
-    super(_injector);
-    
-    this._contentItems = [
-      RenderableInjector.fromRenderable(
-        this._config.use, 
-        [
-          { provide: StackItemContainer, useValue: this },
-          { provide: ContainerRef, useValue: this }
-        ],
-        this._injector
-      )
-        .get(ConfiguredRenderable)
-    ];
-
-    _config.tabControls = _config.tabControls || [];
-
-    if (!ConfiguredRenderable.inList(_config.tabControls, CloseTabControl)) {
-      _config.tabControls.push(CloseTabControl);
-    }
-
-    for (const control of _config.tabControls) {
-      this.addControl(control, { resize: false, render: false });
-    }
-
-    this.subscribe(MakeVisibleCommand, this.makeVisible.bind(this));
+    super();
   }
 
   get container(): Stack {
@@ -136,6 +111,26 @@ export class StackItemContainer extends Renderable implements DropTarget {
     return this._contentItems[0];
   }
 
+  initialize(): void {
+    super.initialize();
+    
+    this._contentItems = [
+      this.createChild(this._config.use)
+    ];
+
+    this._config.tabControls = this._config.tabControls || [];
+
+    if (!ConfiguredRenderable.inList(this._config.tabControls, CloseTabControl)) {
+      this._config.tabControls.push(CloseTabControl);
+    }
+
+    for (const control of this._config.tabControls) {
+      this.addControl(control, { resize: false, render: false });
+    }
+
+    this.subscribe(MakeVisibleCommand, this.makeVisible.bind(this));
+  }
+
   render(): VNode {
     return h('div.ug-layout__stack-item-container', {
       key: this._uid,
@@ -201,15 +196,7 @@ export class StackItemContainer extends Renderable implements DropTarget {
     const { index = -1, render = true, resize = true } = options;
     const { tab } = this;
     
-    const newControl = RenderableInjector.fromRenderable(
-      control, 
-      [
-        { provide: ContainerRef, useValue: this },
-        
-      ],
-      this._injector
-    )
-      .get(ConfiguredRenderable) as TabControl;
+    const newControl = this.createChild(control);
 
     if (index !== -1) {
       this._controls.splice(index, 0, newControl);

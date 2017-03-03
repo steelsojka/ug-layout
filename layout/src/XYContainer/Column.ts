@@ -15,11 +15,9 @@ export class Column extends XYContainer {
   protected _className: string = 'ug-layout__column';
 
   constructor(
-    @Inject(ContainerRef) container: Renderable,
     @Inject(ConfigurationRef) config: ColumnConfig|null,
-    @Inject(Injector) injector: Injector
   ) {
-    super(config, injector, container);
+    super(config);
   }
   
   static configure(config: ColumnConfig): ConfiguredRenderable<Column> {

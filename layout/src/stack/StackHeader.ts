@@ -50,12 +50,11 @@ export class StackHeader extends Renderable implements DropTarget {
   private _tabAreas: RenderableArea[];
   
   constructor(
-    @Inject(Injector) _injector: Injector,
     @Inject(ConfigurationRef) _config: StackHeaderConfigArgs|null,
     @Inject(ContainerRef) protected _container: Stack,
     @Inject(DragHost) protected _dragHost: DragHost
   ) {
-    super(_injector);
+    super();
     
     this._config = Object.assign({
       controls: [],
@@ -63,14 +62,6 @@ export class StackHeader extends Renderable implements DropTarget {
       droppable: true,
       distribute: false
     }, _config);
-
-    this._dragHost.start
-      .takeUntil(this.destroyed)
-      .subscribe(this._onDragHostStart.bind(this));
-      
-    this._dragHost.dropped
-      .takeUntil(this.destroyed)
-      .subscribe(this._onDragHostDropped.bind(this));
   } 
 
   get width(): number {
@@ -101,18 +92,20 @@ export class StackHeader extends Renderable implements DropTarget {
     return this._controls.slice(0);
   }
 
+  initialize(): void {
+    super.initialize();
+    
+    this._dragHost.start
+      .takeUntil(this.destroyed)
+      .subscribe(this._onDragHostStart.bind(this));
+      
+    this._dragHost.dropped
+      .takeUntil(this.destroyed)
+      .subscribe(this._onDragHostDropped.bind(this));
+  }
+
   addTab(config: StackTabConfigArgs, options: AddChildArgs = {}): StackTab {
-    const tab = Injector.fromInjectable(
-      StackTab, 
-      [
-        { provide: ContainerRef, useValue: this },
-        { provide: ConfigurationRef, useValue: config },
-        Draggable,
-        StackTab 
-      ],
-      this._injector
-    )
-      .get(StackTab) as StackTab;
+    const tab = this.createChild(new ConfiguredRenderable(StackTab, config), [ Draggable ]);
 
     tab.subscribe(TabSelectionEvent, e => this.emit(e));
     tab.subscribe(TabCloseEvent, e => this.emit(e));
@@ -124,16 +117,7 @@ export class StackHeader extends Renderable implements DropTarget {
   }
 
   addControl(_control: RenderableArg<StackControl>): void {
-    const control = RenderableInjector.fromRenderable(
-      _control, 
-      [
-        { provide: ContainerRef, useValue: this }
-      ],
-      this.injector 
-    )
-      .get(ConfiguredRenderable);
-
-    this._controls.push(control);
+    this._controls.push(this.createChild(_control));
   }
 
   isTabActive(tab: StackTab): boolean {
