@@ -11,7 +11,7 @@ export function createRenderableInjector(providers: ProviderArg[] = []): Injecto
 export function getRenderable<T>(Ctor: Type<T>, providers: ProviderArg[] = []): T {
   return RenderableInjector.fromRenderable(
     Ctor as any,
-    [],
+    providers,
     undefined,
     { skipInit: true }
   )

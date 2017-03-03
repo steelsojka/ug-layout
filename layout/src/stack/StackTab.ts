@@ -36,7 +36,6 @@ export class StackTab extends Renderable {
   protected _container: StackHeader;
   
   constructor(
-    @Inject(ContainerRef) _container: StackHeader,
     @Inject(ConfigurationRef) private _config: StackTabConfig,
     @Inject(Draggable) private _draggable: Draggable<StackTab>,
     @Inject(DragHost) private _dragHost: DragHost,
