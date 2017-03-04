@@ -8,6 +8,13 @@ import { RenderableArg } from '../common';
  * @export
  * @class ConfiguredRenderable
  * @template T A subclass of a renderable.
+ * @example
+ * class MyClass {}
+ * 
+ * const configured = new ConfiguredRenderable(MyClass, { configProp: true });
+ * 
+ * ConfiguredRenderable.resolve(configured); // => MyClass
+ * ConfiguredRenderable.resolveConfiguration(configured); // => { configProp: true }
  */
 export class ConfiguredRenderable<T extends Renderable> {
   /**

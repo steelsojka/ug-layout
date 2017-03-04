@@ -259,7 +259,8 @@ export class Injector {
   }
 
   /**
-   * Creates a new injector from an annotated injectable Class.
+   * Creates a new injector from an annotated injectable Class. 
+   * See {@link Injectable} for more details.
    * @static
    * @param {Type<any>} injectable 
    * @param {ProviderArg[]} [providers=[]] 
