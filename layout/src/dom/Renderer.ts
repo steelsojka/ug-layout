@@ -46,7 +46,7 @@ export class Renderer {
 
   /**
    * Sets a the function that generates the virtual DOM tree.
-   * @param {() => VNode} fn 
+   * @param {function(): VNode} fn 
    */
   useNodeGenerator(fn: () => VNode): void {
     this._nodeGenerator = fn;

@@ -6,6 +6,9 @@
     "declarationDir": "dist/es2015"
   },
   "include": [
-    "src/**/*"  
+    "src/**/*"
+  ],
+  "exclude": [
+    "src/**/*.spec.ts"
   ]
 }

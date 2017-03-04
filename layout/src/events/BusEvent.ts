@@ -85,7 +85,7 @@ export class BusEvent<T> {
   /**
    * Adds a function that will execute and hold up the finishing of this event
    * until the given promise resolves. These are executed in the order the are received.
-   * @param {() => any} fn 
+   * @param {function(): *} fn 
    * @returns {void} 
    */
   wait(fn: () => any): void {

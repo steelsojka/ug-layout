@@ -299,7 +299,7 @@ export abstract class Renderable {
    * Subscribes to a BusEvent.
    * @template T The event type.
    * @param {Type<T>} Event 
-   * @param {(PartialObserver<T>|((event: T) => void))} observer 
+   * @param {PartialObserver<T>|function(event: T)} observer 
    * @returns {Subscription} 
    */
   subscribe<T extends BusEvent<any>>(Event: Type<T>, observer: PartialObserver<T>|((event: T) => void)): Subscription {

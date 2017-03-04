@@ -16,6 +16,10 @@ import {
  * An instance of a forward ref function.
  * @export
  * @class ForwardRef
+ * @example
+ * const test = new ForwardRef(() => 'test');
+ * 
+ * test.ref; // => 'test'
  */
 export class ForwardRef {
   constructor(private fn: Function) {}
@@ -49,6 +53,10 @@ export class ForwardRef {
  * @export
  * @param {Function} fn 
  * @returns {ForwardRef}
+ * @example
+ * const test = forwardRef(() => 'test');
+ * 
+ * test.ref; // => 'test'
  */
 export function forwardRef(fn: Function): ForwardRef {
   return new ForwardRef(fn);
@@ -58,6 +66,18 @@ export function forwardRef(fn: Function): ForwardRef {
  * A dependency injector for resolving dependencies. Injectors are hierarchicle.
  * @export
  * @class Injector
+ * @example
+ * const injector = new Injector([
+ *   { provide: 'test', useValue: 'blorg' },
+ *   { provide: 'factory', useFactory: () => 'BOOM' },
+ *   { provide: 'myClass', useClass: MyClass },
+ *   MyClass
+ * ]);
+ * 
+ * injector.get('test'); // => 'blorg';
+ * injector.get('factory'); // => 'BOOM';
+ * injector.get('myClass'); // => instanceof MyClass;
+ * injector.get(MyClass); // => instanceof MyClass;
  */
 export class Injector {
   private _providers: Map<any, Provider> = new Map();

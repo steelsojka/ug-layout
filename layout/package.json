@@ -5,14 +5,19 @@
   "main": "dist/es5/index.js",
   "typings": "dist/es5/index.d.ts",
   "scripts": {
+    "predocs": "npm run build:es2015 && npm run docs:clean",
+    "docs": "esdoc",
+    "docs:start": "http-server ./docs",
+    "docs:clean": "rm -rf ./docs",
     "pretest": "npm run build:es2015",
     "test": "ava",
     "test:coverage": "nyc ava",
     "test:watch": "chokidar 'src/**/*.ts' -c 'npm test' --initial -d 1000 --silent",
-    "clean": "rm -rf dist",
-    "prebuild": "npm run clean",
-    "prebuild:es2015": "npm run clean",
+    "prebuild": "npm run build:clean",
+    "prebuild:test": "npm run build:clean",
     "build": "npm run build:es2015 && npm run build:es5",
+    "build:clean": "rm -rf dist",
+    "build:test": "tsc -p tsconfig.test.json",
     "build:es2015": "tsc -p tsconfig.es2015.json",
     "build:es5": "babel dist/es2015 --copy-files --ignore .map --out-dir dist/es5 --source-maps",
     "start": "webpack-dev-server"
@@ -31,7 +36,10 @@
     "babel-preset-es2015": "^6.22.0",
     "chokidar-cli": "^1.2.0",
     "css-loader": "^0.26.1",
+    "esdoc": "^0.5.2",
+    "esdoc-importpath-plugin": "^0.1.1",
     "file-loader": "^0.10.0",
+    "http-server": "^0.9.0",
     "nyc": "^10.1.2",
     "reflect-metadata": "^0.1.9",
     "sinon": "^1.17.7",
@@ -49,11 +57,11 @@
   },
   "ava": {
     "files": [
-      "dist/es2015/**/*.spec.js"
+      "dist/test/**/*.spec.js"
     ],
     "source": [
-      "dist/es2015/**/*.ts",
-      "!dist/es2015/**/*.spec.ts"
+      "dist/test/**/*.ts",
+      "!dist/test/**/*.spec.ts"
     ],
     "require": [
       "babel-register",

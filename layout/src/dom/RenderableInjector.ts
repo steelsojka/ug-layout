@@ -21,6 +21,7 @@ export class RenderableInjector extends Injector {
    * @param {(Type<Renderable>|ConfiguredRenderable<Renderable>|Renderable)} renderable 
    * @param {Provider[]} [providers=[]] 
    * @param {Injector} [parent] 
+   * @param {{skipInit: ?boolean}} [options={}]
    * @returns {RenderableInjector} 
    */
   static fromRenderable(

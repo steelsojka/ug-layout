@@ -163,8 +163,8 @@ export class SerializerContainer {
    * Deserializes a serialized node using the registered serializer for that node type.
    * @template R The class type.
    * @template S The serialized type.
-   * @param {R} instance 
-   * @returns {S} The renderable argument.
+   * @param {S} serialized 
+   * @returns {R} The renderable argument.
    */
   deserialize<R extends Renderable, S extends Serialized>(serialized: S): RenderableArg<R> {
     const serializer = this.resolveFromSerialized(serialized) as Serializer<R, S>|null;
