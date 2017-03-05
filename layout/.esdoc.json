@@ -1,6 +1,6 @@
 {
-  "source": "./dist/es2015",
-  "destination": "./docs",
+  "source": "./dist/docs",
+  "destination": "./generated-docs",
   "title": "ugLayout Documentation",
   "manual": {
     "configuration": ["./manual/Configuring Renderables.md"]
@@ -9,7 +9,8 @@
     "name": "esdoc-importpath-plugin",
     "option": {
       "replaces": [
-        { "from": "^es2015\\/", "to": "" }
+        { "from": "^docs\\/", "to": "" },
+        { "from": "\\/esdoc\\.js", "to": "" }
       ]
     }
   }]

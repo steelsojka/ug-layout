@@ -46,7 +46,16 @@ export type InjectableConfigArgs = {
   [P in keyof InjectableConfig]?: InjectableConfig[P];
 }
 
+/**
+ * A token used for dependency injection.
+ * @export
+ * @class Token
+ */
 export class Token {
+  /**
+   * Creates an instance of Token.
+   * @param {string} name String representation of the string.
+   */
   constructor(private name: string) {}
 
   toString(): string {
