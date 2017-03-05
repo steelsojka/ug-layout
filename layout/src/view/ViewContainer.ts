@@ -85,7 +85,7 @@ export class ViewContainer<T> {
     this.containerChange = this._containerChange.asObservable();
     this.attached = this._attached.asObservable().filter(eq(true));
     this.detached = this._attached.asObservable().filter(eq(false));
-    this.status = this._status.asObservable();  
+    this.status = this._status.asObservable();
     this.statusReady = this.status.filter(eq(ViewContainerStatus.READY));
     this._element.classList.add('ug-layout__view-container-mount');
 
@@ -94,6 +94,7 @@ export class ViewContainer<T> {
     this.sizeChanges.subscribe(dimensions => this._executeHook('ugOnResize', dimensions));
     this.visibilityChanges.subscribe(isVisible => this._executeHook('ugOnVisibilityChange', isVisible));
     this.beforeDestroy.subscribe(event => this._executeHook('ugOnBeforeDestroy', event));
+    this.ready.then(container => this._executeHook('ugOnInit', container));
   }
 
   get ready(): Promise<ViewContainer<T>> {
@@ -212,6 +213,10 @@ export class ViewContainer<T> {
   
   mount(element: HTMLElement): void {
     this._element.appendChild(element);
+  }
+  
+  mountHTML(html: string): void {
+    this._element.innerHTML = html;
   }
 
   detach(): void {

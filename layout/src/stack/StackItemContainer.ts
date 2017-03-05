@@ -5,9 +5,9 @@ import { Inject, Injector } from '../di'
 import { Renderer, Renderable, AddChildArgs, RenderableInjector, ConfiguredRenderable, RenderableArea } from '../dom';
 import { BeforeDestroyEvent, Cancellable, Subject, Observable } from '../events';
 import { MakeVisibleCommand } from '../commands';
-import { 
-  ConfigurationRef, 
-  ContainerRef, 
+import {
+  ConfigurationRef,
+  ContainerRef,
   RenderableArg,
   DropTarget,
   DropArea,
@@ -56,13 +56,13 @@ export class StackItemContainer extends Renderable implements DropTarget {
   }
 
   get width(): number {
-    return this.container.isHorizontal 
-      ? this.container.width 
+    return this.container.isHorizontal
+      ? this.container.width
       : Math.max(this.container.width - this.container.header.width, 0);
   }
 
   get height(): number {
-    return this.container.isHorizontal 
+    return this.container.isHorizontal
       ? Math.max(this.container.height - this.container.header.height, 0)
       : this.container.height;
   }
@@ -173,7 +173,7 @@ export class StackItemContainer extends Renderable implements DropTarget {
         highlightArea.x2 = (this.width / 2) + x;
         break;
       case StackRegion.EAST:
-        highlightArea.x = (this.width / 2) + x;  
+        highlightArea.x = (this.width / 2) + x;
         break;
       case StackRegion.NORTH:
         highlightArea.y2 = (this.height / 2) + y;

@@ -3,7 +3,11 @@
   "destination": "./generated-docs",
   "title": "ugLayout Documentation",
   "manual": {
-    "configuration": ["./manual/Configuring Renderables.md"]
+    "configuration": ["./manual/Configuring Renderables.md"],
+    "usage": [
+      "./manual/Getting Started.md",
+      "./manual/Views.md"
+    ]
   },
   "plugins": [{
     "name": "esdoc-importpath-plugin",
