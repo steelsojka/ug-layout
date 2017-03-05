@@ -1,5 +1,5 @@
-import { 
-  RootLayout, 
+import {
+  RootLayout,
   RootLayoutCreationConfig,
   RootConfigRef
 } from 'ug-layout';
@@ -12,7 +12,7 @@ export interface AngularRootLayoutConfig extends RootLayoutCreationConfig {
 
 export class AngularRootLayout extends RootLayout {
   destroy(): void {
-    const config = this._injector.get(RootConfigRef) as AngularRootLayoutConfig;
+    const config = this.injector.get(RootConfigRef) as AngularRootLayoutConfig;
     
     config.viewContainerRef.clear();
     this._renderer.detach();

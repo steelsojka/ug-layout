@@ -1,77 +1,64 @@
-import { 
-  ReflectiveInjector, 
-  ComponentFactoryResolver, 
-  Injector, 
-  ComponentRef, 
+import {
+  ReflectiveInjector,
+  ComponentFactoryResolver,
+  Injector,
+  ComponentRef,
   Input,
   ApplicationRef,
   ElementRef
 } from '@angular/core';
-import { 
-  ViewFactory, 
-  ViewContainer, 
-  ViewFactoryArgs, 
+import {
+  ViewFactory,
+  ViewContainer,
+  ViewFactoryArgs,
   ViewConfig,
   ViewFactoriesRef,
   RootConfigRef,
   Inject,
-  VIEW_CONFIG_KEY
+  VIEW_CONFIG_KEY,
+  View
 } from 'ug-layout';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/toPromise';
 
 import { AngularRootLayoutConfig } from './RootLayout';
-import { 
-  UgLayoutModuleConfiguration,
+import {
   COMPONENT_REF_KEY,
   ViewComponentConfig,
-  SCOPE_REF_KEY
+  SCOPE_REF_KEY,
+  AngularInjectorRef
 } from './common';
 
-export class AngularViewFactory extends ViewFactory {
+export interface AngularViewConfig {
+  component: Type<any>;
+}
+
+export class AngularView extends View {
   private _componentFactoryResolver: ComponentFactoryResolver;
-  private _ngInjector: Injector;
   private _isInitialized: boolean = false;
-  private _config: UgLayoutModuleConfiguration;
-  private _injector: Injector;
   private _ng1Bootstrapped: Subject<void> = new Subject<void>();
   private _isNg1Bootstrapped: boolean = false;
   private _isCheckingForNg1: boolean = false;
 
   constructor(
-    @Inject(RootConfigRef) private _rootConfig: AngularRootLayoutConfig,
-    @Inject(ViewFactoriesRef) _viewFactories: any
+    @Inject(RootConfigRef) private _rootConfig: AngularRootLayoutConfig
+    @Inject(ContainerRef) protected _container: Renderable,
+    @Inject(ConfigurationRef) private _configuration: AngularViewConfig,
+    @Inject(ViewManager) private _viewManager: ViewManager,
+    @Inject(ViewFactory) private _viewFactory: ViewFactory,
+    @Inject(DocumentRef) private _document: Document
+    @Inject(AngularInjectorRef) private _injector: Injector
   ) {
-    super(_viewFactories);
-  }
-  
-  create<T>(args: ViewFactoryArgs): ViewContainer<T> {
-    const { injector, config, container } = args;
-
-    if (!this._isInitialized) {
-      throw new Error('AngularViewFactory needs to be initialized prior to using');
-    }
-
-    return super.create<T>({
-      injector, container,
-      config: {
-        token: this.getTokenFrom(config),
-        useFactory: this._factory.bind(this, config),
-        deps: [ ViewContainer ]
-      }
-    });
-  }
-
-  initialize(
-    componentFactoryResolver: ComponentFactoryResolver,
-    config: UgLayoutModuleConfiguration,
-    injector: Injector
-  ) {
-    this._componentFactoryResolver = componentFactoryResolver;
-    this._config = config;
-    this._injector = injector;
-    this._isInitialized = true;
+    super(_container, _configuration, _viewManager, _viewFactory, _document);
+    
+    this._componentFactoryResolver = this._injector.get(ComponentFactoryResolver);
+    
+    this._configuration = {
+      token: this._configuration.component,
+      useFactory: this._factory.bind(this),
+      deps: [ ViewContainer ]
+    };
   }
 
   /**
@@ -92,7 +79,7 @@ export class AngularViewFactory extends ViewFactory {
   }
 
   private async _factory<T>(config: ViewConfig, viewContainer: ViewContainer<T>): Promise<T> {
-    const token = this.getTokenFrom(config);
+    const token = this._configuration.component;
     
     const metadata = Reflect.getOwnMetadata(VIEW_CONFIG_KEY, token) as ViewComponentConfig;
     
@@ -114,7 +101,7 @@ export class AngularViewFactory extends ViewFactory {
       await this._ng1Bootstrapped.toPromise();
     }
 
-    const token = this.getTokenFrom(config);
+    const token = this._configuration.component;
     const metadata = Reflect.getOwnMetadata(VIEW_CONFIG_KEY, token) as ViewComponentConfig;
     const ng1Injector = this._injector.get('$injector') as ng.auto.IInjectorService;
     const $rootScope = ng1Injector.get('$rootScope') as ng.IRootScopeService;
@@ -162,7 +149,7 @@ export class AngularViewFactory extends ViewFactory {
   }
 
   private async _ng2Factory<T>(config: ViewConfig, viewContainer: ViewContainer<T>): Promise<T> {
-    const token = this.getTokenFrom(config);
+    const token = this._configuration.component;
     
     const componentFactory = this._componentFactoryResolver.resolveComponentFactory<T>(token);
     const injector = ReflectiveInjector.resolveAndCreate([
@@ -217,24 +204,8 @@ export class AngularViewFactory extends ViewFactory {
       $element: elementRef
     };
   }
+  
+  static configure(config: AngularViewConfig): ConfiguredRenderable<AngularView> {
+    return new ConfiguredRenderable(AngularView, config);
+  }
 }
-
-export function factory(
-  componentFactoryResolver: ComponentFactoryResolver,
-  viewFactories: Map<any, any>,
-  config: UgLayoutModuleConfiguration,
-  injector: Injector
-): any {
-  return (viewFactories, rootConfig) => {
-    const factory = new AngularViewFactory(rootConfig, viewFactories);
-    
-    factory.initialize(componentFactoryResolver, config, injector);
-
-    return factory;
-  };
-}
-
-export const factoryDeps = [
-  ViewFactoriesRef,
-  RootConfigRef
-];

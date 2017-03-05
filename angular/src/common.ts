@@ -1,20 +1,16 @@
 import { OpaqueToken, Type } from '@angular/core';
-import { 
-  ViewComponentConfig as _ViewComponentConfig
+import {
+  ViewComponentConfig as _ViewComponentConfig,
+  Token
 } from 'ug-layout';
 
-export const Angular1GlobalRef = new OpaqueToken('NG1GlobalREf');
 export const UgLayoutModuleConfigRef = new OpaqueToken('UgLayoutModuleConfig');
 export const RootLayoutProviders = new OpaqueToken('RootLayoutProviders');
+export const AngularInjectorRef = new Token('AngularInjectorRef');
 
 export const PRIVATE_PREFIX = '__$'
 export const COMPONENT_REF_KEY = `${PRIVATE_PREFIX}componentRef__`;
 export const SCOPE_REF_KEY = `${PRIVATE_PREFIX}scope__`;
-
-export interface UgLayoutModuleConfiguration {
-  hybrid?: boolean;
-  factories?: Map<string, Type<any>>;
-}
 
 export interface ViewComponentConfig extends _ViewComponentConfig {
   /**
@@ -29,7 +25,7 @@ export interface ViewComponentConfig extends _ViewComponentConfig {
    */
   templateUrl?: string;
   /**
-   * The template to use for this component. This is ONLY used when upgrading an NG1 component since 
+   * The template to use for this component. This is ONLY used when upgrading an NG1 component since
    * there is no metadata compared to an NG2 component. This takes priority over `templateUrl`.
    * @type {string}
    */
