@@ -12,7 +12,6 @@ import { Serialized } from './common';
  * @property {Injector} [injector] An injector to use as the parent injector.
  */
 
-
 /**
  * @interface Serializer
  * @template R The renderable type.
@@ -21,8 +20,8 @@ import { Serialized } from './common';
 export class Serializer<R extends Renderable, S extends Serialized> {
   /**
    * Serializes a renderable into a storeable format.
-   * @param {R} node 
-   * @returns {S} 
+   * @param {R} node
+   * @returns {S}
    */
   serialize(node: R): S {
     return {} as any;
@@ -30,8 +29,8 @@ export class Serializer<R extends Renderable, S extends Serialized> {
   
   /**
    * Desserializes a serialized renderable into a Renderable.
-   * @param {S} serialized 
-   * @returns {RenderableArg<R>} 
+   * @param {S} serialized
+   * @returns {RenderableArg<R>}
    */
   deserialize(serialized: S): RenderableArg<R> {
     return {} as any;
