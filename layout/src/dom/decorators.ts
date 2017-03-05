@@ -1,5 +1,12 @@
 import { get } from '../utils';
 
+/**
+ * A decorator that memoizes a functions computation based on the current
+ * and previous value of other parameters.
+ * @export
+ * @param {...string[]} properties 
+ * @returns {MethodDecorator} 
+ */
 export function MemoizeFrom(...properties: string[]): MethodDecorator {
   const propMap = new WeakMap();
   

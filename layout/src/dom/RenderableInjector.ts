@@ -4,6 +4,11 @@ import { ConfigurationRef } from '../common';
 import { Renderable } from './Renderable';
 import { isFunction } from '../utils';
 
+/**
+ * Key used to assign the injector to on Renderables.
+ * @see {@link RenderableInjector}
+ * @type {string}
+ */
 export const INJECTOR_KEY = '__injector';
 
 /**

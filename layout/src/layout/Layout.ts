@@ -92,6 +92,10 @@ export class Layout extends Renderable {
     super.destroy();
   }
 
+  /**
+   * Gets the visible areas of all descendant Renderables.
+   * @returns {Array<{ item: Renderable, area: RenderableArea }>} 
+   */
   getItemVisibleAreas(): Array<{ item: Renderable, area: RenderableArea }> {
     return this.getDescendants()
       .filter(item => item.isVisible())
@@ -122,6 +126,12 @@ export class Layout extends Renderable {
       }) as any; 
   }
 
+  /**
+   * Configures a layout renderable.
+   * @static
+   * @param {LayoutConfig} config 
+   * @returns {ConfiguredRenderable<Layout>} 
+   */
   static configure(config: LayoutConfig): ConfiguredRenderable<Layout> {
     return new ConfiguredRenderable(Layout, config);    
   }

@@ -30,11 +30,24 @@ export type StackTabConfigArgs = {
   [P in keyof StackTabConfig]?: StackTabConfig[P];
 }
 
+/**
+ * Renderable representing a stack tab.
+ * @export
+ * @class StackTab
+ * @extends {Renderable}
+ */
 export class StackTab extends Renderable {
   private _element: HTMLElement;
   private _isDragging: boolean = false;
   protected _container: StackHeader;
   
+  /**
+   * Creates an instance of StackTab.
+   * @param {StackTabConfig} _config 
+   * @param {Draggable<StackTab>} _draggable 
+   * @param {DragHost} _dragHost 
+   * @param {Document} _document 
+   */
   constructor(
     @Inject(ConfigurationRef) private _config: StackTabConfig,
     @Inject(Draggable) private _draggable: Draggable<StackTab>,
@@ -57,10 +70,21 @@ export class StackTab extends Renderable {
     return this._container.isHorizontal ? this._container.height : this._height;
   }
 
+  /**
+   * The HTML element for this tab.
+   * @readonly
+   * @type {HTMLElement}
+   */
   get element(): HTMLElement {
     return this._element;
   }
 
+  /**
+   * The StackItemContainer associated with this tab.
+   * @see {@link StackItemContainer}
+   * @readonly
+   * @type {(StackItemContainer|null)}
+   */
   get item(): StackItemContainer|null {
     return this._container.getItemFromTab(this);
   }
@@ -73,14 +97,29 @@ export class StackTab extends Renderable {
     return this._container.getOffsetYForTab(this);
   }
 
+  /**
+   * Whether this tab is dragging.
+   * @readonly
+   * @type {boolean}
+   */
   get isDragging(): boolean {
     return this._isDragging;
   }
 
+  /**
+   * The stack that this tab belongs to.
+   * @readonly
+   * @type {(Stack|null)}
+   */
   get stack(): Stack|null {
     return (this._container ? this._container.container : null) as Stack|null;
   }
 
+  /**
+   * The list of tab controls.
+   * @readonly
+   * @type {TabControl[]}
+   */
   get controls(): TabControl[] {
     const { item } = this;
     
