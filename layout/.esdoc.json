@@ -10,8 +10,7 @@
       "./manual/Getting Started.md",
       "./manual/Views.md",
       "./manual/Serialization.md",
-      "./manual/XYContainers.md",
-      "./manual/Stacks.md"
+      "./manual/Builtin Renderables.md"
     ],
     "advanced": [
       "./manual/Creating Renderables.md"  

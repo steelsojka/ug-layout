@@ -29,7 +29,6 @@ export interface StackItemContainerConfig {
   droppable?: boolean;
   draggable?: boolean;
   closeable?: boolean;
-  controls?: StackControlConfig[];
   tabControls?: RenderableArg<TabControl>[];
 }
 
@@ -159,7 +158,7 @@ export class StackItemContainer extends Renderable implements DropTarget {
   handleDrop(item: StackItemContainer, dropArea: DropArea, e: DragEvent<Renderable>): void {
     const region = this._getRegionFromArea(e.pageX, e.pageY, dropArea.area);
 
-    this._container._handleItemDrop(region as StackRegion, item);
+    this._container.handleItemDrop(region as StackRegion, item);
     this._renderer.render();
   }
 

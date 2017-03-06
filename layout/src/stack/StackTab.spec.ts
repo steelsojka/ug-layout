@@ -184,3 +184,37 @@ test('initializing', t => {
   t.is(dragHostStartStub.callCount, 1);
   t.is(dragHostDropStub.callCount, 1);
 });
+
+test('resizing', t => {
+  const tab = getTab();
+
+  stub(tab, '_resizeHashId', { get: () => 1234 });
+
+  (<any>tab)._element = {
+    getBoundingClientRect: () => ({ width: 10, height: 20 })
+  };
+
+  tab.resize();
+
+  t.is((<any>tab)._width, 10);
+  t.is((<any>tab)._height, 20);
+});
+
+test('render', t => {
+  const tab = getTab();    
+  const item = {
+    title: 'title',
+    draggable: true
+  };
+
+  Object.assign(tab, {
+    _container: {
+      isHorizontal: true,
+      isDistributed: false,
+      isTabActive: () => true  
+    }  
+  });
+
+  stub(tab, '_getStyles').returns({});
+  stub(tab, 'item', { get: () => item });
+});

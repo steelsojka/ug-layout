@@ -30,7 +30,7 @@ export interface StackConfig {
   startIndex: number;
   direction: XYDirection;
   reverse: boolean;
-  header: StackHeaderConfigArgs;
+  header: StackHeaderConfigArgs|null;
   controls: RenderableArg<StackControl>[];
 }
 
@@ -43,6 +43,12 @@ export interface StackConfigArgs {
   controls?: RenderableArg<StackControl>[];
 }
 
+/**
+ * A Renderable that renders the Renderable items in a tabbable format.
+ * @export
+ * @class Stack
+ * @extends {Renderable}
+ */
 export class Stack extends Renderable {
   private _direction: XYDirection;
   private _header: StackHeader;
@@ -50,6 +56,11 @@ export class Stack extends Renderable {
   protected _contentItems: StackItemContainer[] = [];
   protected _config: StackConfig;
   
+  /**
+   * Creates an instance of Stack.
+   * @param {StackConfigArgs} _config 
+   * @param {Renderable} _container 
+   */
   constructor(
     @Inject(ConfigurationRef) _config: StackConfigArgs,
     @Inject(ContainerRef) protected _container: Renderable
@@ -66,14 +77,29 @@ export class Stack extends Renderable {
     }, _config);
   }
 
+  /**
+   * The direction of the stack.
+   * @readonly
+   * @type {XYDirection}
+   */
   get direction(): XYDirection {
     return this._config && this._config.direction != null ? this._config.direction : XYDirection.X;
   }
 
+  /**
+   * Whether the stack is horizontal.
+   * @readonly
+   * @type {boolean}
+   */
   get isHorizontal(): boolean {
     return this.direction === XYDirection.X;
   }
 
+  /**
+   * Whether the stack is reversed
+   * @readonly
+   * @type {boolean}
+   */
   get isReversed(): boolean {
     return Boolean(this._config.reverse === true);
   }
@@ -86,22 +112,47 @@ export class Stack extends Renderable {
     return this._container.height;
   }
 
+  /**
+   * Whether this stack is considered closable.
+   * @readonly
+   * @type {boolean}
+   */
   get isCloseable(): boolean {
     return this._contentItems.every(propEq('closeable', true));
   }
 
+  /**
+   * The active content item index.
+   * @readonly
+   * @type {number}
+   */
   get activeIndex(): number {
     return this._activeIndex;
   }
 
+  /**
+   * The header associated with this stack.
+   * @readonly
+   * @type {StackHeader}
+   */
   get header(): StackHeader {
     return this._header;
   }
 
+  /**
+   * Gets the content items.
+   * @readonly
+   * @type {StackItemContainer[]}
+   */
   get items(): StackItemContainer[] {
     return this._contentItems;
   }
 
+  /**
+   * @listens {TabCloseEvent}
+   * @listens {TabSelectionEvent}
+   * @listens {TabDragEvent}
+   */
   initialize(): void {
     super.initialize();
     
@@ -135,16 +186,31 @@ export class Stack extends Renderable {
     ]);
   }
 
+  /**
+   * Creates a child {@link StackItemContainer}.
+   * @param {StackItemContainerConfig} config 
+   * @returns {StackItemContainer} 
+   */
   createChildItem(config: StackItemContainerConfig): StackItemContainer {
     return this.createChild(new ConfiguredRenderable(StackItemContainer, config));
   }
 
+  /**
+   * Adds a header control to this stack.
+   * @param {RenderableArg<StackControl>} control 
+   */
   addControl(control: RenderableArg<StackControl>): void {
     if (this._header) {
       this._header.addControl(control);
     }
   }
 
+  /**
+   * Adds a child renderable. If the renderable being added is not a StackItemContainer
+   * then one is created and the item is wrapped in it.
+   * @param {Renderable} item 
+   * @param {AddChildArgs} [options={}] 
+   */
   addChild(item: Renderable, options: AddChildArgs = {}): void {
     const { index } = options;
     let container: StackItemContainer;
@@ -167,6 +233,12 @@ export class Stack extends Renderable {
     super.addChild(item, options);
   }
 
+  /**
+   * Removes a child item along with the tab associated with.
+   * @param {StackItemContainer} item 
+   * @param {RemoveChildArgs} [options={}] 
+   * @returns {void} 
+   */
   removeChild(item: StackItemContainer, options: RemoveChildArgs = {}): void {
     const { render = true } = options;
     const index = this._contentItems.indexOf(item);
@@ -190,6 +262,11 @@ export class Stack extends Renderable {
     }
   }
 
+  /**
+   * Sets the active item at a specific index.
+   * @param {number} [index] 
+   * @param {BaseModificationArgs} [args={}] 
+   */
   setActiveIndex(index?: number, args: BaseModificationArgs = {}): void {
     const { render = true } = args;
     
@@ -200,6 +277,11 @@ export class Stack extends Renderable {
     }
   }
 
+  /**
+   * Removes an item a specified index.
+   * @param {number} index 
+   * @param {RemoveChildArgs} [options={}] 
+   */
   removeAtIndex(index: number, options: RemoveChildArgs = {}): void {
     const item = this.getAtIndex(index); 
     
@@ -208,8 +290,13 @@ export class Stack extends Renderable {
     }
   }
 
+  /**
+   * Closes the stack if all items are closeable.
+   * @emits {BeforeDestroyEvent} Event that can prevent this action.
+   * @returns {void} 
+   */
   close(): void {
-    if (!this._contentItems.every(propEq('closeable', true))) {
+    if (!this.isCloseable) {
       return;
     }
 
@@ -237,36 +324,71 @@ export class Stack extends Renderable {
     ];
   }
   
+  /**
+   * Gets the index of a tab.
+   * @param {StackTab} tab 
+   * @returns {number} 
+   */
   getIndexOfTab(tab: StackTab): number {
     return this._header.getIndexOf(tab);
   }
   
+  /**
+   * Determines whether an item is the action item container.
+   * @param {StackItemContainer} container 
+   * @returns {boolean} 
+   */
   isActiveContainer(container: StackItemContainer): boolean {
     return this.getIndexOf(container) === this.activeIndex;
   } 
   
+  /**
+   * Determines whether a tab is the active tab.
+   * @param {StackTab} tab 
+   * @returns {boolean} 
+   */
   isActiveTab(tab: StackTab): boolean {
     return this._header.getIndexOf(tab) === this.activeIndex;
   }
   
+  /**
+   * Gets a tab at a specified index.
+   * @param {number} index 
+   * @returns {(StackTab|null)} 
+   */
   getTabAtIndex(index: number): StackTab|null {
     return this._header.getAtIndex(index) as StackTab|null;
   }
   
+  /**
+   * Sets the given container as the active item.
+   * @param {StackItemContainer} container 
+   */
   setActiveContainer(container: StackItemContainer): void {
     this.setActiveIndex(this.getIndexOf(container));
   }
   
+  /**
+   * Sets the active item from the given tab.
+   * @param {StackTab} tab 
+   */
   setActiveTab(tab: StackTab): void {
     this.setActiveIndex(this.getIndexOfTab(tab));
   }
 
-  _handleItemDrop(region: StackRegion, item: Renderable): void {
+  /**
+   * Handles a renderable being dropped on the stack within a certain region.
+   * @param {StackRegion} region The region the item was dropped in.
+   * @param {Renderable} item The item being dropped.
+   */
+  handleItemDrop(region: StackRegion, item: Renderable): void {
     if (
       this._container instanceof XYItemContainer
       && (((region === StackRegion.EAST || region === StackRegion.WEST) && this._container.isRow)
         || ((region === StackRegion.NORTH || region === StackRegion.SOUTH) && !this._container.isRow))
     ) {
+      // If this stack belongs to a Row/Column and the item is being dropped in a region that flows with that container
+      // then it can be dropped in without creating the XYItemContainer.
       const containerIndex = this._container.container.getIndexOf(this._container);
       const index = region === StackRegion.NORTH || region === StackRegion.WEST 
         ? containerIndex
@@ -276,6 +398,7 @@ export class Stack extends Renderable {
       this._container.ratio = <number>this._container.ratio * 0.5;
       this._container.container.resize();
     } else {
+      // Create a Row/Column and replace this stack with it, while adding the stack as an item.
       const container = this._createContainerFromRegion(region);
       const index = region === StackRegion.NORTH || region === StackRegion.WEST ? 0 : -1;
       

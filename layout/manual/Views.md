@@ -1,7 +1,7 @@
 Views
 =====
 
-Views are Renderables that know how to render a specific component. This is where we can integrate it into different frameworks. Lets use the following as our base example. I would read the Getting Started guide before diving in here.
+Views are Renderables that know how to render a specific component. This is where we can integrate it into different frameworks. Let's use the following as our base example. I would read the Getting Started guide before diving in here.
 
 
 #### Component

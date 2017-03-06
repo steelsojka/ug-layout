@@ -32,7 +32,7 @@ export interface ViewConfig {
   ref?: string|null;
   resolution?: ResolverStrategy;
   useFactory?: () => any;
-  useValue?: Function;
+  useValue?: any;
   useClass?: Type<any>;
   deps?: any[];
 }

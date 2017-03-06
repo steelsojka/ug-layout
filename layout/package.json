@@ -9,7 +9,7 @@
     "docs": "esdoc",
     "docs:start": "http-server ./generated-docs",
     "docs:clean": "rm -rf ./generated-docs",
-    "pretest": "npm run build:es2015",
+    "pretest": "npm run build:test",
     "test": "ava",
     "test:coverage": "nyc ava",
     "test:watch": "chokidar 'src/**/*.ts' -c 'npm test' --initial -d 1000 --silent",
