@@ -11,8 +11,8 @@ import {
 } from '@angular/core';
 import { RootLayout, ProviderArg, Renderable, ConfiguredRenderable, Layout } from 'ug-layout';
 
+import { AngularPlugin } from './AngularPlugin';
 import { RootLayoutProviders } from './common';
-import { AngularRootLayout } from './RootLayout';
 
 @Component({
   selector: 'ug-layout-outlet',
@@ -29,20 +29,22 @@ export class UgLayoutOutletComponent implements OnChanges {
 
   @ViewChild('container', { read: ViewContainerRef })
   private _viewContainerRef: ViewContainerRef;
-  private _rootLayout: AngularRootLayout;
   private _isInitialized: boolean = false;
+  private _rootLayout: RootLayout;
 
   constructor(
-    @Inject(RootLayoutProviders) private _layoutProviders: ProviderArg[],
     @Inject(Injector) private _injector: Injector
   ) {}
 
   ngOnInit(): void {
-    this._rootLayout = AngularRootLayout.create({
-      ngInjector: this._injector,
-      viewContainerRef: this._viewContainerRef,
-      container: this._viewContainerRef.element.nativeElement,
-      providers: this._layoutProviders
+    this._rootLayout = RootLayout.create({
+      plugins: [
+        new AngularPlugin({
+          ngInjector: this._injector,
+          viewContainerRef: this._viewContainerRef
+        })  
+      ],
+      container: this._viewContainerRef.element.nativeElement
     });
 
     this._rootLayout.initialize();

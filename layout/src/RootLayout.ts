@@ -6,6 +6,7 @@ import { RootInjector } from './RootInjector';
 import { Layout } from './layout';
 import { Serialized } from './serialization';
 import { ViewManager } from './view';
+import { defaults } from './utils';
 import { Renderer, Renderable, ConfiguredRenderable, RenderableInjector } from './dom';
 import { 
   ConfigurationRef, 
@@ -15,6 +16,7 @@ import {
   RenderableArg,
   ElementRef
 } from './common';
+import { UgPlugin } from './UgPlugin';
 
 export interface RootLayoutConfig {
   use: RenderableArg<Layout>;
@@ -22,6 +24,13 @@ export interface RootLayoutConfig {
 
 export interface RootLayoutCreationConfig {
   container: HTMLElement;
+  plugins: UgPlugin[];
+  providers: ProviderArg[];
+}
+
+export interface RootLayoutCreationConfigArgs {
+  container: HTMLElement;
+  plugins?: UgPlugin[];
   providers?: ProviderArg[];
 }
 
@@ -38,7 +47,8 @@ export class RootLayout extends Renderable {
     @Inject(ConfigurationRef) protected _config: RootLayoutConfig,
     @Inject(Renderer) protected _renderer: Renderer,
     @Inject(ElementRef) protected _containerEl: HTMLElement,
-    @Inject(ViewManager) protected _viewManager: ViewManager
+    @Inject(ViewManager) protected _viewManager: ViewManager,
+    @Inject(RootConfigRef) protected _rootConfig: RootLayoutCreationConfig
   ) {
     super();
   }
@@ -108,6 +118,10 @@ export class RootLayout extends Renderable {
     this._renderer.initialize(this._containerEl);
     this._renderer.useNodeGenerator(() => this.render());
     this._isInitialized = true;
+
+    for (const plugin of this._rootConfig.plugins) {
+      plugin.initialize(this);
+    }
   }
 
   load(config: ConfiguredRenderable<RootLayout>|RootLayoutConfig): void {
@@ -132,11 +146,16 @@ export class RootLayout extends Renderable {
     return true;
   }
 
-  static create<T extends RootLayout>(config: RootLayoutCreationConfig): T {
+  static create<T extends RootLayout>(config: RootLayoutCreationConfigArgs): T {
+    const _config = defaults(config, {
+      plugins: [],
+      providers: [] 
+    }) as RootLayoutCreationConfig;
+    
     const rootInjector = new RootInjector([
       { provide: ElementRef, useValue: config.container },
       { provide: RootConfigRef, useValue: config },
-      ...config.providers ? config.providers : []
+      ..._config.providers
     ]);
 
     return RenderableInjector.fromRenderable(

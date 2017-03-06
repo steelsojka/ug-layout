@@ -9,3 +9,4 @@ export * from './RootInjector';
 export * from './XYContainer';
 export * from './layout';
 export * from './RootSerializer';
+export * from './UgPlugin';

@@ -1,8 +1,8 @@
 import { Injector, Inject, Component, ViewChild, ViewContainerRef } from '@angular/core';
-import { Row, Layout, ConfiguredRenderable, Stack } from 'ug-layout';
+import { RootLayout, Row, Layout, ConfiguredRenderable, Stack } from 'ug-layout';
 
 import { TestComponent } from './Test.component';
-import { RootLayout, RootLayoutProviders, AngularView } from '../../src';
+import { AngularView } from '../../src';
 import { Ng1TestComponent } from './Ng1Test.component';
 
 @Component({
@@ -25,11 +25,11 @@ export class AppComponent {
         child: Row.configure({
           children: [{
             use: AngularView.configure({
-              component: TestComponent
+              useClass: TestComponent
             })
           }, {
             use: AngularView.configure({
-              component: Ng1TestComponent
+              useClass: Ng1TestComponent
             })
           }]
         })
@@ -43,11 +43,11 @@ export class AppComponent {
             use: Row.configure({
               children: [{
                 use: AngularView.configure({
-                  component: TestComponent
+                  useClass: TestComponent
                 })
               }, {
                 use: AngularView.configure({
-                  component: TestComponent
+                  useClass: TestComponent
                 })
               }]
             })

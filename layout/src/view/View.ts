@@ -17,16 +17,16 @@ export class View extends Renderable {
   visibilityChanges: Observable<boolean>;
   sizeChanges: Observable<{ width: number, height: number }>;
   
-  private _viewContainer: ViewContainer<any>;
-  private _visiblityChanges: Subject<boolean> = new Subject();
-  private _sizeChanges: Subject<{ width: number, height: number }> = new Subject();
+  protected _viewContainer: ViewContainer<any>;
+  protected _visiblityChanges: Subject<boolean> = new Subject();
+  protected _sizeChanges: Subject<{ width: number, height: number }> = new Subject();
   
   constructor(
     @Inject(ContainerRef) protected _container: Renderable,
-    @Inject(ConfigurationRef) private _configuration: ViewConfig,
-    @Inject(ViewManager) private _viewManager: ViewManager,
-    @Inject(ViewFactory) private _viewFactory: ViewFactory,
-    @Inject(DocumentRef) private _document: Document
+    @Inject(ConfigurationRef) protected _configuration: ViewConfig,
+    @Inject(ViewManager) protected _viewManager: ViewManager,
+    @Inject(ViewFactory) protected _viewFactory: ViewFactory,
+    @Inject(DocumentRef) protected _document: Document
   ) {
     super();
     

@@ -5,9 +5,11 @@ import {
   ComponentRef,
   Input,
   ApplicationRef,
-  ElementRef
+  ElementRef,
+  Type
 } from '@angular/core';
 import {
+  Renderable,
   ViewFactory,
   ViewContainer,
   ViewFactoryArgs,
@@ -16,13 +18,18 @@ import {
   RootConfigRef,
   Inject,
   VIEW_CONFIG_KEY,
-  View
+  View,
+  ConfigurationRef,
+  ContainerRef,
+  ViewManager,
+  DocumentRef
 } from 'ug-layout';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/toPromise';
 
 import { AngularRootLayoutConfig } from './RootLayout';
+import { AngularPluginConfigRef, AngularPluginConfig } from './AngularPlugin';
 import {
   COMPONENT_REF_KEY,
   ViewComponentConfig,
@@ -30,32 +37,30 @@ import {
   AngularInjectorRef
 } from './common';
 
-export interface AngularViewConfig {
-  component: Type<any>;
-}
-
 export class AngularView extends View {
   private _componentFactoryResolver: ComponentFactoryResolver;
   private _isInitialized: boolean = false;
   private _ng1Bootstrapped: Subject<void> = new Subject<void>();
   private _isNg1Bootstrapped: boolean = false;
   private _isCheckingForNg1: boolean = false;
+  private _injector: Injector;
 
   constructor(
-    @Inject(RootConfigRef) private _rootConfig: AngularRootLayoutConfig
+    @Inject(RootConfigRef) private _rootConfig: AngularRootLayoutConfig,
     @Inject(ContainerRef) protected _container: Renderable,
-    @Inject(ConfigurationRef) private _configuration: AngularViewConfig,
-    @Inject(ViewManager) private _viewManager: ViewManager,
-    @Inject(ViewFactory) private _viewFactory: ViewFactory,
-    @Inject(DocumentRef) private _document: Document
-    @Inject(AngularInjectorRef) private _injector: Injector
+    @Inject(ConfigurationRef) _configuration: ViewConfig,
+    @Inject(ViewManager) _viewManager: ViewManager,
+    @Inject(ViewFactory) _viewFactory: ViewFactory,
+    @Inject(DocumentRef) _document: Document,
+    @Inject(AngularPluginConfigRef) private _pluginConfig: AngularPluginConfig
   ) {
     super(_container, _configuration, _viewManager, _viewFactory, _document);
     
+    this._injector = this._pluginConfig.ngInjector;
     this._componentFactoryResolver = this._injector.get(ComponentFactoryResolver);
     
     this._configuration = {
-      token: this._configuration.component,
+      token: this._viewFactory.getTokenFrom(this._configuration),
       useFactory: this._factory.bind(this),
       deps: [ ViewContainer ]
     };
@@ -79,7 +84,7 @@ export class AngularView extends View {
   }
 
   private async _factory<T>(config: ViewConfig, viewContainer: ViewContainer<T>): Promise<T> {
-    const token = this._configuration.component;
+    const token = this._viewFactory.getTokenFrom(this._configuration);
     
     const metadata = Reflect.getOwnMetadata(VIEW_CONFIG_KEY, token) as ViewComponentConfig;
     
@@ -101,7 +106,7 @@ export class AngularView extends View {
       await this._ng1Bootstrapped.toPromise();
     }
 
-    const token = this._configuration.component;
+    const token = this._viewFactory.getTokenFrom(this._configuration);
     const metadata = Reflect.getOwnMetadata(VIEW_CONFIG_KEY, token) as ViewComponentConfig;
     const ng1Injector = this._injector.get('$injector') as ng.auto.IInjectorService;
     const $rootScope = ng1Injector.get('$rootScope') as ng.IRootScopeService;
@@ -149,7 +154,7 @@ export class AngularView extends View {
   }
 
   private async _ng2Factory<T>(config: ViewConfig, viewContainer: ViewContainer<T>): Promise<T> {
-    const token = this._configuration.component;
+    const token = this._viewFactory.getTokenFrom(this._configuration);
     
     const componentFactory = this._componentFactoryResolver.resolveComponentFactory<T>(token);
     const injector = ReflectiveInjector.resolveAndCreate([
@@ -203,9 +208,5 @@ export class AngularView extends View {
       viewContainer,
       $element: elementRef
     };
-  }
-  
-  static configure(config: AngularViewConfig): ConfiguredRenderable<AngularView> {
-    return new ConfiguredRenderable(AngularView, config);
   }
 }

@@ -4,7 +4,7 @@ import {
   ApplicationRef
 } from '@angular/core';
 
-import { RootLayoutProviders } from './common';
+import { RootLayoutProviders, AngularInjectorRef } from './common';
 import { UgLayoutOutletComponent } from './UgLayoutOutlet.component';
 
 @NgModule({
