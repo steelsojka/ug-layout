@@ -18,7 +18,7 @@ export class View extends Renderable {
   sizeChanges: Observable<{ width: number, height: number }>;
   
   protected _viewContainer: ViewContainer<any>;
-  protected _visiblityChanges: Subject<boolean> = new Subject();
+  protected _visibilityChanges: Subject<boolean> = new Subject();
   protected _sizeChanges: Subject<{ width: number, height: number }> = new Subject();
   
   constructor(
@@ -30,7 +30,7 @@ export class View extends Renderable {
   ) {
     super();
     
-    this.visibilityChanges = this._visiblityChanges.asObservable().distinctUntilChanged();
+    this.visibilityChanges = this._visibilityChanges.asObservable().distinctUntilChanged();
     this.sizeChanges = this._sizeChanges.asObservable().distinctUntilChanged((p, c) => {
       return p.width === c.width && p.height === c.height;
     });
@@ -45,19 +45,19 @@ export class View extends Renderable {
   }
 
   get lazy(): boolean|null {
-    return get(this._configuration, 'lazy', null);
+    return this.resolveConfigProperty<boolean>('lazy');
   }
   
   get isCacheable(): boolean|null {
-    return get(this._configuration, 'cacheable', null);
+    return this.resolveConfigProperty<boolean>('cacheable');
   }
   
   get ref(): string|null {
-    return get(this._configuration, 'ref', null);
+    return this.resolveConfigProperty<string>('ref');
   }
   
   get resolution(): ResolverStrategy|null {
-    return get(this._configuration, 'resolution', null);
+    return this.resolveConfigProperty<ResolverStrategy>('resolution');
   }
   
   get token(): any|null {
@@ -87,7 +87,7 @@ export class View extends Renderable {
 
   destroy(): void {
     this._sizeChanges.complete();
-    this._visiblityChanges.complete();
+    this._visibilityChanges.complete();
 
     super.destroy();
   }
@@ -118,7 +118,7 @@ export class View extends Renderable {
   }
 
   private _postRender(): void {
-    this._visiblityChanges.next(this.isVisible());
+    this._visibilityChanges.next(this.isVisible());
     this._sizeChanges.next({ width: this.width, height: this.height });
   }
 

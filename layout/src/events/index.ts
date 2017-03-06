@@ -2,6 +2,7 @@ export * from 'rxjs/Observable';
 export * from 'rxjs/ReplaySubject';
 export * from 'rxjs/Subject';
 export * from 'rxjs/BehaviorSubject';
+export * from 'rxjs/Subscription';
 
 export * from './CancelAction';
 export * from './Cancellable';

@@ -20,6 +20,7 @@ export class ViewFactory {
   
   create<T>(args: ViewFactoryArgs): ViewContainer<T> {
     const { config, injector, container } = args;
+    const isLazy = this.resolveConfigProperty(config, 'lazy');
     
     const providers: ProviderArg[] = [
       { provide: ContainerRef, useValue: container },
@@ -31,13 +32,6 @@ export class ViewFactory {
         provide: ViewComponentRef, 
         useFactory: config.useFactory,
         deps: config.deps
-      });
-    } else if (config.useName) {
-      this._assertFactoryExists(config.useName);
-      
-      providers.push({
-        provide: ViewComponentRef,
-        useClass: (<FactoryMap>this._factories).get(config.useName)
       });
     } else if (config.useClass) {
       providers.push({ provide: ViewComponentRef, useClass: config.useClass });
@@ -51,7 +45,16 @@ export class ViewFactory {
     const viewContainer = viewInjector.get(ViewContainer) as ViewContainer<any>;
     
     viewInjector.registerProvider({ provide: ElementRef, useValue: viewContainer.element });
-    viewContainer.initialize();
+
+    // If this view is lazy and it is not already visible wait for the
+    // view to become visible before initializing the view container.
+    if (isLazy && !viewContainer.isVisible()) {
+      viewContainer.visibilityChanges
+        .takeUntil(viewContainer.visibilityChanges.filter(Boolean))
+        .subscribe({ complete: () => viewContainer.initialize() });
+    } else {
+      viewContainer.initialize();
+    }
      
     return viewContainer;
   }  

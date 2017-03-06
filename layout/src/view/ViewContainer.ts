@@ -206,9 +206,7 @@ export class ViewContainer<T> {
   }
 
   mountTo(element: HTMLElement): void {
-    if (Array.prototype.indexOf.call(element.children, this._element) === -1) {
-      element.appendChild(this._element);
-    }
+    element.appendChild(this._element);
   }
   
   mount(element: HTMLElement): void {
@@ -231,14 +229,25 @@ export class ViewContainer<T> {
     }
   }
 
-  private _executeHook(name: string, ...args: any[]): void {
-    if (isObject(this._component) && isFunction(this._component[name])) {
-      this._component[name].apply(this._component, args);
+  private _executeHook(name: string, ...args: any[]): any {
+    if (this._hasHook(name)) {
+      return this._component[name].apply(this._component, args);
     }
   }
 
-  private _onComponentReady(component: T): void {
+  private _hasHook(name: string): boolean {
+   return isObject(this._component) && isFunction(this._component[name]);
+  }
+
+  private async _onComponentReady(component: T): Promise<void> {
     this._component = component;
+
+    const result = this._executeHook('ugOnResolve', this);
+
+    if (isPromise(result)) {
+      await result;
+    }
+    
     this._status.next(ViewContainerStatus.READY);
   }
 }

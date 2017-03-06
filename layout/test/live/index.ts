@@ -94,7 +94,7 @@ const initialLayout = RootLayout.configure({
               use: View.configure({ useClass: TestView, ref: 'Account Activity' })  
             }, {
               title: 'Trade',
-              use: View.configure({ useClass: TestView, ref: 'Trade' })  
+              use: View.configure({ lazy: true, useClass: TestView, ref: 'Trade' })  
             }]
           })
         })
