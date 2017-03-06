@@ -3,10 +3,18 @@
   "destination": "./generated-docs",
   "title": "ugLayout Documentation",
   "manual": {
-    "configuration": ["./manual/Configuring Renderables.md"],
+    "configuration": [
+      "./manual/Configuring Renderables.md"
+    ],
     "usage": [
       "./manual/Getting Started.md",
-      "./manual/Views.md"
+      "./manual/Views.md",
+      "./manual/Serialization.md",
+      "./manual/XYContainers.md",
+      "./manual/Stacks.md"
+    ],
+    "advanced": [
+      "./manual/Creating Renderables.md"  
     ]
   },
   "plugins": [{

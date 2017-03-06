@@ -11,13 +11,7 @@ export interface ViewFactoryArgs {
   container: View;
 }
 
-export type FactoryMap = Map<string, ViewFactory>;
-
 export class ViewFactory {
-  constructor(
-    @Inject(ViewFactoriesRef) @Optional() protected _factories: FactoryMap|null
-  ) {}
-  
   create<T>(args: ViewFactoryArgs): ViewContainer<T> {
     const { config, injector, container } = args;
     const isLazy = this.resolveConfigProperty(config, 'lazy');
@@ -50,8 +44,8 @@ export class ViewFactory {
     // view to become visible before initializing the view container.
     if (isLazy && !viewContainer.isVisible()) {
       viewContainer.visibilityChanges
-        .takeUntil(viewContainer.visibilityChanges.filter(Boolean))
-        .subscribe({ complete: () => viewContainer.initialize() });
+        .takeUntil(viewContainer.initialized.filter(Boolean))
+        .subscribe(() => viewContainer.initialize());
     } else {
       viewContainer.initialize();
     }
@@ -66,10 +60,6 @@ export class ViewFactory {
     
     if (config.useClass) {
       return config.useClass;
-    } else if (config.useName) {
-      this._assertFactoryExists(config.useName);
-      
-      return (<FactoryMap>this._factories).get(config.useName);
     } else if (config.useFactory) {
       return config.useFactory;
     } else if (config.useValue) {
@@ -99,14 +89,4 @@ export class ViewFactory {
   }
 
   destroy(): void {}
-
-  protected _assertFactoryExists(name: string): void {
-    if (!this._factories) {
-      throw new Error('There are no configured views.');
-    }
-    
-    if (!this._factories.has(name)) {
-      throw new Error(`${name} is not a configured view.`);
-    }
-  }
 }

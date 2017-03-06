@@ -52,6 +52,11 @@ export class ViewContainer<T> {
    * @type {Observable<ViewContainerStatus>}
    */
   statusReady: Observable<ViewContainerStatus>;
+  /**
+   * Contains the state of ths views initialized state.
+   * @type {Observable<boolean>}
+   */
+  initialized: Observable<boolean>;
   containerChange: Observable<View|null>;
   attached: Observable<boolean>;
   detached: Observable<boolean>;
@@ -73,6 +78,8 @@ export class ViewContainer<T> {
   private _visibilityChanges: Subject<boolean> = new Subject();
   private _sizeChanges: Subject<{ width: number, height: number }> = new Subject();
   private _attached: Subject<boolean> = new Subject();
+  private _initialized: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  private _isInitialized: boolean = false;
   
   constructor(
     @Inject(DocumentRef) protected _document: Document,
@@ -85,6 +92,7 @@ export class ViewContainer<T> {
     this.containerChange = this._containerChange.asObservable();
     this.attached = this._attached.asObservable().filter(eq(true));
     this.detached = this._attached.asObservable().filter(eq(false));
+    this.initialized = this._initialized.asObservable();
     this.status = this._status.asObservable();
     this.statusReady = this.status.filter(eq(ViewContainerStatus.READY));
     this._element.classList.add('ug-layout__view-container-mount');
@@ -94,11 +102,7 @@ export class ViewContainer<T> {
     this.sizeChanges.subscribe(dimensions => this._executeHook('ugOnResize', dimensions));
     this.visibilityChanges.subscribe(isVisible => this._executeHook('ugOnVisibilityChange', isVisible));
     this.beforeDestroy.subscribe(event => this._executeHook('ugOnBeforeDestroy', event));
-    this.ready.then(container => this._executeHook('ugOnInit', container));
-  }
-
-  get ready(): Promise<ViewContainer<T>> {
-    return this.statusReady.toPromise().then(() => this);
+    this.initialized.subscribe(v => this._isInitialized = v);
   }
 
   get width(): number {
@@ -121,7 +125,7 @@ export class ViewContainer<T> {
     return this._element;
   }
 
-  get(token: any): any {
+  get<U>(token: any): U|null {
     return this._injector.get(token, null);
   }
 
@@ -134,6 +138,27 @@ export class ViewContainer<T> {
     this._containerChange.complete();
     this._visibilityChanges.complete();
     this._sizeChanges.complete();
+    this._initialized.complete();
+  }
+  
+  /**
+   * Waits for the component to be ready. If the component is not initialized
+   * it will be initialized. This is important when the view is lazy and hasn't
+   * been shown yet but we need to interact with the component.
+   * @async
+   * @param {{ init?: boolean }} [options={}] 
+   * @returns {Promise<ViewContainer<T>>} 
+   */
+  async ready(options: { init?: boolean } = {}): Promise<ViewContainer<T>> {
+    const { init = true } = options;
+    
+    if (!this._isInitialized && init !== false) {
+      this.initialize();  
+    }
+    
+    await this.statusReady.toPromise();
+
+    return this;
   }
 
   initialize(): void {
@@ -144,6 +169,8 @@ export class ViewContainer<T> {
     } else {
       this._onComponentReady(component);
     }
+
+    this._initialized.next(true);
   }
 
   setView(container: View|null): void {
@@ -249,5 +276,6 @@ export class ViewContainer<T> {
     }
     
     this._status.next(ViewContainerStatus.READY);
+    this._executeHook('ugOnInit', this);
   }
 }

@@ -84,7 +84,8 @@ View.configure({
 });
 ```
 
-### Component Lifecycle Hooks
+Component Lifecycle Hooks
+-------------------------
 
 These are hooks that get invoked during different points in the lifecycle of the view.
 
@@ -96,7 +97,8 @@ These are hooks that get invoked during different points in the lifecycle of the
 - ugOnVisibilityChange(isVisible: boolean) -> Invoked whenever this view becomes visible or hidden.
 - ugOnBeforeDestroy(event: BeforeDestroyEvent) -> Invoked whenever the view is about to be destroyed. The event for this hook is cancellable or can wait on an async operation. This is useful for confirming before closing or halting the closing all together. Note, this is only fired during some destroy events (ex: Tab closing), not every time the view is destroyed.
 
-### View Component
+View Component
+--------------
 
 The `ViewComponent` decorator is a special decorator used to define metadata for the view component. Many of the options for a view can be configured when configuring the view renderable as well.
 
@@ -116,4 +118,30 @@ View.configure({
 });
 ```
 
-### View Configuration
+View Configuration
+------------------
+
+A view config has the following properties:
+
+- `lazy: boolean` -> The view container won't be initialized until the view is visible for the first time. This also won't create the component until it is first shown or intialize is explicitly invoked on the ViewContainer.
+- `cacheable: boolean` -> Whether the view container and it's component should NOT be destroyed when the View renderable is destroyed. This means you can use the same component instance across different layout configurations.
+- `resolution: ResolverStrategy` -> How the view should be resolved with the ViewManager. See the section on `Resolver Strategies`.
+- `token: any` -> The token to use to store this view with the {@link ViewManager}. If using `useClass` the constructor will be used as the token. If using a factory a `token` must be provided. This token is used to resolve configuration for the component as well. 
+- `useFactory: Function` -> Use a factory to generate the component.
+- `deps: any[]` -> Depenedencies to inject into the factory function. Only applies when using `useFactory` option.
+- `useClass: Type<any>` -> A class that will be instantiated as the component. 
+- `useValue: any` -> An already create component instance.
+- `ref: string` -> A reference identifier. This is used to identify specific component references programmatically.
+
+### Resolver Strategies
+
+We can determine how a view gets resolved when it is created or asked for.
+
+- `ResolverStrategy.TRANSIENT` -> Each time a view is requested to create a component, it will always create a new one.
+- `ResolverStrategy.SINGLETON` -> Each time a view is requested to create a component, it will either return an existing instance of that component or create one that will be the single instance for that component.
+- `ResolverStrategy.REF` -> Each time a view is requested to create a component, it will either return an existing instance of that component that matches the same ref identifier given or create one that will be registered under the given ref. Note, `ref` must be provided or else an error will be thrown.
+
+Custom View Renderables
+-----------------------
+
+A {@link View} can be extended like any {@link Renderable} and can be integrated into any framework. Checkout the `ug-layout-angular` package for a View that renders Angular 1 and 2 components.
