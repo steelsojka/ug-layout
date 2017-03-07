@@ -21,8 +21,11 @@
     "option": {
       "replaces": [
         { "from": "^docs\\/", "to": "" },
-        { "from": "\\/esdoc\\.js", "to": "" }
+        { "from": "\\/esdoc\\.js", "to": "" },
+        { "from": "\\.js", "to": "" }
       ]
     }
+  }, {
+    "name": "./esdoc-plugin"
   }]
 }

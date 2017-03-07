@@ -6,7 +6,7 @@ import { Stack, StackSerializer } from './stack';
 import { RootLayout } from './RootLayout';
 import { RootLayoutSerializer, SerializedRootLayout } from './RootLayoutSerializer';
 import { View, ViewSerializer } from './view';
-import { RootLayoutRef, RenderableArg } from './common';
+import { RenderableArg } from './common';
 
 export class RootSerializer extends SerializerContainer {
   constructor(config?: SerializerContainerConfig) {

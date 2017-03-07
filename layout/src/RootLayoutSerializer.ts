@@ -2,7 +2,7 @@ import { ConfiguredRenderable } from './dom';
 import { Inject } from './di';
 import { GenericSerializer, SerializerContainer, Serializer, Serialized } from './serialization';
 import { RootLayout } from './RootLayout';
-import { RootLayoutRef, RenderableArg } from './common';
+import { RenderableArg } from './common';
 import { Layout } from './layout';
 
 export interface SerializedRootLayout extends Serialized {

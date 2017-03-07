@@ -1,6 +1,3 @@
-import { Renderable, RenderableArea } from '../dom';
-import { DropArea, DragEvent, HighlightCoordinateArgs } from '../common';
-
 /**
  * @typedef {Object} StackTabConfig
  * @property {number} maxSize The max size of the tab in pixels.
@@ -42,26 +39,3 @@ import { DropArea, DragEvent, HighlightCoordinateArgs } from '../common';
  * @property {boolean} [closeable=true] Whether the item can be closed.
  * @property {RenderableArg<TabControl>[]} [tabControls=[]] List of TabControls to use.
  */
-
-/**
- * @interface
- */
-export class DropTarget {
-  /**
-   * Handles an item being dropped on this Renderable.
-   * @param {Renderable} item 
-   * @param {DropArea} dropArea 
-   * @param {DragEvent<Renderable>} event 
-   */
-  handleDrop(item: Renderable, dropArea: DropArea, event: DragEvent<Renderable>): void {}
-  /**
-   * Calculates the highlight coordinates for the drop target.
-   * @param {HighlightCoordinateArgs} args 
-   * @returns {RenderableArea} 
-   */
-  getHighlightCoordinates(args: HighlightCoordinateArgs): RenderableArea { return {} as any; }
-  /**
-   * Invoked when the item is no longer a drop target.
-   */
-  onDropHighlightExit(): void {}
-}

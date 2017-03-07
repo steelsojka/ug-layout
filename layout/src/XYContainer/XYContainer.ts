@@ -11,7 +11,6 @@ import {
 import { Inject, Injector, Optional } from '../di';
 import { 
   ContainerRef, 
-  XYDirectionRef, 
   XYDirection,
   ConfigurationRef,
   RenderableConfig,
