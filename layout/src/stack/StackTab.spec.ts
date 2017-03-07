@@ -3,11 +3,12 @@ import { stub, spy } from 'sinon';
 import { Subject } from '../events';
 
 import { TabDragEvent } from './TabDragEvent';
+import { TabSelectionEvent } from './TabSelectionEvent';
 import { StackTab } from './StackTab';
 import { Draggable } from '../Draggable';
 import { DragHost } from '../DragHost';
 import { DocumentRef } from '../common';
-import { Renderable } from '../dom';
+import { Renderable, RenderableArea } from '../dom';
 import { getRenderable } from '../../test/unit/helpers';
 
 let stubs;
@@ -371,4 +372,99 @@ test('on drag start', t => {
   dropped.next();
   
   t.true(destroyStub.called);
+});
+
+test('on drag move', t => {
+  const tab = getTab();
+  const bounds = new RenderableArea(0, 250, 0, 50);
+
+  stub(tab, 'width', { get: () => 30 });
+  stub(tab, 'height', { get: () => 60 });
+
+  Object.assign(tab, {
+    _dragHost: {
+      bounds
+    },
+    _element: {
+      style: {}
+    }
+  });
+
+  (<any>tab)._onDragMove({ pageX: 200, pageY: 200 });
+
+  t.is((<any>tab)._element.style.transform, 'translateX(185px) translateY(50px)');
+});
+
+test('on drag stop', t => {
+  const tab = getTab();
+  const removeSpy = spy();
+  const removeChildSpy = spy();
+
+  Object.assign(tab, {
+    _isDragging: true,
+    _element: { 
+      style: {},
+      classList: {
+        remove: removeSpy
+      }
+    },
+    _document: {
+      body: {
+        removeChild: removeChildSpy
+      }
+    }
+  });
+
+  (<any>tab)._onDragStop({});
+
+  t.false(tab.isDragging);
+  t.is((<any>tab)._element.style.transform, 'translateX(0px) translateY(0px)');
+  t.true(removeSpy.called);
+  t.is(removeSpy.args[0][0], 'ug-layout__tab-dragging');
+  t.true(removeChildSpy.called);
+  t.is(removeChildSpy.args[0][0], (<any>tab)._element);
+});
+
+test('on drag host start', t => {
+  const tab = getTab();
+  const addSpy = spy();
+
+  Object.assign(tab, {
+    _element: {
+      classList: { add: addSpy }
+    }
+  });  
+
+  (<any>tab)._onDragHostStart();
+
+  t.true(addSpy.called);
+  t.is(addSpy.args[0][0], 'ug-layout__tab-drag-enabled');
+});
+
+test('on drag host dropped', t => {
+  const tab = getTab();
+  const removeSpy = spy();
+
+  Object.assign(tab, {
+    _element: {
+      classList: { remove: removeSpy }
+    }
+  });  
+
+  (<any>tab)._onDragHostDropped();
+
+  t.true(removeSpy.called);
+  t.is(removeSpy.args[0][0], 'ug-layout__tab-drag-enabled');
+});
+
+test('on tab click', t => {
+  const tab = getTab();
+  const _spy = spy();
+
+  tab.subscribe(TabSelectionEvent, _spy);
+
+  (<any>tab)._onClick();
+
+  t.true(_spy.called);
+  t.true(_spy.args[0][0] instanceof TabSelectionEvent);
 });
