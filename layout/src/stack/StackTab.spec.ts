@@ -1,7 +1,8 @@
 import test from 'ava';
-import { stub } from 'sinon';
+import { stub, spy } from 'sinon';
 import { Subject } from '../events';
 
+import { TabDragEvent } from './TabDragEvent';
 import { StackTab } from './StackTab';
 import { Draggable } from '../Draggable';
 import { DragHost } from '../DragHost';
@@ -200,21 +201,174 @@ test('resizing', t => {
   t.is((<any>tab)._height, 20);
 });
 
-test('render', t => {
-  const tab = getTab();    
-  const item = {
-    title: 'title',
-    draggable: true
-  };
+test.todo('render');
 
+test('destroy', t => {
+  const tab = getTab();
+  const destroyStub = stub();
+  const superStub = stub(Renderable.prototype, 'destroy');
+  
   Object.assign(tab, {
-    _container: {
-      isHorizontal: true,
-      isDistributed: false,
-      isTabActive: () => true  
-    }  
+    _draggable: { destroy: destroyStub }
   });
 
-  stub(tab, '_getStyles').returns({});
+  tab.destroy();
+
+  t.true(destroyStub.called);
+  t.true(superStub.called);
+});
+
+// private _getStyles
+function testGetStyles(t, config, expected): void {
+  const tab = getTab();
+
+  stub(tab, 'width', { get: () => 15 });
+  stub(tab, 'height', { get: () => 5 });
+  
+  Object.assign(tab, {
+    _config: {
+      maxSize: 10
+    },
+    _container: {
+      isHorizontal: config.horz,
+      isDistributed: config.dist,
+      width: 100,
+      height: 150
+    }
+  });
+
+  const result = (<any>tab)._getStyles();
+  
+  t.deepEqual(result, expected);
+}
+
+test('get styles horizontal, not distributed', testGetStyles, {
+  horz: true,
+  dist: false
+}, {
+  'max-width': '10px',
+  'max-height': '150px',
+  'height': '5px'
+});
+
+test('get styles horizontal, distributed', testGetStyles, {
+  horz: true,
+  dist: true
+}, {
+  'max-height': '150px',
+  'height': '5px'
+});
+
+test('get styles vertical, not distributed', testGetStyles, {
+  horz: false,
+  dist: false
+}, {
+  'max-height': '10px',
+  'max-width': '100px',
+  'width': '15px'
+});
+
+test('get styles vertical, distributed', testGetStyles, {
+  horz: false,
+  dist: true
+}, {
+  'max-width': '100px',
+  'width': '15px'
+});
+
+// _onMouseDown
+test('dragging on mouse down', t => {
+  const tab = getTab();
+  const item = { draggable: false };
+  const startDragSpy = spy();
+
+  Object.assign(tab, {
+    _draggable: { startDrag: startDragSpy }
+  });
+
   stub(tab, 'item', { get: () => item });
+
+  (<any>tab)._onMouseDown({ pageX: 15, pageY: 20 });
+
+  t.false(startDragSpy.called);
+
+  item.draggable = true;
+  (<any>tab)._onMouseDown({ pageX: 15, pageY: 20 });
+  
+  t.true(startDragSpy.called);
+  t.deepEqual(startDragSpy.args[0][0], {
+    host: tab,
+    startX: 15,
+    startY: 20
+  });
+});
+
+// _onDragStart
+test('on drag start', t => {
+  const tab = getTab();
+  const item = {};
+  const stack = {} as any;
+  const area = {};
+  const fail = new Subject();
+  const dropped = new Subject();
+  
+  const dragEventSpy = spy();
+  const dragHostInitSpy = spy();
+  const addChildSpy = spy();
+  const classListAddSpy = spy();
+  const appendChildSpy = spy();
+
+  stack.addChild = addChildSpy;
+  stub(tab, 'stack', { get: () => stack });
+  stub(tab, 'getArea').returns(area);
+  
+  const destroyStub = stub(tab, 'destroy');
+  
+  Object.assign(tab, {
+    _draggable: {},
+    _document: {
+      body: { appendChild: appendChildSpy }
+    },
+    _element: {
+      classList: { add: classListAddSpy }
+    },
+    _container: {
+      getItemFromTab: () => item,
+      getIndexOf: () => 0
+    },
+    _dragHost: {
+      fail, dropped,
+      initialize: dragHostInitSpy
+    }
+  });
+
+  tab.subscribe(TabDragEvent, dragEventSpy);
+
+  (<any>tab)._onDragStart({});
+
+  t.true(tab.isDragging);
+  t.true(dragEventSpy.called);
+  t.true(dragEventSpy.args[0][0] instanceof TabDragEvent);
+  t.true(classListAddSpy.called);
+  t.is(classListAddSpy.args[0][0], 'ug-layout__tab-dragging');
+  t.true(appendChildSpy.called);
+  t.is(appendChildSpy.args[0][0], (<any>tab)._element);
+  t.true(dragHostInitSpy.called);
+  t.deepEqual(dragHostInitSpy.args[0][0], {
+    item,
+    draggable: (<any>tab)._draggable,
+    dragArea: area
+  });
+  t.false(destroyStub.called);
+
+  fail.next();
+
+  t.true(addChildSpy.called);
+  t.is(addChildSpy.args[0][0], item);
+  t.deepEqual(addChildSpy.args[0][1], { index: 0 });
+  t.false(destroyStub.called);
+
+  dropped.next();
+  
+  t.true(destroyStub.called);
 });

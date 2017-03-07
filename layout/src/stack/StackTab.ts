@@ -209,14 +209,14 @@ export class StackTab extends Renderable {
       }
       
       result['max-height'] = `${this._container.height}px`;
-      result['height'] = this.height;
+      result['height'] = `${this.height}px`;
     } else {
       if (!this._container.isDistributed) {
         result['max-height'] = `${this._config.maxSize}px`;
       }
       
       result['max-width'] = `${this._container.width}px`;
-      result['width'] = this.width;
+      result['width'] = `${this.width}px`;
     }
     
     return result;
