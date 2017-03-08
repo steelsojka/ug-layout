@@ -32,9 +32,21 @@ export interface StackItemContainerConfig {
   tabControls?: RenderableArg<TabControl>[];
 }
 
+/**
+ * A renderable that is a direct child of a stack. Handles a renderable item.
+ * @export
+ * @class StackItemContainer
+ * @extends {Renderable}
+ * @implements {DropTarget}
+ */
 export class StackItemContainer extends Renderable implements DropTarget {
   private _controls: TabControl[] = [];
   
+  /**
+   * Creates an instance of StackItemContainer.
+   * @param {StackItemContainerConfig} _config 
+   * @param {Stack} _container 
+   */
   constructor(
     @Inject(ConfigurationRef) private _config: StackItemContainerConfig,
     @Inject(ContainerRef) protected _container: Stack
@@ -77,19 +89,19 @@ export class StackItemContainer extends Renderable implements DropTarget {
       }
     }
     
-    return this.container.offsetX;
+    return this.container.offsetY;
   }
 
   get draggable(): boolean {
-    return get(this._config, 'draggable', true);
+    return Boolean(get(this._config, 'draggable', true));
   }
   
   get droppable(): boolean {
-    return get(this._config, 'droppable', true);
+    return Boolean(get(this._config, 'droppable', true));
   }
   
   get closeable(): boolean {
-    return get(this._config, 'closeable', false);
+    return Boolean(get(this._config, 'closeable', false));
   }
 
   get title(): string {
