@@ -73,7 +73,7 @@ const initialLayout = RootLayout.configure({
       children: [{
         use: View.configure({
           cacheable: true,
-          ref: 'Account Summary',
+          ref: 'View 1',
           useClass: TestView
         })
       }, {
@@ -81,20 +81,20 @@ const initialLayout = RootLayout.configure({
           child: Stack.configure({
             children: [{
               closeable: true,
-              title: 'Account Positions',
-              use: View.configure({ useClass: TestView, cacheable: false, ref: 'Account Positions' })  
+              title: 'View 2',
+              use: View.configure({ useClass: TestView, cacheable: false, ref: 'View 2' })  
             }, {
-              title: 'Account Balances',
-              use: View.configure({ useClass: TestView, ref: 'Account Balances' })  
+              title: 'View 3',
+              use: View.configure({ useClass: TestView, ref: 'View 3' })  
             }, {
-              title: 'Order Activity',
-              use: View.configure({ useClass: TestView, ref: 'Order Activity' })  
+              title: 'View 4',
+              use: View.configure({ useClass: TestView, ref: 'View 4' })  
             }, {
-              title: 'Account Activity',
-              use: View.configure({ useClass: TestView, ref: 'Account Activity' })  
+              title: 'View 5',
+              use: View.configure({ useClass: TestView, ref: 'View 5' })  
             }, {
-              title: 'Trade',
-              use: View.configure({ lazy: true, useClass: TestView, ref: 'Trade' })  
+              title: 'View 6',
+              use: View.configure({ lazy: true, useClass: TestView, ref: 'View 6' })  
             }]
           })
         })
@@ -107,11 +107,11 @@ const initialLayout = RootLayout.configure({
             })
           ],
           children: [{
-            title: 'Order Entry',
+            title: 'View 7',
             draggable: false,
             droppable: false,
             closeable: true,
-            use: View.configure({ useClass: TestView, ref: 'Order Entry' })
+            use: View.configure({ useClass: TestView, ref: 'View 7' })
           }]
         })
       }]
