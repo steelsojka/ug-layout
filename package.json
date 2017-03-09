@@ -9,7 +9,7 @@
     "docs": "esdoc",
     "docs:start": "http-server ./generated-docs",
     "docs:clean": "rm -rf ./generated-docs",
-    "docs:publish": "git subtree push --prefix generated-docs origin gh-pages",
+    "docs:publish": "cd ../ && git subtree push --prefix layout/generated-docs origin gh-pages",
     "pretest": "npm run build:test",
     "test": "ava",
     "test:coverage": "nyc ava",
