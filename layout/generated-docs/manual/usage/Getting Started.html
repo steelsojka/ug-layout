@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">Usage</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container manual-root" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  <a href="./manual/index.html" data-ice="manualHeaderLink">Manual</a>
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <a data-ice="repoURL" href="http://github.com/steelsojka/ug-layout" class="repo-url-github">Repository</a>
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div class="manual-toc-root">
+  
+<div data-ice="manual" data-toc-name="usage">
+    <ul class="manual-toc">
+      
+    <li data-ice="manualNav" class="indent-h1 manual-color manual-color-usage" data-section-count="&#x25A0;" data-link="manual/usage/Getting Started.html"><a href="manual/usage/Getting Started.html" data-ice="link">Getting Started</a></li>
+<li data-ice="manualNav" class="indent-h1 manual-color manual-color-usage" data-section-count="&#x25A0;&#x25A0;&#x25A0;" data-link="manual/usage/Views.html"><a href="manual/usage/Views.html" data-ice="link">Views</a></li>
+<li data-ice="manualNav" class="indent-h4" data-link="manual/usage/Views.html"><a href="manual/usage/Views.html#component" data-ice="link">Component</a></li>
+<li data-ice="manualNav" class="indent-h4" data-link="manual/usage/Views.html"><a href="manual/usage/Views.html#layout" data-ice="link">Layout</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="manual/usage/Views.html"><a href="manual/usage/Views.html#view-container" data-ice="link">View Container</a></li>
+<li data-ice="manualNav" class="indent-h3" data-link="manual/usage/Views.html"><a href="manual/usage/Views.html#async-view-resolution" data-ice="link">Async View Resolution</a></li>
+<li data-ice="manualNav" class="indent-h4" data-link="manual/usage/Views.html"><a href="manual/usage/Views.html#factory" data-ice="link">Factory</a></li>
+<li data-ice="manualNav" class="indent-h4" data-link="manual/usage/Views.html"><a href="manual/usage/Views.html#ugonresolve-hook" data-ice="link">ugOnResolve Hook</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="manual/usage/Views.html"><a href="manual/usage/Views.html#component-lifecycle-hooks" data-ice="link">Component Lifecycle Hooks</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="manual/usage/Views.html"><a href="manual/usage/Views.html#view-component" data-ice="link">View Component</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="manual/usage/Views.html"><a href="manual/usage/Views.html#view-configuration" data-ice="link">View Configuration</a></li>
+<li data-ice="manualNav" class="indent-h3" data-link="manual/usage/Views.html"><a href="manual/usage/Views.html#resolver-strategies" data-ice="link">Resolver Strategies</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="manual/usage/Views.html"><a href="manual/usage/Views.html#custom-view-renderables" data-ice="link">Custom View Renderables</a></li>
+<li data-ice="manualNav" class="indent-h1 manual-color manual-color-usage" data-section-count="&#x25A0;" data-link="manual/usage/Serialization.html"><a href="manual/usage/Serialization.html" data-ice="link">Serialization</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="manual/usage/Serialization.html"><a href="manual/usage/Serialization.html#usage" data-ice="link">Usage</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="manual/usage/Serialization.html"><a href="manual/usage/Serialization.html#creating-serializers" data-ice="link">Creating Serializers</a></li>
+<li data-ice="manualNav" class="indent-h1 manual-color manual-color-usage" data-section-count="&#x25A0;&#x25A0;" data-link="manual/usage/Builtin Renderables.html"><a href="manual/usage/Builtin Renderables.html" data-ice="link">Builtin Renderables</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="manual/usage/Builtin Renderables.html"><a href="manual/usage/Builtin Renderables.html#row" data-ice="link">Row</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="manual/usage/Builtin Renderables.html"><a href="manual/usage/Builtin Renderables.html#column" data-ice="link">Column</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="manual/usage/Builtin Renderables.html"><a href="manual/usage/Builtin Renderables.html#stack" data-ice="link">Stack</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="manual/usage/Builtin Renderables.html"><a href="manual/usage/Builtin Renderables.html#layout" data-ice="link">Layout</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="manual/usage/Builtin Renderables.html"><a href="manual/usage/Builtin Renderables.html#rootlayout" data-ice="link">RootLayout</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="manual/usage/Builtin Renderables.html"><a href="manual/usage/Builtin Renderables.html#view" data-ice="link">View</a></li>
+</ul>
+  </div>
+<div data-ice="manual" data-toc-name="configuration">
+    <ul class="manual-toc">
+      
+    <li data-ice="manualNav" class="indent-h1 manual-color manual-color-configuration" data-section-count="&#x25A0;" data-link="manual/configuration/Configuring Renderables.html"><a href="manual/configuration/Configuring Renderables.html" data-ice="link">Configuring Renderables</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="manual/configuration/Configuring Renderables.html"><a href="manual/configuration/Configuring Renderables.html#resolving-renderables-and-configuration" data-ice="link">Resolving Renderables and Configuration</a></li>
+</ul>
+  </div>
+<div data-ice="manual" data-toc-name="advanced">
+    <ul class="manual-toc">
+      
+    <li data-ice="manualNav" class="indent-h1 manual-color manual-color-advanced" data-section-count="&#x25A0;" data-link="manual/advanced/Creating Renderables.html"><a href="manual/advanced/Creating Renderables.html" data-ice="link">Creating Renderables</a></li>
+</ul>
+  </div>
+<div data-ice="manual" data-toc-name="reference">
+    <ul class="manual-toc">
+      
+    <li data-ice="manualNav" class="indent-h1 manual-color manual-color-reference" data-section-count="&#x25A0;&#x25A0;&#x25A0;&#x25A0;&#x25A0;" data-link="identifiers.html"><a href="identifiers.html" data-ice="link">Reference</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="identifiers.html"><a href="identifiers.html#class" data-ice="link">Class</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="identifiers.html"><a href="identifiers.html#interface" data-ice="link">Interface</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="identifiers.html"><a href="identifiers.html#function" data-ice="link">Function</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="identifiers.html"><a href="identifiers.html#variable" data-ice="link">Variable</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="identifiers.html"><a href="identifiers.html#typedef" data-ice="link">Typedef</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="identifiers.html"><a href="identifiers.html#external" data-ice="link">External</a></li>
+</ul>
+  </div>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><div class="github-markdown">
+  <div class="manual-breadcrumb-list">
+    <a href="./manual/./index.html">Manual</a>
+    <span>&#xBB;</span>
+    <span data-ice="title">Usage</span>
+  </div>
+  <div data-ice="content"><h1 id="getting-started">Getting Started</h1>
+<p>We always start by creating a <code>RootLayout</code>.</p>
+<pre><code><code class="source-code prettyprint">import { RootLayout } from &apos;ug-layout&apos;;
+
+const root = RootLayout.create({
+  container: document.body // This can be any HTMLElement
+});</code>
+</code></pre><p>Not that we have a root layout all we need to do is configure the renderable tree.
+For configuring renderables refer to the configuration section of the docs.</p>
+<pre><code><code class="source-code prettyprint">import { RootLayout, Layout, Row, View } from &apos;ug-layout&apos;;
+
+const root = RootLayout.create({
+  container: document.body
+});
+
+root.load(
+  RootLayout.configure({
+    child: Layout.configure({
+      child: Row
+    })
+  })
+)</code>
+</code></pre><p>The above will create a layout with a single row. We haven&apos;t configured any renderables
+to occupy that row yet. This is where <code>Views</code> come into play. Views are Renderables
+that render a component that we create. We can use factories, classes, or already existing instances.
+Read the configuration for the {@link View} Renderable for more information.</p>
+<p>Let&apos;s create a basic component we want to render.</p>
+<pre><code><code class="source-code prettyprint">export class MyComponent {
+  // This hook gets fired when the component is initialized.
+  ugOnInit(container: ViewContainer): void {
+    container.mountHTML(&apos;&lt;div&gt;Hello World!&lt;/div&gt;&apos;);
+  }
+}</code>
+</code></pre><p>The <code>ViewContainer</code> is an object that contains the component instance. It&apos;s the link
+between your component and the layout framework. This seperation allows for the framework to be
+transparent to the component. You only need to expose hooks on your component.</p>
+<p>So no that our component is created lets hook it up.</p>
+<pre><code><code class="source-code prettyprint">import { RootLayout, Layout, Row, View } from &apos;ug-layout&apos;;
+
+import { MyComponent } from &apos;./MyComponent&apos;;
+
+const root = RootLayout.create({
+  container: document.body
+});
+
+root.load(
+  RootLayout.configure({
+    child: Layout.configure({
+      child: Row.configure({
+        children: [{
+          use: View.configure({
+            useClass: MyComponent
+          })
+        }, {
+          use: View.configure({
+            useClass: MyComponent
+          })
+        }]
+      })
+    })
+  })
+)</code>
+</code></pre><p>So, from this example we have a layout with a row that will render two instances of <code>MyComponet</code>. This all the configuration needed. This may seem a little verbose at first but this allows for any number of combinations of <code>Renderables</code>. Since this framework is completely extensible we can create adapters into any frameworks rendering and component engine. For example <code>ug-layout-angular</code> will render Angular 2 and Angular 1 components.</p>
+</div>
+</div>
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.5.2)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

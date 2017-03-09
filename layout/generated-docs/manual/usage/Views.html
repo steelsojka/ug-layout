@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">Usage</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container manual-root" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  <a href="./manual/index.html" data-ice="manualHeaderLink">Manual</a>
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <a data-ice="repoURL" href="http://github.com/steelsojka/ug-layout" class="repo-url-github">Repository</a>
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div class="manual-toc-root">
+  
+<div data-ice="manual" data-toc-name="usage">
+    <ul class="manual-toc">
+      
+    <li data-ice="manualNav" class="indent-h1 manual-color manual-color-usage" data-section-count="&#x25A0;" data-link="manual/usage/Getting Started.html"><a href="manual/usage/Getting Started.html" data-ice="link">Getting Started</a></li>
+<li data-ice="manualNav" class="indent-h1 manual-color manual-color-usage" data-section-count="&#x25A0;&#x25A0;&#x25A0;" data-link="manual/usage/Views.html"><a href="manual/usage/Views.html" data-ice="link">Views</a></li>
+<li data-ice="manualNav" class="indent-h4" data-link="manual/usage/Views.html"><a href="manual/usage/Views.html#component" data-ice="link">Component</a></li>
+<li data-ice="manualNav" class="indent-h4" data-link="manual/usage/Views.html"><a href="manual/usage/Views.html#layout" data-ice="link">Layout</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="manual/usage/Views.html"><a href="manual/usage/Views.html#view-container" data-ice="link">View Container</a></li>
+<li data-ice="manualNav" class="indent-h3" data-link="manual/usage/Views.html"><a href="manual/usage/Views.html#async-view-resolution" data-ice="link">Async View Resolution</a></li>
+<li data-ice="manualNav" class="indent-h4" data-link="manual/usage/Views.html"><a href="manual/usage/Views.html#factory" data-ice="link">Factory</a></li>
+<li data-ice="manualNav" class="indent-h4" data-link="manual/usage/Views.html"><a href="manual/usage/Views.html#ugonresolve-hook" data-ice="link">ugOnResolve Hook</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="manual/usage/Views.html"><a href="manual/usage/Views.html#component-lifecycle-hooks" data-ice="link">Component Lifecycle Hooks</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="manual/usage/Views.html"><a href="manual/usage/Views.html#view-component" data-ice="link">View Component</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="manual/usage/Views.html"><a href="manual/usage/Views.html#view-configuration" data-ice="link">View Configuration</a></li>
+<li data-ice="manualNav" class="indent-h3" data-link="manual/usage/Views.html"><a href="manual/usage/Views.html#resolver-strategies" data-ice="link">Resolver Strategies</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="manual/usage/Views.html"><a href="manual/usage/Views.html#custom-view-renderables" data-ice="link">Custom View Renderables</a></li>
+<li data-ice="manualNav" class="indent-h1 manual-color manual-color-usage" data-section-count="&#x25A0;" data-link="manual/usage/Serialization.html"><a href="manual/usage/Serialization.html" data-ice="link">Serialization</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="manual/usage/Serialization.html"><a href="manual/usage/Serialization.html#usage" data-ice="link">Usage</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="manual/usage/Serialization.html"><a href="manual/usage/Serialization.html#creating-serializers" data-ice="link">Creating Serializers</a></li>
+<li data-ice="manualNav" class="indent-h1 manual-color manual-color-usage" data-section-count="&#x25A0;&#x25A0;" data-link="manual/usage/Builtin Renderables.html"><a href="manual/usage/Builtin Renderables.html" data-ice="link">Builtin Renderables</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="manual/usage/Builtin Renderables.html"><a href="manual/usage/Builtin Renderables.html#row" data-ice="link">Row</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="manual/usage/Builtin Renderables.html"><a href="manual/usage/Builtin Renderables.html#column" data-ice="link">Column</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="manual/usage/Builtin Renderables.html"><a href="manual/usage/Builtin Renderables.html#stack" data-ice="link">Stack</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="manual/usage/Builtin Renderables.html"><a href="manual/usage/Builtin Renderables.html#layout" data-ice="link">Layout</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="manual/usage/Builtin Renderables.html"><a href="manual/usage/Builtin Renderables.html#rootlayout" data-ice="link">RootLayout</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="manual/usage/Builtin Renderables.html"><a href="manual/usage/Builtin Renderables.html#view" data-ice="link">View</a></li>
+</ul>
+  </div>
+<div data-ice="manual" data-toc-name="configuration">
+    <ul class="manual-toc">
+      
+    <li data-ice="manualNav" class="indent-h1 manual-color manual-color-configuration" data-section-count="&#x25A0;" data-link="manual/configuration/Configuring Renderables.html"><a href="manual/configuration/Configuring Renderables.html" data-ice="link">Configuring Renderables</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="manual/configuration/Configuring Renderables.html"><a href="manual/configuration/Configuring Renderables.html#resolving-renderables-and-configuration" data-ice="link">Resolving Renderables and Configuration</a></li>
+</ul>
+  </div>
+<div data-ice="manual" data-toc-name="advanced">
+    <ul class="manual-toc">
+      
+    <li data-ice="manualNav" class="indent-h1 manual-color manual-color-advanced" data-section-count="&#x25A0;" data-link="manual/advanced/Creating Renderables.html"><a href="manual/advanced/Creating Renderables.html" data-ice="link">Creating Renderables</a></li>
+</ul>
+  </div>
+<div data-ice="manual" data-toc-name="reference">
+    <ul class="manual-toc">
+      
+    <li data-ice="manualNav" class="indent-h1 manual-color manual-color-reference" data-section-count="&#x25A0;&#x25A0;&#x25A0;&#x25A0;&#x25A0;" data-link="identifiers.html"><a href="identifiers.html" data-ice="link">Reference</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="identifiers.html"><a href="identifiers.html#class" data-ice="link">Class</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="identifiers.html"><a href="identifiers.html#interface" data-ice="link">Interface</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="identifiers.html"><a href="identifiers.html#function" data-ice="link">Function</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="identifiers.html"><a href="identifiers.html#variable" data-ice="link">Variable</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="identifiers.html"><a href="identifiers.html#typedef" data-ice="link">Typedef</a></li>
+<li data-ice="manualNav" class="indent-h2" data-link="identifiers.html"><a href="identifiers.html#external" data-ice="link">External</a></li>
+</ul>
+  </div>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><div class="github-markdown">
+  <div class="manual-breadcrumb-list">
+    <a href="./manual/./index.html">Manual</a>
+    <span>&#xBB;</span>
+    <span data-ice="title">Usage</span>
+  </div>
+  <div data-ice="content"><h1 id="views">Views</h1>
+<p>Views are Renderables that know how to render a specific component. This is where we can integrate it into different frameworks. Let&apos;s use the following as our base example. I would read the Getting Started guide before diving in here.</p>
+<h4 id="component">Component</h4>
+<pre><code><code class="source-code prettyprint">import { ViewComponent } from &apos;ug-layout&apos;;
+
+@ViewComponent()
+export class MyComponent {
+  ugOnInit(container: ViewContainer): void {
+    container.mountHTML(&apos;&lt;div&gt;Hello World!&lt;/div&gt;&apos;);
+  }
+}</code>
+</code></pre><h4 id="layout">Layout</h4>
+<pre><code><code class="source-code prettyprint">import { RootLayout, Layout, Row, View } from &apos;ug-layout&apos;;
+
+import { MyComponent } from &apos;./MyComponent&apos;;
+
+const root = RootLayout.create({
+  container: document.body
+});
+
+root.load(
+  RootLayout.configure({
+    child: Layout.configure({
+      child: Row.configure({
+        children: [{
+          use: View.configure({
+            useClass: MyComponent
+          })
+        }]
+      })
+    })
+  })
+)</code>
+</code></pre><h2 id="view-container">View Container</h2>
+<p>The view container is a special object that manages how the component integrates with the view. It invokes hooks on the component, contains notification observables, and APIs for interacting with the layout framework. In the above example we are setting the content of the view with our components template. The view container also manages when the component is &apos;ready&apos; allowing for components to resolve asynchronously.</p>
+<h3 id="async-view-resolution">Async View Resolution</h3>
+<p>Views can have two async resolution phases. We can use a factory that returns a promise or we can use the <code>ugOnResolve</code> hook and return a promise.</p>
+<h4 id="factory">Factory</h4>
+<pre><code><code class="source-code prettyprint">View.configure({
+  useFactory: async () =&gt; {
+    const data = await service.fetchData();
+
+    return myViewFactory(data); // Returns our component instance.
+  }
+});</code>
+</code></pre><h4 id="ugonresolve-hook">ugOnResolve Hook</h4>
+<pre><code><code class="source-code prettyprint">@ViewComponent()
+class MyComponent {
+  async ugOnResolve(): Promise&lt;void&gt; {
+    this.data = await this.getData();    
+  }
+
+  ugOnInit(container: ViewContainer): void {
+    // This won&apos;t be invoked until the data is fetched.
+    container.mountHTML(&apos;&lt;div&gt;Hello World!&lt;/div&gt;&apos;);
+  }
+}
+
+View.configure({
+  useClass: MyComponent
+});</code>
+</code></pre><h2 id="component-lifecycle-hooks">Component Lifecycle Hooks</h2>
+<p>These are hooks that get invoked during different points in the lifecycle of the view.</p>
+<ul>
+<li>ugOnResolve(container: ViewContainer) -&gt; Invoked when the component is created, but before the <code>ugOnInit</code> hook. Can resolve async operations.</li>
+<li>ugOnInit(container: ViewContainer) -&gt; Invoked when the component is ready and resolved.</li>
+<li>ugOnAttach(container: ViewContainer) -&gt; Invoked when the ViewContainer is attached to it&apos;s View Renderable.</li>
+<li>ugOnDetach() -&gt; Invoked when the ViewContainer is detached from it&apos;s View Renderable. This is useful for component caching.</li>
+<li>ugOnResize(dimensions: { width: number, height: number }) -&gt; Invoked when the dimensions of the container change.</li>
+<li>ugOnVisibilityChange(isVisible: boolean) -&gt; Invoked whenever this view becomes visible or hidden.</li>
+<li>ugOnBeforeDestroy(event: BeforeDestroyEvent) -&gt; Invoked whenever the view is about to be destroyed. The event for this hook is cancellable or can wait on an async operation. This is useful for confirming before closing or halting the closing all together. Note, this is only fired during some destroy events (ex: Tab closing), not every time the view is destroyed.</li>
+</ul>
+<h2 id="view-component">View Component</h2>
+<p>The <code>ViewComponent</code> decorator is a special decorator used to define metadata for the view component. Many of the options for a view can be configured when configuring the view renderable as well.</p>
+<pre><code><code class="source-code prettyprint">@ViewComponent({
+  lazy: true,
+  cacheable: true
+})
+export class MyComponent {}
+
+// These can be overriden upon each use of the component.
+
+View.configure({
+  useClass: MyComponent,
+  lazy: false,
+  cacheable: false
+});</code>
+</code></pre><h2 id="view-configuration">View Configuration</h2>
+<p>A view config has the following properties:</p>
+<ul>
+<li><code>lazy: boolean</code> -&gt; The view container won&apos;t be initialized until the view is visible for the first time. This also won&apos;t create the component until it is first shown or intialize is explicitly invoked on the ViewContainer.</li>
+<li><code>cacheable: boolean</code> -&gt; Whether the view container and it&apos;s component should NOT be destroyed when the View renderable is destroyed. This means you can use the same component instance across different layout configurations.</li>
+<li><code>resolution: ResolverStrategy</code> -&gt; How the view should be resolved with the ViewManager. See the section on <code>Resolver Strategies</code>.</li>
+<li><code>token: any</code> -&gt; The token to use to store this view with the {@link ViewManager}. If using <code>useClass</code> the constructor will be used as the token. If using a factory a <code>token</code> must be provided. This token is used to resolve configuration for the component as well. </li>
+<li><code>useFactory: Function</code> -&gt; Use a factory to generate the component.</li>
+<li><code>deps: any[]</code> -&gt; Depenedencies to inject into the factory function. Only applies when using <code>useFactory</code> option.</li>
+<li><code>useClass: Type&lt;any&gt;</code> -&gt; A class that will be instantiated as the component. </li>
+<li><code>useValue: any</code> -&gt; An already create component instance.</li>
+<li><code>ref: string</code> -&gt; A reference identifier. This is used to identify specific component references programmatically.</li>
+</ul>
+<h3 id="resolver-strategies">Resolver Strategies</h3>
+<p>We can determine how a view gets resolved when it is created or asked for.</p>
+<ul>
+<li><code>ResolverStrategy.TRANSIENT</code> -&gt; Each time a view is requested to create a component, it will always create a new one.</li>
+<li><code>ResolverStrategy.SINGLETON</code> -&gt; Each time a view is requested to create a component, it will either return an existing instance of that component or create one that will be the single instance for that component.</li>
+<li><code>ResolverStrategy.REF</code> -&gt; Each time a view is requested to create a component, it will either return an existing instance of that component that matches the same ref identifier given or create one that will be registered under the given ref. Note, <code>ref</code> must be provided or else an error will be thrown.</li>
+</ul>
+<h2 id="custom-view-renderables">Custom View Renderables</h2>
+<p>A {@link View} can be extended like any {@link Renderable} and can be integrated into any framework. Checkout the <code>ug-layout-angular</code> package for a View that renders Angular 1 and 2 components.</p>
+</div>
+</div>
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.5.2)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

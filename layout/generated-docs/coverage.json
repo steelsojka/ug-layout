@@ -1,0 +1,681 @@
+{
+  "coverage": "43.14%",
+  "expectCount": 554,
+  "actualCount": 239,
+  "files": {
+    "docs/events/BeforeDestroyEvent.js": {
+      "expectCount": 1,
+      "actualCount": 1,
+      "undocumentLines": []
+    },
+    "docs/events/BusEvent.js": {
+      "expectCount": 11,
+      "actualCount": 11,
+      "undocumentLines": []
+    },
+    "docs/events/CancelAction.js": {
+      "expectCount": 1,
+      "actualCount": 1,
+      "undocumentLines": []
+    },
+    "docs/events/Cancellable.js": {
+      "expectCount": 3,
+      "actualCount": 3,
+      "undocumentLines": []
+    },
+    "docs/di/esdoc.js": {
+      "expectCount": 25,
+      "actualCount": 19,
+      "undocumentLines": [
+        15,
+        54,
+        32,
+        9,
+        71,
+        88
+      ]
+    },
+    "docs/stack/controls/CloseStackControl.js": {
+      "expectCount": 5,
+      "actualCount": 0,
+      "undocumentLines": [
+        3,
+        7,
+        27,
+        10,
+        4
+      ]
+    },
+    "docs/stack/tabControls/CloseTabControl.js": {
+      "expectCount": 3,
+      "actualCount": 1,
+      "undocumentLines": [
+        21,
+        11
+      ]
+    },
+    "docs/XYContainer/Column.js": {
+      "expectCount": 3,
+      "actualCount": 0,
+      "undocumentLines": [
+        6,
+        12,
+        7
+      ]
+    },
+    "docs/commands/Command.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        2
+      ]
+    },
+    "docs/common.js": {
+      "expectCount": 7,
+      "actualCount": 7,
+      "undocumentLines": []
+    },
+    "docs/dom/ConfiguredRenderable.js": {
+      "expectCount": 7,
+      "actualCount": 7,
+      "undocumentLines": []
+    },
+    "docs/view/CustomViewHookEvent.js": {
+      "expectCount": 4,
+      "actualCount": 0,
+      "undocumentLines": [
+        3,
+        11,
+        4,
+        8
+      ]
+    },
+    "docs/stack/StackHeader.js": {
+      "expectCount": 23,
+      "actualCount": 0,
+      "undocumentLines": [
+        15,
+        16,
+        68,
+        60,
+        17,
+        48,
+        39,
+        93,
+        107,
+        74,
+        130,
+        136,
+        99,
+        33,
+        51,
+        45,
+        90,
+        42,
+        71,
+        123,
+        77,
+        36,
+        30
+      ]
+    },
+    "docs/utils/Deferred.js": {
+      "expectCount": 5,
+      "actualCount": 0,
+      "undocumentLines": [
+        1,
+        2,
+        3,
+        5,
+        4
+      ]
+    },
+    "docs/esdoc.js": {
+      "expectCount": 12,
+      "actualCount": 11,
+      "undocumentLines": [
+        52
+      ]
+    },
+    "docs/DragHost.js": {
+      "expectCount": 13,
+      "actualCount": 0,
+      "undocumentLines": [
+        10,
+        8,
+        29,
+        32,
+        11,
+        35,
+        21,
+        23,
+        38,
+        102,
+        53,
+        22,
+        24
+      ]
+    },
+    "docs/Draggable.js": {
+      "expectCount": 6,
+      "actualCount": 0,
+      "undocumentLines": [
+        6,
+        7,
+        32,
+        15,
+        19,
+        22
+      ]
+    },
+    "docs/events/EventBus.js": {
+      "expectCount": 5,
+      "actualCount": 5,
+      "undocumentLines": []
+    },
+    "docs/di/Injector.js": {
+      "expectCount": 18,
+      "actualCount": 13,
+      "undocumentLines": [
+        12,
+        13,
+        178,
+        181,
+        230
+      ]
+    },
+    "docs/serialization/GenericSerializer.js": {
+      "expectCount": 5,
+      "actualCount": 5,
+      "undocumentLines": []
+    },
+    "docs/di/common.js": {
+      "expectCount": 6,
+      "actualCount": 2,
+      "undocumentLines": [
+        2,
+        1,
+        14,
+        16
+      ]
+    },
+    "docs/dom/RenderableInjector.js": {
+      "expectCount": 3,
+      "actualCount": 3,
+      "undocumentLines": []
+    },
+    "docs/di/decorators.js": {
+      "expectCount": 5,
+      "actualCount": 5,
+      "undocumentLines": []
+    },
+    "docs/layout/Layout.js": {
+      "expectCount": 1,
+      "actualCount": 1,
+      "undocumentLines": []
+    },
+    "docs/layout/LayoutSerializer.js": {
+      "expectCount": 5,
+      "actualCount": 5,
+      "undocumentLines": []
+    },
+    "docs/XYContainer/XYContainer.js": {
+      "expectCount": 20,
+      "actualCount": 0,
+      "undocumentLines": [
+        11,
+        12,
+        62,
+        13,
+        59,
+        29,
+        151,
+        148,
+        158,
+        168,
+        23,
+        52,
+        32,
+        89,
+        112,
+        127,
+        134,
+        38,
+        35,
+        26
+      ]
+    },
+    "docs/commands/MakeVisibleCommand.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        2
+      ]
+    },
+    "docs/dom/decorators.js": {
+      "expectCount": 1,
+      "actualCount": 1,
+      "undocumentLines": []
+    },
+    "docs/commands/MinimizeCommand.js": {
+      "expectCount": 4,
+      "actualCount": 0,
+      "undocumentLines": [
+        2,
+        3,
+        12,
+        9
+      ]
+    },
+    "docs/stack/controls/MinimizeStackControl.js": {
+      "expectCount": 4,
+      "actualCount": 0,
+      "undocumentLines": [
+        5,
+        9,
+        12,
+        6
+      ]
+    },
+    "docs/dom/Renderable.js": {
+      "expectCount": 39,
+      "actualCount": 36,
+      "undocumentLines": [
+        15,
+        23,
+        22
+      ]
+    },
+    "docs/dom/RenderableArea.js": {
+      "expectCount": 15,
+      "actualCount": 10,
+      "undocumentLines": [
+        8,
+        20,
+        29,
+        38,
+        47
+      ]
+    },
+    "docs/dom/Renderer.js": {
+      "expectCount": 8,
+      "actualCount": 7,
+      "undocumentLines": [
+        21
+      ]
+    },
+    "docs/RootInjector.js": {
+      "expectCount": 2,
+      "actualCount": 0,
+      "undocumentLines": [
+        18,
+        19
+      ]
+    },
+    "docs/RootLayout.js": {
+      "expectCount": 18,
+      "actualCount": 0,
+      "undocumentLines": [
+        9,
+        112,
+        10,
+        33,
+        97,
+        89,
+        24,
+        74,
+        30,
+        94,
+        82,
+        42,
+        36,
+        39,
+        45,
+        55,
+        71,
+        27
+      ]
+    },
+    "docs/RootLayoutSerializer.js": {
+      "expectCount": 5,
+      "actualCount": 0,
+      "undocumentLines": [
+        5,
+        6,
+        15,
+        20,
+        9
+      ]
+    },
+    "docs/RootSerializer.js": {
+      "expectCount": 5,
+      "actualCount": 0,
+      "undocumentLines": [
+        8,
+        9,
+        17,
+        23,
+        20
+      ]
+    },
+    "docs/XYContainer/Row.js": {
+      "expectCount": 3,
+      "actualCount": 0,
+      "undocumentLines": [
+        6,
+        12,
+        7
+      ]
+    },
+    "docs/XYContainer/Splitter.js": {
+      "expectCount": 18,
+      "actualCount": 0,
+      "undocumentLines": [
+        7,
+        8,
+        9,
+        97,
+        101,
+        21,
+        66,
+        32,
+        104,
+        38,
+        23,
+        57,
+        35,
+        71,
+        29,
+        26,
+        15,
+        16
+      ]
+    },
+    "docs/serialization/esdoc.js": {
+      "expectCount": 3,
+      "actualCount": 3,
+      "undocumentLines": []
+    },
+    "docs/serialization/SerializerContainer.js": {
+      "expectCount": 13,
+      "actualCount": 13,
+      "undocumentLines": []
+    },
+    "docs/stack/Stack.js": {
+      "expectCount": 30,
+      "actualCount": 24,
+      "undocumentLines": [
+        363,
+        244,
+        248,
+        70,
+        125,
+        67
+      ]
+    },
+    "docs/stack/controls/StackControl.js": {
+      "expectCount": 6,
+      "actualCount": 1,
+      "undocumentLines": [
+        32,
+        20,
+        26,
+        17,
+        29
+      ]
+    },
+    "docs/stack/controls/StackControlSerializer.js": {
+      "expectCount": 3,
+      "actualCount": 0,
+      "undocumentLines": [
+        2,
+        9,
+        3
+      ]
+    },
+    "docs/stack/StackItemCloseEvent.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        2
+      ]
+    },
+    "docs/stack/StackItemContainer.js": {
+      "expectCount": 25,
+      "actualCount": 2,
+      "undocumentLines": [
+        148,
+        67,
+        31,
+        34,
+        61,
+        64,
+        116,
+        124,
+        119,
+        45,
+        84,
+        50,
+        144,
+        110,
+        113,
+        73,
+        53,
+        147,
+        98,
+        165,
+        37,
+        70,
+        40
+      ]
+    },
+    "docs/stack/StackSerializer.js": {
+      "expectCount": 5,
+      "actualCount": 0,
+      "undocumentLines": [
+        7,
+        8,
+        39,
+        66,
+        11
+      ]
+    },
+    "docs/stack/StackTab.js": {
+      "expectCount": 15,
+      "actualCount": 7,
+      "undocumentLines": [
+        148,
+        40,
+        98,
+        60,
+        63,
+        123,
+        116,
+        37
+      ]
+    },
+    "docs/stack/TabCloseEvent.js": {
+      "expectCount": 1,
+      "actualCount": 1,
+      "undocumentLines": []
+    },
+    "docs/stack/tabControls/TabControl.js": {
+      "expectCount": 2,
+      "actualCount": 0,
+      "undocumentLines": [
+        2,
+        3
+      ]
+    },
+    "docs/stack/TabDragEvent.js": {
+      "expectCount": 1,
+      "actualCount": 1,
+      "undocumentLines": []
+    },
+    "docs/stack/TabSelectionEvent.js": {
+      "expectCount": 1,
+      "actualCount": 1,
+      "undocumentLines": []
+    },
+    "docs/UgPlugin.js": {
+      "expectCount": 2,
+      "actualCount": 0,
+      "undocumentLines": [
+        1,
+        2
+      ]
+    },
+    "docs/view/common.js": {
+      "expectCount": 3,
+      "actualCount": 0,
+      "undocumentLines": [
+        4,
+        3,
+        2
+      ]
+    },
+    "docs/view/View.js": {
+      "expectCount": 19,
+      "actualCount": 0,
+      "undocumentLines": [
+        10,
+        69,
+        104,
+        11,
+        64,
+        28,
+        46,
+        34,
+        31,
+        80,
+        83,
+        37,
+        52,
+        40,
+        86,
+        21,
+        43,
+        20,
+        25
+      ]
+    },
+    "docs/view/decorators.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        2
+      ]
+    },
+    "docs/view/ViewContainer.js": {
+      "expectCount": 32,
+      "actualCount": 32,
+      "undocumentLines": []
+    },
+    "docs/view/ViewFactory.js": {
+      "expectCount": 5,
+      "actualCount": 0,
+      "undocumentLines": [
+        6,
+        7,
+        73,
+        45,
+        60
+      ]
+    },
+    "docs/view/ViewManager.js": {
+      "expectCount": 14,
+      "actualCount": 0,
+      "undocumentLines": [
+        5,
+        6,
+        63,
+        68,
+        31,
+        21,
+        28,
+        41,
+        11,
+        75,
+        44,
+        49,
+        54,
+        94
+      ]
+    },
+    "docs/view/ViewSerializer.js": {
+      "expectCount": 5,
+      "actualCount": 0,
+      "undocumentLines": [
+        6,
+        7,
+        25,
+        39,
+        10
+      ]
+    },
+    "docs/XYContainer/XYContainerSerializer.js": {
+      "expectCount": 5,
+      "actualCount": 0,
+      "undocumentLines": [
+        8,
+        9,
+        31,
+        49,
+        12
+      ]
+    },
+    "docs/XYContainer/XYItemContainer.js": {
+      "expectCount": 25,
+      "actualCount": 0,
+      "undocumentLines": [
+        8,
+        121,
+        9,
+        54,
+        48,
+        30,
+        88,
+        45,
+        51,
+        57,
+        118,
+        82,
+        24,
+        36,
+        42,
+        21,
+        33,
+        39,
+        60,
+        71,
+        12,
+        103,
+        114,
+        18,
+        27
+      ]
+    },
+    "docs/utils/index.js": {
+      "expectCount": 16,
+      "actualCount": 0,
+      "undocumentLines": [
+        8,
+        67,
+        42,
+        26,
+        17,
+        14,
+        2,
+        11,
+        51,
+        5,
+        20,
+        23,
+        54,
+        37,
+        47,
+        80
+      ]
+    }
+  }
+}

@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">docs/stack/StackHeader.js | ugLayout Documentation API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  <a href="./manual/index.html" data-ice="manualHeaderLink">Manual</a>
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <a data-ice="repoURL" href="http://github.com/steelsojka/ug-layout" class="repo-url-github">Repository</a>
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/DragHost.js~DragHost.html">DragHost</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/DragHost.js~DragHostContainer.html">DragHostContainer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/Draggable.js~Draggable.html">Draggable</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/RootInjector.js~RootInjector.html">RootInjector</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/RootLayout.js~RootLayout.html">RootLayout</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/RootLayoutSerializer.js~RootLayoutSerializer.html">RootLayoutSerializer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/RootSerializer.js~RootSerializer.html">RootSerializer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/UgPlugin.js~UgPlugin.html">UgPlugin</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-interface">I</span><span data-ice="name"><span><a href="class/docs/esdoc.js~DragEvent.html">DragEvent</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-interface">I</span><span data-ice="name"><span><a href="class/docs/esdoc.js~DropTarget.html">DropTarget</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ConfigurationRef">ConfigurationRef</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ContainerRef">ContainerRef</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-DocumentRef">DocumentRef</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ElementRef">ElementRef</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-PatchRef">PatchRef</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-RootConfigRef">RootConfigRef</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-UNALLOCATED">UNALLOCATED</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-DragOptions">DragOptions</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-DropArea">DropArea</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-HighlightCoordinateArgs">HighlightCoordinateArgs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="http://reactivex.io/rxjs/class/es6/BehaviorSubject.js~BehaviorSubject.html">BehaviorSubject</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developer.mozilla.org/en-US/docs/Web/API/Document">Document</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement">HTMLElement</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html">Observable</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="http://reactivex.io/rxjs/class/es6/Subject.js~Subject.html">Subject</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="http://reactivex.io/rxjs/class/es6/Subscription.js~Subscription.html">Subscription</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">XYContainer</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/XYContainer/Column.js~Column.html">Column</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/XYContainer/Row.js~Row.html">Row</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/XYContainer/Splitter.js~Splitter.html">Splitter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/XYContainer/XYContainer.js~XYContainer.html">XYContainer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/XYContainer/XYContainerSerializer.js~XYContainerSerializer.html">XYContainerSerializer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/XYContainer/XYItemContainer.js~XYItemContainer.html">XYItemContainer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-SPLITTER_SIZE">SPLITTER_SIZE</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-MAX_RATIO_DISTRIBUTION_ITERATIONS">MAX_RATIO_DISTRIBUTION_ITERATIONS</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">commands</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/commands/Command.js~Command.html">Command</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/commands/MakeVisibleCommand.js~MakeVisibleCommand.html">MakeVisibleCommand</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/commands/MinimizeCommand.js~MinimizeCommand.html">MinimizeCommand</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">di</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/di/Injector.js~ForwardRef.html">ForwardRef</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/di/Injector.js~Injector.html">Injector</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/di/common.js~Token.html">Token</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-interface">I</span><span data-ice="name"><span><a href="class/docs/di/esdoc.js~ClassProvider.html">ClassProvider</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-interface">I</span><span data-ice="name"><span><a href="class/docs/di/esdoc.js~ExistingProvider.html">ExistingProvider</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-interface">I</span><span data-ice="name"><span><a href="class/docs/di/esdoc.js~FactoryProvider.html">FactoryProvider</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-interface">I</span><span data-ice="name"><span><a href="class/docs/di/esdoc.js~InjectionMetadata.html">InjectionMetadata</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-interface">I</span><span data-ice="name"><span><a href="class/docs/di/esdoc.js~Type.html">Type</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-interface">I</span><span data-ice="name"><span><a href="class/docs/di/esdoc.js~ValueProvider.html">ValueProvider</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-forwardRef">forwardRef</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Inject">Inject</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Injectable">Injectable</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Lazy">Lazy</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Optional">Optional</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Self">Self</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-INJECTABLE_META_KEY">INJECTABLE_META_KEY</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-INJECT_PARAM_KEY">INJECT_PARAM_KEY</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-Provider">Provider</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-ProviderArg">ProviderArg</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">dom</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/dom/ConfiguredRenderable.js~ConfiguredRenderable.html">ConfiguredRenderable</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html">Renderable</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/dom/RenderableArea.js~RenderableArea.html">RenderableArea</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/dom/RenderableInjector.js~RenderableInjector.html">RenderableInjector</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/dom/Renderer.js~Renderer.html">Renderer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-MemoizeFrom">MemoizeFrom</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-INJECTOR_KEY">INJECTOR_KEY</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-AddChildArgs">AddChildArgs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-BaseModificationArgs">BaseModificationArgs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RemoveChildArgs">RemoveChildArgs</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">events</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/events/BeforeDestroyEvent.js~BeforeDestroyEvent.html">BeforeDestroyEvent</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/events/BusEvent.js~BusEvent.html">BusEvent</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/events/CancelAction.js~CancelAction.html">CancelAction</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/events/Cancellable.js~Cancellable.html">Cancellable</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/events/EventBus.js~EventBus.html">EventBus</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-BusEventOptions">BusEventOptions</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">layout</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/layout/LayoutSerializer.js~LayoutSerializer.html">LayoutSerializer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Layout">Layout</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-LayoutConfig">LayoutConfig</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-SerializedLayout">SerializedLayout</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">serialization</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/serialization/GenericSerializer.js~GenericSerializer.html">GenericSerializer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/serialization/SerializerContainer.js~SerializerContainer.html">SerializerContainer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/serialization/esdoc.js~Serializer.html">Serializer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-Serialized">Serialized</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-SerializerContainerConfig">SerializerContainerConfig</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">stack</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/stack/Stack.js~Stack.html">Stack</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/stack/StackHeader.js~StackHeader.html">StackHeader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/stack/StackItemCloseEvent.js~StackItemCloseEvent.html">StackItemCloseEvent</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/stack/StackItemContainer.js~StackItemContainer.html">StackItemContainer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/stack/StackSerializer.js~StackSerializer.html">StackSerializer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/stack/StackTab.js~StackTab.html">StackTab</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/stack/TabCloseEvent.js~TabCloseEvent.html">TabCloseEvent</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/stack/TabDragEvent.js~TabDragEvent.html">TabDragEvent</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/stack/TabSelectionEvent.js~TabSelectionEvent.html">TabSelectionEvent</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-DEFAULT_STACK_HEADER_SIZE">DEFAULT_STACK_HEADER_SIZE</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-StackConfig">StackConfig</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-StackConfigArgs">StackConfigArgs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-StackItemContainerConfig">StackItemContainerConfig</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-StackTabConfig">StackTabConfig</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-StackTabConfigArgs">StackTabConfigArgs</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">stack/controls</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/stack/controls/CloseStackControl.js~CloseStackControl.html">CloseStackControl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/stack/controls/MinimizeStackControl.js~MinimizeStackControl.html">MinimizeStackControl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/stack/controls/StackControl.js~StackControl.html">StackControl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/stack/controls/StackControlSerializer.js~StackControlSerializer.html">StackControlSerializer</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">stack/tabControls</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/stack/tabControls/CloseTabControl.js~CloseTabControl.html">CloseTabControl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/stack/tabControls/TabControl.js~TabControl.html">TabControl</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">utils</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/utils/Deferred.js~Deferred.html">Deferred</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-clamp">clamp</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-defaults">defaults</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-eq">eq</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-get">get</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isBoolean">isBoolean</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isFunction">isFunction</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isNumber">isNumber</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isObject">isObject</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isPromise">isPromise</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isString">isString</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isUndefined">isUndefined</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-negate">negate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-partition">partition</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-propEq">propEq</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-round">round</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-uid">uid</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">view</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/view/CustomViewHookEvent.js~CustomViewHookEvent.html">CustomViewHookEvent</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/view/View.js~View.html">View</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/view/ViewContainer.js~ViewContainer.html">ViewContainer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/view/ViewFactory.js~ViewFactory.html">ViewFactory</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/view/ViewManager.js~ViewManager.html">ViewManager</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/view/ViewSerializer.js~ViewSerializer.html">ViewSerializer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ViewComponent">ViewComponent</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-VIEW_CONFIG_KEY">VIEW_CONFIG_KEY</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ViewComponentRef">ViewComponentRef</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ViewFactoriesRef">ViewFactoriesRef</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">docs/stack/StackHeader.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import { VNode } from &apos;snabbdom/vnode&apos;;
+import h from &apos;snabbdom/h&apos;;
+
+import { Inject, Injector } from &apos;../di&apos;;
+import { 
+  Renderable, 
+  RenderableInjector, 
+  ConfiguredRenderable, 
+  RenderableArea,
+  AddChildArgs,
+  RemoveChildArgs
+} from &apos;../dom&apos;;
+import { Stack } from &apos;./Stack&apos;;
+import { Draggable } from &apos;../Draggable&apos;;
+import { DragHost } from &apos;../DragHost&apos;;
+import { StackTab, StackTabConfigArgs } from &apos;./StackTab&apos;;
+import { TabCloseEvent } from &apos;./TabCloseEvent&apos;;
+import { TabSelectionEvent } from &apos;./TabSelectionEvent&apos;;
+import { TabDragEvent } from &apos;./TabDragEvent&apos;;
+import { get, isNumber, partition, propEq } from &apos;../utils&apos;;
+import { 
+  ConfigurationRef, 
+  ContainerRef, 
+  DropTarget, 
+  DropArea, 
+  HighlightCoordinateArgs,
+  DragEvent,
+  RenderableArg
+} from &apos;../common&apos;;
+import { Subject, Observable, BeforeDestroyEvent } from &apos;../events&apos;;
+import { StackControl, StackControlPosition } from &apos;./controls&apos;;
+import { StackItemContainer } from &apos;./StackItemContainer&apos;;
+
+export interface StackHeaderConfig {
+  size: number;
+  distribute: boolean;
+  droppable: boolean;
+}
+
+export type StackHeaderConfigArgs = {
+  [P in keyof StackHeaderConfig]?: StackHeaderConfig[P];
+}
+
+export const DEFAULT_STACK_HEADER_SIZE = 25;
+
+export class StackHeader extends Renderable implements DropTarget {
+  protected _contentItems: StackTab[] = [];
+  private _controls: StackControl[] = [];
+  private _config: StackHeaderConfig;
+  private _tabAreas: RenderableArea[];
+  
+  constructor(
+    @Inject(ConfigurationRef) _config: StackHeaderConfigArgs|null,
+    @Inject(ContainerRef) protected _container: Stack,
+    @Inject(DragHost) protected _dragHost: DragHost
+  ) {
+    super();
+    
+    this._config = Object.assign({
+      controls: [],
+      size: DEFAULT_STACK_HEADER_SIZE,
+      droppable: true,
+      distribute: false
+    }, _config);
+  } 
+
+  get width(): number {
+    return this._container.isHorizontal ? this._container.width : this._config.size;
+  }
+
+  get height(): number {
+    return this._container.isHorizontal ? this._config.size : this._container.height;
+  }
+
+  get size(): number {
+    return get(this._config, &apos;size&apos;, DEFAULT_STACK_HEADER_SIZE);
+  }
+
+  get droppable(): boolean {
+    return get(this._config, &apos;droppable&apos;, true);
+  }
+
+  get isHorizontal(): boolean {
+    return this._container.isHorizontal;
+  }
+
+  get isDistributed(): boolean {
+    return get(this._config, &apos;distribute&apos;, false);
+  }
+
+  get controls(): StackControl[] {
+    return this._controls.slice(0);
+  }
+
+  initialize(): void {
+    super.initialize();
+    
+    this._dragHost.start
+      .takeUntil(this.destroyed)
+      .subscribe(this._onDragHostStart.bind(this));
+      
+    this._dragHost.dropped
+      .takeUntil(this.destroyed)
+      .subscribe(this._onDragHostDropped.bind(this));
+  }
+
+  addTab(config: StackTabConfigArgs, options: AddChildArgs = {}): StackTab {
+    const tab = this.createChild(new ConfiguredRenderable(StackTab, config), [ Draggable ]);
+
+    tab.subscribe(TabSelectionEvent, e =&gt; this.emit(e));
+    tab.subscribe(TabCloseEvent, e =&gt; this.emit(e));
+    tab.subscribe(TabDragEvent, e =&gt; this.emit(e));
+
+    this.addChild(tab, options);
+
+    return tab;
+  }
+
+  addControl(_control: RenderableArg&lt;StackControl&gt;): void {
+    this._controls.push(this.createChild(_control));
+  }
+
+  isTabActive(tab: StackTab): boolean {
+    return this._container.isActiveTab(tab);
+  }
+
+  getItemFromTab(tab: StackTab): StackItemContainer|null {
+    return this._container.getAtIndex(this.getIndexOf(tab)) as StackItemContainer|null;
+  }
+
+  render(): VNode {
+    const [ postTabControls, preTabControls ] = partition(
+      this._controls.filter(c =&gt; c.isActive()),
+      propEq(&apos;position&apos;, StackControlPosition.POST_TAB)
+    );
+
+    return h(&apos;div.ug-layout__stack-header&apos;, {
+      style: {
+        height: `${this.height}px`,
+        width: `${this.width}px`
+      }
+    }, 
+      [
+        h(&apos;div.ug-layout__stack-controls&apos;, preTabControls.map(c =&gt; c.render())),
+        h(&apos;div.ug-layout__tab-container&apos;, this._contentItems.map(tab =&gt; tab.render())),
+        h(&apos;div.ug-layout__stack-controls&apos;, postTabControls.map(c =&gt; c.render()))
+      ]
+    );
+  }
+
+  isDroppable(): boolean {
+    return this.droppable;
+  }
+
+  getChildren(): Renderable[] {
+    return [
+      ...this._controls,
+      ...this._contentItems
+    ];
+  }
+
+  handleDrop(item: Renderable, dropArea: DropArea, e: DragEvent&lt;Renderable&gt;): void {
+    const index = this._getIndexFromArea(e.pageX, e.pageY, dropArea.area) + 1;
+    
+    if (item instanceof StackItemContainer &amp;&amp; this._container.getIndexOf(item) === -1) {
+      this._container.addChild(item, { index });
+      this._container.setActiveIndex(index);
+    } 
+
+    this.onDropHighlightExit();
+  }
+
+  getHighlightCoordinates(args: HighlightCoordinateArgs): RenderableArea {
+    let { pageX, pageY, dragArea, dropArea: { item, area: { x, x2, y, y2, height } } } = args;
+    
+    const highlightArea = new RenderableArea(x, dragArea.width + x, y, y2);
+    let leftMostTabIndex = this._getIndexFromArea(pageX, pageY, args.dropArea.area);
+    let leftMostTabArea = this._tabAreas[leftMostTabIndex];
+
+    if (leftMostTabArea) {
+      highlightArea.x = leftMostTabArea.x2;
+      highlightArea.x2 = leftMostTabArea.x2 + dragArea.width;
+    }
+
+    for (const [ index, tab ] of this._contentItems.entries()) {
+      if (!tab.isDragging) {
+        tab.element.style.transform = index &gt; leftMostTabIndex ? `translateX(${dragArea.width}px)` : &apos;translateX(0px)&apos;;
+      }
+    }
+    
+    return highlightArea;
+  }
+
+  onDropHighlightExit(): void {
+    for (const tab of this._contentItems) {
+      if (!tab.isDragging) {
+        tab.element.style.transform = &apos;translateX(0px)&apos;;
+      }
+    }
+  }
+
+  getOffsetXForTab(tab: StackTab): number {
+    if (this.isHorizontal) {
+      return this._contentItems.slice(0, this.getIndexOf(tab)).reduce((result, tab) =&gt; result + tab.width, this.offsetX);
+    }
+    
+    return this.offsetX;
+  }
+  
+  getOffsetYForTab(tab: StackTab): number {
+    if (!this.isHorizontal) {
+      return this._contentItems.slice(0, this.getIndexOf(tab)).reduce((result, tab) =&gt; result + tab.height, this.offsetY);
+    }
+
+    return this.offsetY;
+  }
+
+  private _onDragHostStart(): void {
+    this._tabAreas = this._contentItems.map(tab =&gt; tab.getArea());
+  }
+  
+  private _onDragHostDropped(): void {
+    this._tabAreas = [];
+  }
+
+  private _getIndexFromArea(pageX: number, pageY: number, area: RenderableArea): number {
+    let { x, y } = area;
+    
+    const deltaX = pageX - x;
+    const deltaY = pageY - y;
+
+    let result = -1;
+
+    for (const [ index, tabArea ] of this._tabAreas.entries()) {
+      if (deltaX &gt;= (tabArea.x - x) + (tabArea.width / 2)) {
+        result = index;
+      }
+    }
+
+    return result;
+  }
+}</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.5.2)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

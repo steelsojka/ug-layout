@@ -1,0 +1,79 @@
+{
+  "name": "ug-layout",
+  "version": "1.0.0",
+  "description": "An extensible and performant layout management framework.",
+  "main": "dist/es5/index.js",
+  "typings": "dist/es5/index.d.ts",
+  "scripts": {
+    "predocs": "npm run build:docs && npm run docs:clean",
+    "docs": "esdoc",
+    "docs:start": "http-server ./generated-docs",
+    "docs:clean": "rm -rf ./generated-docs",
+    "docs:publish": "git subtree push --prefix generated-docs origin gh-pages",
+    "pretest": "npm run build:test",
+    "test": "ava",
+    "test:coverage": "nyc ava",
+    "test:watch": "chokidar 'src/**/*.ts' -c 'npm test' --initial -d 1000 --silent",
+    "prebuild": "npm run build:clean",
+    "prebuild:test": "npm run build:clean",
+    "prebuild:docs": "npm run build:clean",
+    "build": "npm run build:es2015 && npm run build:es5",
+    "build:clean": "rm -rf dist",
+    "build:docs": "tsc -p tsconfig.docs.json",
+    "build:test": "tsc -p tsconfig.test.json",
+    "build:es2015": "tsc -p tsconfig.es2015.json",
+    "build:es5": "babel dist/es2015 --copy-files --ignore .map --out-dir dist/es5 --source-maps",
+    "start": "webpack-dev-server"
+  },
+  "author": "steelsojka@gmail.com",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/steelsojka/ug-layout"
+  },
+  "devDependencies": {
+    "@types/node": "^7.0.5",
+    "@types/reflect-metadata": "0.0.5",
+    "@types/sinon": "^1.16.34",
+    "ava": "^0.18.2",
+    "babel-cli": "^6.22.2",
+    "babel-core": "^6.22.1",
+    "babel-loader": "^6.2.10",
+    "babel-polyfill": "^6.23.0",
+    "babel-preset-es2015": "^6.22.0",
+    "chokidar-cli": "^1.2.0",
+    "css-loader": "^0.26.1",
+    "esdoc": "^0.5.2",
+    "esdoc-importpath-plugin": "^0.1.1",
+    "file-loader": "^0.10.0",
+    "http-server": "^0.9.0",
+    "nyc": "^10.1.2",
+    "reflect-metadata": "^0.1.9",
+    "sinon": "^1.17.7",
+    "style-loader": "^0.13.1",
+    "ts-loader": "^2.0.0",
+    "ts-node": "^2.1.0",
+    "typedoc": "^0.5.7",
+    "typescript": "^2.2.1",
+    "webpack": "^2.2.1",
+    "webpack-dev-server": "^2.2.1"
+  },
+  "dependencies": {
+    "rxjs": "^5.1.0",
+    "snabbdom": "^0.6.3",
+    "tslib": "^1.5.0"
+  },
+  "ava": {
+    "files": [
+      "dist/test/**/*.spec.js"
+    ],
+    "source": [
+      "dist/test/**/*.ts",
+      "!dist/test/**/*.spec.ts"
+    ],
+    "require": [
+      "babel-register",
+      "./test/unit/setup.ts"
+    ]
+  }
+}
