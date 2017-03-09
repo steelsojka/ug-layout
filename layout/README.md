@@ -1,7 +1,9 @@
-(U)ltra (G)oodness Layout
-=========================
+UgLayout
+========
 
-ugLayout is a perfomant, highly extensible framework for making configureable layouts with components.
+(Ug)h Free (Layout) Management.
+
+UgLayout is a perfomant, highly extensible framework for making configureable layouts with components.
 
 Concepts
 --------
@@ -23,18 +25,25 @@ Basic Useage
 ------------
 
 ```
-import { RootLayout, Layout, Column } from 'ug-layout';
+import { RootLayout, Layout, View } from 'ug-layout';
+
+// My component to use.
+class MyComponent {
+  ugOnInit(container) {
+    container.mountHTML('<div>Hello World!!</div>');
+  }
+}
 
 // The configuration for the layout (tree of Renderables)
 const configuration = RootLayout.configure({
   child: Layout.configure({
-    child: Column  
+    child: View.configure({ useClass: MyComponent })
   })
 });
 
 // Creates the root alyout instance.
 const layout = RootLayout.create({
-  container: documentk.body
+  container: document.body
 });
 
 // Load the configuration

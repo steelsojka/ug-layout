@@ -1,7 +1,7 @@
 {
   "name": "ug-layout",
   "version": "1.0.0",
-  "description": "",
+  "description": "An extensible and performant layout management framework.",
   "main": "dist/es5/index.js",
   "typings": "dist/es5/index.d.ts",
   "scripts": {
@@ -24,8 +24,12 @@
     "build:es5": "babel dist/es2015 --copy-files --ignore .map --out-dir dist/es5 --source-maps",
     "start": "webpack-dev-server"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "steelsojka@gmail.com",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/steelsojka/ug-layout"
+  },
   "devDependencies": {
     "@types/node": "^7.0.5",
     "@types/reflect-metadata": "0.0.5",
