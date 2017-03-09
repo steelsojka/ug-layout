@@ -41,7 +41,7 @@ const configuration = RootLayout.configure({
   })
 });
 
-// Creates the root alyout instance.
+// Creates the root layout instance.
 const layout = RootLayout.create({
   container: document.body
 });
