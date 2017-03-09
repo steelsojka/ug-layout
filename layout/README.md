@@ -1,9 +1,11 @@
 UgLayout
 ========
 
-(Ug)h Free (Layout) Management.
+**Ug**h Free **Layout** Management.
 
 UgLayout is a perfomant, highly extensible framework for making configureable layouts with components.
+
+- [Documentation](https://steelsojka.github.io/ug-layout/)
 
 Concepts
 --------
@@ -51,3 +53,4 @@ layout.load(configuration);
 ```
 
 The example above will render the layout into the container element. This example is the most BASIC example. Please resort to the manual for more complex scenarios.
+

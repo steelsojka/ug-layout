@@ -1,9 +1,11 @@
 UgLayout
 ========
 
-(Ug)h Free (Layout) Management.
+**Ug**h Free **Layout** Management.
 
 UgLayout is a perfomant, highly extensible framework for making configureable layouts with components.
+
+- [Documentation](https://steelsojka.github.io/ug-layout/)
 
 Concepts
 --------
@@ -41,7 +43,7 @@ const configuration = RootLayout.configure({
   })
 });
 
-// Creates the root layout instance.
+// Creates the root alyout instance.
 const layout = RootLayout.create({
   container: document.body
 });
