@@ -1,0 +1,258 @@
+{
+  "type": "File",
+  "start": 0,
+  "end": 598,
+  "loc": {
+    "start": {
+      "line": 1,
+      "column": 0
+    },
+    "end": {
+      "line": 14,
+      "column": 33
+    }
+  },
+  "program": {
+    "type": "Program",
+    "start": 0,
+    "end": 598,
+    "loc": {
+      "start": {
+        "line": 1,
+        "column": 0
+      },
+      "end": {
+        "line": 14,
+        "column": 33
+      }
+    },
+    "sourceType": "module",
+    "body": [],
+    "directives": [],
+    "leadingComments": null,
+    "innerComments": [
+      {
+        "type": "CommentBlock",
+        "value": "*\n * @typedef {Object} BaseModificationArgs\n * @property {boolean} [render] Whether to invoke the render cycle. This is useful for delaying the render cycle to a later time.\n ",
+        "start": 0,
+        "end": 179,
+        "loc": {
+          "start": {
+            "line": 1,
+            "column": 0
+          },
+          "end": {
+            "line": 4,
+            "column": 3
+          }
+        }
+      },
+      {
+        "type": "CommentBlock",
+        "value": "*\n * @typedef {BaseModificationArgs} RemoveChildArgs\n * @property {boolean} [destroy] Whether to destroy the child being removed.\n ",
+        "start": 180,
+        "end": 315,
+        "loc": {
+          "start": {
+            "line": 5,
+            "column": 0
+          },
+          "end": {
+            "line": 8,
+            "column": 3
+          }
+        }
+      },
+      {
+        "type": "CommentBlock",
+        "value": "*\n * @typedef {BaseModificationArgs} AddChildArgs\n * @property {number} [index] What index to add the child renderable to. If not provided then it will be pushed.\n * @property {boolean} [resize] Whether to invoke a resize of this renderable.\n ",
+        "start": 316,
+        "end": 563,
+        "loc": {
+          "start": {
+            "line": 9,
+            "column": 0
+          },
+          "end": {
+            "line": 13,
+            "column": 3
+          }
+        }
+      },
+      {
+        "type": "CommentLine",
+        "value": "# sourceMappingURL=esdoc.js.map",
+        "start": 565,
+        "end": 598,
+        "loc": {
+          "start": {
+            "line": 14,
+            "column": 0
+          },
+          "end": {
+            "line": 14,
+            "column": 33
+          }
+        }
+      }
+    ]
+  },
+  "comments": [
+    {
+      "type": "CommentBlock",
+      "value": "*\n * @typedef {Object} BaseModificationArgs\n * @property {boolean} [render] Whether to invoke the render cycle. This is useful for delaying the render cycle to a later time.\n ",
+      "start": 0,
+      "end": 179,
+      "loc": {
+        "start": {
+          "line": 1,
+          "column": 0
+        },
+        "end": {
+          "line": 4,
+          "column": 3
+        }
+      }
+    },
+    {
+      "type": "CommentBlock",
+      "value": "*\n * @typedef {BaseModificationArgs} RemoveChildArgs\n * @property {boolean} [destroy] Whether to destroy the child being removed.\n ",
+      "start": 180,
+      "end": 315,
+      "loc": {
+        "start": {
+          "line": 5,
+          "column": 0
+        },
+        "end": {
+          "line": 8,
+          "column": 3
+        }
+      }
+    },
+    {
+      "type": "CommentBlock",
+      "value": "*\n * @typedef {BaseModificationArgs} AddChildArgs\n * @property {number} [index] What index to add the child renderable to. If not provided then it will be pushed.\n * @property {boolean} [resize] Whether to invoke a resize of this renderable.\n ",
+      "start": 316,
+      "end": 563,
+      "loc": {
+        "start": {
+          "line": 9,
+          "column": 0
+        },
+        "end": {
+          "line": 13,
+          "column": 3
+        }
+      }
+    },
+    {
+      "type": "CommentLine",
+      "value": "# sourceMappingURL=esdoc.js.map",
+      "start": 565,
+      "end": 598,
+      "loc": {
+        "start": {
+          "line": 14,
+          "column": 0
+        },
+        "end": {
+          "line": 14,
+          "column": 33
+        }
+      }
+    }
+  ],
+  "tokens": [
+    {
+      "type": "CommentBlock",
+      "value": "*\n * @typedef {Object} BaseModificationArgs\n * @property {boolean} [render] Whether to invoke the render cycle. This is useful for delaying the render cycle to a later time.\n ",
+      "start": 0,
+      "end": 179,
+      "loc": {
+        "start": {
+          "line": 1,
+          "column": 0
+        },
+        "end": {
+          "line": 4,
+          "column": 3
+        }
+      }
+    },
+    {
+      "type": "CommentBlock",
+      "value": "*\n * @typedef {BaseModificationArgs} RemoveChildArgs\n * @property {boolean} [destroy] Whether to destroy the child being removed.\n ",
+      "start": 180,
+      "end": 315,
+      "loc": {
+        "start": {
+          "line": 5,
+          "column": 0
+        },
+        "end": {
+          "line": 8,
+          "column": 3
+        }
+      }
+    },
+    {
+      "type": "CommentBlock",
+      "value": "*\n * @typedef {BaseModificationArgs} AddChildArgs\n * @property {number} [index] What index to add the child renderable to. If not provided then it will be pushed.\n * @property {boolean} [resize] Whether to invoke a resize of this renderable.\n ",
+      "start": 316,
+      "end": 563,
+      "loc": {
+        "start": {
+          "line": 9,
+          "column": 0
+        },
+        "end": {
+          "line": 13,
+          "column": 3
+        }
+      }
+    },
+    {
+      "type": "CommentLine",
+      "value": "# sourceMappingURL=esdoc.js.map",
+      "start": 565,
+      "end": 598,
+      "loc": {
+        "start": {
+          "line": 14,
+          "column": 0
+        },
+        "end": {
+          "line": 14,
+          "column": 33
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "eof",
+        "beforeExpr": false,
+        "startsExpr": false,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null,
+        "updateContext": null
+      },
+      "start": 598,
+      "end": 598,
+      "loc": {
+        "start": {
+          "line": 14,
+          "column": 33
+        },
+        "end": {
+          "line": 14,
+          "column": 33
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">docs/view/ViewContainer.js | ugLayout Documentation API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  <a href="./manual/index.html" data-ice="manualHeaderLink">Manual</a>
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <a data-ice="repoURL" href="http://github.com/steelsojka/ug-layout" class="repo-url-github">Repository</a>
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/DragHost.js~DragHost.html">DragHost</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/DragHost.js~DragHostContainer.html">DragHostContainer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/Draggable.js~Draggable.html">Draggable</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/RootInjector.js~RootInjector.html">RootInjector</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/RootLayout.js~RootLayout.html">RootLayout</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/RootLayoutSerializer.js~RootLayoutSerializer.html">RootLayoutSerializer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/RootSerializer.js~RootSerializer.html">RootSerializer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/UgPlugin.js~UgPlugin.html">UgPlugin</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-interface">I</span><span data-ice="name"><span><a href="class/docs/esdoc.js~DragEvent.html">DragEvent</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-interface">I</span><span data-ice="name"><span><a href="class/docs/esdoc.js~DropTarget.html">DropTarget</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ConfigurationRef">ConfigurationRef</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ContainerRef">ContainerRef</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-DocumentRef">DocumentRef</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ElementRef">ElementRef</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-PatchRef">PatchRef</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-RootConfigRef">RootConfigRef</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-UNALLOCATED">UNALLOCATED</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-DragOptions">DragOptions</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-DropArea">DropArea</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-HighlightCoordinateArgs">HighlightCoordinateArgs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="http://reactivex.io/rxjs/class/es6/BehaviorSubject.js~BehaviorSubject.html">BehaviorSubject</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developer.mozilla.org/en-US/docs/Web/API/Document">Document</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement">HTMLElement</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html">Observable</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="http://reactivex.io/rxjs/class/es6/Subject.js~Subject.html">Subject</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="http://reactivex.io/rxjs/class/es6/Subscription.js~Subscription.html">Subscription</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">XYContainer</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/XYContainer/Column.js~Column.html">Column</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/XYContainer/Row.js~Row.html">Row</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/XYContainer/Splitter.js~Splitter.html">Splitter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/XYContainer/XYContainer.js~XYContainer.html">XYContainer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/XYContainer/XYContainerSerializer.js~XYContainerSerializer.html">XYContainerSerializer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/XYContainer/XYItemContainer.js~XYItemContainer.html">XYItemContainer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-SPLITTER_SIZE">SPLITTER_SIZE</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-MAX_RATIO_DISTRIBUTION_ITERATIONS">MAX_RATIO_DISTRIBUTION_ITERATIONS</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">commands</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/commands/Command.js~Command.html">Command</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/commands/MakeVisibleCommand.js~MakeVisibleCommand.html">MakeVisibleCommand</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/commands/MinimizeCommand.js~MinimizeCommand.html">MinimizeCommand</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">di</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/di/Injector.js~ForwardRef.html">ForwardRef</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/di/Injector.js~Injector.html">Injector</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/di/common.js~Token.html">Token</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-interface">I</span><span data-ice="name"><span><a href="class/docs/di/esdoc.js~ClassProvider.html">ClassProvider</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-interface">I</span><span data-ice="name"><span><a href="class/docs/di/esdoc.js~ExistingProvider.html">ExistingProvider</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-interface">I</span><span data-ice="name"><span><a href="class/docs/di/esdoc.js~FactoryProvider.html">FactoryProvider</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-interface">I</span><span data-ice="name"><span><a href="class/docs/di/esdoc.js~InjectionMetadata.html">InjectionMetadata</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-interface">I</span><span data-ice="name"><span><a href="class/docs/di/esdoc.js~Type.html">Type</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-interface">I</span><span data-ice="name"><span><a href="class/docs/di/esdoc.js~ValueProvider.html">ValueProvider</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-forwardRef">forwardRef</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Inject">Inject</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Injectable">Injectable</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Lazy">Lazy</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Optional">Optional</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Self">Self</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-INJECTABLE_META_KEY">INJECTABLE_META_KEY</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-INJECT_PARAM_KEY">INJECT_PARAM_KEY</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-Provider">Provider</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-ProviderArg">ProviderArg</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">dom</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/dom/ConfiguredRenderable.js~ConfiguredRenderable.html">ConfiguredRenderable</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html">Renderable</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/dom/RenderableArea.js~RenderableArea.html">RenderableArea</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/dom/RenderableInjector.js~RenderableInjector.html">RenderableInjector</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/dom/Renderer.js~Renderer.html">Renderer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-MemoizeFrom">MemoizeFrom</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-INJECTOR_KEY">INJECTOR_KEY</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-AddChildArgs">AddChildArgs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-BaseModificationArgs">BaseModificationArgs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RemoveChildArgs">RemoveChildArgs</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">events</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/events/BeforeDestroyEvent.js~BeforeDestroyEvent.html">BeforeDestroyEvent</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/events/BusEvent.js~BusEvent.html">BusEvent</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/events/CancelAction.js~CancelAction.html">CancelAction</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/events/Cancellable.js~Cancellable.html">Cancellable</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/events/EventBus.js~EventBus.html">EventBus</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-BusEventOptions">BusEventOptions</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">layout</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/layout/LayoutSerializer.js~LayoutSerializer.html">LayoutSerializer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Layout">Layout</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-LayoutConfig">LayoutConfig</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-SerializedLayout">SerializedLayout</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">serialization</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/serialization/GenericSerializer.js~GenericSerializer.html">GenericSerializer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/serialization/SerializerContainer.js~SerializerContainer.html">SerializerContainer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/serialization/esdoc.js~Serializer.html">Serializer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-Serialized">Serialized</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-SerializerContainerConfig">SerializerContainerConfig</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">stack</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/stack/Stack.js~Stack.html">Stack</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/stack/StackHeader.js~StackHeader.html">StackHeader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/stack/StackItemCloseEvent.js~StackItemCloseEvent.html">StackItemCloseEvent</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/stack/StackItemContainer.js~StackItemContainer.html">StackItemContainer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/stack/StackSerializer.js~StackSerializer.html">StackSerializer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/stack/StackTab.js~StackTab.html">StackTab</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/stack/TabCloseEvent.js~TabCloseEvent.html">TabCloseEvent</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/stack/TabDragEvent.js~TabDragEvent.html">TabDragEvent</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/stack/TabSelectionEvent.js~TabSelectionEvent.html">TabSelectionEvent</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-DEFAULT_STACK_HEADER_SIZE">DEFAULT_STACK_HEADER_SIZE</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-StackConfig">StackConfig</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-StackConfigArgs">StackConfigArgs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-StackItemContainerConfig">StackItemContainerConfig</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-StackTabConfig">StackTabConfig</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-StackTabConfigArgs">StackTabConfigArgs</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">stack/controls</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/stack/controls/CloseStackControl.js~CloseStackControl.html">CloseStackControl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/stack/controls/MinimizeStackControl.js~MinimizeStackControl.html">MinimizeStackControl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/stack/controls/StackControl.js~StackControl.html">StackControl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/stack/controls/StackControlSerializer.js~StackControlSerializer.html">StackControlSerializer</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">stack/tabControls</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/stack/tabControls/CloseTabControl.js~CloseTabControl.html">CloseTabControl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/stack/tabControls/TabControl.js~TabControl.html">TabControl</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">utils</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/utils/Deferred.js~Deferred.html">Deferred</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-clamp">clamp</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-defaults">defaults</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-eq">eq</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-get">get</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isBoolean">isBoolean</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isFunction">isFunction</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isNumber">isNumber</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isObject">isObject</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isPromise">isPromise</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isString">isString</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isUndefined">isUndefined</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-negate">negate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-partition">partition</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-propEq">propEq</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-round">round</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-uid">uid</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">view</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/view/CustomViewHookEvent.js~CustomViewHookEvent.html">CustomViewHookEvent</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/view/View.js~View.html">View</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/view/ViewContainer.js~ViewContainer.html">ViewContainer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/view/ViewFactory.js~ViewFactory.html">ViewFactory</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/view/ViewManager.js~ViewManager.html">ViewManager</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/docs/view/ViewSerializer.js~ViewSerializer.html">ViewSerializer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ViewComponent">ViewComponent</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-VIEW_CONFIG_KEY">VIEW_CONFIG_KEY</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ViewComponentRef">ViewComponentRef</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ViewFactoriesRef">ViewFactoriesRef</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">docs/view/ViewContainer.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import { Injector, Type, Inject, Optional } from &apos;../di&apos;;
+import { Renderable } from &apos;../dom&apos;;
+import { ReplaySubject, Observable, Subject, BeforeDestroyEvent, BehaviorSubject } from &apos;../events&apos;;
+import { ContainerRef, ConfigurationRef, DocumentRef } from &apos;../common&apos;;
+import { View } from &apos;./View&apos;;
+import { ViewFactoriesRef, ViewComponentRef } from &apos;./common&apos;;
+import { CustomViewHookEvent } from &apos;./CustomViewHookEvent&apos;;
+import { isFunction, get, uid, eq, isPromise, isObject } from &apos;../utils&apos;;
+
+export enum ViewContainerStatus {
+  READY,
+  PENDING
+}
+
+export enum ViewContainerAttachedStatus {
+  ATTACHED,
+  DETACHED
+}
+
+/**
+ * A container that holds a 1 to 1 relationship with a component instance. This instance
+ * is the main API for a component to interact with the layout framework.
+ * @export
+ * @class ViewContainer
+ * @template T The component type.
+ */
+export class ViewContainer&lt;T&gt; {
+  /**
+   * This element is the mount point that views can mount to.
+   * The node created by the render method gets recreated when moved
+   * somewhere else in the tree. This element is constant.
+   * @private
+   * @type {HTMLElement}
+   */
+  private _element: HTMLElement = this._document.createElement(&apos;div&apos;);
+  private _component: T|null = null;
+  private _container: View|null;
+  private _status: BehaviorSubject&lt;ViewContainerStatus&gt; = new BehaviorSubject(ViewContainerStatus.PENDING);
+  private _destroyed: Subject&lt;ViewContainer&lt;T&gt;&gt; = new Subject();
+  private _beforeDestroy: Subject&lt;BeforeDestroyEvent&lt;Renderable&gt;&gt; = new Subject();
+  private _containerChange: Subject&lt;View|null&gt; = new Subject&lt;View|null&gt;();
+  private _visibilityChanges: Subject&lt;boolean&gt; = new Subject();
+  private _sizeChanges: Subject&lt;{ width: number, height: number }&gt; = new Subject();
+  private _attached: Subject&lt;boolean&gt; = new Subject();
+  private _initialized: BehaviorSubject&lt;boolean&gt; = new BehaviorSubject&lt;boolean&gt;(false);
+  private _isInitialized: boolean = false;
+  
+  /**
+   * A unique identifier for this instance.
+   * @type {number}
+   */
+  readonly id: number = uid();
+  /**
+   * Notifies that the view is being destroyed. This action is cancellable or can be halted until
+   * an async action is complete.
+   * @see Cancellable
+   * @type {Observable&lt;BeforeDestroyEvent&lt;Renderable&gt;&gt;}
+   */
+  beforeDestroy: Observable&lt;BeforeDestroyEvent&lt;Renderable&gt;&gt; = this._beforeDestroy.asObservable();
+  /**
+   * Notifies when the view is destroyed.
+   * @type {Observable&lt;ViewContainer&lt;T&gt;&gt;}
+   */
+  destroyed: Observable&lt;ViewContainer&lt;T&gt;&gt; = this._destroyed.asObservable();
+  /**
+   * Notifies when the visibility of this view changes.
+   * @type {Observable&lt;boolean&gt;}
+   */
+  visibilityChanges: Observable&lt;boolean&gt; = this._visibilityChanges.asObservable();
+  /**
+   * Notifies when the dimensions of this views container has changed.
+   * @type {Observable&lt;{ width: number, height: number }&gt;}
+   */
+  sizeChanges: Observable&lt;{ width: number, height: number }&gt; = this._sizeChanges.asObservable();
+  /**
+   * Notifies when the status of this component changes.
+   * @type {Observable&lt;ViewContainerStatus&gt;}
+   */
+  status: Observable&lt;ViewContainerStatus&gt; = this._status.asObservable();
+  /**
+   * Notifies when the component is ready.
+   * @type {Observable&lt;ViewContainerStatus&gt;}
+   */
+  statusReady: Observable&lt;ViewContainerStatus&gt; = this.status.filter(eq(ViewContainerStatus.READY));
+  /**
+   * Contains the state of ths views initialized state.
+   * @type {Observable&lt;boolean&gt;}
+   */
+  initialized: Observable&lt;boolean&gt; = this._initialized.asObservable();
+  /**
+   * Notifies when this container has changed the {@link View} it is associated with.
+   * @type {(Observable&lt;View|null&gt;)}
+   */
+  containerChange: Observable&lt;View|null&gt; = this._containerChange.asObservable();
+  /**
+   * Notifies when the view has become attached.
+   * @type {Observable&lt;boolean&gt;}
+   */
+  attached: Observable&lt;boolean&gt; = this._attached.asObservable().filter(eq(true));
+  /**
+   * Notifies when the view has become detached.
+   * @type {Observable&lt;boolean&gt;}
+   */
+  detached: Observable&lt;boolean&gt; = this._attached.asObservable().filter(eq(false));
+  
+  /**
+   * Creates an instance of ViewContainer.
+   * @param {Document} _document 
+   * @param {Injector} _injector 
+   */
+  constructor(
+    @Inject(DocumentRef) protected _document: Document,
+    @Inject(Injector) protected _injector: Injector
+  ) {
+    this._element.classList.add(&apos;ug-layout__view-container-mount&apos;);
+
+    this.attached.subscribe(() =&gt; this._executeHook(&apos;ugOnAttach&apos;, this._container));
+    this.detached.subscribe(() =&gt; this._executeHook(&apos;ugOnDetach&apos;));
+    this.sizeChanges.subscribe(dimensions =&gt; this._executeHook(&apos;ugOnResize&apos;, dimensions));
+    this.visibilityChanges.subscribe(isVisible =&gt; this._executeHook(&apos;ugOnVisibilityChange&apos;, isVisible));
+    this.beforeDestroy.subscribe(event =&gt; this._executeHook(&apos;ugOnBeforeDestroy&apos;, event));
+    this.initialized.subscribe(v =&gt; this._isInitialized = v);
+  }
+
+  /**
+   * Current width in pixels.
+   * @readonly
+   * @type {number}
+   */
+  get width(): number {
+    return get(this._container, &apos;width&apos;, 0);
+  }
+  
+  /**
+   * Current height in pixels.
+   * @readonly
+   * @type {number}
+   */
+  get height(): number {
+    return get(this._container, &apos;height&apos;, 0);
+  }
+
+  /**
+   * The component instance associated with this container.
+   * @readonly
+   * @type {T|null}
+   */
+  get component(): T|null {
+    return this._component;
+  }
+
+  /**
+   * Whether the container is cacheable.
+   * @readonly
+   * @type {boolean}
+   */
+  get isCacheable(): boolean {
+    return this._container ? Boolean(this._container.resolveConfigProperty(&apos;cacheable&apos;)) : false;
+  }
+
+  /**
+   * The HTML element for this container.
+   * @readonly
+   * @type {HTMLElement}
+   */
+  get element(): HTMLElement {
+    return this._element;
+  }
+
+  /**
+   * Get&apos;s a token from this containers injector. Note, this should not be used to grab
+   * parent renderables or any item that can be changed.
+   * @template U The return type.
+   * @param {*} token 
+   * @returns {(U|null)} 
+   */
+  get&lt;U&gt;(token: any): U|null {
+    return this._injector.get(token, null);
+  }
+
+  /**
+   * Destroys the container.
+   */
+  destroy(): void {
+    this._destroyed.next();
+    
+    this._destroyed.complete();
+    this._status.complete();
+    this._beforeDestroy.complete();
+    this._containerChange.complete();
+    this._visibilityChanges.complete();
+    this._sizeChanges.complete();
+    this._initialized.complete();
+  }
+  
+  /**
+   * Waits for the component to be ready. If the component is not initialized
+   * it will be initialized. This is important when the view is lazy and hasn&apos;t
+   * been shown yet but we need to interact with the component.
+   * @async
+   * @param {{ init?: boolean }} [options={}] 
+   * @returns {Promise&lt;ViewContainer&lt;T&gt;&gt;} 
+   */
+  async ready(options: { init?: boolean } = {}): Promise&lt;ViewContainer&lt;T&gt;&gt; {
+    const { init = true } = options;
+    
+    if (!this._isInitialized &amp;&amp; init !== false) {
+      this.initialize();  
+    }
+    
+    await this.statusReady.toPromise();
+
+    return this;
+  }
+
+  /**
+   * Initializes the component. This creates the component. 
+   */
+  initialize(): void {
+    const component = this._injector.get(ViewComponentRef);
+    
+    if (isPromise&lt;T&gt;(component)) {
+      component.then(val =&gt; this._onComponentReady(val));
+    } else {
+      this._onComponentReady(component);
+    }
+
+    this._initialized.next(true);
+  }
+
+  /**
+   * Sets the containing {@link View} for this container.
+   * @param {(View|null)} container 
+   * @returns {void} 
+   */
+  setView(container: View|null): void {
+    if (container === this._container) {
+      return;
+    }
+    
+    this._container = container;
+
+    // This needs to fire before we wire up to the new container.
+    this._containerChange.next(container);
+
+    if (this._container) {
+      this._container.destroyed
+        .takeUntil(this._containerChange)
+        .subscribe(() =&gt; this._onViewDestroy());
+      
+      this._container
+        .scope(BeforeDestroyEvent)
+        .takeUntil(this._containerChange)
+        .subscribe(e =&gt; this._beforeDestroy.next(e));
+      
+      this._container.visibilityChanges
+        .takeUntil(this._containerChange)
+        .subscribe(e =&gt; this._visibilityChanges.next(e));
+      
+      this._container.sizeChanges
+        .takeUntil(this._containerChange)
+        .subscribe(e =&gt; this._sizeChanges.next(e));
+
+      this._container
+        .scope(CustomViewHookEvent)
+        .takeUntil(this._containerChange)
+        .subscribe(event =&gt; this._executeHook(event.name, ...event.args));
+    }
+
+    this._attached.next(Boolean(this._container));
+  }
+
+  /**
+   * Gets this renderables parent or any parent that is
+   * an instance of the passed in constructor. If non is found
+   * then null is returned.
+   * @template T The constructor type.
+   * @param {Type&lt;T&gt;} [Ctor] 
+   * @returns {(T|null)} 
+   */
+  getParent&lt;U extends Renderable&gt;(Ctor: Type&lt;U&gt;): U|null {
+    return this._container ? this._container.getParent(Ctor) : null;
+  }
+  
+  /**
+   * Gets this renderables parents or any parents that are
+   * an instance of the passed in constructor.    
+   * @template T The constructor type.
+   * @param {Type&lt;T&gt;} [Ctor] 
+   * @returns {(T|null)} 
+   */
+  getParents&lt;U extends Renderable&gt;(Ctor: Type&lt;U&gt;): U[] {
+    return this._container ? this._container.getParents(Ctor) : [];
+  }
+  
+  /**
+   * Signals up the tree to make this {@link View} visible.
+   */
+  makeVisible(): void {
+    if (this._container) {
+      this._container.makeVisible();
+    }
+  }
+  
+  /**
+   * Determines whether this renderable is visible.
+   * @returns {boolean} 
+   */
+  isVisible(): boolean {
+    return this._container ? this._container.isVisible() : false;
+  }
+  
+  /**
+   * Closes this view.
+   * @param {{ silent?: boolean }} args 
+   */
+  close(args: { silent?: boolean }): void {
+    if (this._container) {
+      this._container.close(args);
+    }
+  }
+
+  /**
+   * Mounts this containers element to the given element.
+   * @param {HTMLElement} element 
+   */
+  mountTo(element: HTMLElement): void {
+    element.appendChild(this._element);
+  }
+  
+  /**
+   * Mounts an element to this containers element.
+   * @param {HTMLElement} element 
+   */
+  mount(element: HTMLElement): void {
+    this._element.appendChild(element);
+  }
+  
+  /**
+   * Sets all the content of this containers element to the given HTML string.
+   * @param {string} html 
+   */
+  mountHTML(html: string): void {
+    this._element.innerHTML = html;
+  }
+
+  /**
+   * Detaches this container from it&apos;s view.
+   */
+  detach(): void {
+    this.setView(null);
+  }
+
+  private _onViewDestroy(): void {
+    // If this view is cacheable, we don&apos;t destroy it.
+    if (this.isCacheable) {
+      this.detach();
+    } else {
+      this.destroy();
+    }
+  }
+
+  private _executeHook(name: string, ...args: any[]): any {
+    if (this._component &amp;&amp; this._hasHook(name)) {
+      return this._component[name].apply(this._component, args);
+    }
+  }
+
+  private _hasHook(name: string): boolean {
+   return Boolean(this._component &amp;&amp; isObject(this._component) &amp;&amp; isFunction(this._component[name]));
+  }
+
+  private async _onComponentReady(component: T): Promise&lt;void&gt; {
+    this._component = component;
+
+    const result = this._executeHook(&apos;ugOnResolve&apos;, this);
+
+    // Allow the `ugOnResolve` hook to run async tasks.
+    if (isPromise(result)) {
+      await result;
+    }
+    
+    this._status.next(ViewContainerStatus.READY);
+    this._executeHook(&apos;ugOnInit&apos;, this);
+  }
+}</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.5.2)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>
