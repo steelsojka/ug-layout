@@ -93,15 +93,15 @@ export class StackItemContainer extends Renderable implements DropTarget {
   }
 
   get draggable(): boolean {
-    return get(this._config, 'draggable', true);
+    return Boolean(get(this._config, 'draggable', true));
   }
   
   get droppable(): boolean {
-    return get(this._config, 'droppable', true);
+    return Boolean(get(this._config, 'droppable', true));
   }
   
   get closeable(): boolean {
-    return get(this._config, 'closeable', false);
+    return Boolean(get(this._config, 'closeable', false));
   }
 
   get title(): string {

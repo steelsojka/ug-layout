@@ -3,6 +3,9 @@ import { stub, spy } from 'sinon';
 
 import { ConfigurationRef, ContainerRef } from '../common';
 import { StackItemContainer } from './StackItemContainer';
+import { Renderable } from '../dom';
+import { MakeVisibleCommand } from '../commands';
+import { CloseTabControl } from './tabControls';
 import { getRenderable } from '../../test/unit/helpers';
 
 function getItem(container = {}): StackItemContainer {
@@ -11,6 +14,8 @@ function getItem(container = {}): StackItemContainer {
     { provide: ContainerRef, useValue: container }  
   ]);
 }
+
+const initializeStub = stub(Renderable.prototype, 'initialize');
 
 test('get tab', t => {
   const tab = {};
@@ -91,3 +96,55 @@ test(offsetTest, { horz: false, rev: true, prop: 'offsetY' }, 150);
 test(offsetTest, { horz: false, rev: false, prop: 'offsetX' }, 110);
 test(offsetTest, { horz: true, rev: false, prop: 'offsetX' }, 100);
 test(offsetTest, { horz: false, rev: true, prop: 'offsetX' }, 100);
+test(offsetTest, { horz: false, rev: true, prop: 'offsetX' }, 100);
+
+function configPropTest(t, prop, value, expect) {
+  const item = getItem();
+
+  Object.assign(item, {
+    _config: { [prop]: value }
+  });
+
+  t.is(item[prop], expect);
+}
+
+(<any>configPropTest).title = (p, prop, v, e) => `config property ${prop} w/ value ${v} => ${e}`;
+
+test(configPropTest, 'draggable', false, false);
+test(configPropTest, 'draggable', undefined, true);
+test(configPropTest, 'droppable', false, false);
+test(configPropTest, 'droppable', undefined, true);
+test(configPropTest, 'closeable', true, true);
+test(configPropTest, 'closeable', undefined, false);
+test(configPropTest, 'title', 'test', 'test');
+test(configPropTest, 'title', null, '');
+
+function initializeTest(t, controls = [], expectControls = -1) {
+  const item = getItem();
+  const createChildStub = stub(item, 'createChild').returns({});
+  const addControl = stub(item, 'addControl');
+  const subscribeStub = stub(item, 'subscribe');
+  const use = {};
+
+  Object.assign(item, {
+    _config: {
+      use,
+      tabControls: controls
+    }
+  });
+
+  item.initialize();
+
+  t.true(initializeStub.called);
+  t.true(addControl.called);
+  t.true(createChildStub.called);
+  t.true(subscribeStub.called);
+  t.is(subscribeStub.args[0][0], MakeVisibleCommand);
+  t.is(createChildStub.args[0][0], use);
+  t.is(addControl.callCount, expectControls);
+  t.deepEqual(addControl.args[0][1], { resize: false, render: false });
+}
+
+test('initialize with detault controls', initializeTest, [], 1);
+test('initialize with control', initializeTest, [{}], 2);
+test('initialize with close control', initializeTest, [ CloseTabControl ], 1);
