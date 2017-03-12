@@ -166,13 +166,13 @@
 </nav>
 
 <div class="content" data-ice="content"><div class="header-notice">
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {ViewFactory} from &apos;<span><a href="file/docs/view/ViewFactory.js.html#lineNumber6">ug-layout/view/ViewFactory</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {ViewFactory} from &apos;<span><a href="file/docs/view/ViewFactory.js.html#lineNumber11">ug-layout/view/ViewFactory</a></span>&apos;</code></pre></div>
   <span data-ice="access">public</span>
   <span data-ice="kind">class</span>
   
   
   
-  <span data-ice="source">| <span><a href="file/docs/view/ViewFactory.js.html#lineNumber6">source</a></span></span>
+  <span data-ice="source">| <span><a href="file/docs/view/ViewFactory.js.html#lineNumber11">source</a></span></span>
 </div>
 
 <div class="self-detail detail">
@@ -192,7 +192,8 @@
 
   
   
-  
+  <div class="description" data-ice="description"><p>Responsible for creating view containers from view configurations.</p>
+</div>
   
 
   
@@ -225,13 +226,14 @@
         <p>
           
           
-          <span data-ice="name"><span><a href="class/docs/view/ViewFactory.js~ViewFactory.html#instance-method-create">create</a></span></span><span data-ice="signature">(args: <span>*</span>): <span>*</span></span>
+          <span data-ice="name"><span><a href="class/docs/view/ViewFactory.js~ViewFactory.html#instance-method-create">create</a></span></span><span data-ice="signature">(args: <span>ViewFactoryArgs</span>): <span><a href="class/docs/view/ViewContainer.js~ViewContainer.html">ViewContainer</a></span>&lt;<span>T</span>&gt;</span>
         </p>
       </div>
       <div>
         
         
-        
+        <div data-ice="description"><p>Creates a view container from the given configuration.</p>
+</div>
       </div>
     </td>
     <td>
@@ -279,13 +281,14 @@
         <p>
           
           
-          <span data-ice="name"><span><a href="class/docs/view/ViewFactory.js~ViewFactory.html#instance-method-getTokenFrom">getTokenFrom</a></span></span><span data-ice="signature">(config: <span>*</span>): <span>*</span></span>
+          <span data-ice="name"><span><a href="class/docs/view/ViewFactory.js~ViewFactory.html#instance-method-getTokenFrom">getTokenFrom</a></span></span><span data-ice="signature">(config: <span>ViewConfig</span>): <span>*</span></span>
         </p>
       </div>
       <div>
         
         
-        
+        <div data-ice="description"><p>Gets the token from a view config.</p>
+</div>
       </div>
     </td>
     <td>
@@ -306,13 +309,14 @@
         <p>
           
           
-          <span data-ice="name"><span><a href="class/docs/view/ViewFactory.js~ViewFactory.html#instance-method-resolveConfigProperty">resolveConfigProperty</a></span></span><span data-ice="signature">(config: <span>*</span>, path: <span>*</span>): <span>*</span></span>
+          <span data-ice="name"><span><a href="class/docs/view/ViewFactory.js~ViewFactory.html#instance-method-resolveConfigProperty">resolveConfigProperty</a></span></span><span data-ice="signature">(config: <span>ViewConfig</span>, path: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span>T</span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null">null</a></span></span>
         </p>
       </div>
       <div>
         
         
-        
+        <div data-ice="description"><p>Resolves a config property by looking at the view config then the components metadata config.</p>
+</div>
       </div>
     </td>
     <td>
@@ -340,18 +344,19 @@
     
     
     
-    <span data-ice="name">create</span><span data-ice="signature">(args: <span>*</span>): <span>*</span></span>
+    <span data-ice="name">create</span><span data-ice="signature">(args: <span>ViewFactoryArgs</span>): <span><a href="class/docs/view/ViewContainer.js~ViewContainer.html">ViewContainer</a></span>&lt;<span>T</span>&gt;</span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/docs/view/ViewFactory.js.html#lineNumber7">source</a></span></span>
+      <span data-ice="source"><span><a href="file/docs/view/ViewFactory.js.html#lineNumber18">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>Creates a view container from the given configuration.</p>
+</div>
 
   
 
@@ -365,7 +370,7 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" data-depth="0">args</td>
-      <td data-ice="type"><span>*</span></td>
+      <td data-ice="type"><span>ViewFactoryArgs</span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
@@ -379,7 +384,7 @@
     <table>
       <tbody>
         <tr>
-          <td class="return-type" data-ice="returnType"><span>*</span></td>
+          <td class="return-type" data-ice="returnType"><span><a href="class/docs/view/ViewContainer.js~ViewContainer.html">ViewContainer</a></span>&lt;<span>T</span>&gt;</td>
           
         </tr>
       </tbody>
@@ -415,7 +420,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/docs/view/ViewFactory.js.html#lineNumber73">source</a></span></span>
+      <span data-ice="source"><span><a href="file/docs/view/ViewFactory.js.html#lineNumber94">source</a></span></span>
     </span>
   </h3>
 
@@ -454,18 +459,20 @@
     
     
     
-    <span data-ice="name">getTokenFrom</span><span data-ice="signature">(config: <span>*</span>): <span>*</span></span>
+    <span data-ice="name">getTokenFrom</span><span data-ice="signature">(config: <span>ViewConfig</span>): <span>*</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/docs/view/ViewFactory.js.html#lineNumber45">source</a></span></span>
+      <span data-ice="source"><span><a href="file/docs/view/ViewFactory.js.html#lineNumber59">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>Gets the token from a view config. If using <code>useClass</code> the class will be used as the token.
+Any other type will require token to be provided.</p>
+</div>
 
   
 
@@ -479,7 +486,7 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" data-depth="0">config</td>
-      <td data-ice="type"><span>*</span></td>
+      <td data-ice="type"><span>ViewConfig</span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
@@ -525,18 +532,19 @@
     
     
     
-    <span data-ice="name">resolveConfigProperty</span><span data-ice="signature">(config: <span>*</span>, path: <span>*</span>): <span>*</span></span>
+    <span data-ice="name">resolveConfigProperty</span><span data-ice="signature">(config: <span>ViewConfig</span>, path: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span>T</span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null">null</a></span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/docs/view/ViewFactory.js.html#lineNumber60">source</a></span></span>
+      <span data-ice="source"><span><a href="file/docs/view/ViewFactory.js.html#lineNumber81">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>Resolves a config property by looking at the view config then the components metadata config.</p>
+</div>
 
   
 
@@ -550,13 +558,13 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" data-depth="0">config</td>
-      <td data-ice="type"><span>*</span></td>
+      <td data-ice="type"><span>ViewConfig</span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" data-depth="0">path</td>
-      <td data-ice="type"><span>*</span></td>
+      <td data-ice="type"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
@@ -570,7 +578,7 @@
     <table>
       <tbody>
         <tr>
-          <td class="return-type" data-ice="returnType"><span>*</span></td>
+          <td class="return-type" data-ice="returnType"><span>T</span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null">null</a></span></td>
           
         </tr>
       </tbody>

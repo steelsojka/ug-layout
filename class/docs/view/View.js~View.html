@@ -166,13 +166,13 @@
 </nav>
 
 <div class="content" data-ice="content"><div class="header-notice">
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {View} from &apos;<span><a href="file/docs/view/View.js.html#lineNumber10">ug-layout/view/View</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {View} from &apos;<span><a href="file/docs/view/View.js.html#lineNumber16">ug-layout/view/View</a></span>&apos;</code></pre></div>
   <span data-ice="access">public</span>
   <span data-ice="kind">class</span>
   
   
   
-  <span data-ice="source">| <span><a href="file/docs/view/View.js.html#lineNumber10">source</a></span></span>
+  <span data-ice="source">| <span><a href="file/docs/view/View.js.html#lineNumber16">source</a></span></span>
 </div>
 
 <div class="self-detail detail">
@@ -182,7 +182,7 @@
 
   
   
-  <div class="flat-list" data-ice="extendsChain"><h4>Extends:</h4><div><span>docs/dom.js~Renderable</span> &#x2192; View</div></div>
+  <div class="flat-list" data-ice="extendsChain"><h4>Extends:</h4><div><span><a href="class/docs/dom/Renderable.js~Renderable.html">Renderable</a></span> &#x2192; View</div></div>
   
   
   
@@ -192,7 +192,8 @@
 
   
   
-  
+  <div class="description" data-ice="description"><p>A renderable that renders a component.</p>
+</div>
   
 
   
@@ -222,13 +223,14 @@
         <p>
           
           
-          <span data-ice="name"><span><a href="class/docs/view/View.js~View.html#static-method-configure">configure</a></span></span><span data-ice="signature">(config: <span>*</span>): <span>*</span></span>
+          <span data-ice="name"><span><a href="class/docs/view/View.js~View.html#static-method-configure">configure</a></span></span><span data-ice="signature">(config: <span>ViewConfig</span>): <span><a href="class/docs/dom/ConfiguredRenderable.js~ConfiguredRenderable.html">ConfiguredRenderable</a></span>&lt;<span><a href="class/docs/view/View.js~View.html">View</a></span>&gt;</span>
         </p>
       </div>
       <div>
         
         
-        
+        <div data-ice="description"><p>Configures a view.</p>
+</div>
       </div>
     </td>
     <td>
@@ -256,13 +258,14 @@
         <p>
           
           
-          <span data-ice="name"><span><a href="class/docs/view/View.js~View.html#instance-constructor-constructor">constructor</a></span></span><span data-ice="signature">(_container: <span>*</span>, _configuration: <span>*</span>, _viewManager: <span>*</span>, _viewFactory: <span>*</span>, _document: <span>*</span>)</span>
+          <span data-ice="name"><span><a href="class/docs/view/View.js~View.html#instance-constructor-constructor">constructor</a></span></span><span data-ice="signature">(_container: <span><a href="class/docs/dom/Renderable.js~Renderable.html">Renderable</a></span>, _configuration: <span>ViewConfig</span>, _viewManager: <span><a href="class/docs/view/ViewManager.js~ViewManager.html">ViewManager</a></span>, _viewFactory: <span><a href="class/docs/view/ViewFactory.js~ViewFactory.html">ViewFactory</a></span>, _document: <span><a href="https://developer.mozilla.org/en-US/docs/Web/API/Document">Document</a></span>)</span>
         </p>
       </div>
       <div>
         
         
-        
+        <div data-ice="description"><p>Creates an instance of View.</p>
+</div>
       </div>
     </td>
     <td>
@@ -317,13 +320,14 @@
         <p>
           
           
-          <span data-ice="name"><span><a href="class/docs/view/View.js~View.html#instance-get-isCacheable">isCacheable</a></span></span><span data-ice="signature">: <span>*</span></span>
+          <span data-ice="name"><span><a href="class/docs/view/View.js~View.html#instance-get-isCacheable">isCacheable</a></span></span><span data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null">null</a></span></span>
         </p>
       </div>
       <div>
         
         
-        
+        <div data-ice="description"><p>Whether this view in configured to be cacheable.</p>
+</div>
       </div>
     </td>
     <td>
@@ -344,13 +348,14 @@
         <p>
           
           
-          <span data-ice="name"><span><a href="class/docs/view/View.js~View.html#instance-get-lazy">lazy</a></span></span><span data-ice="signature">: <span>*</span></span>
+          <span data-ice="name"><span><a href="class/docs/view/View.js~View.html#instance-get-lazy">lazy</a></span></span><span data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null">null</a></span></span>
         </p>
       </div>
       <div>
         
         
-        
+        <div data-ice="description"><p>Whether this view is configured to be lazy.</p>
+</div>
       </div>
     </td>
     <td>
@@ -371,13 +376,14 @@
         <p>
           
           
-          <span data-ice="name"><span><a href="class/docs/view/View.js~View.html#instance-get-ref">ref</a></span></span><span data-ice="signature">: <span>*</span></span>
+          <span data-ice="name"><span><a href="class/docs/view/View.js~View.html#instance-get-ref">ref</a></span></span><span data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null">null</a></span></span>
         </p>
       </div>
       <div>
         
         
-        
+        <div data-ice="description"><p>The &apos;ref&apos; string this view is configured with.</p>
+</div>
       </div>
     </td>
     <td>
@@ -398,13 +404,14 @@
         <p>
           
           
-          <span data-ice="name"><span><a href="class/docs/view/View.js~View.html#instance-get-resolution">resolution</a></span></span><span data-ice="signature">: <span>*</span></span>
+          <span data-ice="name"><span><a href="class/docs/view/View.js~View.html#instance-get-resolution">resolution</a></span></span><span data-ice="signature">: <span>ResolverStrategy</span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null">null</a></span></span>
         </p>
       </div>
       <div>
         
         
-        
+        <div data-ice="description"><p>The resolution strategy this view is configured with.</p>
+</div>
       </div>
     </td>
     <td>
@@ -425,13 +432,14 @@
         <p>
           
           
-          <span data-ice="name"><span><a href="class/docs/view/View.js~View.html#instance-member-sizeChanges">sizeChanges</a></span></span><span data-ice="signature">: <span>*</span></span>
+          <span data-ice="name"><span><a href="class/docs/view/View.js~View.html#instance-member-sizeChanges">sizeChanges</a></span></span><span data-ice="signature">: <span><a href="http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html">Observable</a></span><{width: <span=""><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, height: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>}&gt;</{width:></span>
         </p>
       </div>
       <div>
         
         
-        
+        <div data-ice="description"><p>Notifies when the dimensions of this view changes.</p>
+</div>
       </div>
     </td>
     <td>
@@ -452,13 +460,14 @@
         <p>
           
           
-          <span data-ice="name"><span><a href="class/docs/view/View.js~View.html#instance-get-token">token</a></span></span><span data-ice="signature">: <span>*</span></span>
+          <span data-ice="name"><span><a href="class/docs/view/View.js~View.html#instance-get-token">token</a></span></span><span data-ice="signature">: <span>any</span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null">null</a></span></span>
         </p>
       </div>
       <div>
         
         
-        
+        <div data-ice="description"><p>The token this view is using for registration.</p>
+</div>
       </div>
     </td>
     <td>
@@ -479,13 +488,14 @@
         <p>
           
           
-          <span data-ice="name"><span><a href="class/docs/view/View.js~View.html#instance-member-visibilityChanges">visibilityChanges</a></span></span><span data-ice="signature">: <span>*</span></span>
+          <span data-ice="name"><span><a href="class/docs/view/View.js~View.html#instance-member-visibilityChanges">visibilityChanges</a></span></span><span data-ice="signature">: <span><a href="http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html">Observable</a></span>&lt;<span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span>&gt;</span>
         </p>
       </div>
       <div>
         
         
-        
+        <div data-ice="description"><p>Notifies when the visibility of this view changes.</p>
+</div>
       </div>
     </td>
     <td>
@@ -540,13 +550,14 @@
         <p>
           
           
-          <span data-ice="name"><span><a href="class/docs/view/View.js~View.html#instance-method-close">close</a></span></span><span data-ice="signature">(args: {})</span>
+          <span data-ice="name"><span><a href="class/docs/view/View.js~View.html#instance-method-close">close</a></span></span><span data-ice="signature">(args: {silent?: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span>})</span>
         </p>
       </div>
       <div>
         
         
-        
+        <div data-ice="description"><p>Closes this view.</p>
+</div>
       </div>
     </td>
     <td>
@@ -627,7 +638,8 @@
       <div>
         
         
-        
+        <div data-ice="description"><p>Makes this view visible.</p>
+</div>
       </div>
     </td>
     <td>
@@ -654,7 +666,8 @@
       <div>
         
         
-        
+        <div data-ice="description"><p>Minimizes this view if applicable.</p>
+</div>
       </div>
     </td>
     <td>
@@ -702,7 +715,295 @@
         <p>
           
           
-          <span data-ice="name"><span><a href="class/docs/view/View.js~View.html#instance-method-resolveConfigProperty">resolveConfigProperty</a></span></span><span data-ice="signature">(path: <span>*</span>): <span>*</span></span>
+          <span data-ice="name"><span><a href="class/docs/view/View.js~View.html#instance-method-resolveConfigProperty">resolveConfigProperty</a></span></span><span data-ice="signature">(path: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span>T</span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null">null</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Resolves a views config property.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+</tbody>
+</table>
+</div>
+
+<div class="inherited-summary" data-ice="inheritedSummary"><h2>Inherited Summary</h2><table class="summary" data-ice="summary">
+  <thead><tr><td data-ice="title" colspan="3"><span class="toggle closed"></span> From class <span><a href="class/docs/dom/Renderable.js~Renderable.html">Renderable</a></span></td></tr></thead>
+  <tbody>
+  
+  <tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      <span class="kind" data-ice="kind">get</span>
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-get-container">container</a></span></span><span data-ice="signature">: <span><a href="class/docs/dom/Renderable.js~Renderable.html">Renderable</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null">null</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>This renderables container or null if none.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      <span class="kind" data-ice="kind">get</span>
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-get-height">height</a></span></span><span data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>This renderables height in pixels.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      <span class="kind" data-ice="kind">get</span>
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-get-injector">injector</a></span></span><span data-ice="signature">: <span><a href="class/docs/di/Injector.js~Injector.html">Injector</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>The injector used to create this renderable.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      <span class="kind" data-ice="kind">get</span>
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-get-isDestroyed">isDestroyed</a></span></span><span data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Whether this renderable is destroyed.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      <span class="kind" data-ice="kind">get</span>
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-get-length">length</a></span></span><span data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>The amount of content items belonging to this renderable.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      <span class="kind" data-ice="kind">get</span>
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-get-offsetX">offsetX</a></span></span><span data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>This renderables page offset x.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      <span class="kind" data-ice="kind">get</span>
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-get-offsetY">offsetY</a></span></span><span data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>This renderables page offset y.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      <span class="kind" data-ice="kind">get</span>
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-get-uid">uid</a></span></span><span data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>A unique identifier for this renderable.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      <span class="kind" data-ice="kind">get</span>
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-get-width">width</a></span></span><span data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>This renderables width in pixels.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-member-containerChange">containerChange</a></span></span><span data-ice="signature">: <span>*</span></span>
         </p>
       </div>
       <div>
@@ -716,11 +1017,767 @@
       
     </td>
   </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-member-destroyed">destroyed</a></span></span><span data-ice="signature">: <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-method-addChild">addChild</a></span></span><span data-ice="signature">(item: <span><a href="class/docs/dom/Renderable.js~Renderable.html">Renderable</a></span>, options: <span><a href="typedef/index.html#static-typedef-AddChildArgs">AddChildArgs</a></span>)</span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Adds a child item to this renderable.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-method-contains">contains</a></span></span><span data-ice="signature">(item: <span><a href="class/docs/dom/Renderable.js~Renderable.html">Renderable</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Whether a renderable is a descendant of this renderable.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-method-createChild">createChild</a></span></span><span data-ice="signature">(renderable: <span>RenderableArg</span>&lt;<span>T</span>&gt;, providers: <span><span><a href="typedef/index.html#static-typedef-ProviderArg">ProviderArg</a></span><span>[]</span></span>): <span>T</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Creates a child renderable using this renderable as it&apos;s container.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-method-destroy">destroy</a></span></span><span data-ice="signature">(): <span>void</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Destroys this renderable and all it&apos;s children.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-method-emit">emit</a></span></span><span data-ice="signature">(event: <span>T</span>)</span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Emits a BusEvent on this renderable.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-method-emitDown">emitDown</a></span></span><span data-ice="signature">(event: <span>T</span>)</span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Emits a BusEvent down to all descendants recursively.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-method-emitUp">emitUp</a></span></span><span data-ice="signature">(event: <span>T</span>)</span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Emits a BusEvent up to all parents recursively.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-method-getArea">getArea</a></span></span><span data-ice="signature">(): <span><a href="class/docs/dom/RenderableArea.js~RenderableArea.html">RenderableArea</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Gets the renderable area of this renderable.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-method-getAtIndex">getAtIndex</a></span></span><span data-ice="signature">(index: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>): <span><a href="class/docs/dom/Renderable.js~Renderable.html">Renderable</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null">null</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Gets a content renderable at an index.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-method-getChildren">getChildren</a></span></span><span data-ice="signature">(): <span><span><a href="class/docs/dom/Renderable.js~Renderable.html">Renderable</a></span><span>[]</span></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Returns this renderables children renderables.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-method-getDescendants">getDescendants</a></span></span><span data-ice="signature">(): <span><span><a href="class/docs/dom/Renderable.js~Renderable.html">Renderable</a></span><span>[]</span></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Gets all descendants of this renderable recursively.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-method-getIndexOf">getIndexOf</a></span></span><span data-ice="signature">(item: <span><a href="class/docs/dom/Renderable.js~Renderable.html">Renderable</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Gets the index of a content renderable.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-method-getParent">getParent</a></span></span><span data-ice="signature">(Ctor: <span><a href="class/docs/di/esdoc.js~Type.html">Type</a></span>&lt;<span>T</span>&gt;): <span>T</span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null">null</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Gets this renderables parent or any parent that is
+an instance of the passed in constructor.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-method-getParents">getParents</a></span></span><span data-ice="signature">(Ctor: <span><a href="class/docs/di/esdoc.js~Type.html">Type</a></span>&lt;<span>T</span>&gt;): <span>T</span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null">null</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Gets this renderables parents or any parents that are
+an instance of the passed in constructor.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-method-handleDropCleanup">handleDropCleanup</a></span></span><span data-ice="signature">()</span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Handles any cleanup from a drop.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-method-initialize">initialize</a></span></span><span data-ice="signature">()</span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Invoked when the Injector has been assigned and ready for use.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-method-isContainedWithin">isContainedWithin</a></span></span><span data-ice="signature">(item: <span><a href="class/docs/dom/Renderable.js~Renderable.html">Renderable</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Whether this renderable is a descendant of another renderable.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-method-isDroppable">isDroppable</a></span></span><span data-ice="signature">(target: <span><a href="class/docs/dom/Renderable.js~Renderable.html">Renderable</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Whether this renderable can be dropped on.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-method-isVisible">isVisible</a></span></span><span data-ice="signature">(): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Determines whether this renderable is visible.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-method-remove">remove</a></span></span><span data-ice="signature">()</span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Removes this item from it&apos;s parent. If there is no
+parent then this renderable will just be destroyed.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-method-removeChild">removeChild</a></span></span><span data-ice="signature">(item: <span><a href="class/docs/dom/Renderable.js~Renderable.html">Renderable</a></span>, options: <span><a href="typedef/index.html#static-typedef-RemoveChildArgs">RemoveChildArgs</a></span>)</span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Removes a content item from this renderable.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-method-replaceChild">replaceChild</a></span></span><span data-ice="signature">(item: <span><a href="class/docs/dom/Renderable.js~Renderable.html">Renderable</a></span>, withItem: <span><a href="class/docs/dom/Renderable.js~Renderable.html">Renderable</a></span>, options: <span><a href="typedef/index.html#static-typedef-RemoveChildArgs">RemoveChildArgs</a></span>)</span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Replaces a content item on this renderable with another content item.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-method-resize">resize</a></span></span><span data-ice="signature">()</span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Sets this components size and triggers it&apos;s childrens sizing.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-method-scope">scope</a></span></span><span data-ice="signature">(Event: <span><a href="class/docs/di/esdoc.js~Type.html">Type</a></span>&lt;<span>T</span>&gt;): <span><a href="http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html">Observable</a></span>&lt;<span>T</span>&gt;</span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Creates an Observable scoped to a specific event type.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-method-setContainer">setContainer</a></span></span><span data-ice="signature">(container: <span><a href="class/docs/dom/Renderable.js~Renderable.html">Renderable</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null">null</a></span>)</span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Sets the container of this renderable.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          <span data-ice="name"><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-method-subscribe">subscribe</a></span></span><span data-ice="signature">(Event: <span><a href="class/docs/di/esdoc.js~Type.html">Type</a></span>&lt;<span>T</span>&gt;, observer: <span>PartialObserver</span>&lt;<span>T</span>&gt; | <span><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function">function</a></span><span>(event: <span>T</span>)</span></span>): <span><a href="http://reactivex.io/rxjs/class/es6/Subscription.js~Subscription.html">Subscription</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Subscribes to a BusEvent.</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
 </tbody>
 </table>
 </div>
-
-
 
 
 <div data-ice="staticMethodDetails"><h2 data-ice="title">Static Public Methods</h2>
@@ -733,18 +1790,19 @@
     
     
     
-    <span data-ice="name">configure</span><span data-ice="signature">(config: <span>*</span>): <span>*</span></span>
+    <span data-ice="name">configure</span><span data-ice="signature">(config: <span>ViewConfig</span>): <span><a href="class/docs/dom/ConfiguredRenderable.js~ConfiguredRenderable.html">ConfiguredRenderable</a></span>&lt;<span><a href="class/docs/view/View.js~View.html">View</a></span>&gt;</span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber104">source</a></span></span>
+      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber186">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>Configures a view.</p>
+</div>
 
   
 
@@ -758,7 +1816,7 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" data-depth="0">config</td>
-      <td data-ice="type"><span>*</span></td>
+      <td data-ice="type"><span>ViewConfig</span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
@@ -772,7 +1830,7 @@
     <table>
       <tbody>
         <tr>
-          <td class="return-type" data-ice="returnType"><span>*</span></td>
+          <td class="return-type" data-ice="returnType"><span><a href="class/docs/dom/ConfiguredRenderable.js~ConfiguredRenderable.html">ConfiguredRenderable</a></span>&lt;<span><a href="class/docs/view/View.js~View.html">View</a></span>&gt;</td>
           
         </tr>
       </tbody>
@@ -807,20 +1865,21 @@
     
     
     
-    <span data-ice="name">constructor</span><span data-ice="signature">(_container: <span>*</span>, _configuration: <span>*</span>, _viewManager: <span>*</span>, _viewFactory: <span>*</span>, _document: <span>*</span>)</span>
+    <span data-ice="name">constructor</span><span data-ice="signature">(_container: <span><a href="class/docs/dom/Renderable.js~Renderable.html">Renderable</a></span>, _configuration: <span>ViewConfig</span>, _viewManager: <span><a href="class/docs/view/ViewManager.js~ViewManager.html">ViewManager</a></span>, _viewFactory: <span><a href="class/docs/view/ViewFactory.js~ViewFactory.html">ViewFactory</a></span>, _document: <span><a href="https://developer.mozilla.org/en-US/docs/Web/API/Document">Document</a></span>)</span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber11">source</a></span></span>
+      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber25">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>Creates an instance of View.</p>
+</div>
 
-  
+  <div data-ice="override"><h4>Override:</h4><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-constructor-constructor">Renderable#constructor</a></span></div>
 
   <div data-ice="properties"><div data-ice="properties">
   <h4 data-ice="title">Params:</h4>
@@ -832,31 +1891,31 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" data-depth="0">_container</td>
-      <td data-ice="type"><span>*</span></td>
+      <td data-ice="type"><span><a href="class/docs/dom/Renderable.js~Renderable.html">Renderable</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" data-depth="0">_configuration</td>
-      <td data-ice="type"><span>*</span></td>
+      <td data-ice="type"><span>ViewConfig</span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" data-depth="0">_viewManager</td>
-      <td data-ice="type"><span>*</span></td>
+      <td data-ice="type"><span><a href="class/docs/view/ViewManager.js~ViewManager.html">ViewManager</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" data-depth="0">_viewFactory</td>
-      <td data-ice="type"><span>*</span></td>
+      <td data-ice="type"><span><a href="class/docs/view/ViewFactory.js~ViewFactory.html">ViewFactory</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" data-depth="0">_document</td>
-      <td data-ice="type"><span>*</span></td>
+      <td data-ice="type"><span><a href="https://developer.mozilla.org/en-US/docs/Web/API/Document">Document</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
@@ -897,16 +1956,17 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber28">source</a></span></span>
+      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber50">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>This renderables height in pixels.</p>
+</div>
 
-  
+  <div data-ice="override"><h4>Override:</h4><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-get-height">Renderable#height</a></span></div>
 
   <div data-ice="properties">
 </div>
@@ -936,18 +1996,19 @@
     
     
     
-    <span data-ice="name">isCacheable</span><span data-ice="signature">: <span>*</span></span>
+    <span data-ice="name">isCacheable</span><span data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null">null</a></span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber34">source</a></span></span>
+      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber66">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>Whether this view in configured to be cacheable.</p>
+</div>
 
   
 
@@ -979,18 +2040,19 @@
     
     
     
-    <span data-ice="name">lazy</span><span data-ice="signature">: <span>*</span></span>
+    <span data-ice="name">lazy</span><span data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null">null</a></span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber31">source</a></span></span>
+      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber58">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>Whether this view is configured to be lazy.</p>
+</div>
 
   
 
@@ -1022,18 +2084,19 @@
     
     
     
-    <span data-ice="name">ref</span><span data-ice="signature">: <span>*</span></span>
+    <span data-ice="name">ref</span><span data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null">null</a></span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber37">source</a></span></span>
+      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber74">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>The &apos;ref&apos; string this view is configured with.</p>
+</div>
 
   
 
@@ -1065,18 +2128,19 @@
     
     
     
-    <span data-ice="name">resolution</span><span data-ice="signature">: <span>*</span></span>
+    <span data-ice="name">resolution</span><span data-ice="signature">: <span>ResolverStrategy</span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null">null</a></span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber40">source</a></span></span>
+      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber82">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>The resolution strategy this view is configured with.</p>
+</div>
 
   
 
@@ -1108,18 +2172,19 @@
     
     
     
-    <span data-ice="name">sizeChanges</span><span data-ice="signature">: <span>*</span></span>
+    <span data-ice="name">sizeChanges</span><span data-ice="signature">: <span><a href="http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html">Observable</a></span><{width: <span=""><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, height: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>}&gt;</{width:></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber21">source</a></span></span>
+      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber43">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>Notifies when the dimensions of this view changes.</p>
+</div>
 
   
 
@@ -1151,18 +2216,19 @@
     
     
     
-    <span data-ice="name">token</span><span data-ice="signature">: <span>*</span></span>
+    <span data-ice="name">token</span><span data-ice="signature">: <span>any</span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null">null</a></span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber43">source</a></span></span>
+      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber90">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>The token this view is using for registration.</p>
+</div>
 
   
 
@@ -1194,18 +2260,19 @@
     
     
     
-    <span data-ice="name">visibilityChanges</span><span data-ice="signature">: <span>*</span></span>
+    <span data-ice="name">visibilityChanges</span><span data-ice="signature">: <span><a href="http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html">Observable</a></span>&lt;<span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span>&gt;</span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber20">source</a></span></span>
+      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber38">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>Notifies when the visibility of this view changes.</p>
+</div>
 
   
 
@@ -1241,16 +2308,17 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber25">source</a></span></span>
+      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber47">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>This renderables width in pixels.</p>
+</div>
 
-  
+  <div data-ice="override"><h4>Override:</h4><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-get-width">Renderable#width</a></span></div>
 
   <div data-ice="properties">
 </div>
@@ -1283,18 +2351,19 @@
     
     
     
-    <span data-ice="name">close</span><span data-ice="signature">(args: {})</span>
+    <span data-ice="name">close</span><span data-ice="signature">(args: {silent?: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span>})</span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber69">source</a></span></span>
+      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber121">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>Closes this view.</p>
+</div>
 
   
 
@@ -1308,7 +2377,7 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" data-depth="0">args</td>
-      <td data-ice="type">{}</td>
+      <td data-ice="type">{silent?: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span>}</td>
       <td data-ice="appendix"><ul><li>optional</li>
 <li>default: {}</li></ul></td>
       <td data-ice="description"></td>
@@ -1320,7 +2389,19 @@
 
   
 
-  
+  <div data-ice="emitWrap">
+    <h4>Emit:</h4>
+    <table>
+      <tbody>
+      
+      <tr class="emit" data-ice="emit">
+        <td><p data-ice="emitName"><span><a href="class/docs/events/BeforeDestroyEvent.js~BeforeDestroyEvent.html">BeforeDestroyEvent</a></span></p></td>
+        <td data-ice="emitDesc"><p>Fired when not silent.</p>
+</td>
+      </tr>
+</tbody>
+    </table>
+  </div>
 
   
 
@@ -1347,16 +2428,17 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber64">source</a></span></span>
+      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber111">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>Destroys this renderable and all it&apos;s children.</p>
+</div>
 
-  
+  <div data-ice="override"><h4>Override:</h4><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-method-destroy">Renderable#destroy</a></span></div>
 
   <div data-ice="properties">
 </div>
@@ -1390,16 +2472,17 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber46">source</a></span></span>
+      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber93">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>Invoked when the Injector has been assigned and ready for use.</p>
+</div>
 
-  
+  <div data-ice="override"><h4>Override:</h4><span><a href="class/docs/dom/Renderable.js~Renderable.html#instance-method-initialize">Renderable#initialize</a></span></div>
 
   <div data-ice="properties">
 </div>
@@ -1433,14 +2516,15 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber80">source</a></span></span>
+      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber136">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>Makes this view visible.</p>
+</div>
 
   
 
@@ -1449,7 +2533,18 @@
 
   
 
-  
+  <div data-ice="emitWrap">
+    <h4>Emit:</h4>
+    <table>
+      <tbody>
+      
+      <tr class="emit" data-ice="emit">
+        <td><p data-ice="emitName"><span>MakeVisibileCommand</span></p></td>
+        
+      </tr>
+</tbody>
+    </table>
+  </div>
 
   
 
@@ -1476,14 +2571,15 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber83">source</a></span></span>
+      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber143">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>Minimizes this view if applicable.</p>
+</div>
 
   
 
@@ -1492,7 +2588,18 @@
 
   
 
-  
+  <div data-ice="emitWrap">
+    <h4>Emit:</h4>
+    <table>
+      <tbody>
+      
+      <tr class="emit" data-ice="emit">
+        <td><p data-ice="emitName"><span><a href="class/docs/commands/MinimizeCommand.js~MinimizeCommand.html">MinimizeCommand</a></span></p></td>
+        
+      </tr>
+</tbody>
+    </table>
+  </div>
 
   
 
@@ -1519,7 +2626,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber52">source</a></span></span>
+      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber99">source</a></span></span>
     </span>
   </h3>
 
@@ -1570,18 +2677,20 @@
     
     
     
-    <span data-ice="name">resolveConfigProperty</span><span data-ice="signature">(path: <span>*</span>): <span>*</span></span>
+    <span data-ice="name">resolveConfigProperty</span><span data-ice="signature">(path: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span>T</span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null">null</a></span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber86">source</a></span></span>
+      <span data-ice="source"><span><a href="file/docs/view/View.js.html#lineNumber153">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>Resolves a views config property. Checks the configuration given to the
+view renderable first then checks the component metadata.</p>
+</div>
 
   
 
@@ -1595,7 +2704,7 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" data-depth="0">path</td>
-      <td data-ice="type"><span>*</span></td>
+      <td data-ice="type"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
@@ -1609,7 +2718,7 @@
     <table>
       <tbody>
         <tr>
-          <td class="return-type" data-ice="returnType"><span>*</span></td>
+          <td class="return-type" data-ice="returnType"><span>T</span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null">null</a></span></td>
           
         </tr>
       </tbody>

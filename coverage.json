@@ -1,7 +1,7 @@
 {
-  "coverage": "43.14%",
+  "coverage": "46.38%",
   "expectCount": 554,
-  "actualCount": 239,
+  "actualCount": 257,
   "files": {
     "docs/events/BeforeDestroyEvent.js": {
       "expectCount": 1,
@@ -536,27 +536,13 @@
     },
     "docs/view/View.js": {
       "expectCount": 19,
-      "actualCount": 0,
+      "actualCount": 14,
       "undocumentLines": [
-        10,
-        69,
-        104,
-        11,
-        64,
-        28,
-        46,
-        34,
-        31,
-        80,
-        83,
-        37,
-        52,
-        40,
-        86,
-        21,
-        43,
-        20,
-        25
+        111,
+        50,
+        93,
+        99,
+        47
       ]
     },
     "docs/view/decorators.js": {
@@ -573,13 +559,9 @@
     },
     "docs/view/ViewFactory.js": {
       "expectCount": 5,
-      "actualCount": 0,
+      "actualCount": 4,
       "undocumentLines": [
-        6,
-        7,
-        73,
-        45,
-        60
+        94
       ]
     },
     "docs/view/ViewManager.js": {
