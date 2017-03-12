@@ -7,19 +7,26 @@ import { get } from '../utils';
 
 export interface ViewFactoryArgs {
   config: ViewConfig;
-  injector: Injector;
-  container: View;
+  injector?: Injector;
 }
 
+/**
+ * Responsible for creating view containers from view configurations.
+ * @export
+ * @class ViewFactory
+ */
 export class ViewFactory {
+  /**
+   * Creates a view container from the given configuration.
+   * @template T The component type.
+   * @param {ViewFactoryArgs} args 
+   * @returns {ViewContainer<T>} 
+   */
   create<T>(args: ViewFactoryArgs): ViewContainer<T> {
-    const { config, injector, container } = args;
+    const { config, injector } = args;
     const isLazy = this.resolveConfigProperty(config, 'lazy');
     
-    const providers: ProviderArg[] = [
-      { provide: ContainerRef, useValue: container },
-      ViewContainer
-    ];
+    const providers: ProviderArg[] = [ ViewContainer ];
 
     if (config.useFactory) {
       providers.push({
@@ -53,6 +60,12 @@ export class ViewFactory {
     return viewContainer;
   }  
 
+  /**
+   * Gets the token from a view config. If using `useClass` the class will be used as the token.
+   * Any other type will require token to be provided.
+   * @param {ViewConfig} config 
+   * @returns {*} 
+   */
   getTokenFrom(config: ViewConfig): any {
     if (config.token) {
       return config.token;
@@ -69,6 +82,13 @@ export class ViewFactory {
     throw new Error('Can not resolve token from config.');
   }
 
+  /**
+   * Resolves a config property by looking at the view config then the components metadata config.
+   * @template T The type of the value expected.
+   * @param {ViewConfig} config 
+   * @param {string} path 
+   * @returns {(T|null)} 
+   */
   resolveConfigProperty<T>(config: ViewConfig, path: string): T|null {
     const token = this.getTokenFrom(config);
     let result = get(config, path);

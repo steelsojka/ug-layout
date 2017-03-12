@@ -13,14 +13,38 @@ import { ViewManager } from './ViewManager';
 import { ViewFactory } from './ViewFactory';
 import { get } from '../utils';
 
+/**
+ * A renderable that renders a component.
+ * @export
+ * @class View
+ * @extends {Renderable}
+ */
 export class View extends Renderable {
-  visibilityChanges: Observable<boolean>;
-  sizeChanges: Observable<{ width: number, height: number }>;
-  
   protected _viewContainer: ViewContainer<any>;
   protected _visibilityChanges: Subject<boolean> = new Subject();
   protected _sizeChanges: Subject<{ width: number, height: number }> = new Subject();
   
+  /**
+   * Notifies when the visibility of this view changes.
+   * @type {Observable<boolean>}
+   */
+  visibilityChanges: Observable<boolean> = this._visibilityChanges.asObservable().distinctUntilChanged();
+  /**
+   * Notifies when the dimensions of this view changes.
+   * @type {Observable<{ width: number, height: number }>}
+   */
+  sizeChanges: Observable<{ width: number, height: number }> = this._sizeChanges.asObservable().distinctUntilChanged((p, c) => {
+    return p.width === c.width && p.height === c.height;
+  });
+  
+  /**
+   * Creates an instance of View.
+   * @param {Renderable} _container 
+   * @param {ViewConfig} _configuration 
+   * @param {ViewManager} _viewManager 
+   * @param {ViewFactory} _viewFactory 
+   * @param {Document} _document 
+   */
   constructor(
     @Inject(ContainerRef) protected _container: Renderable,
     @Inject(ConfigurationRef) protected _configuration: ViewConfig,
@@ -29,11 +53,6 @@ export class View extends Renderable {
     @Inject(DocumentRef) protected _document: Document
   ) {
     super();
-    
-    this.visibilityChanges = this._visibilityChanges.asObservable().distinctUntilChanged();
-    this.sizeChanges = this._sizeChanges.asObservable().distinctUntilChanged((p, c) => {
-      return p.width === c.width && p.height === c.height;
-    });
   }
 
   get width(): number {
@@ -44,22 +63,47 @@ export class View extends Renderable {
     return this._container.height;
   }
 
+  /**
+   * Whether this view is configured to be lazy.
+   * @readonly
+   * @type {(boolean|null)}
+   */
   get lazy(): boolean|null {
     return this.resolveConfigProperty<boolean>('lazy');
   }
   
+  /**
+   * Whether this view in configured to be cacheable.
+   * @readonly
+   * @type {(boolean|null)}
+   */
   get isCacheable(): boolean|null {
     return this.resolveConfigProperty<boolean>('cacheable');
   }
   
+  /**
+   * The 'ref' string this view is configured with.
+   * @readonly
+   * @type {(string|null)}
+   */
   get ref(): string|null {
     return this.resolveConfigProperty<string>('ref');
   }
   
+  /**
+   * The resolution strategy this view is configured with.
+   * @readonly
+   * @type {(ResolverStrategy|null)}
+   */
   get resolution(): ResolverStrategy|null {
     return this.resolveConfigProperty<ResolverStrategy>('resolution');
   }
   
+  /**
+   * The token this view is using for registration.
+   * @readonly
+   * @type {(any|null)}
+   */
   get token(): any|null {
     return this._viewFactory.getTokenFrom(this._configuration);
   }
@@ -92,6 +136,11 @@ export class View extends Renderable {
     super.destroy();
   }
 
+  /**
+   * Closes this view.
+   * @emits {BeforeDestroyEvent} Fired when not silent.
+   * @param {{ silent?: boolean }} [args={}] 
+   */
   close(args: { silent?: boolean } = {}): void {
     const { silent = false } = args;
     
@@ -105,29 +154,53 @@ export class View extends Renderable {
     }
   }
 
+  /**
+   * Makes this view visible.
+   * @emits {MakeVisibileCommand}
+   */
   makeVisible(): void {
     this.emitUp(new MakeVisibleCommand(this));
   }
 
+  /**
+   * Minimizes this view if applicable.
+   * @emits {MinimizeCommand}
+   */
   minimize(): void {
     this.emitUp(new MinimizeCommand(this));
   }
 
+  /**
+   * Resolves a views config property. Checks the configuration given to the
+   * view renderable first then checks the component metadata.
+   * @template T The return type.
+   * @param {string} path 
+   * @returns {(T|null)} 
+   */
   resolveConfigProperty<T>(path: string): T|null {
     return this._viewFactory.resolveConfigProperty<T>(this._configuration, path);
   }
 
+  /**
+   * Invoked on every render cycle.
+   * @private
+   */
   private _postRender(): void {
+    // Check for these changes every render iteration.
     this._visibilityChanges.next(this.isVisible());
     this._sizeChanges.next({ width: this.width, height: this.height });
   }
 
+  /**
+   * Invoked when snabbdom has created the HTML element for this view.
+   * @private
+   * @param {HTMLElement} element 
+   */
   private _onCreate(element: HTMLElement): void {
     if (!this._viewContainer) {
       this._viewContainer = this._viewManager.resolveOrCreate<any>({
         config: this._configuration,
-        injector: this.injector,
-        container: this
+        injector: this.injector
       });
     }
 
@@ -135,6 +208,12 @@ export class View extends Renderable {
     this._viewContainer.mountTo(element);
   }
 
+  /**
+   * Configures a view.
+   * @static
+   * @param {ViewConfig} config 
+   * @returns {ConfiguredRenderable<View>} 
+   */
   static configure(config: ViewConfig): ConfiguredRenderable<View> {
     return new ConfiguredRenderable(View, config);
   }

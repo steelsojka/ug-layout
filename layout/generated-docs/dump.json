@@ -21038,7 +21038,7 @@
     "__docId__": 810,
     "kind": "file",
     "name": "docs/view/View.js",
-    "content": "import { VNode } from 'snabbdom/vnode';\nimport h from 'snabbdom/h';\n\nimport { Type, ProviderArg, Inject, Injector, Optional, forwardRef } from '../di';\nimport { Renderer, Renderable, ConfiguredRenderable } from '../dom';\nimport { ContainerRef, ConfigurationRef, ElementRef, DocumentRef } from '../common';\nimport { Stack } from '../stack';\nimport { ViewContainer } from './ViewContainer';\nimport { ViewConfig, ResolverStrategy } from './common';\nimport { Subject, Observable, BeforeDestroyEvent } from '../events';\nimport { MakeVisibleCommand, MinimizeCommand } from '../commands';\nimport { ViewManager } from './ViewManager';\nimport { ViewFactory } from './ViewFactory';\nimport { get } from '../utils';\n\nexport class View extends Renderable {\n  visibilityChanges: Observable<boolean>;\n  sizeChanges: Observable<{ width: number, height: number }>;\n  \n  protected _viewContainer: ViewContainer<any>;\n  protected _visibilityChanges: Subject<boolean> = new Subject();\n  protected _sizeChanges: Subject<{ width: number, height: number }> = new Subject();\n  \n  constructor(\n    @Inject(ContainerRef) protected _container: Renderable,\n    @Inject(ConfigurationRef) protected _configuration: ViewConfig,\n    @Inject(ViewManager) protected _viewManager: ViewManager,\n    @Inject(ViewFactory) protected _viewFactory: ViewFactory,\n    @Inject(DocumentRef) protected _document: Document\n  ) {\n    super();\n    \n    this.visibilityChanges = this._visibilityChanges.asObservable().distinctUntilChanged();\n    this.sizeChanges = this._sizeChanges.asObservable().distinctUntilChanged((p, c) => {\n      return p.width === c.width && p.height === c.height;\n    });\n  }\n\n  get width(): number {\n    return this._container.width;\n  }\n\n  get height(): number {\n    return this._container.height;\n  }\n\n  get lazy(): boolean|null {\n    return this.resolveConfigProperty<boolean>('lazy');\n  }\n  \n  get isCacheable(): boolean|null {\n    return this.resolveConfigProperty<boolean>('cacheable');\n  }\n  \n  get ref(): string|null {\n    return this.resolveConfigProperty<string>('ref');\n  }\n  \n  get resolution(): ResolverStrategy|null {\n    return this.resolveConfigProperty<ResolverStrategy>('resolution');\n  }\n  \n  get token(): any|null {\n    return this._viewFactory.getTokenFrom(this._configuration);\n  }\n\n  initialize(): void {\n    super.initialize();\n    \n    this._renderer.rendered\n      .takeUntil(this.destroyed)\n      .subscribe(this._postRender.bind(this));\n  }\n\n  render(): VNode {\n    return h('div.ug-layout__view-container', {\n      key: this.uid,\n      style: {\n        width: `${this.width}px`,\n        height: `${this.height}px`\n      },\n      hook: {\n        create: (oldNode, newNode) => this._onCreate(newNode.elm as HTMLElement)\n      }\n    });\n  }\n\n  destroy(): void {\n    this._sizeChanges.complete();\n    this._visibilityChanges.complete();\n\n    super.destroy();\n  }\n\n  close(args: { silent?: boolean } = {}): void {\n    const { silent = false } = args;\n    \n    if (!silent) {\n      const event = new BeforeDestroyEvent(this);\n      \n      this._eventBus.next(event);\n      event.results().subscribe(() => this.remove());\n    } else {\n      this.destroy();\n    }\n  }\n\n  makeVisible(): void {\n    this.emitUp(new MakeVisibleCommand(this));\n  }\n\n  minimize(): void {\n    this.emitUp(new MinimizeCommand(this));\n  }\n\n  resolveConfigProperty<T>(path: string): T|null {\n    return this._viewFactory.resolveConfigProperty<T>(this._configuration, path);\n  }\n\n  private _postRender(): void {\n    this._visibilityChanges.next(this.isVisible());\n    this._sizeChanges.next({ width: this.width, height: this.height });\n  }\n\n  private _onCreate(element: HTMLElement): void {\n    if (!this._viewContainer) {\n      this._viewContainer = this._viewManager.resolveOrCreate<any>({\n        config: this._configuration,\n        injector: this.injector,\n        container: this\n      });\n    }\n\n    this._viewContainer.setView(this);\n    this._viewContainer.mountTo(element);\n  }\n\n  static configure(config: ViewConfig): ConfiguredRenderable<View> {\n    return new ConfiguredRenderable(View, config);\n  }\n}",
+    "content": "import { VNode } from 'snabbdom/vnode';\nimport h from 'snabbdom/h';\n\nimport { Type, ProviderArg, Inject, Injector, Optional, forwardRef } from '../di';\nimport { Renderer, Renderable, ConfiguredRenderable } from '../dom';\nimport { ContainerRef, ConfigurationRef, ElementRef, DocumentRef } from '../common';\nimport { Stack } from '../stack';\nimport { ViewContainer } from './ViewContainer';\nimport { ViewConfig, ResolverStrategy } from './common';\nimport { Subject, Observable, BeforeDestroyEvent } from '../events';\nimport { MakeVisibleCommand, MinimizeCommand } from '../commands';\nimport { ViewManager } from './ViewManager';\nimport { ViewFactory } from './ViewFactory';\nimport { get } from '../utils';\n\n/**\n * A renderable that renders a component.\n * @export\n * @class View\n * @extends {Renderable}\n */\nexport class View extends Renderable {\n  protected _viewContainer: ViewContainer<any>;\n  protected _visibilityChanges: Subject<boolean> = new Subject();\n  protected _sizeChanges: Subject<{ width: number, height: number }> = new Subject();\n  \n  /**\n   * Notifies when the visibility of this view changes.\n   * @type {Observable<boolean>}\n   */\n  visibilityChanges: Observable<boolean> = this._visibilityChanges.asObservable().distinctUntilChanged();\n  /**\n   * Notifies when the dimensions of this view changes.\n   * @type {Observable<{ width: number, height: number }>}\n   */\n  sizeChanges: Observable<{ width: number, height: number }> = this._sizeChanges.asObservable().distinctUntilChanged((p, c) => {\n    return p.width === c.width && p.height === c.height;\n  });\n  \n  /**\n   * Creates an instance of View.\n   * @param {Renderable} _container \n   * @param {ViewConfig} _configuration \n   * @param {ViewManager} _viewManager \n   * @param {ViewFactory} _viewFactory \n   * @param {Document} _document \n   */\n  constructor(\n    @Inject(ContainerRef) protected _container: Renderable,\n    @Inject(ConfigurationRef) protected _configuration: ViewConfig,\n    @Inject(ViewManager) protected _viewManager: ViewManager,\n    @Inject(ViewFactory) protected _viewFactory: ViewFactory,\n    @Inject(DocumentRef) protected _document: Document\n  ) {\n    super();\n  }\n\n  get width(): number {\n    return this._container.width;\n  }\n\n  get height(): number {\n    return this._container.height;\n  }\n\n  /**\n   * Whether this view is configured to be lazy.\n   * @readonly\n   * @type {(boolean|null)}\n   */\n  get lazy(): boolean|null {\n    return this.resolveConfigProperty<boolean>('lazy');\n  }\n  \n  /**\n   * Whether this view in configured to be cacheable.\n   * @readonly\n   * @type {(boolean|null)}\n   */\n  get isCacheable(): boolean|null {\n    return this.resolveConfigProperty<boolean>('cacheable');\n  }\n  \n  /**\n   * The 'ref' string this view is configured with.\n   * @readonly\n   * @type {(string|null)}\n   */\n  get ref(): string|null {\n    return this.resolveConfigProperty<string>('ref');\n  }\n  \n  /**\n   * The resolution strategy this view is configured with.\n   * @readonly\n   * @type {(ResolverStrategy|null)}\n   */\n  get resolution(): ResolverStrategy|null {\n    return this.resolveConfigProperty<ResolverStrategy>('resolution');\n  }\n  \n  /**\n   * The token this view is using for registration.\n   * @readonly\n   * @type {(any|null)}\n   */\n  get token(): any|null {\n    return this._viewFactory.getTokenFrom(this._configuration);\n  }\n\n  initialize(): void {\n    super.initialize();\n    \n    this._renderer.rendered\n      .takeUntil(this.destroyed)\n      .subscribe(this._postRender.bind(this));\n  }\n\n  render(): VNode {\n    return h('div.ug-layout__view-container', {\n      key: this.uid,\n      style: {\n        width: `${this.width}px`,\n        height: `${this.height}px`\n      },\n      hook: {\n        create: (oldNode, newNode) => this._onCreate(newNode.elm as HTMLElement)\n      }\n    });\n  }\n\n  destroy(): void {\n    this._sizeChanges.complete();\n    this._visibilityChanges.complete();\n\n    super.destroy();\n  }\n\n  /**\n   * Closes this view.\n   * @emits {BeforeDestroyEvent} Fired when not silent.\n   * @param {{ silent?: boolean }} [args={}] \n   */\n  close(args: { silent?: boolean } = {}): void {\n    const { silent = false } = args;\n    \n    if (!silent) {\n      const event = new BeforeDestroyEvent(this);\n      \n      this._eventBus.next(event);\n      event.results().subscribe(() => this.remove());\n    } else {\n      this.destroy();\n    }\n  }\n\n  /**\n   * Makes this view visible.\n   * @emits {MakeVisibileCommand}\n   */\n  makeVisible(): void {\n    this.emitUp(new MakeVisibleCommand(this));\n  }\n\n  /**\n   * Minimizes this view if applicable.\n   * @emits {MinimizeCommand}\n   */\n  minimize(): void {\n    this.emitUp(new MinimizeCommand(this));\n  }\n\n  /**\n   * Resolves a views config property. Checks the configuration given to the\n   * view renderable first then checks the component metadata.\n   * @template T The return type.\n   * @param {string} path \n   * @returns {(T|null)} \n   */\n  resolveConfigProperty<T>(path: string): T|null {\n    return this._viewFactory.resolveConfigProperty<T>(this._configuration, path);\n  }\n\n  /**\n   * Invoked on every render cycle.\n   * @private\n   */\n  private _postRender(): void {\n    // Check for these changes every render iteration.\n    this._visibilityChanges.next(this.isVisible());\n    this._sizeChanges.next({ width: this.width, height: this.height });\n  }\n\n  /**\n   * Invoked when snabbdom has created the HTML element for this view.\n   * @private\n   * @param {HTMLElement} element \n   */\n  private _onCreate(element: HTMLElement): void {\n    if (!this._viewContainer) {\n      this._viewContainer = this._viewManager.resolveOrCreate<any>({\n        config: this._configuration,\n        injector: this.injector\n      });\n    }\n\n    this._viewContainer.setView(this);\n    this._viewContainer.mountTo(element);\n  }\n\n  /**\n   * Configures a view.\n   * @static\n   * @param {ViewConfig} config \n   * @returns {ConfiguredRenderable<View>} \n   */\n  static configure(config: ViewConfig): ConfiguredRenderable<View> {\n    return new ConfiguredRenderable(View, config);\n  }\n}",
     "static": true,
     "longname": "docs/view/View.js",
     "access": null,
@@ -21056,18 +21056,17 @@
     "export": true,
     "importPath": "ug-layout/view/View",
     "importStyle": "{View}",
-    "description": null,
-    "lineNumber": 10,
-    "undocument": true,
+    "description": "A renderable that renders a component.",
+    "lineNumber": 16,
     "unknown": [
       {
-        "tagName": "@_undocument",
-        "tagValue": ""
+        "tagName": "@class",
+        "tagValue": "View"
       }
     ],
     "interface": false,
     "extends": [
-      "docs/dom.js~Renderable"
+      "Renderable"
     ]
   },
   {
@@ -21080,45 +21079,58 @@
     "static": false,
     "longname": "docs/view/View.js~View#constructor",
     "access": null,
-    "description": null,
-    "lineNumber": 11,
-    "undocument": true,
-    "unknown": [
-      {
-        "tagName": "@_undocument",
-        "tagValue": ""
-      }
-    ],
+    "description": "Creates an instance of View.",
+    "lineNumber": 25,
     "params": [
       {
+        "nullable": null,
+        "types": [
+          "Renderable"
+        ],
+        "spread": false,
+        "optional": false,
         "name": "_container",
-        "types": [
-          "*"
-        ]
+        "description": ""
       },
       {
+        "nullable": null,
+        "types": [
+          "ViewConfig"
+        ],
+        "spread": false,
+        "optional": false,
         "name": "_configuration",
-        "types": [
-          "*"
-        ]
+        "description": ""
       },
       {
+        "nullable": null,
+        "types": [
+          "ViewManager"
+        ],
+        "spread": false,
+        "optional": false,
         "name": "_viewManager",
-        "types": [
-          "*"
-        ]
+        "description": ""
       },
       {
+        "nullable": null,
+        "types": [
+          "ViewFactory"
+        ],
+        "spread": false,
+        "optional": false,
         "name": "_viewFactory",
-        "types": [
-          "*"
-        ]
+        "description": ""
       },
       {
-        "name": "_document",
+        "nullable": null,
         "types": [
-          "*"
-        ]
+          "Document"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "_document",
+        "description": ""
       }
     ]
   },
@@ -21131,7 +21143,7 @@
     "longname": "docs/view/View.js~View#_container",
     "access": null,
     "description": null,
-    "lineNumber": 13,
+    "lineNumber": 27,
     "undocument": true,
     "unknown": [
       {
@@ -21154,7 +21166,7 @@
     "longname": "docs/view/View.js~View#_configuration",
     "access": null,
     "description": null,
-    "lineNumber": 14,
+    "lineNumber": 28,
     "undocument": true,
     "unknown": [
       {
@@ -21177,7 +21189,7 @@
     "longname": "docs/view/View.js~View#_viewManager",
     "access": null,
     "description": null,
-    "lineNumber": 15,
+    "lineNumber": 29,
     "undocument": true,
     "unknown": [
       {
@@ -21200,7 +21212,7 @@
     "longname": "docs/view/View.js~View#_viewFactory",
     "access": null,
     "description": null,
-    "lineNumber": 16,
+    "lineNumber": 30,
     "undocument": true,
     "unknown": [
       {
@@ -21223,7 +21235,7 @@
     "longname": "docs/view/View.js~View#_document",
     "access": null,
     "description": null,
-    "lineNumber": 17,
+    "lineNumber": 31,
     "undocument": true,
     "unknown": [
       {
@@ -21246,7 +21258,7 @@
     "longname": "docs/view/View.js~View#_visibilityChanges",
     "access": null,
     "description": null,
-    "lineNumber": 18,
+    "lineNumber": 32,
     "undocument": true,
     "unknown": [
       {
@@ -21269,7 +21281,7 @@
     "longname": "docs/view/View.js~View#_sizeChanges",
     "access": null,
     "description": null,
-    "lineNumber": 19,
+    "lineNumber": 33,
     "undocument": true,
     "unknown": [
       {
@@ -21291,19 +21303,15 @@
     "static": false,
     "longname": "docs/view/View.js~View#visibilityChanges",
     "access": null,
-    "description": null,
-    "lineNumber": 20,
-    "undocument": true,
-    "unknown": [
-      {
-        "tagName": "@_undocument",
-        "tagValue": ""
-      }
-    ],
+    "description": "Notifies when the visibility of this view changes.",
+    "lineNumber": 38,
     "type": {
+      "nullable": null,
       "types": [
-        "*"
-      ]
+        "Observable<boolean>"
+      ],
+      "spread": false,
+      "description": null
     }
   },
   {
@@ -21314,19 +21322,15 @@
     "static": false,
     "longname": "docs/view/View.js~View#sizeChanges",
     "access": null,
-    "description": null,
-    "lineNumber": 21,
-    "undocument": true,
-    "unknown": [
-      {
-        "tagName": "@_undocument",
-        "tagValue": ""
-      }
-    ],
+    "description": "Notifies when the dimensions of this view changes.",
+    "lineNumber": 43,
     "type": {
+      "nullable": null,
       "types": [
-        "*"
-      ]
+        "Observable<{ width: number, height: number }>"
+      ],
+      "spread": false,
+      "description": null
     }
   },
   {
@@ -21340,7 +21344,7 @@
     "longname": "docs/view/View.js~View#width",
     "access": null,
     "description": null,
-    "lineNumber": 25,
+    "lineNumber": 47,
     "undocument": true,
     "unknown": [
       {
@@ -21365,7 +21369,7 @@
     "longname": "docs/view/View.js~View#height",
     "access": null,
     "description": null,
-    "lineNumber": 28,
+    "lineNumber": 50,
     "undocument": true,
     "unknown": [
       {
@@ -21389,19 +21393,22 @@
     "static": false,
     "longname": "docs/view/View.js~View#lazy",
     "access": null,
-    "description": null,
-    "lineNumber": 31,
-    "undocument": true,
+    "description": "Whether this view is configured to be lazy.",
+    "lineNumber": 58,
     "unknown": [
       {
-        "tagName": "@_undocument",
+        "tagName": "@readonly",
         "tagValue": ""
       }
     ],
     "type": {
+      "nullable": null,
       "types": [
-        "*"
-      ]
+        "boolean",
+        "null"
+      ],
+      "spread": false,
+      "description": null
     }
   },
   {
@@ -21414,19 +21421,22 @@
     "static": false,
     "longname": "docs/view/View.js~View#isCacheable",
     "access": null,
-    "description": null,
-    "lineNumber": 34,
-    "undocument": true,
+    "description": "Whether this view in configured to be cacheable.",
+    "lineNumber": 66,
     "unknown": [
       {
-        "tagName": "@_undocument",
+        "tagName": "@readonly",
         "tagValue": ""
       }
     ],
     "type": {
+      "nullable": null,
       "types": [
-        "*"
-      ]
+        "boolean",
+        "null"
+      ],
+      "spread": false,
+      "description": null
     }
   },
   {
@@ -21439,19 +21449,22 @@
     "static": false,
     "longname": "docs/view/View.js~View#ref",
     "access": null,
-    "description": null,
-    "lineNumber": 37,
-    "undocument": true,
+    "description": "The 'ref' string this view is configured with.",
+    "lineNumber": 74,
     "unknown": [
       {
-        "tagName": "@_undocument",
+        "tagName": "@readonly",
         "tagValue": ""
       }
     ],
     "type": {
+      "nullable": null,
       "types": [
-        "*"
-      ]
+        "string",
+        "null"
+      ],
+      "spread": false,
+      "description": null
     }
   },
   {
@@ -21464,19 +21477,22 @@
     "static": false,
     "longname": "docs/view/View.js~View#resolution",
     "access": null,
-    "description": null,
-    "lineNumber": 40,
-    "undocument": true,
+    "description": "The resolution strategy this view is configured with.",
+    "lineNumber": 82,
     "unknown": [
       {
-        "tagName": "@_undocument",
+        "tagName": "@readonly",
         "tagValue": ""
       }
     ],
     "type": {
+      "nullable": null,
       "types": [
-        "*"
-      ]
+        "ResolverStrategy",
+        "null"
+      ],
+      "spread": false,
+      "description": null
     }
   },
   {
@@ -21489,19 +21505,22 @@
     "static": false,
     "longname": "docs/view/View.js~View#token",
     "access": null,
-    "description": null,
-    "lineNumber": 43,
-    "undocument": true,
+    "description": "The token this view is using for registration.",
+    "lineNumber": 90,
     "unknown": [
       {
-        "tagName": "@_undocument",
+        "tagName": "@readonly",
         "tagValue": ""
       }
     ],
     "type": {
+      "nullable": null,
       "types": [
-        "*"
-      ]
+        "any",
+        "null"
+      ],
+      "spread": false,
+      "description": null
     }
   },
   {
@@ -21515,7 +21534,7 @@
     "longname": "docs/view/View.js~View#initialize",
     "access": null,
     "description": null,
-    "lineNumber": 46,
+    "lineNumber": 93,
     "undocument": true,
     "unknown": [
       {
@@ -21536,7 +21555,7 @@
     "longname": "docs/view/View.js~View#render",
     "access": null,
     "description": null,
-    "lineNumber": 52,
+    "lineNumber": 99,
     "undocument": true,
     "unknown": [
       {
@@ -21562,7 +21581,7 @@
     "longname": "docs/view/View.js~View#destroy",
     "access": null,
     "description": null,
-    "lineNumber": 64,
+    "lineNumber": 111,
     "undocument": true,
     "unknown": [
       {
@@ -21582,24 +21601,28 @@
     "static": false,
     "longname": "docs/view/View.js~View#close",
     "access": null,
-    "description": null,
-    "lineNumber": 69,
-    "undocument": true,
-    "unknown": [
-      {
-        "tagName": "@_undocument",
-        "tagValue": ""
-      }
-    ],
+    "description": "Closes this view.",
+    "lineNumber": 121,
     "params": [
       {
-        "name": "args",
-        "optional": true,
+        "nullable": null,
         "types": [
-          "{}"
+          "{ silent?: boolean }"
         ],
+        "spread": false,
+        "optional": true,
+        "defaultValue": "{}",
         "defaultRaw": {},
-        "defaultValue": "{}"
+        "name": "args",
+        "description": ""
+      }
+    ],
+    "emits": [
+      {
+        "types": [
+          "BeforeDestroyEvent"
+        ],
+        "description": "Fired when not silent."
       }
     ]
   },
@@ -21613,16 +21636,17 @@
     "static": false,
     "longname": "docs/view/View.js~View#makeVisible",
     "access": null,
-    "description": null,
-    "lineNumber": 80,
-    "undocument": true,
-    "unknown": [
+    "description": "Makes this view visible.",
+    "lineNumber": 136,
+    "params": [],
+    "emits": [
       {
-        "tagName": "@_undocument",
-        "tagValue": ""
+        "types": [
+          "MakeVisibileCommand"
+        ],
+        "description": ""
       }
-    ],
-    "params": []
+    ]
   },
   {
     "__docId__": 834,
@@ -21634,16 +21658,17 @@
     "static": false,
     "longname": "docs/view/View.js~View#minimize",
     "access": null,
-    "description": null,
-    "lineNumber": 83,
-    "undocument": true,
-    "unknown": [
+    "description": "Minimizes this view if applicable.",
+    "lineNumber": 143,
+    "params": [],
+    "emits": [
       {
-        "tagName": "@_undocument",
-        "tagValue": ""
+        "types": [
+          "MinimizeCommand"
+        ],
+        "description": ""
       }
-    ],
-    "params": []
+    ]
   },
   {
     "__docId__": 835,
@@ -21655,27 +21680,38 @@
     "static": false,
     "longname": "docs/view/View.js~View#resolveConfigProperty",
     "access": null,
-    "description": null,
-    "lineNumber": 86,
-    "undocument": true,
+    "description": "Resolves a views config property. Checks the configuration given to the\nview renderable first then checks the component metadata.",
+    "lineNumber": 153,
     "unknown": [
       {
-        "tagName": "@_undocument",
-        "tagValue": ""
+        "tagName": "@template",
+        "tagValue": "T The return type."
+      },
+      {
+        "tagName": "@returns",
+        "tagValue": "{(T|null)}"
       }
     ],
     "params": [
       {
-        "name": "path",
+        "nullable": null,
         "types": [
-          "*"
-        ]
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "path",
+        "description": ""
       }
     ],
     "return": {
+      "nullable": null,
       "types": [
-        "*"
-      ]
+        "T",
+        "null"
+      ],
+      "spread": false,
+      "description": ""
     }
   },
   {
@@ -21687,16 +21723,9 @@
     "async": false,
     "static": false,
     "longname": "docs/view/View.js~View#_postRender",
-    "access": null,
-    "description": null,
-    "lineNumber": 89,
-    "undocument": true,
-    "unknown": [
-      {
-        "tagName": "@_undocument",
-        "tagValue": ""
-      }
-    ],
+    "access": "private",
+    "description": "Invoked on every render cycle.",
+    "lineNumber": 160,
     "params": []
   },
   {
@@ -21708,22 +21737,19 @@
     "async": false,
     "static": false,
     "longname": "docs/view/View.js~View#_onCreate",
-    "access": null,
-    "description": null,
-    "lineNumber": 93,
-    "undocument": true,
-    "unknown": [
-      {
-        "tagName": "@_undocument",
-        "tagValue": ""
-      }
-    ],
+    "access": "private",
+    "description": "Invoked when snabbdom has created the HTML element for this view.",
+    "lineNumber": 170,
     "params": [
       {
-        "name": "element",
+        "nullable": null,
         "types": [
-          "*"
-        ]
+          "HTMLElement"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "element",
+        "description": ""
       }
     ]
   },
@@ -21736,7 +21762,7 @@
     "longname": "docs/view/View.js~View#_viewContainer",
     "access": null,
     "description": null,
-    "lineNumber": 95,
+    "lineNumber": 172,
     "undocument": true,
     "unknown": [
       {
@@ -21760,34 +21786,40 @@
     "static": true,
     "longname": "docs/view/View.js~View.configure",
     "access": null,
-    "description": null,
-    "lineNumber": 104,
-    "undocument": true,
+    "description": "Configures a view.",
+    "lineNumber": 186,
     "unknown": [
       {
-        "tagName": "@_undocument",
-        "tagValue": ""
+        "tagName": "@returns",
+        "tagValue": "{ConfiguredRenderable<View>}"
       }
     ],
     "params": [
       {
-        "name": "config",
+        "nullable": null,
         "types": [
-          "*"
-        ]
+          "ViewConfig"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "config",
+        "description": ""
       }
     ],
     "return": {
+      "nullable": null,
       "types": [
-        "*"
-      ]
+        "ConfiguredRenderable<View>"
+      ],
+      "spread": false,
+      "description": ""
     }
   },
   {
     "__docId__": 840,
     "kind": "file",
     "name": "docs/view/ViewContainer.js",
-    "content": "import { Injector, Type, Inject, Optional } from '../di';\nimport { Renderable } from '../dom';\nimport { ReplaySubject, Observable, Subject, BeforeDestroyEvent, BehaviorSubject } from '../events';\nimport { ContainerRef, ConfigurationRef, DocumentRef } from '../common';\nimport { View } from './View';\nimport { ViewFactoriesRef, ViewComponentRef } from './common';\nimport { CustomViewHookEvent } from './CustomViewHookEvent';\nimport { isFunction, get, uid, eq, isPromise, isObject } from '../utils';\n\nexport enum ViewContainerStatus {\n  READY,\n  PENDING\n}\n\nexport enum ViewContainerAttachedStatus {\n  ATTACHED,\n  DETACHED\n}\n\n/**\n * A container that holds a 1 to 1 relationship with a component instance. This instance\n * is the main API for a component to interact with the layout framework.\n * @export\n * @class ViewContainer\n * @template T The component type.\n */\nexport class ViewContainer<T> {\n  /**\n   * This element is the mount point that views can mount to.\n   * The node created by the render method gets recreated when moved\n   * somewhere else in the tree. This element is constant.\n   * @private\n   * @type {HTMLElement}\n   */\n  private _element: HTMLElement = this._document.createElement('div');\n  private _component: T|null = null;\n  private _container: View|null;\n  private _status: BehaviorSubject<ViewContainerStatus> = new BehaviorSubject(ViewContainerStatus.PENDING);\n  private _destroyed: Subject<ViewContainer<T>> = new Subject();\n  private _beforeDestroy: Subject<BeforeDestroyEvent<Renderable>> = new Subject();\n  private _containerChange: Subject<View|null> = new Subject<View|null>();\n  private _visibilityChanges: Subject<boolean> = new Subject();\n  private _sizeChanges: Subject<{ width: number, height: number }> = new Subject();\n  private _attached: Subject<boolean> = new Subject();\n  private _initialized: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);\n  private _isInitialized: boolean = false;\n  \n  /**\n   * A unique identifier for this instance.\n   * @type {number}\n   */\n  readonly id: number = uid();\n  /**\n   * Notifies that the view is being destroyed. This action is cancellable or can be halted until\n   * an async action is complete.\n   * @see Cancellable\n   * @type {Observable<BeforeDestroyEvent<Renderable>>}\n   */\n  beforeDestroy: Observable<BeforeDestroyEvent<Renderable>> = this._beforeDestroy.asObservable();\n  /**\n   * Notifies when the view is destroyed.\n   * @type {Observable<ViewContainer<T>>}\n   */\n  destroyed: Observable<ViewContainer<T>> = this._destroyed.asObservable();\n  /**\n   * Notifies when the visibility of this view changes.\n   * @type {Observable<boolean>}\n   */\n  visibilityChanges: Observable<boolean> = this._visibilityChanges.asObservable();\n  /**\n   * Notifies when the dimensions of this views container has changed.\n   * @type {Observable<{ width: number, height: number }>}\n   */\n  sizeChanges: Observable<{ width: number, height: number }> = this._sizeChanges.asObservable();\n  /**\n   * Notifies when the status of this component changes.\n   * @type {Observable<ViewContainerStatus>}\n   */\n  status: Observable<ViewContainerStatus> = this._status.asObservable();\n  /**\n   * Notifies when the component is ready.\n   * @type {Observable<ViewContainerStatus>}\n   */\n  statusReady: Observable<ViewContainerStatus> = this.status.filter(eq(ViewContainerStatus.READY));\n  /**\n   * Contains the state of ths views initialized state.\n   * @type {Observable<boolean>}\n   */\n  initialized: Observable<boolean> = this._initialized.asObservable();\n  /**\n   * Notifies when this container has changed the {@link View} it is associated with.\n   * @type {(Observable<View|null>)}\n   */\n  containerChange: Observable<View|null> = this._containerChange.asObservable();\n  /**\n   * Notifies when the view has become attached.\n   * @type {Observable<boolean>}\n   */\n  attached: Observable<boolean> = this._attached.asObservable().filter(eq(true));\n  /**\n   * Notifies when the view has become detached.\n   * @type {Observable<boolean>}\n   */\n  detached: Observable<boolean> = this._attached.asObservable().filter(eq(false));\n  \n  /**\n   * Creates an instance of ViewContainer.\n   * @param {Document} _document \n   * @param {Injector} _injector \n   */\n  constructor(\n    @Inject(DocumentRef) protected _document: Document,\n    @Inject(Injector) protected _injector: Injector\n  ) {\n    this._element.classList.add('ug-layout__view-container-mount');\n\n    this.attached.subscribe(() => this._executeHook('ugOnAttach', this._container));\n    this.detached.subscribe(() => this._executeHook('ugOnDetach'));\n    this.sizeChanges.subscribe(dimensions => this._executeHook('ugOnResize', dimensions));\n    this.visibilityChanges.subscribe(isVisible => this._executeHook('ugOnVisibilityChange', isVisible));\n    this.beforeDestroy.subscribe(event => this._executeHook('ugOnBeforeDestroy', event));\n    this.initialized.subscribe(v => this._isInitialized = v);\n  }\n\n  /**\n   * Current width in pixels.\n   * @readonly\n   * @type {number}\n   */\n  get width(): number {\n    return get(this._container, 'width', 0);\n  }\n  \n  /**\n   * Current height in pixels.\n   * @readonly\n   * @type {number}\n   */\n  get height(): number {\n    return get(this._container, 'height', 0);\n  }\n\n  /**\n   * The component instance associated with this container.\n   * @readonly\n   * @type {T|null}\n   */\n  get component(): T|null {\n    return this._component;\n  }\n\n  /**\n   * Whether the container is cacheable.\n   * @readonly\n   * @type {boolean}\n   */\n  get isCacheable(): boolean {\n    return this._container ? Boolean(this._container.resolveConfigProperty('cacheable')) : false;\n  }\n\n  /**\n   * The HTML element for this container.\n   * @readonly\n   * @type {HTMLElement}\n   */\n  get element(): HTMLElement {\n    return this._element;\n  }\n\n  /**\n   * Get's a token from this containers injector. Note, this should not be used to grab\n   * parent renderables or any item that can be changed.\n   * @template U The return type.\n   * @param {*} token \n   * @returns {(U|null)} \n   */\n  get<U>(token: any): U|null {\n    return this._injector.get(token, null);\n  }\n\n  /**\n   * Destroys the container.\n   */\n  destroy(): void {\n    this._destroyed.next();\n    \n    this._destroyed.complete();\n    this._status.complete();\n    this._beforeDestroy.complete();\n    this._containerChange.complete();\n    this._visibilityChanges.complete();\n    this._sizeChanges.complete();\n    this._initialized.complete();\n  }\n  \n  /**\n   * Waits for the component to be ready. If the component is not initialized\n   * it will be initialized. This is important when the view is lazy and hasn't\n   * been shown yet but we need to interact with the component.\n   * @async\n   * @param {{ init?: boolean }} [options={}] \n   * @returns {Promise<ViewContainer<T>>} \n   */\n  async ready(options: { init?: boolean } = {}): Promise<ViewContainer<T>> {\n    const { init = true } = options;\n    \n    if (!this._isInitialized && init !== false) {\n      this.initialize();  \n    }\n    \n    await this.statusReady.toPromise();\n\n    return this;\n  }\n\n  /**\n   * Initializes the component. This creates the component. \n   */\n  initialize(): void {\n    const component = this._injector.get(ViewComponentRef);\n    \n    if (isPromise<T>(component)) {\n      component.then(val => this._onComponentReady(val));\n    } else {\n      this._onComponentReady(component);\n    }\n\n    this._initialized.next(true);\n  }\n\n  /**\n   * Sets the containing {@link View} for this container.\n   * @param {(View|null)} container \n   * @returns {void} \n   */\n  setView(container: View|null): void {\n    if (container === this._container) {\n      return;\n    }\n    \n    this._container = container;\n\n    // This needs to fire before we wire up to the new container.\n    this._containerChange.next(container);\n\n    if (this._container) {\n      this._container.destroyed\n        .takeUntil(this._containerChange)\n        .subscribe(() => this._onViewDestroy());\n      \n      this._container\n        .scope(BeforeDestroyEvent)\n        .takeUntil(this._containerChange)\n        .subscribe(e => this._beforeDestroy.next(e));\n      \n      this._container.visibilityChanges\n        .takeUntil(this._containerChange)\n        .subscribe(e => this._visibilityChanges.next(e));\n      \n      this._container.sizeChanges\n        .takeUntil(this._containerChange)\n        .subscribe(e => this._sizeChanges.next(e));\n\n      this._container\n        .scope(CustomViewHookEvent)\n        .takeUntil(this._containerChange)\n        .subscribe(event => this._executeHook(event.name, ...event.args));\n    }\n\n    this._attached.next(Boolean(this._container));\n  }\n\n  /**\n   * Gets this renderables parent or any parent that is\n   * an instance of the passed in constructor. If non is found\n   * then null is returned.\n   * @template T The constructor type.\n   * @param {Type<T>} [Ctor] \n   * @returns {(T|null)} \n   */\n  getParent<U extends Renderable>(Ctor: Type<U>): U|null {\n    return this._container ? this._container.getParent(Ctor) : null;\n  }\n  \n  /**\n   * Gets this renderables parents or any parents that are\n   * an instance of the passed in constructor.    \n   * @template T The constructor type.\n   * @param {Type<T>} [Ctor] \n   * @returns {(T|null)} \n   */\n  getParents<U extends Renderable>(Ctor: Type<U>): U[] {\n    return this._container ? this._container.getParents(Ctor) : [];\n  }\n  \n  /**\n   * Signals up the tree to make this {@link View} visible.\n   */\n  makeVisible(): void {\n    if (this._container) {\n      this._container.makeVisible();\n    }\n  }\n  \n  /**\n   * Determines whether this renderable is visible.\n   * @returns {boolean} \n   */\n  isVisible(): boolean {\n    return this._container ? this._container.isVisible() : false;\n  }\n  \n  /**\n   * Closes this view.\n   * @param {{ silent?: boolean }} args \n   */\n  close(args: { silent?: boolean }): void {\n    if (this._container) {\n      this._container.close(args);\n    }\n  }\n\n  /**\n   * Mounts this containers element to the given element.\n   * @param {HTMLElement} element \n   */\n  mountTo(element: HTMLElement): void {\n    element.appendChild(this._element);\n  }\n  \n  /**\n   * Mounts an element to this containers element.\n   * @param {HTMLElement} element \n   */\n  mount(element: HTMLElement): void {\n    this._element.appendChild(element);\n  }\n  \n  /**\n   * Sets all the content of this containers element to the given HTML string.\n   * @param {string} html \n   */\n  mountHTML(html: string): void {\n    this._element.innerHTML = html;\n  }\n\n  /**\n   * Detaches this container from it's view.\n   */\n  detach(): void {\n    this.setView(null);\n  }\n\n  private _onViewDestroy(): void {\n    // If this view is cacheable, we don't destroy it.\n    if (this.isCacheable) {\n      this.detach();\n    } else {\n      this.destroy();\n    }\n  }\n\n  private _executeHook(name: string, ...args: any[]): any {\n    if (this._component && this._hasHook(name)) {\n      return this._component[name].apply(this._component, args);\n    }\n  }\n\n  private _hasHook(name: string): boolean {\n   return Boolean(this._component && isObject(this._component) && isFunction(this._component[name]));\n  }\n\n  private async _onComponentReady(component: T): Promise<void> {\n    this._component = component;\n\n    const result = this._executeHook('ugOnResolve', this);\n\n    // Allow the `ugOnResolve` hook to run async tasks.\n    if (isPromise(result)) {\n      await result;\n    }\n    \n    this._status.next(ViewContainerStatus.READY);\n    this._executeHook('ugOnInit', this);\n  }\n}",
+    "content": "import { Injector, Type, Inject, Optional } from '../di';\nimport { Renderable } from '../dom';\nimport { ReplaySubject, Observable, Subject, BeforeDestroyEvent, BehaviorSubject } from '../events';\nimport { ContainerRef, ConfigurationRef, DocumentRef } from '../common';\nimport { View } from './View';\nimport { ViewFactoriesRef, ViewComponentRef } from './common';\nimport { CustomViewHookEvent } from './CustomViewHookEvent';\nimport { isFunction, get, uid, eq, isPromise, isObject } from '../utils';\n\nexport enum ViewContainerStatus {\n  READY,\n  PENDING\n}\n\nexport enum ViewContainerAttachedStatus {\n  ATTACHED,\n  DETACHED\n}\n\n/**\n * A container that holds a 1 to 1 relationship with a component instance. This instance\n * is the main API for a component to interact with the layout framework.\n * @export\n * @class ViewContainer\n * @template T The component type.\n */\nexport class ViewContainer<T> {\n  /**\n   * This element is the mount point that views can mount to.\n   * The node created by the render method gets recreated when moved\n   * somewhere else in the tree. This element is constant.\n   * @private\n   * @type {HTMLElement}\n   */\n  private _element: HTMLElement = this._document.createElement('div');\n  private _component: T|null = null;\n  private _container: View|null;\n  private _status: BehaviorSubject<ViewContainerStatus> = new BehaviorSubject(ViewContainerStatus.PENDING);\n  private _destroyed: Subject<ViewContainer<T>> = new Subject();\n  private _beforeDestroy: Subject<BeforeDestroyEvent<Renderable>> = new Subject();\n  private _containerChange: Subject<View|null> = new Subject<View|null>();\n  private _visibilityChanges: Subject<boolean> = new Subject();\n  private _sizeChanges: Subject<{ width: number, height: number }> = new Subject();\n  private _attached: Subject<boolean> = new Subject();\n  private _initialized: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);\n  private _isInitialized: boolean = false;\n  \n  /**\n   * A unique identifier for this instance.\n   * @type {number}\n   */\n  readonly id: number = uid();\n  /**\n   * Notifies that the view is being destroyed. This action is cancellable or can be halted until\n   * an async action is complete.\n   * @see Cancellable\n   * @type {Observable<BeforeDestroyEvent<Renderable>>}\n   */\n  beforeDestroy: Observable<BeforeDestroyEvent<Renderable>> = this._beforeDestroy.asObservable();\n  /**\n   * Notifies when the view is destroyed.\n   * @type {Observable<ViewContainer<T>>}\n   */\n  destroyed: Observable<ViewContainer<T>> = this._destroyed.asObservable();\n  /**\n   * Notifies when the visibility of this view changes.\n   * @type {Observable<boolean>}\n   */\n  visibilityChanges: Observable<boolean> = this._visibilityChanges.asObservable();\n  /**\n   * Notifies when the dimensions of this views container has changed.\n   * @type {Observable<{ width: number, height: number }>}\n   */\n  sizeChanges: Observable<{ width: number, height: number }> = this._sizeChanges.asObservable();\n  /**\n   * Notifies when the status of this component changes.\n   * @type {Observable<ViewContainerStatus>}\n   */\n  status: Observable<ViewContainerStatus> = this._status.asObservable();\n  /**\n   * Notifies when the component is ready.\n   * @type {Observable<ViewContainerStatus>}\n   */\n  statusReady: Observable<ViewContainerStatus> = this.status.filter(eq(ViewContainerStatus.READY));\n  /**\n   * Contains the state of ths views initialized state.\n   * @type {Observable<boolean>}\n   */\n  initialized: Observable<boolean> = this._initialized.asObservable();\n  /**\n   * Notifies when this container has changed the {@link View} it is associated with.\n   * @type {(Observable<View|null>)}\n   */\n  containerChange: Observable<View|null> = this._containerChange.asObservable();\n  /**\n   * Notifies when the view has become attached.\n   * @type {Observable<boolean>}\n   */\n  attached: Observable<boolean> = this._attached.asObservable().filter(eq(true));\n  /**\n   * Notifies when the view has become detached.\n   * @type {Observable<boolean>}\n   */\n  detached: Observable<boolean> = this._attached.asObservable().filter(eq(false));\n  \n  /**\n   * Creates an instance of ViewContainer.\n   * @param {Document} _document \n   * @param {Injector} _injector \n   */\n  constructor(\n    @Inject(DocumentRef) protected _document: Document,\n    @Inject(Injector) protected _injector: Injector\n  ) {\n    this._element.classList.add('ug-layout__view-container-mount');\n\n    this.attached.subscribe(() => this._executeHook('ugOnAttach', this._container));\n    this.detached.subscribe(() => this._executeHook('ugOnDetach'));\n    this.sizeChanges.subscribe(dimensions => this._executeHook('ugOnResize', dimensions));\n    this.visibilityChanges.subscribe(isVisible => this._executeHook('ugOnVisibilityChange', isVisible));\n    this.beforeDestroy.subscribe(event => this._executeHook('ugOnBeforeDestroy', event));\n    this.initialized.subscribe(v => this._isInitialized = v);\n  }\n\n  /**\n   * Current width in pixels.\n   * @readonly\n   * @type {number}\n   */\n  get width(): number {\n    return get(this._container, 'width', 0);\n  }\n  \n  /**\n   * Current height in pixels.\n   * @readonly\n   * @type {number}\n   */\n  get height(): number {\n    return get(this._container, 'height', 0);\n  }\n\n  /**\n   * The component instance associated with this container.\n   * @readonly\n   * @type {T|null}\n   */\n  get component(): T|null {\n    return this._component;\n  }\n\n  /**\n   * Whether the container is cacheable.\n   * @readonly\n   * @type {boolean}\n   */\n  get isCacheable(): boolean {\n    return this._container ? Boolean(this._container.resolveConfigProperty('cacheable')) : false;\n  }\n\n  /**\n   * The HTML element for this container.\n   * @readonly\n   * @type {HTMLElement}\n   */\n  get element(): HTMLElement {\n    return this._element;\n  }\n\n  /**\n   * Get's a token from this containers injector. Note, this should not be used to grab\n   * parent renderables or any item that can be changed.\n   * @template U The return type.\n   * @param {*} token \n   * @returns {(U|null)} \n   */\n  get<U>(token: any): U|null {\n    return this._injector.get(token, null);\n  }\n\n  /**\n   * Destroys the container.\n   */\n  destroy(): void {\n    this._destroyed.next();\n    \n    this._destroyed.complete();\n    this._status.complete();\n    this._beforeDestroy.complete();\n    this._containerChange.complete();\n    this._visibilityChanges.complete();\n    this._sizeChanges.complete();\n    this._initialized.complete();\n  }\n  \n  /**\n   * Waits for the component to be ready. If the component is not initialized\n   * it will be initialized. This is important when the view is lazy and hasn't\n   * been shown yet but we need to interact with the component.\n   * @async\n   * @param {{ init?: boolean }} [options={}] \n   * @returns {Promise<ViewContainer<T>>} \n   */\n  async ready(options: { init?: boolean } = {}): Promise<ViewContainer<T>> {\n    const { init = true } = options;\n    \n    if (!this._isInitialized && init !== false) {\n      this.initialize();  \n    }\n    \n    await this.statusReady.toPromise();\n\n    return this;\n  }\n\n  /**\n   * Initializes the component. This creates the component. \n   */\n  initialize(): void {\n    const component = this._injector.get(ViewComponentRef);\n    \n    if (isPromise<T>(component)) {\n      component.then(val => this._onComponentReady(val));\n    } else {\n      this._onComponentReady(component);\n    }\n\n    this._initialized.next(true);\n  }\n\n  /**\n   * Sets the containing {@link View} for this container.\n   * @param {(View|null)} container \n   * @returns {void} \n   */\n  setView(container: View|null): void {\n    if (container === this._container) {\n      return;\n    }\n    \n    this._container = container;\n\n    // This needs to fire before we wire up to the new container.\n    this._containerChange.next(container);\n\n    if (this._container) {\n      this._container.destroyed\n        .takeUntil(this._containerChange)\n        .subscribe(() => this._onViewDestroy());\n      \n      this._container\n        .scope(BeforeDestroyEvent)\n        .takeUntil(this._containerChange)\n        .subscribe(e => this._beforeDestroy.next(e));\n      \n      this._container.visibilityChanges\n        .takeUntil(this._containerChange)\n        .subscribe(e => this._visibilityChanges.next(e));\n      \n      this._container.sizeChanges\n        .takeUntil(this._containerChange)\n        .subscribe(e => this._sizeChanges.next(e));\n\n      this._container\n        .scope(CustomViewHookEvent)\n        .takeUntil(this._containerChange)\n        .subscribe(event => this._executeHook(event.name, ...event.args));\n    }\n\n    this._attached.next(Boolean(this._container));\n  }\n\n  /**\n   * Gets this renderables parent or any parent that is\n   * an instance of the passed in constructor. If non is found\n   * then null is returned.\n   * @template T The constructor type.\n   * @param {Type<T>} [Ctor] \n   * @returns {(T|null)} \n   */\n  getParent<U extends Renderable>(Ctor: Type<U>): U|null {\n    return this._container ? this._container.getParent(Ctor) : null;\n  }\n  \n  /**\n   * Gets this renderables parents or any parents that are\n   * an instance of the passed in constructor.    \n   * @template T The constructor type.\n   * @param {Type<T>} [Ctor] \n   * @returns {(T|null)} \n   */\n  getParents<U extends Renderable>(Ctor: Type<U>): U[] {\n    return this._container ? this._container.getParents(Ctor) : [];\n  }\n  \n  /**\n   * Signals up the tree to make this {@link View} visible.\n   */\n  makeVisible(): void {\n    if (this._container) {\n      this._container.makeVisible();\n    }\n  }\n  \n  /**\n   * Determines whether this renderable is visible.\n   * @returns {boolean} \n   */\n  isVisible(): boolean {\n    return this._container ? this._container.isVisible() : false;\n  }\n  \n  /**\n   * Closes this view.\n   * @param {{ silent?: boolean }} args \n   */\n  close(args: { silent?: boolean }): void {\n    if (this._container) {\n      this._container.close(args);\n    }\n  }\n\n  /**\n   * Mounts this containers element to the given element.\n   * @param {HTMLElement} element \n   */\n  mountTo(element: HTMLElement): void {\n    element.appendChild(this._element);\n  }\n  \n  /**\n   * Mounts an element to this containers element.\n   * @param {HTMLElement} element \n   */\n  mount(element: HTMLElement): void {\n    this._element.appendChild(element);\n  }\n  \n  /**\n   * Sets all the content of this containers element to the given HTML string.\n   * @param {string} html \n   */\n  mountHTML(html: string): void {\n    this._element.innerHTML = html;\n  }\n\n  /**\n   * Detaches this container from it's view.\n   */\n  detach(): void {\n    this.setView(null);\n  }\n\n  /**\n   * Invoked when the view renderable is destroyed.\n   * @private\n   */\n  private _onViewDestroy(): void {\n    // If this view is cacheable, we don't destroy it.\n    if (this.isCacheable) {\n      this.detach();\n    } else {\n      this.destroy();\n    }\n  }\n\n  /**\n   * Executes a hook on the component.\n   * @private\n   * @param {string} name \n   * @param {...any[]} args \n   * @returns {*} \n   */\n  private _executeHook(name: string, ...args: any[]): any {\n    if (this._component && this._hasHook(name)) {\n      return this._component[name].apply(this._component, args);\n    }\n  }\n\n  /**\n   * Determines whether a component has a hook.\n   * @private\n   * @param {string} name \n   * @returns {boolean} \n   */\n  private _hasHook(name: string): boolean {\n   return Boolean(this._component && isObject(this._component) && isFunction(this._component[name]));\n  }\n\n  /**\n   * Invoked when the component is resolved from the initialization.\n   * @private\n   * @async\n   * @param {T} component \n   * @returns {Promise<void>} \n   */\n  private async _onComponentReady(component: T): Promise<void> {\n    this._component = component;\n\n    const result = this._executeHook('ugOnResolve', this);\n\n    // Allow the `ugOnResolve` hook to run async tasks.\n    if (isPromise(result)) {\n      await result;\n    }\n    \n    this._status.next(ViewContainerStatus.READY);\n    this._executeHook('ugOnInit', this);\n  }\n}",
     "static": true,
     "longname": "docs/view/ViewContainer.js",
     "access": null,
@@ -22927,16 +22959,9 @@
     "async": false,
     "static": false,
     "longname": "docs/view/ViewContainer.js~ViewContainer#_onViewDestroy",
-    "access": null,
-    "description": null,
-    "lineNumber": 316,
-    "undocument": true,
-    "unknown": [
-      {
-        "tagName": "@_undocument",
-        "tagValue": ""
-      }
-    ],
+    "access": "private",
+    "description": "Invoked when the view renderable is destroyed.",
+    "lineNumber": 320,
     "params": []
   },
   {
@@ -22948,35 +22973,44 @@
     "async": false,
     "static": false,
     "longname": "docs/view/ViewContainer.js~ViewContainer#_executeHook",
-    "access": null,
-    "description": null,
-    "lineNumber": 325,
-    "undocument": true,
+    "access": "private",
+    "description": "Executes a hook on the component.",
+    "lineNumber": 336,
     "unknown": [
       {
-        "tagName": "@_undocument",
-        "tagValue": ""
+        "tagName": "@returns",
+        "tagValue": "{*}"
       }
     ],
     "params": [
       {
-        "name": "name",
+        "nullable": null,
         "types": [
-          "*"
-        ]
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "name",
+        "description": ""
       },
       {
-        "name": "args",
+        "nullable": null,
         "types": [
-          "...*"
+          "...any[]"
         ],
-        "spread": true
+        "spread": true,
+        "optional": false,
+        "name": "args",
+        "description": ""
       }
     ],
     "return": {
+      "nullable": null,
       "types": [
         "*"
-      ]
+      ],
+      "spread": false,
+      "description": ""
     }
   },
   {
@@ -22988,28 +23022,34 @@
     "async": false,
     "static": false,
     "longname": "docs/view/ViewContainer.js~ViewContainer#_hasHook",
-    "access": null,
-    "description": null,
-    "lineNumber": 330,
-    "undocument": true,
+    "access": "private",
+    "description": "Determines whether a component has a hook.",
+    "lineNumber": 347,
     "unknown": [
       {
-        "tagName": "@_undocument",
-        "tagValue": ""
+        "tagName": "@returns",
+        "tagValue": "{boolean}"
       }
     ],
     "params": [
       {
-        "name": "name",
+        "nullable": null,
         "types": [
-          "*"
-        ]
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "name",
+        "description": ""
       }
     ],
     "return": {
+      "nullable": null,
       "types": [
-        "*"
-      ]
+        "boolean"
+      ],
+      "spread": false,
+      "description": ""
     }
   },
   {
@@ -23021,28 +23061,34 @@
     "async": false,
     "static": false,
     "longname": "docs/view/ViewContainer.js~ViewContainer#_onComponentReady",
-    "access": null,
-    "description": null,
-    "lineNumber": 333,
-    "undocument": true,
+    "access": "private",
+    "description": "Invoked when the component is resolved from the initialization.",
+    "lineNumber": 357,
     "unknown": [
       {
-        "tagName": "@_undocument",
-        "tagValue": ""
+        "tagName": "@returns",
+        "tagValue": "{Promise<void>}"
       }
     ],
     "params": [
       {
-        "name": "component",
+        "nullable": null,
         "types": [
-          "*"
-        ]
+          "T"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "component",
+        "description": ""
       }
     ],
     "return": {
+      "nullable": null,
       "types": [
-        "*"
-      ]
+        "Promise<void>"
+      ],
+      "spread": false,
+      "description": ""
     }
   },
   {
@@ -23054,7 +23100,7 @@
     "longname": "docs/view/ViewContainer.js~ViewContainer#_component",
     "access": null,
     "description": null,
-    "lineNumber": 335,
+    "lineNumber": 359,
     "undocument": true,
     "unknown": [
       {
@@ -23072,7 +23118,7 @@
     "__docId__": 892,
     "kind": "file",
     "name": "docs/view/ViewFactory.js",
-    "content": "import { ViewComponentConfig, ViewConfig, ViewFactoriesRef, ViewComponentRef, VIEW_CONFIG_KEY } from './common';\nimport { Injector, Inject, Optional, ProviderArg } from '../di';\nimport { View } from './View';\nimport { ViewContainer } from './ViewContainer';\nimport { ElementRef, ContainerRef } from '../common';\nimport { get } from '../utils';\n\nexport interface ViewFactoryArgs {\n  config: ViewConfig;\n  injector: Injector;\n  container: View;\n}\n\nexport class ViewFactory {\n  create<T>(args: ViewFactoryArgs): ViewContainer<T> {\n    const { config, injector, container } = args;\n    const isLazy = this.resolveConfigProperty(config, 'lazy');\n    \n    const providers: ProviderArg[] = [\n      { provide: ContainerRef, useValue: container },\n      ViewContainer\n    ];\n\n    if (config.useFactory) {\n      providers.push({\n        provide: ViewComponentRef, \n        useFactory: config.useFactory,\n        deps: config.deps\n      });\n    } else if (config.useClass) {\n      providers.push({ provide: ViewComponentRef, useClass: config.useClass });\n    } else if (config.useValue) {\n      providers.push({ provide: ViewComponentRef, useValue: config.useValue });\n    } else {\n      throw new Error('View config has no creatable view.');\n    }\n\n    const viewInjector = Injector.fromInjectable(ViewContainer, providers, injector);\n    const viewContainer = viewInjector.get(ViewContainer) as ViewContainer<any>;\n    \n    viewInjector.registerProvider({ provide: ElementRef, useValue: viewContainer.element });\n\n    // If this view is lazy and it is not already visible wait for the\n    // view to become visible before initializing the view container.\n    if (isLazy && !viewContainer.isVisible()) {\n      viewContainer.visibilityChanges\n        .takeUntil(viewContainer.initialized.filter(Boolean))\n        .subscribe(() => viewContainer.initialize());\n    } else {\n      viewContainer.initialize();\n    }\n     \n    return viewContainer;\n  }  \n\n  getTokenFrom(config: ViewConfig): any {\n    if (config.token) {\n      return config.token;\n    }\n    \n    if (config.useClass) {\n      return config.useClass;\n    } else if (config.useFactory) {\n      return config.useFactory;\n    } else if (config.useValue) {\n      return config.useValue;\n    }\n\n    throw new Error('Can not resolve token from config.');\n  }\n\n  resolveConfigProperty<T>(config: ViewConfig, path: string): T|null {\n    const token = this.getTokenFrom(config);\n    let result = get(config, path);\n\n    if (result !== undefined) {\n      return result as T;\n    }\n\n    const metadata = Reflect.getOwnMetadata(VIEW_CONFIG_KEY, token) as ViewComponentConfig|undefined;\n\n    result = get(metadata, path);\n\n    if (result !== undefined) {\n      return result as T;\n    }\n\n    return null;\n  }\n\n  destroy(): void {}\n}",
+    "content": "import { ViewComponentConfig, ViewConfig, ViewFactoriesRef, ViewComponentRef, VIEW_CONFIG_KEY } from './common';\nimport { Injector, Inject, Optional, ProviderArg } from '../di';\nimport { View } from './View';\nimport { ViewContainer } from './ViewContainer';\nimport { ElementRef, ContainerRef } from '../common';\nimport { get } from '../utils';\n\nexport interface ViewFactoryArgs {\n  config: ViewConfig;\n  injector?: Injector;\n}\n\n/**\n * Responsible for creating view containers from view configurations.\n * @export\n * @class ViewFactory\n */\nexport class ViewFactory {\n  /**\n   * Creates a view container from the given configuration.\n   * @template T The component type.\n   * @param {ViewFactoryArgs} args \n   * @returns {ViewContainer<T>} \n   */\n  create<T>(args: ViewFactoryArgs): ViewContainer<T> {\n    const { config, injector } = args;\n    const isLazy = this.resolveConfigProperty(config, 'lazy');\n    \n    const providers: ProviderArg[] = [ ViewContainer ];\n\n    if (config.useFactory) {\n      providers.push({\n        provide: ViewComponentRef, \n        useFactory: config.useFactory,\n        deps: config.deps\n      });\n    } else if (config.useClass) {\n      providers.push({ provide: ViewComponentRef, useClass: config.useClass });\n    } else if (config.useValue) {\n      providers.push({ provide: ViewComponentRef, useValue: config.useValue });\n    } else {\n      throw new Error('View config has no creatable view.');\n    }\n\n    const viewInjector = Injector.fromInjectable(ViewContainer, providers, injector);\n    const viewContainer = viewInjector.get(ViewContainer) as ViewContainer<any>;\n    \n    viewInjector.registerProvider({ provide: ElementRef, useValue: viewContainer.element });\n\n    // If this view is lazy and it is not already visible wait for the\n    // view to become visible before initializing the view container.\n    if (isLazy && !viewContainer.isVisible()) {\n      viewContainer.visibilityChanges\n        .takeUntil(viewContainer.initialized.filter(Boolean))\n        .subscribe(() => viewContainer.initialize());\n    } else {\n      viewContainer.initialize();\n    }\n     \n    return viewContainer;\n  }  \n\n  /**\n   * Gets the token from a view config. If using `useClass` the class will be used as the token.\n   * Any other type will require token to be provided.\n   * @param {ViewConfig} config \n   * @returns {*} \n   */\n  getTokenFrom(config: ViewConfig): any {\n    if (config.token) {\n      return config.token;\n    }\n    \n    if (config.useClass) {\n      return config.useClass;\n    } else if (config.useFactory) {\n      return config.useFactory;\n    } else if (config.useValue) {\n      return config.useValue;\n    }\n\n    throw new Error('Can not resolve token from config.');\n  }\n\n  /**\n   * Resolves a config property by looking at the view config then the components metadata config.\n   * @template T The type of the value expected.\n   * @param {ViewConfig} config \n   * @param {string} path \n   * @returns {(T|null)} \n   */\n  resolveConfigProperty<T>(config: ViewConfig, path: string): T|null {\n    const token = this.getTokenFrom(config);\n    let result = get(config, path);\n\n    if (result !== undefined) {\n      return result as T;\n    }\n\n    const metadata = Reflect.getOwnMetadata(VIEW_CONFIG_KEY, token) as ViewComponentConfig|undefined;\n\n    result = get(metadata, path);\n\n    if (result !== undefined) {\n      return result as T;\n    }\n\n    return null;\n  }\n\n  destroy(): void {}\n}",
     "static": true,
     "longname": "docs/view/ViewFactory.js",
     "access": null,
@@ -23090,13 +23136,12 @@
     "export": true,
     "importPath": "ug-layout/view/ViewFactory",
     "importStyle": "{ViewFactory}",
-    "description": null,
-    "lineNumber": 6,
-    "undocument": true,
+    "description": "Responsible for creating view containers from view configurations.",
+    "lineNumber": 11,
     "unknown": [
       {
-        "tagName": "@_undocument",
-        "tagValue": ""
+        "tagName": "@class",
+        "tagValue": "ViewFactory"
       }
     ],
     "interface": false
@@ -23111,27 +23156,37 @@
     "static": false,
     "longname": "docs/view/ViewFactory.js~ViewFactory#create",
     "access": null,
-    "description": null,
-    "lineNumber": 7,
-    "undocument": true,
+    "description": "Creates a view container from the given configuration.",
+    "lineNumber": 18,
     "unknown": [
       {
-        "tagName": "@_undocument",
-        "tagValue": ""
+        "tagName": "@template",
+        "tagValue": "T The component type."
+      },
+      {
+        "tagName": "@returns",
+        "tagValue": "{ViewContainer<T>}"
       }
     ],
     "params": [
       {
-        "name": "args",
+        "nullable": null,
         "types": [
-          "*"
-        ]
+          "ViewFactoryArgs"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "args",
+        "description": ""
       }
     ],
     "return": {
+      "nullable": null,
       "types": [
-        "*"
-      ]
+        "ViewContainer<T>"
+      ],
+      "spread": false,
+      "description": ""
     }
   },
   {
@@ -23144,27 +23199,33 @@
     "static": false,
     "longname": "docs/view/ViewFactory.js~ViewFactory#getTokenFrom",
     "access": null,
-    "description": null,
-    "lineNumber": 45,
-    "undocument": true,
+    "description": "Gets the token from a view config. If using `useClass` the class will be used as the token.\nAny other type will require token to be provided.",
+    "lineNumber": 59,
     "unknown": [
       {
-        "tagName": "@_undocument",
-        "tagValue": ""
+        "tagName": "@returns",
+        "tagValue": "{*}"
       }
     ],
     "params": [
       {
-        "name": "config",
+        "nullable": null,
         "types": [
-          "*"
-        ]
+          "ViewConfig"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "config",
+        "description": ""
       }
     ],
     "return": {
+      "nullable": null,
       "types": [
         "*"
-      ]
+      ],
+      "spread": false,
+      "description": ""
     }
   },
   {
@@ -23177,33 +23238,48 @@
     "static": false,
     "longname": "docs/view/ViewFactory.js~ViewFactory#resolveConfigProperty",
     "access": null,
-    "description": null,
-    "lineNumber": 60,
-    "undocument": true,
+    "description": "Resolves a config property by looking at the view config then the components metadata config.",
+    "lineNumber": 81,
     "unknown": [
       {
-        "tagName": "@_undocument",
-        "tagValue": ""
+        "tagName": "@template",
+        "tagValue": "T The type of the value expected."
+      },
+      {
+        "tagName": "@returns",
+        "tagValue": "{(T|null)}"
       }
     ],
     "params": [
       {
-        "name": "config",
+        "nullable": null,
         "types": [
-          "*"
-        ]
+          "ViewConfig"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "config",
+        "description": ""
       },
       {
-        "name": "path",
+        "nullable": null,
         "types": [
-          "*"
-        ]
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "path",
+        "description": ""
       }
     ],
     "return": {
+      "nullable": null,
       "types": [
-        "*"
-      ]
+        "T",
+        "null"
+      ],
+      "spread": false,
+      "description": ""
     }
   },
   {
@@ -23217,7 +23293,7 @@
     "longname": "docs/view/ViewFactory.js~ViewFactory#destroy",
     "access": null,
     "description": null,
-    "lineNumber": 73,
+    "lineNumber": 94,
     "undocument": true,
     "unknown": [
       {
@@ -24128,7 +24204,7 @@
     "__docId__": 929,
     "kind": "file",
     "name": "docs/view/decorators.js",
-    "content": "import {\n  VIEW_CONFIG_KEY, \n  ViewComponentConfigArgs,\n  ResolverStrategy\n} from './common';\n\nexport function ViewComponent(config: ViewComponentConfigArgs = {}): ClassDecorator {\n  return (target: Function): void => {\n    config = Object.assign({\n      cacheable: false,\n      lazy: false,\n      resolution: ResolverStrategy.SINGLETON,\n      name: null\n    }, config);\n    \n    Reflect.defineMetadata(VIEW_CONFIG_KEY, config, target);\n  };\n}",
+    "content": "import {\n  VIEW_CONFIG_KEY, \n  ViewComponentConfigArgs,\n  ResolverStrategy\n} from './common';\n\nexport function ViewComponent(config: ViewComponentConfigArgs = {}): ClassDecorator {\n  return (target: Function): void => {\n    config = Object.assign({\n      cacheable: false,\n      lazy: false,\n      resolution: ResolverStrategy.TRANSIENT,\n      name: null\n    }, config);\n    \n    Reflect.defineMetadata(VIEW_CONFIG_KEY, config, target);\n  };\n}",
     "static": true,
     "longname": "docs/view/decorators.js",
     "access": null,

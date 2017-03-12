@@ -9,7 +9,7 @@ export function ViewComponent(config: ViewComponentConfigArgs = {}): ClassDecora
     config = Object.assign({
       cacheable: false,
       lazy: false,
-      resolution: ResolverStrategy.SINGLETON,
+      resolution: ResolverStrategy.TRANSIENT,
       name: null
     }, config);
     

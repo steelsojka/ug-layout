@@ -519,6 +519,10 @@ export class ViewContainer&lt;T&gt; {
     this.setView(null);
   }
 
+  /**
+   * Invoked when the view renderable is destroyed.
+   * @private
+   */
   private _onViewDestroy(): void {
     // If this view is cacheable, we don&apos;t destroy it.
     if (this.isCacheable) {
@@ -528,16 +532,36 @@ export class ViewContainer&lt;T&gt; {
     }
   }
 
+  /**
+   * Executes a hook on the component.
+   * @private
+   * @param {string} name 
+   * @param {...any[]} args 
+   * @returns {*} 
+   */
   private _executeHook(name: string, ...args: any[]): any {
     if (this._component &amp;&amp; this._hasHook(name)) {
       return this._component[name].apply(this._component, args);
     }
   }
 
+  /**
+   * Determines whether a component has a hook.
+   * @private
+   * @param {string} name 
+   * @returns {boolean} 
+   */
   private _hasHook(name: string): boolean {
    return Boolean(this._component &amp;&amp; isObject(this._component) &amp;&amp; isFunction(this._component[name]));
   }
 
+  /**
+   * Invoked when the component is resolved from the initialization.
+   * @private
+   * @async
+   * @param {T} component 
+   * @returns {Promise&lt;void&gt;} 
+   */
   private async _onComponentReady(component: T): Promise&lt;void&gt; {
     this._component = component;
 

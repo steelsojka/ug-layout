@@ -650,9 +650,9 @@
                                             "line": 7,
                                             "column": 50
                                           },
-                                          "identifierName": "SINGLETON"
+                                          "identifierName": "TRANSIENT"
                                         },
-                                        "name": "SINGLETON"
+                                        "name": "TRANSIENT"
                                       },
                                       "computed": false
                                     }
@@ -2091,7 +2091,7 @@
         "postfix": false,
         "binop": null
       },
-      "value": "SINGLETON",
+      "value": "TRANSIENT",
       "start": 261,
       "end": 270,
       "loc": {
