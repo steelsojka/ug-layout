@@ -6,6 +6,7 @@ import { Renderable } from '../dom';
 export const ViewFactoriesRef = new Token('ViewFactoriesToken');
 export const ViewComponentRef = new Token('ViewComponentRef');
 export const VIEW_CONFIG_KEY = 'ugLayout:viewConfig';
+export const ViewFactoryInterceptorsRef = new Token('ViewFactoryInterceptorsRef');
 
 export enum ResolverStrategy {
   SINGLETON,

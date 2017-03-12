@@ -5,11 +5,12 @@ import { ContainerRef, ConfigurationRef, DocumentRef } from '../common';
 import { View } from './View';
 import { ViewFactoriesRef, ViewComponentRef } from './common';
 import { CustomViewHookEvent } from './CustomViewHookEvent';
-import { isFunction, get, uid, eq, isPromise, isObject } from '../utils';
+import { isFunction, get, uid, eq, isPromise, isObject, Deferred } from '../utils';
 
 export enum ViewContainerStatus {
   READY,
-  PENDING
+  PENDING,
+  FAILED
 }
 
 export enum ViewContainerAttachedStatus {
@@ -201,16 +202,27 @@ export class ViewContainer<T> {
    * @param {{ init?: boolean }} [options={}] 
    * @returns {Promise<ViewContainer<T>>} 
    */
-  async ready(options: { init?: boolean } = {}): Promise<ViewContainer<T>> {
+  ready(options: { init?: boolean } = {}): Promise<ViewContainer<T>> {
+    const deferred = new Deferred();
+    const resolved = Observable.fromPromise(deferred.promise);
+
     const { init = true } = options;
     
     if (!this._isInitialized && init !== false) {
       this.initialize();  
     }
     
-    await this.statusReady.toPromise();
+    this.statusReady
+      .takeUntil(resolved)
+      .subscribe(() => deferred.resolve(this));
+      
+    this.status
+      .takeUntil(resolved)
+      .filter(eq(ViewContainerStatus.FAILED))
+      .subscribe(() => deferred.reject());
+    
 
-    return this;
+    return deferred.promise;
   }
 
   /**
@@ -403,6 +415,8 @@ export class ViewContainer<T> {
     if (isPromise(result)) {
       await result;
     }
+
+    // TODO: handle failed status
     
     this._status.next(ViewContainerStatus.READY);
     this._executeHook('ugOnInit', this);

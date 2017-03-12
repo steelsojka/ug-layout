@@ -1,9 +1,17 @@
-import { ViewComponentConfig, ViewConfig, ViewFactoriesRef, ViewComponentRef, VIEW_CONFIG_KEY } from './common';
-import { Injector, Inject, Optional, ProviderArg } from '../di';
+import {
+  ViewComponentConfig, 
+  ViewConfig, 
+  ViewFactoriesRef, 
+  ViewComponentRef, 
+  ViewFactoryInterceptorsRef,
+  VIEW_CONFIG_KEY
+} from './common';
+import { Injector, Inject, Optional, ProviderArg, Type } from '../di';
 import { View } from './View';
 import { ViewContainer } from './ViewContainer';
 import { ElementRef, ContainerRef } from '../common';
-import { get } from '../utils';
+import { get, isFunction } from '../utils';
+import { ViewFactoryInterceptor } from './ViewFactoryInterceptor';
 
 export interface ViewFactoryArgs {
   config: ViewConfig;
@@ -16,6 +24,14 @@ export interface ViewFactoryArgs {
  * @class ViewFactory
  */
 export class ViewFactory {
+  constructor(
+    @Inject(Injector) private _injector: Injector,
+    @Inject(ViewFactoryInterceptorsRef) @Optional() private _interceptors: ViewFactoryInterceptor[]|null
+  ) {}
+
+  get interceptors(): ViewFactoryInterceptor[] {
+    return this._interceptors || [];
+  }
   /**
    * Creates a view container from the given configuration.
    * @template T The component type.
@@ -23,10 +39,13 @@ export class ViewFactory {
    * @returns {ViewContainer<T>} 
    */
   create<T>(args: ViewFactoryArgs): ViewContainer<T> {
-    const { config, injector } = args;
+    let { config } = args;
+    const { injector = this._injector } = args;
     const isLazy = this.resolveConfigProperty(config, 'lazy');
     
     const providers: ProviderArg[] = [ ViewContainer ];
+
+    config = this.interceptors.reduce((result, interceptor) => interceptor.config(result), config);
 
     if (config.useFactory) {
       providers.push({

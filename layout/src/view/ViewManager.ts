@@ -84,7 +84,7 @@ export class ViewManager {
   create<T>(args: ViewFactoryArgs): ViewContainer<T> {
     return this.createWith(args.config, (): ViewContainer<T> => {
       return this._viewFactory.create<T>(args);
-    })
+    });
   }
   
   createWith<T>(config: ViewConfig, factory: (viewFactory: ViewFactory) => ViewContainer<T>): ViewContainer<T> {
