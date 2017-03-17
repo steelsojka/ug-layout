@@ -1,15 +1,15 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
-import { Injector, Inject, Optional, forwardRef, ProviderArg } from './di';
+import { Type, Injector, Inject, Optional, forwardRef, ProviderArg } from './di';
 import { RootInjector } from './RootInjector';
 import { Layout } from './layout';
 import { Serialized } from './serialization';
-import { ViewManager } from './view';
+import { ViewManager, ViewInterceptor, VIEW_INTERCEPTORS } from './view';
 import { defaults } from './utils';
 import { Renderer, Renderable, ConfiguredRenderable, RenderableInjector } from './dom';
 import { 
-  ConfigurationRef, 
+  ConfigurationRef,
   ContainerRef, 
   RootConfigRef,
   RenderableConfig,
@@ -32,6 +32,7 @@ export interface RootLayoutCreationConfigArgs {
   container: HTMLElement;
   plugins?: UgPlugin[];
   providers?: ProviderArg[];
+  interceptors?: ProviderArg[];
 }
 
 export class RootLayout extends Renderable {
@@ -155,6 +156,7 @@ export class RootLayout extends Renderable {
     const rootInjector = new RootInjector([
       { provide: ElementRef, useValue: config.container },
       { provide: RootConfigRef, useValue: config },
+      { provide: VIEW_INTERCEPTORS, useValue: config.interceptors || null },
       ..._config.providers
     ]);
 

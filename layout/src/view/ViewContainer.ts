@@ -45,6 +45,7 @@ export class ViewContainer<T> {
   private _attached: Subject<boolean> = new Subject();
   private _initialized: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   private _isInitialized: boolean = false;
+  private _retry: Function|null = null;
   
   /**
    * A unique identifier for this instance.
@@ -121,6 +122,9 @@ export class ViewContainer<T> {
     this.visibilityChanges.subscribe(isVisible => this._executeHook('ugOnVisibilityChange', isVisible));
     this.beforeDestroy.subscribe(event => this._executeHook('ugOnBeforeDestroy', event));
     this.initialized.subscribe(v => this._isInitialized = v);
+
+    // Reset the retry function when the component is no longer failed.
+    this.status.filter(eq(ViewContainerStatus.READY)).subscribe(() => this._retry = null);
   }
 
   /**
@@ -363,6 +367,21 @@ export class ViewContainer<T> {
     this.setView(null);
   }
 
+  fail(retry?: Function|null): void {
+    // Can be nulled with explicit null value
+    if (retry || retry === null) {
+      this._retry = retry;
+    }
+
+    this._status.next(ViewContainerStatus.FAILED);
+  }
+
+  retry(): void {
+    if (this._retry) {
+      this._retry();
+    }
+  }
+
   /**
    * Invoked when the view renderable is destroyed.
    * @private
@@ -413,10 +432,14 @@ export class ViewContainer<T> {
 
     // Allow the `ugOnResolve` hook to run async tasks.
     if (isPromise(result)) {
-      await result;
-    }
+      try {
+        await result;
+      } catch(e) {
+        this.fail(() => this._onComponentReady(component));
 
-    // TODO: handle failed status
+        return;
+      }
+    }
     
     this._status.next(ViewContainerStatus.READY);
     this._executeHook('ugOnInit', this);

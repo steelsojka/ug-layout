@@ -25,7 +25,8 @@ import {
   ConfiguredRenderable,
   ResolverStrategy,
   OnBeforeDestroy,
-  BeforeDestroyEvent
+  BeforeDestroyEvent,
+  ViewInterceptor
 } from '../../src';
 
 const colors = [ 'red', 'blue', 'white', 'cyan', 'yellow' ];
@@ -53,6 +54,14 @@ class TestView implements OnBeforeDestroy {
 
   ugOnResize(dimensions): void {
     console.log(dimensions);
+  }
+}
+
+class MyViewInterceptor implements ViewInterceptor {
+  config(config) {
+    console.log(config);
+    
+    return config;
   }
 }
   
@@ -121,6 +130,7 @@ const initialLayout = RootLayout.configure({
 
 const rootLayout = window['rootLayout'] = RootLayout
   .create({
+    interceptors: [ { provide: null, useValue: new MyViewInterceptor() } ],
     container: document.body  
   });
   

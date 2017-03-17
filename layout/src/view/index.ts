@@ -6,3 +6,5 @@ export * from './ViewFactory';
 export * from './ViewManager';
 export * from './ViewSerializer';
 export * from './CustomViewHookEvent';
+export * from './ViewInterceptor';
+export * from './ViewInterceptorRunner';
