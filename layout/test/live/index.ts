@@ -26,10 +26,38 @@ import {
   ResolverStrategy,
   OnBeforeDestroy,
   BeforeDestroyEvent,
-  ViewInterceptor
+  DocumentRef,
+  Injector,
+  ViewConfig
 } from '../../src';
 
 const colors = [ 'red', 'blue', 'white', 'cyan', 'yellow' ];
+
+class MyView extends View {
+  initialize(): void {
+    super.initialize();  
+
+    const token = this.token;
+
+    this._configuration = {
+      token,
+      useClass: OtherComponent
+    };
+  }
+
+  static configure(config: ViewConfig): ConfiguredRenderable<MyView> {
+    return new ConfiguredRenderable(MyView, config);
+  }
+}
+
+@ViewComponent({
+  cacheable: true
+})
+class OtherComponent {
+  ugOnInit(container: ViewContainer<this>): void {
+    container.mountHTML('<div>BAMFFFFFFFF</div>');
+  }
+}
 
 @ViewComponent({
   cacheable: true,
@@ -53,18 +81,10 @@ class TestView implements OnBeforeDestroy {
   }
 
   ugOnResize(dimensions): void {
-    console.log(dimensions);
+    // console.log(dimensions);
   }
 }
 
-class MyViewInterceptor implements ViewInterceptor {
-  config(config) {
-    console.log(config);
-    
-    return config;
-  }
-}
-  
 window.addEventListener('resize', () => {
   rootLayout.resize({
     height: window.innerHeight,
@@ -91,7 +111,7 @@ const initialLayout = RootLayout.configure({
             children: [{
               closeable: true,
               title: 'View 2',
-              use: View.configure({ useClass: TestView, cacheable: false, ref: 'View 2' })  
+              use: MyView.configure({ useClass: TestView, cacheable: false, ref: 'View 2' })  
             }, {
               title: 'View 3',
               use: View.configure({ useClass: TestView, ref: 'View 3' })  
@@ -130,7 +150,6 @@ const initialLayout = RootLayout.configure({
 
 const rootLayout = window['rootLayout'] = RootLayout
   .create({
-    interceptors: [ { provide: null, useValue: new MyViewInterceptor() } ],
     container: document.body  
   });
   

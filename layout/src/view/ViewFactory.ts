@@ -1,14 +1,12 @@
 import {
   ViewComponentConfig, 
   ViewConfig, 
-  ViewFactoriesRef, 
   ViewComponentRef, 
   VIEW_CONFIG_KEY
 } from './common';
 import { Injector, Inject, Optional, ProviderArg, Type } from '../di';
 import { View } from './View';
 import { ViewContainer } from './ViewContainer';
-import { ViewInterceptorRunner } from './ViewInterceptorRunner';
 import { ElementRef, ContainerRef } from '../common';
 import { get, isFunction } from '../utils';
 
@@ -24,8 +22,7 @@ export interface ViewFactoryArgs {
  */
 export class ViewFactory {
   constructor(
-    @Inject(Injector) private _injector: Injector,
-    @Inject(ViewInterceptorRunner) private _viewInterceptorRunner: ViewInterceptorRunner
+    @Inject(Injector) private _injector: Injector
   ) {}
 
   /**
@@ -38,10 +35,7 @@ export class ViewFactory {
     let { config } = args;
     const { injector = this._injector } = args;
     const isLazy = this.resolveConfigProperty(config, 'lazy');
-    
-    const providers: ProviderArg[] = [ ViewContainer ];
-
-    config = this._viewInterceptorRunner.config(config);
+    const providers: ProviderArg[] = [ this._getViewContainerProvider(config) ];
 
     if (config.useFactory) {
       providers.push({
@@ -112,9 +106,19 @@ export class ViewFactory {
       return result as T;
     }
 
-    const metadata = Reflect.getOwnMetadata(VIEW_CONFIG_KEY, token) as ViewComponentConfig|undefined;
+    return this.resolveMetaConfigProperty<T>(token, path);
+  }
 
-    result = get(metadata, path);
+  /**
+   * Resolves a config property from the tokens metadata.
+   * @template T The return type.
+   * @param {*} token 
+   * @param {string} path 
+   * @returns {(T|null)} 
+   */
+  resolveMetaConfigProperty<T>(token: any, path: string): T|null {
+    const metadata = Reflect.getOwnMetadata(VIEW_CONFIG_KEY, token) as ViewComponentConfig|undefined;
+    const result = get(metadata, path);
 
     if (result !== undefined) {
       return result as T;
@@ -124,4 +128,14 @@ export class ViewFactory {
   }
 
   destroy(): void {}
+
+  private _getViewContainerProvider(config: ViewConfig): ProviderArg {
+    let viewContainerProvider = this.resolveMetaConfigProperty<ProviderArg>(this.getTokenFrom(config), 'container') || ViewContainer;
+
+    if (isFunction(viewContainerProvider)) {
+      viewContainerProvider = { provide: ViewContainer, useClass: viewContainerProvider };
+    }
+
+    return viewContainerProvider;
+  }
 }

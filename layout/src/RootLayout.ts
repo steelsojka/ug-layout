@@ -5,7 +5,7 @@ import { Type, Injector, Inject, Optional, forwardRef, ProviderArg } from './di'
 import { RootInjector } from './RootInjector';
 import { Layout } from './layout';
 import { Serialized } from './serialization';
-import { ViewManager, ViewInterceptor, VIEW_INTERCEPTORS } from './view';
+import { ViewManager } from './view';
 import { defaults } from './utils';
 import { Renderer, Renderable, ConfiguredRenderable, RenderableInjector } from './dom';
 import { 
@@ -156,7 +156,6 @@ export class RootLayout extends Renderable {
     const rootInjector = new RootInjector([
       { provide: ElementRef, useValue: config.container },
       { provide: RootConfigRef, useValue: config },
-      { provide: VIEW_INTERCEPTORS, useValue: config.interceptors || null },
       ..._config.providers
     ]);
 

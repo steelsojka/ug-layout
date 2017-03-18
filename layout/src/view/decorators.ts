@@ -10,7 +10,8 @@ export function ViewComponent(config: ViewComponentConfigArgs = {}): ClassDecora
       cacheable: false,
       lazy: false,
       resolution: ResolverStrategy.TRANSIENT,
-      name: null
+      name: null,
+      container: null
     }, config);
     
     Reflect.defineMetadata(VIEW_CONFIG_KEY, config, target);

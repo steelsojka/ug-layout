@@ -2,11 +2,11 @@ import { Token, Type } from '../di';
 import { View } from './View';
 import { BeforeDestroyEvent } from '../events';
 import { Renderable } from '../dom';
+import { ViewContainer } from './ViewContainer';
 
 export const ViewFactoriesRef = new Token('ViewFactoriesToken');
 export const ViewComponentRef = new Token('ViewComponentRef');
 export const VIEW_CONFIG_KEY = 'ugLayout:viewConfig';
-export const VIEW_INTERCEPTORS = new Token('ViewInterceptors');
 
 export enum ResolverStrategy {
   SINGLETON,
@@ -20,6 +20,7 @@ export interface ViewComponentConfig {
   cacheable: boolean;
   lazy: boolean;
   resolution: ResolverStrategy;
+  container: Type<ViewContainer<any>>|null;
 }
 
 export type ViewComponentConfigArgs = {

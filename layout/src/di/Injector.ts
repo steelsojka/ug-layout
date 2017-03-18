@@ -191,7 +191,7 @@ export class Injector {
     const provider = this._normalizeProvider(_provider);
     
     if (this._isClassProvider(provider)) {
-      const injections = Reflect.getOwnMetadata(INJECT_PARAM_KEY, provider.useClass, (<any>undefined)) || [];
+      const injections = Reflect.getMetadata(INJECT_PARAM_KEY, provider.useClass, (<any>undefined)) || [];
       const resolved = this.getDependencies(injections);
       const ref = ForwardRef.resolve(provider.useClass);
 

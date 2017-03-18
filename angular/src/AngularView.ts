@@ -38,6 +38,8 @@ import {
 } from './common';
 
 export class AngularView extends View {
+  protected component: Type<any>;
+  
   private _componentFactoryResolver: ComponentFactoryResolver;
   private _isInitialized: boolean = false;
   private _ng1Bootstrapped: Subject<void> = new Subject<void>();
@@ -58,9 +60,10 @@ export class AngularView extends View {
     
     this._injector = this._pluginConfig.ngInjector;
     this._componentFactoryResolver = this._injector.get(ComponentFactoryResolver);
+    this.component = this._viewFactory.getTokenFrom(this._configuration);
     
     this._configuration = {
-      token: this._viewFactory.getTokenFrom(this._configuration),
+      token: this.component,
       useFactory: this._factory.bind(this),
       deps: [ ViewContainer ]
     };
@@ -86,9 +89,7 @@ export class AngularView extends View {
   private async _factory<T>(config: ViewConfig, viewContainer: ViewContainer<T>): Promise<T> {
     const token = this._viewFactory.getTokenFrom(this._configuration);
     
-    const metadata = Reflect.getOwnMetadata(VIEW_CONFIG_KEY, token) as ViewComponentConfig;
-    
-    // TODO: Add interceptor logic here
+    const metadata = Reflect.getMetadata(VIEW_CONFIG_KEY, token) as ViewComponentConfig;
 
     if (metadata.upgrade) {
       return await this._ng1Factory(config, viewContainer);
@@ -106,7 +107,7 @@ export class AngularView extends View {
       await this._ng1Bootstrapped.toPromise();
     }
 
-    const token = this._viewFactory.getTokenFrom(this._configuration);
+    const token = this.component;
     const metadata = Reflect.getOwnMetadata(VIEW_CONFIG_KEY, token) as ViewComponentConfig;
     const ng1Injector = this._injector.get('$injector') as ng.auto.IInjectorService;
     const $rootScope = ng1Injector.get('$rootScope') as ng.IRootScopeService;
@@ -154,7 +155,7 @@ export class AngularView extends View {
   }
 
   private async _ng2Factory<T>(config: ViewConfig, viewContainer: ViewContainer<T>): Promise<T> {
-    const token = this._viewFactory.getTokenFrom(this._configuration);
+    const token = this.component;
     
     const componentFactory = this._componentFactoryResolver.resolveComponentFactory<T>(token);
     const injector = ReflectiveInjector.resolveAndCreate([

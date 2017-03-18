@@ -7,7 +7,7 @@ import DOMAttrs from 'snabbdom/modules/attributes';
 
 import { Injector, ProviderArg, forwardRef } from './di';
 import { Renderer, RenderableInjector } from './dom';
-import { ViewFactory, ViewManager, ViewInterceptorRunner } from './view';
+import { ViewFactory, ViewManager } from './view';
 import { DocumentRef, PatchRef } from './common';
 
 const patch = snabbdom.init([
@@ -24,7 +24,6 @@ export class RootInjector extends RenderableInjector {
       Renderer,
       ViewFactory,
       ViewManager,
-      ViewInterceptorRunner,
       { provide: PatchRef, useValue: patch },
       { provide: DocumentRef, useValue: document },
       { provide: RootInjector, useValue: forwardRef(() => this) },
