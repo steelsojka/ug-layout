@@ -136,6 +136,12 @@ export class RootLayout extends Renderable {
     this._renderer.render();
   }
 
+  setContainingNode(node: Node): void {
+    this._renderer.setContainer(node);
+    this.resize();
+    this.update();
+  }
+
   destroy(): void {
     super.destroy();
     

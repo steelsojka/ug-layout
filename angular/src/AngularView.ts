@@ -6,7 +6,8 @@ import {
   Input,
   ApplicationRef,
   ElementRef,
-  Type
+  Type,
+  Provider
 } from '@angular/core';
 import {
   Renderable,
@@ -22,7 +23,8 @@ import {
   ConfigurationRef,
   ContainerRef,
   ViewManager,
-  DocumentRef
+  DocumentRef,
+  ConfiguredRenderable
 } from 'ug-layout';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
@@ -40,15 +42,15 @@ import {
 export class AngularView extends View {
   protected component: Type<any>;
   
-  private _componentFactoryResolver: ComponentFactoryResolver;
-  private _isInitialized: boolean = false;
-  private _ng1Bootstrapped: Subject<void> = new Subject<void>();
-  private _isNg1Bootstrapped: boolean = false;
-  private _isCheckingForNg1: boolean = false;
-  private _injector: Injector;
+  protected _componentFactoryResolver: ComponentFactoryResolver;
+  protected _isInitialized: boolean = false;
+  protected _ng1Bootstrapped: Subject<void> = new Subject<void>();
+  protected _isNg1Bootstrapped: boolean = false;
+  protected _isCheckingForNg1: boolean = false;
+  protected _injector: Injector;
 
   constructor(
-    @Inject(RootConfigRef) private _rootConfig: AngularRootLayoutConfig,
+    @Inject(RootConfigRef) protected _rootConfig: AngularRootLayoutConfig,
     @Inject(ContainerRef) protected _container: Renderable,
     @Inject(ConfigurationRef) _configuration: ViewConfig,
     @Inject(ViewManager) _viewManager: ViewManager,
@@ -63,8 +65,9 @@ export class AngularView extends View {
     this.component = this._viewFactory.getTokenFrom(this._configuration);
     
     this._configuration = {
+      ..._configuration,
       token: this.component,
-      useFactory: this._factory.bind(this),
+      useFactory: this.factory.bind(this),
       deps: [ ViewContainer ]
     };
   }
@@ -74,7 +77,7 @@ export class AngularView extends View {
    * pull for when it's ready. In reality this only gets invoked 2 or 3 times so it's not that big of a deal.
    * @private
    */
-  private _checkForNg1Init(): void {
+  protected _checkForNg1Init(): void {
     this._isCheckingForNg1 = true;
     
     if (this._injector.get('$injector', null)) {
@@ -86,19 +89,17 @@ export class AngularView extends View {
     }
   }
 
-  private async _factory<T>(config: ViewConfig, viewContainer: ViewContainer<T>): Promise<T> {
-    const token = this._viewFactory.getTokenFrom(this._configuration);
-    
-    const metadata = Reflect.getMetadata(VIEW_CONFIG_KEY, token) as ViewComponentConfig;
+  protected async factory<T>(viewContainer: ViewContainer<T>): Promise<T> {
+    const metadata = Reflect.getMetadata(VIEW_CONFIG_KEY, this.component) as ViewComponentConfig;
 
     if (metadata.upgrade) {
-      return await this._ng1Factory(config, viewContainer);
+      return await this._ng1Factory(viewContainer);
     }
 
-    return await this._ng2Factory(config, viewContainer);
+    return await this._ng2Factory(viewContainer);
   }
 
-  private async _ng1Factory<T>(config: ViewConfig, viewContainer: ViewContainer<T>): Promise<T> {
+  private async _ng1Factory<T>(viewContainer: ViewContainer<T>): Promise<T> {
     if (!this._isNg1Bootstrapped) {
       if (!this._isCheckingForNg1) {
         this._checkForNg1Init();
@@ -131,7 +132,11 @@ export class AngularView extends View {
     }
 
     // Instaniate our controller for the component.
-    const ctrl = ng1Injector.instantiate(token, this._getNg1Providers(config, viewContainer.element, viewContainer)) as T;
+    const ctrl = ng1Injector.instantiate(token, this.getNg1Providers({
+      $element: viewContainer.element, 
+      $scope: scope,
+      viewContainer
+    }, viewContainer)) as T;
 
     // Assign it to scope.
     scope[metadata.controllerAs || '$ctrl'] = ctrl;
@@ -154,14 +159,20 @@ export class AngularView extends View {
     return ctrl;
   }
 
-  private async _ng2Factory<T>(config: ViewConfig, viewContainer: ViewContainer<T>): Promise<T> {
+  private async _ng2Factory<T>(viewContainer: ViewContainer<T>): Promise<T> {
     const token = this.component;
     
     const componentFactory = this._componentFactoryResolver.resolveComponentFactory<T>(token);
-    const injector = ReflectiveInjector.resolveAndCreate([
-      { provide: ElementRef, useValue: new ElementRef(viewContainer.element) },
-      { provide: ViewContainer, useValue: viewContainer }
-    ], this._rootConfig.ngInjector);
+    const injector = ReflectiveInjector.resolveAndCreate(
+      this.getNg2Providers(
+        [
+          { provide: ElementRef, useValue: new ElementRef(viewContainer.element) },
+          { provide: ViewContainer, useValue: viewContainer }
+        ],
+        viewContainer
+      ), 
+      this._rootConfig.ngInjector
+    );
     
     const componentRef = this._rootConfig.viewContainerRef.createComponent(
       componentFactory,
@@ -204,10 +215,15 @@ export class AngularView extends View {
     }
   }
 
-  protected _getNg1Providers<T>(config: ViewConfig, elementRef: HTMLElement, viewContainer: ViewContainer<T>): { [key: string]: any } {
-    return {
-      viewContainer,
-      $element: elementRef
-    };
+  protected getNg1Providers(providers: { [key: string]: any }, viewContainer: ViewContainer<any>): { [key: string]: any } {
+    return providers;
+  }
+  
+  protected getNg2Providers(providers: Provider[], viewContainer: ViewContainer<any>): Provider[] {
+    return providers;
+  }
+
+  static configure(config: ViewConfig): ConfiguredRenderable<AngularView> {
+    return new ConfiguredRenderable(AngularView, config);
   }
 }

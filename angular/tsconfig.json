@@ -3,7 +3,8 @@
   "compilerOptions": {
     "skipLibCheck": true,
     "types": [
-      "reflect-metadata"
+      "reflect-metadata",
+      "angular"
     ]
   },
   "include": [

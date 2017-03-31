@@ -7,11 +7,46 @@ import { ViewContainer } from './ViewContainer';
 export const ViewFactoriesRef = new Token('ViewFactoriesToken');
 export const ViewComponentRef = new Token('ViewComponentRef');
 export const VIEW_CONFIG_KEY = 'ugLayout:viewConfig';
+export const VIEW_QUERY_METADATA = 'ugLayout:ViewQueryMetadata';
 
 export enum ResolverStrategy {
   SINGLETON,
   TRANSIENT,
   REF
+}
+
+export enum ViewQueryReadType {
+  CONTAINER,
+  OBSERVABLE,
+  COMPONENT  
+}
+
+export interface ViewQueryArgs {
+  ref?: string;
+  token?: any;
+  id?: number;
+}
+
+export interface ViewQueryMetadata {
+  queries: ViewQueryConfig[];
+  inits: ViewQueryInitConfig[];
+}
+
+export interface ViewQueryInitConfig {
+  method: string;
+  injections: any[];
+}
+
+export interface ViewQueryConfigArgs extends ViewQueryArgs {
+  read?: ViewQueryReadType;
+}
+
+export interface ViewQueryConfig {
+  ref?: string;
+  token?: any;
+  id?: number;
+  read: ViewQueryReadType;
+  method: string;
 }
 
 export interface ViewComponentConfig {

@@ -13,7 +13,7 @@ export function clamp(val, min, max): number {
 }
 
 export function isObject(val: any): boolean {
-  return typeof val === 'object' && val !== null;
+  return (typeof val === 'object' || isFunction(val)) && val !== null;
 }
 
 export function isFunction(val: any): val is Function {

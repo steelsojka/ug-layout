@@ -7,7 +7,8 @@ import {
   Output,
   OnChanges,
   SimpleChanges,
-  ViewChild
+  ViewChild,
+  EventEmitter
 } from '@angular/core';
 import { RootLayout, ProviderArg, Renderable, ConfiguredRenderable, Layout } from 'ug-layout';
 
@@ -26,6 +27,7 @@ import { RootLayoutProviders } from './common';
 })
 export class UgLayoutOutletComponent implements OnChanges {
   @Input() root?: ConfiguredRenderable<RootLayout>;
+  @Output() initialized: EventEmitter<RootLayout> = new EventEmitter();
 
   @ViewChild('container', { read: ViewContainerRef })
   private _viewContainerRef: ViewContainerRef;
@@ -52,6 +54,8 @@ export class UgLayoutOutletComponent implements OnChanges {
     if (this.root) {
       this._construct(this.root);
     }
+
+    this.initialized.emit(this._rootLayout);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -64,5 +68,13 @@ export class UgLayoutOutletComponent implements OnChanges {
 
   private _construct(root: ConfiguredRenderable<RootLayout>): void {
     this._rootLayout.load(root);
+  }
+
+  static downgrade(): any {
+    return {
+      component: UgLayoutOutletComponent,
+      inputs: [ 'root' ],
+      outputs: [ 'initialized' ]
+    };
   }
 }

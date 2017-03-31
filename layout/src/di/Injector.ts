@@ -187,6 +187,10 @@ export class Injector {
     return this._resolve(provider);
   }
 
+  invoke(fn: Function, providers: ProviderArg[]): any {
+    return fn(...providers.map(p => this._resolve(p)));
+  }
+
   private _resolve(_provider: ProviderArg, metadata: InjectionMetadata = {}): any {
     const provider = this._normalizeProvider(_provider);
     

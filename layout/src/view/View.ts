@@ -7,7 +7,7 @@ import { ContainerRef, ConfigurationRef, ElementRef, DocumentRef } from '../comm
 import { Stack } from '../stack';
 import { ViewContainer } from './ViewContainer';
 import { ViewConfig, ResolverStrategy } from './common';
-import { Subject, Observable, BeforeDestroyEvent } from '../events';
+import { Subject, Observable, BeforeDestroyEvent, BehaviorSubject } from '../events';
 import { MakeVisibleCommand, MinimizeCommand } from '../commands';
 import { ViewManager } from './ViewManager';
 import { ViewFactory } from './ViewFactory';
@@ -21,8 +21,8 @@ import { get } from '../utils';
  */
 export class View extends Renderable {
   protected _viewContainer: ViewContainer<any>;
-  protected _visibilityChanges: Subject<boolean> = new Subject();
-  protected _sizeChanges: Subject<{ width: number, height: number }> = new Subject();
+  protected _visibilityChanges: BehaviorSubject<boolean> = new BehaviorSubject(true);
+  protected _sizeChanges: BehaviorSubject<{ width: number, height: number }> = new BehaviorSubject({ width: 0, height: 0 });
   
   /**
    * Notifies when the visibility of this view changes.

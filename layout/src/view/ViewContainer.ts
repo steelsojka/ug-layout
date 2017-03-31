@@ -40,8 +40,8 @@ export class ViewContainer<T> {
   private _destroyed: Subject<ViewContainer<T>> = new Subject();
   private _beforeDestroy: Subject<BeforeDestroyEvent<Renderable>> = new Subject();
   private _containerChange: Subject<View|null> = new Subject<View|null>();
-  private _visibilityChanges: Subject<boolean> = new Subject();
-  private _sizeChanges: Subject<{ width: number, height: number }> = new Subject();
+  private _visibilityChanges: BehaviorSubject<boolean> = new BehaviorSubject(true);
+  private _sizeChanges: BehaviorSubject<{ width: number, height: number }> = new BehaviorSubject({ width: 0, height: 0 });
   private _attached: Subject<boolean> = new Subject();
   private _initialized: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   private _isInitialized: boolean = false;

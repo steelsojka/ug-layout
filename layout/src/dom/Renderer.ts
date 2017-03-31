@@ -40,6 +40,10 @@ export class Renderer {
    */
   initialize(containerEl: Node): void {
     this._mountPoint = this._document.createElement('div');
+    this.setContainer(containerEl);
+  }
+
+  setContainer(containerEl: Node): void { 
     this._containerEl = containerEl;
     this._containerEl.appendChild(this._mountPoint);
   }
