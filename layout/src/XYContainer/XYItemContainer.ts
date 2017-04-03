@@ -25,6 +25,7 @@ import { Splitter } from './Splitter';
 export interface XYItemContainerConfig {
   use: RenderableArg<Renderable>;
   ratio?: number;
+  initialSize?: number;
   minSizeX?: number;
   maxSizeX?: number;
   minSizeY?: number;
@@ -83,6 +84,10 @@ export class XYItemContainer extends Renderable {
 
   get maxSizeY(): number {
     return isNumber(this._config.maxSizeY) ? this._config.maxSizeY : Number.MAX_SAFE_INTEGER;
+  }
+
+  get initialSize(): number|null {
+    return isNumber(this._config.initialSize) ? this._config.initialSize : null;
   }
 
   get isMinimized(): boolean {
@@ -211,5 +216,9 @@ export class XYItemContainer extends Renderable {
     if (size != null) {
       this._container.setSizeOf(this, size);
     }
+  }
+
+  static configure(config: XYItemContainerConfig): ConfiguredRenderable<XYItemContainer> {
+    return new ConfiguredRenderable(XYItemContainer, config);
   }
 }

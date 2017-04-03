@@ -1,4 +1,4 @@
-import { ConfiguredRenderable } from '../dom';
+import { ConfiguredRenderable, SerializedRenderable } from '../dom';
 import { Inject } from '../di';
 import { SerializerContainer, Serializer, Serialized } from '../serialization';
 import { XYContainer } from './XYContainer';
@@ -8,6 +8,7 @@ import { UNALLOCATED, XYDirection } from '../common';
 
 export interface SerializedXYContainerItem {
   use: Serialized;
+  tags: string[];
   ratio: number|null;
   minSizeX: number;
   maxSizeX: number;
@@ -17,7 +18,7 @@ export interface SerializedXYContainerItem {
   minimized: boolean;
 }
 
-export interface SerializedXYContainer extends Serialized {
+export interface SerializedXYContainer extends SerializedRenderable {
   direction: XYDirection;
   splitterSize: number;
   children: SerializedXYContainerItem[];
@@ -31,11 +32,13 @@ export class XYContainerSerializer implements Serializer<XYContainer, Serialized
   serialize(node: XYContainer): SerializedXYContainer {
     return {
       name: 'XYContainer',
+      tags: [ ...node.tags ],
       direction: node.direction,
       splitterSize: node.splitterSize,
       children: node.getChildren().map(item => {
         return {
           use: this._container.serialize(item.item),
+          tags: [ ...item.tags ],
           ratio: item.ratio === UNALLOCATED ? null : item.ratio as number,
           minimized: item.isMinimized,
           minSizeX: item.minSizeX,
@@ -53,10 +56,12 @@ export class XYContainerSerializer implements Serializer<XYContainer, Serialized
     
     return Ctor.configure({
       splitterSize: node.splitterSize,
+      tags: node.tags,
       children: node.children.map(child => {
         return {
           use: this._container.deserialize(child.use),
           ratio: child.ratio == null ? undefined : child.ratio as number,
+          tags: child.tags,
           minSizeX: child.minSizeX,
           maxSizeX: child.maxSizeX,
           minSizeY: child.minSizeY,

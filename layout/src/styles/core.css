@@ -175,6 +175,7 @@
 
 .ug-layout__view-container {
   overflow: auto;
+  position: relative;
 }
 
 .ug-layout__drop-indicator {

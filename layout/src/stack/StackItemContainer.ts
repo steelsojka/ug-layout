@@ -2,7 +2,7 @@ import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
 import { Inject, Injector } from '../di'
-import { Renderer, Renderable, AddChildArgs, RenderableInjector, ConfiguredRenderable, RenderableArea } from '../dom';
+import { Renderer, Renderable, AddChildArgs, RenderableInjector, ConfiguredRenderable, RenderableArea, RenderableConfig } from '../dom';
 import { BeforeDestroyEvent, Cancellable, Subject, Observable } from '../events';
 import { MakeVisibleCommand } from '../commands';
 import {
@@ -23,7 +23,7 @@ import { get } from '../utils'
 import { TabControl, CloseTabControl } from './tabControls';
 import { StackControlConfig } from './controls';
 
-export interface StackItemContainerConfig {
+export interface StackItemContainerConfig extends RenderableConfig {
   use: RenderableArg<Renderable>;
   title?: string;
   droppable?: boolean;

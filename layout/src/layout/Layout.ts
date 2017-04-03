@@ -6,19 +6,19 @@ import {
   Renderable, 
   RenderableInjector,
   ConfiguredRenderable,
-  RenderableArea
+  RenderableArea,
+  RenderableConfig
 } from '../dom';
 import { 
   ContainerRef, 
   ConfigurationRef,
-  RenderableConfig,
   RenderableArg,
   DropArea
 } from '../common';
 import { XYContainer } from '../XYContainer';
 import { DragHost, DragHostContainer } from '../DragHost';
 
-export interface LayoutConfig {
+export interface LayoutConfig extends RenderableConfig {
   child: RenderableArg<Renderable>;
 }
 

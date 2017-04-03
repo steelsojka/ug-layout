@@ -144,7 +144,7 @@ test('should get null if no parent', t => {
   t.is<any>(myClass.getParent(), null);
 });
 
-test('should the first parent that matches the selector', t => {
+test('should get the first parent that matches the selector', t => {
   class Parent {}
   
   const myClass = getRenderable(MyClass);  
@@ -152,6 +152,19 @@ test('should the first parent that matches the selector', t => {
   (<any>myClass)._container = parent;
   
   t.is<any>(myClass.getParent(Parent as any), parent);
+});
+
+test('should get either of the parent selectors', t => {
+  class Parent {}
+  class OtherParent {}
+  
+  const myClass = getRenderable(MyClass);  
+  const parent = new Parent();
+  const otherParent = new OtherParent();
+  (<any>myClass)._container = parent;
+  (<any>parent)._container = otherParent;
+  
+  t.is<any>(myClass.getParent([ Parent, OtherParent ] as any), parent);
 });
 
 test('should get the parents', t => {

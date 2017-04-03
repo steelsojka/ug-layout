@@ -253,7 +253,7 @@ export class ViewManager {
    * @param {{ token?: any, ref?: string }} [query={}] 
    * @returns {Observable<ViewContainer<T>>} 
    */
-  query<T>(query: ViewQueryArgs = {}): Observable<ViewContainer<T>> {
+  subscribeToQuery<T>(query: ViewQueryArgs = {}): Observable<ViewContainer<T>> {
     const { ref, token, id } = query;
   
     if (ref) {
@@ -267,34 +267,60 @@ export class ViewManager {
 
   queryToken<T>(token: any, id?: number): Observable<ViewContainer<T>> {
     return Observable.create((observer: Observer<ViewContainer<T>>) => {
-      if (this.has(token)) {
-        const containers = this.getAll(token) as { [key: number]: ViewContainer<T> };
-        
-        for (const containerId of Object.keys(containers)) {
-          if (!id || (id && containerId === id.toString())) {
-            observer.next(containers[containerId]);
-          }
-        }
+      for (const container of this.query<T>({ token, id })) {
+        observer.next(container);
       }
 
-      this.viewInit
+      const sub = this.viewInit
         .filter(propEq('token', token))
         .filter(e => id ? id === e.container.id : true)
+        .map(e => e.container)
         .subscribe(observer);
+
+      return () => sub.unsubscribe();
     });
   }
 
   queryRef<T>(ref: string): Observable<ViewContainer<T>> {
     return Observable.create((observer: Observer<ViewContainer<T>>) => {
-      if (this._refs.has(ref)) {
-        observer.next(this._refs.get(ref) as ViewContainer<T>);
+      const result = this.query<T>({ ref });
+      
+      if (result.length) {
+        observer.next(result[0]);
       }
 
-      this.refChanges
+      const sub = this.refChanges
         .filter(propEq('type', 'add'))
         .filter(propEq('ref', ref))
+        .map(e => e.container)
         .subscribe(observer);
+        
+      return () => sub.unsubscribe();
     });
+  }
+
+  query<T>(query: ViewQueryArgs): ViewContainer<T>[] {
+    const { ref, id, token } = query;
+    
+    if (ref && this._refs.has(ref)) {
+      return [ this._refs.get(ref) as ViewContainer<T> ];
+    } else if (token) {
+      if (this.has(token)) {
+        const containers = this.getAll(token) as { [key: number]: ViewContainer<T> };
+
+        if (!id) {
+          return Object.keys(containers).map(id => containers[id]);
+        }
+        
+        for (const containerId of Object.keys(containers)) {
+          if (id && containerId === id.toString()) {
+            return [ containers[containerId] ];
+          }
+        }
+      }
+    }
+
+    return [];
   }
 
   private _assertAndReadComponent(token: any): ViewComponentConfig {

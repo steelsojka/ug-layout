@@ -4,3 +4,4 @@ export * from './RenderableInjector';
 export * from './Renderable';
 export * from './RenderableArea';
 export * from './decorators';
+export * from './common';

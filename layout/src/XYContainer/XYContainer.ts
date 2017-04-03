@@ -6,14 +6,14 @@ import {
   RenderableInjector,
   ConfiguredRenderable,
   Renderer,
-  AddChildArgs
+  AddChildArgs,
+  RenderableConfig
 } from '../dom';
 import { Inject, Injector, Optional } from '../di';
 import { 
   ContainerRef, 
   XYDirection,
   ConfigurationRef,
-  RenderableConfig,
   RenderableArg,
   UNALLOCATED,
   DragStatus,
@@ -26,8 +26,9 @@ import { Splitter, SPLITTER_SIZE } from './Splitter';
 import { get, isNumber, clamp, round } from '../utils';
 import { Stack, StackItemContainer } from '../stack';
 
-export interface XYContainerConfig {
+export interface XYContainerConfig extends RenderableConfig {
   splitterSize?: number;
+  keepOnSingleItem?: boolean;
   children: XYItemContainerConfig[];
 }
 
@@ -131,7 +132,13 @@ export class XYContainer extends Renderable {
     }
 
     if (resize) {
-      const newItemRatio = (1 / (this._contentItems.length + 1)) * 100;
+      let newItemRatio;
+      
+      if (container.initialSize != null) {
+        newItemRatio = (container.initialSize / this._totalContainerSize) * 100;
+      } else {
+        newItemRatio = (1 / (this._contentItems.length + 1)) * 100;
+      }
 
       container.ratio = newItemRatio;
       
@@ -164,7 +171,7 @@ export class XYContainer extends Renderable {
 
     super.removeChild(item, { render: false });
 
-    if (this._contentItems.length === 1 && this.container) {
+    if (this._contentItems.length === 1 && this.container && get(this._config, 'keepOnSingleItem') !== true) {
       const container = this._contentItems[0];
       const item = container.item;
       

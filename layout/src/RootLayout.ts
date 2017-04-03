@@ -12,7 +12,6 @@ import {
   ConfigurationRef,
   ContainerRef, 
   RootConfigRef,
-  RenderableConfig,
   RenderableArg,
   ElementRef
 } from './common';

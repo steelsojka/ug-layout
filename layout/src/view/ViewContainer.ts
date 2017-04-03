@@ -172,6 +172,10 @@ export class ViewContainer<T> {
     return this._element;
   }
 
+  get view(): View|null {
+    return this._container;
+  }
+
   /**
    * Get's a token from this containers injector. Note, this should not be used to grab
    * parent renderables or any item that can be changed.

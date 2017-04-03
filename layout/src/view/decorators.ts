@@ -7,7 +7,9 @@ import {
   ViewQueryConfigArgs,
   ViewQueryReadType,
   ViewQueryInitConfig,
-  ViewQueryMetadata
+  ViewQueryMetadata,
+  ViewInsertConfigArgs,
+  ViewResolveConfigArgs
 } from './common';
 
 export function ViewComponent(config: ViewComponentConfigArgs = {}): ClassDecorator {
@@ -26,10 +28,10 @@ export function ViewComponent(config: ViewComponentConfigArgs = {}): ClassDecora
 
 export function ViewQuery(config: ViewQueryConfigArgs = {}): MethodDecorator {
   return (target: Object, key: string) => {
-    const metadata = Reflect.getOwnMetadata(VIEW_QUERY_METADATA, target) || { queries: [], inits: [] } as ViewQueryMetadata;
+    const metadata: ViewQueryMetadata = Reflect.getOwnMetadata(VIEW_QUERY_METADATA, target) || getDefaultMetadata();
 
     metadata.queries.push({
-      read: ViewQueryReadType.CONTAINER,
+      read: ViewQueryReadType.COMPONENT,
       method: key,
       ...config,
     });
@@ -40,7 +42,7 @@ export function ViewQuery(config: ViewQueryConfigArgs = {}): MethodDecorator {
 
 export function ViewLinkInit(...injections: any[]): MethodDecorator {
   return (target: Object, key: string) => {
-    const metadata = Reflect.getOwnMetadata(VIEW_QUERY_METADATA, target) || { queries: [], inits: [] } as ViewQueryMetadata;
+    const metadata: ViewQueryMetadata = Reflect.getOwnMetadata(VIEW_QUERY_METADATA, target) || getDefaultMetadata();
 
     metadata.inits.push({
       injections,
@@ -48,5 +50,40 @@ export function ViewLinkInit(...injections: any[]): MethodDecorator {
     });
 
     Reflect.defineMetadata(VIEW_QUERY_METADATA, metadata, target);
+  };
+}
+
+export function ViewInsert(config: ViewInsertConfigArgs): PropertyDecorator {
+  return (target: Object, key: string) => {
+    const metadata: ViewQueryMetadata = Reflect.getOwnMetadata(VIEW_QUERY_METADATA, target) || getDefaultMetadata();
+
+    metadata.inserts.push({
+      ...config,
+      method: key
+    });
+
+    Reflect.defineMetadata(VIEW_QUERY_METADATA, metadata, target);
+  };
+}
+
+export function ViewResolve(config: ViewResolveConfigArgs): PropertyDecorator {
+  return (target: Object, key: string) => {
+    const metadata: ViewQueryMetadata = Reflect.getOwnMetadata(VIEW_QUERY_METADATA, target) || getDefaultMetadata();
+
+    metadata.resolves.push({
+      ...config,
+      method: key
+    });
+
+    Reflect.defineMetadata(VIEW_QUERY_METADATA, metadata, target);
+  };
+}
+
+function getDefaultMetadata(): ViewQueryMetadata {
+  return {
+    queries: [],
+    inits: [],
+    inserts: [],
+    resolves: []
   };
 }

@@ -9,7 +9,7 @@ import {
   BeforeDestroyEvent
 } from '../events';
 import { TabSelectionEvent } from './TabSelectionEvent';
-import { Renderable, ConfiguredRenderable, MemoizeFrom } from '../dom';
+import { Renderable, ConfiguredRenderable, MemoizeFrom, RenderableConfig } from '../dom';
 import { Draggable } from '../Draggable';
 import { ContainerRef, ConfigurationRef, DocumentRef, DragEvent, DragStatus } from '../common';
 import { StackHeader } from './StackHeader';
@@ -21,7 +21,7 @@ import { DragHost } from '../DragHost';
 import { get } from '../utils';
 import { TabControl } from './tabControls';
 
-export interface StackTabConfig {
+export interface StackTabConfig extends RenderableConfig {
   maxSize: number;
   title: string;
 }

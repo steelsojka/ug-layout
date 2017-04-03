@@ -4,8 +4,7 @@ import { Renderable, ConfiguredRenderable, Renderer } from '../dom';
 import { 
   XYDirection, 
   ContainerRef, 
-  ConfigurationRef, 
-  RenderableConfig 
+  ConfigurationRef
 } from '../common';
 
 export interface RowConfig extends XYContainerConfig {}

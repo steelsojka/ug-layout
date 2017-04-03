@@ -8,7 +8,8 @@ import {
   ConfiguredRenderable, 
   RenderableArea,
   AddChildArgs,
-  RemoveChildArgs
+  RemoveChildArgs,
+  RenderableConfig
 } from '../dom';
 import { Stack } from './Stack';
 import { Draggable } from '../Draggable';
@@ -31,7 +32,7 @@ import { Subject, Observable, BeforeDestroyEvent } from '../events';
 import { StackControl, StackControlPosition } from './controls';
 import { StackItemContainer } from './StackItemContainer';
 
-export interface StackHeaderConfig {
+export interface StackHeaderConfig extends RenderableConfig {
   size: number;
   distribute: boolean;
   droppable: boolean;

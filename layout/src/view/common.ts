@@ -1,8 +1,10 @@
 import { Token, Type } from '../di';
 import { View } from './View';
 import { BeforeDestroyEvent } from '../events';
-import { Renderable } from '../dom';
+import { Renderable, RenderableConfig } from '../dom';
 import { ViewContainer } from './ViewContainer';
+import { LayoutInsertPosition } from '../layout';
+import { RenderableArg } from '../common';
 
 export const ViewFactoriesRef = new Token('ViewFactoriesToken');
 export const ViewComponentRef = new Token('ViewComponentRef');
@@ -27,9 +29,20 @@ export interface ViewQueryArgs {
   id?: number;
 }
 
+export interface ViewResolveConfigArgs {
+  query: ViewQueryArgs;
+  read?: ViewQueryReadType;
+}
+
+export interface ViewResolveConfig extends ViewResolveConfigArgs {
+  method: string;
+}
+
 export interface ViewQueryMetadata {
   queries: ViewQueryConfig[];
   inits: ViewQueryInitConfig[];
+  inserts: ViewInsertConfig[];
+  resolves: ViewResolveConfig[];
 }
 
 export interface ViewQueryInitConfig {
@@ -39,6 +52,21 @@ export interface ViewQueryInitConfig {
 
 export interface ViewQueryConfigArgs extends ViewQueryArgs {
   read?: ViewQueryReadType;
+}
+
+export interface ViewInsertConfigArgs {
+  from: ViewQueryArgs;
+  into: Type<Renderable>|Type<Renderable>[];
+  insert: RenderableArg<Renderable>;
+  position?: LayoutInsertPosition;
+  index?: number;
+  read?: ViewQueryReadType;
+  tag?: string;
+  query: ViewQueryArgs;
+}
+
+export interface ViewInsertConfig extends ViewInsertConfigArgs {
+  method: string;
 }
 
 export interface ViewQueryConfig {
@@ -62,7 +90,7 @@ export type ViewComponentConfigArgs = {
   [P in keyof ViewComponentConfig]?: ViewComponentConfig[P];
 }
 
-export interface ViewConfig {
+export interface ViewConfig extends RenderableConfig {
   lazy?: boolean;
   cacheable?: boolean;
   token?: any;

@@ -23,9 +23,10 @@ import { RootInjector } from '../RootInjector';
 import { StackTab } from './StackTab';
 import { clamp, get, isNumber, propEq } from '../utils';
 import { StackRegion } from './common';
+import { RenderableConfigArgs, RenderableConfig } from '../dom';
 import { StackControl, CloseStackControl } from './controls';
 
-export interface StackConfig {
+export interface StackConfig extends RenderableConfig {
   children: StackItemContainerConfig[];
   startIndex: number;
   direction: XYDirection;
@@ -34,7 +35,7 @@ export interface StackConfig {
   controls: RenderableArg<StackControl>[];
 }
 
-export interface StackConfigArgs {
+export interface StackConfigArgs extends RenderableConfigArgs {
   children: StackItemContainerConfig[];
   startIndex?: number;
   direction?: XYDirection;

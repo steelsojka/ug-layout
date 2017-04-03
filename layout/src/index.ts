@@ -10,3 +10,4 @@ export * from './XYContainer';
 export * from './layout';
 export * from './RootSerializer';
 export * from './UgPlugin';
+export * from './TagUtil';

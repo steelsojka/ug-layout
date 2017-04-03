@@ -10,12 +10,13 @@ import {
   EventBus,
   BusEvent
 } from '../events';
-import { negate, uid, isNumber, get } from '../utils';
-import { ContainerRef, RenderableArg } from '../common';
+import { clamp, negate, uid, isNumber, get } from '../utils';
+import { ContainerRef, RenderableArg, ConfigurationRef } from '../common';
 import { RenderableArea } from './RenderableArea';
 import { Renderer } from './Renderer';
 import { INJECTOR_KEY, RenderableInjector } from './RenderableInjector';
 import { ConfiguredRenderable } from './ConfiguredRenderable';
+import { RenderableConfig } from './common';
 
 export interface BaseModificationArgs {
   /**
@@ -77,6 +78,8 @@ export abstract class Renderable {
    * @type {(Observable<Renderable|null>)}
    */
   containerChange: Observable<Renderable|null>;
+  
+  tags: Set<string> = new Set<string>();
   
   protected _eventBus = new EventBus();
   protected _width: number;  
@@ -178,6 +181,10 @@ export abstract class Renderable {
     
     return this[INJECTOR_KEY];
   }
+
+  get contentItems(): Renderable[] {
+    return [ ...this._contentItems ];
+  }
   
   /**
    * Creates this renderables VNode for diffing against the previous VNode state.
@@ -192,6 +199,12 @@ export abstract class Renderable {
   initialize(): void {
     this._renderer = this.injector.get(Renderer);
     this.setContainer(this.injector.get(ContainerRef, null));
+    
+    const config = this.injector.get(ConfigurationRef, null) as RenderableConfig|null;
+
+    if (config && Array.isArray(config.tags)) {
+      config.tags.forEach(tag => this.tags.add(tag));
+    }
   }
   
   /**
@@ -247,13 +260,13 @@ export abstract class Renderable {
    * @param {Type<T>} [Ctor] 
    * @returns {(T|null)} 
    */
-  getParent<T extends Renderable>(Ctor?: Type<T>): T|null {
+  getParent<T extends Renderable>(Ctor?: Type<T>|Type<T>[]): T|null {
     if (this._container) {
       if (!Ctor) {
         return this._container as T;
       }
       
-      if (this._container instanceof Ctor) {
+      if (this._matchesRenderable(this._container, Ctor)) {
         return this._container as T;
       }
       
@@ -270,7 +283,7 @@ export abstract class Renderable {
    * @param {Type<T>} [Ctor] 
    * @returns {(T|null)} 
    */
-  getParents<T extends Renderable>(Ctor?: Type<T>): T[] {
+  getParents<T extends Renderable>(Ctor?: Type<T>|Type<T>[]): T[] {
     let parent: Renderable|null = this;
     let result: T[] = [];
 
@@ -395,7 +408,7 @@ export abstract class Renderable {
     if (index === -1) {
       this._contentItems.push(item);
     } else {
-      this._contentItems.splice(index, 0, item);
+      this._contentItems.splice(clamp(index, 0, this._contentItems.length), 0, item);
     }
 
     item.setContainer(this);
@@ -539,5 +552,11 @@ export abstract class Renderable {
    */
   isDroppable(target: Renderable): boolean {
     return false;
+  }
+
+  protected _matchesRenderable<T extends Renderable>(instance: T, query: Type<T>|Type<T>[]): boolean {
+    const matches = q => instance instanceof q;
+
+    return Array.isArray(query) ? query.some(matches) : matches(query);
   }
 }

@@ -1,4 +1,4 @@
-import { ConfiguredRenderable } from '../dom';
+import { ConfiguredRenderable, SerializedRenderable } from '../dom';
 import { Inject } from '../di';
 import { GenericSerializer, SerializerContainer, Serializer, Serialized } from '../serialization';
 import { Stack } from './Stack';
@@ -9,6 +9,7 @@ import { TabControl, CloseTabControl } from './tabControls'
 import { XYDirection } from '../common';
 
 export interface SerializedStackItem {
+  tags: string[];
   use: Serialized;
   title: string;
   droppable: boolean;
@@ -17,7 +18,7 @@ export interface SerializedStackItem {
   tabControls: Serialized[];
 }
 
-export interface SerializedStack extends Serialized {
+export interface SerializedStack extends SerializedRenderable {
   children: SerializedStackItem[];
   startIndex: number;
   direction: XYDirection;
@@ -34,6 +35,7 @@ export class StackSerializer implements Serializer<Stack, SerializedStack> {
   serialize(node: Stack): SerializedStack {
     return {
       name: 'Stack',
+      tags: [ ...node.tags ],
       startIndex: node.activeIndex,
       direction: node.direction,
       reverse: node.isReversed,
@@ -48,6 +50,7 @@ export class StackSerializer implements Serializer<Stack, SerializedStack> {
       children: node.items.map(item => {
         return {
           use: this._container.serialize(item.getChildren()[0]),
+          tags: [ ...item.tags ],
           title: item.title,
           draggable: item.draggable,
           droppable: item.droppable,
@@ -65,6 +68,7 @@ export class StackSerializer implements Serializer<Stack, SerializedStack> {
       startIndex: node.startIndex,
       direction: node.direction,
       reverse: node.reverse,
+      tags: node.tags,
       header: !node.header ? {} : {
         size: node.header.size,
         droppable: node.header.droppable,
@@ -75,6 +79,7 @@ export class StackSerializer implements Serializer<Stack, SerializedStack> {
       }),
       children: node.children.map(child => {
         return {
+          tags: child.tags,
           title: child.title,
           draggable: child.draggable,
           droppable: child.droppable,

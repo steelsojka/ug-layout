@@ -1,9 +1,9 @@
-import { ConfiguredRenderable } from '../dom';
+import { ConfiguredRenderable, SerializedRenderable } from '../dom';
 import { Inject } from '../di';
 import { SerializerContainer, Serializer, Serialized } from '../serialization';
 import { Layout } from './Layout';
 
-export interface SerializedLayout extends Serialized {
+export interface SerializedLayout extends SerializedRenderable {
   child: Serialized;
 }
 
@@ -30,6 +30,7 @@ export class LayoutSerializer implements Serializer<Layout, SerializedLayout> {
   serialize(node: Layout): SerializedLayout {
     return {
       name: 'Layout',
+      tags: [ ...node.tags ],
       child: this._container.serialize(node.getChildren()[0])
     };
   }
@@ -41,6 +42,7 @@ export class LayoutSerializer implements Serializer<Layout, SerializedLayout> {
    */
   deserialize(node: SerializedLayout): ConfiguredRenderable<Layout> {
     return Layout.configure({
+      tags: [ ...node.tags ],
       child: this._container.deserialize(node.child)
     });
   }

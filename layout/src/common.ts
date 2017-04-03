@@ -27,10 +27,6 @@ export interface DropArea {
   dragArea: RenderableArea;
 };
 
-export interface RenderableConfig<T extends Renderable> {
-  use: Type<T>|ConfiguredRenderable<T>;
-}
-
 export enum DragStatus {
   START,
   STOP,
