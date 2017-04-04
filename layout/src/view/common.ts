@@ -2,7 +2,7 @@ import { Token, Type } from '../di';
 import { View } from './View';
 import { BeforeDestroyEvent } from '../events';
 import { Renderable, RenderableConfig } from '../dom';
-import { ViewContainer } from './ViewContainer';
+import { ViewContainer, ViewContainerStatus } from './ViewContainer';
 import { LayoutInsertPosition } from '../layout';
 import { RenderableArg } from '../common';
 
@@ -29,9 +29,15 @@ export interface ViewQueryArgs {
   id?: number;
 }
 
+export interface ViewQueryReadOptions {
+  type?: ViewQueryReadType;
+  when?: ViewContainerStatus[];
+  until?: ViewContainerStatus[];
+}
+
 export interface ViewResolveConfigArgs {
   query: ViewQueryArgs;
-  read?: ViewQueryReadType;
+  read?: ViewQueryReadType|ViewQueryReadOptions;
 }
 
 export interface ViewResolveConfig extends ViewResolveConfigArgs {
@@ -51,18 +57,18 @@ export interface ViewQueryInitConfig {
 }
 
 export interface ViewQueryConfigArgs extends ViewQueryArgs {
-  read?: ViewQueryReadType;
+  read?: ViewQueryReadType|ViewQueryReadOptions;
 }
 
 export interface ViewInsertConfigArgs {
   from: ViewQueryArgs;
   into: Type<Renderable>|Type<Renderable>[];
   insert: RenderableArg<Renderable>;
+  query: ViewQueryArgs;
   position?: LayoutInsertPosition;
   index?: number;
-  read?: ViewQueryReadType;
+  read?: ViewQueryReadType|ViewQueryReadOptions;
   tag?: string;
-  query: ViewQueryArgs;
 }
 
 export interface ViewInsertConfig extends ViewInsertConfigArgs {
@@ -73,7 +79,7 @@ export interface ViewQueryConfig {
   ref?: string;
   token?: any;
   id?: number;
-  read: ViewQueryReadType;
+  read: ViewQueryReadType|ViewQueryReadOptions;
   method: string;
 }
 

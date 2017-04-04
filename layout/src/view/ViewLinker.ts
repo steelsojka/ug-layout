@@ -6,12 +6,14 @@ import {
   ViewQueryReadType, 
   ViewQueryMetadata,
   ViewInsertConfig,
-  ViewResolveConfig
+  ViewResolveConfig,
+  ViewQueryReadOptions
 } from './common';
-import { ViewContainer } from './ViewContainer';
+import { ViewContainer, ViewContainerStatus } from './ViewContainer';
 import { Subscription, Observable, Observer } from '../events';
-import { get, isFunction } from '../utils';
+import { get, isFunction, isObject } from '../utils';
 import { LayoutManipulator } from '../layout';
+import { getDefaultMetadata } from './decorators';
 
 export class ViewLinker {
   constructor(
@@ -81,13 +83,20 @@ export class ViewLinker {
     const target = get(instance, 'constructor.prototype', null);
     
     if (!target) {
-      return { queries: [], inits: [], inserts: [], resolves: [] };
+      return getDefaultMetadata();
     }
 
-    return Reflect.getOwnMetadata(VIEW_QUERY_METADATA, target) || [];
+    return Reflect.getOwnMetadata(VIEW_QUERY_METADATA, target) || getDefaultMetadata();
   }
 
-  readQuery<T>(query: Observable<ViewContainer<T>>, type: ViewQueryReadType): Observable<any> {
+  readQuery<T>(query: Observable<ViewContainer<T>>, options?: ViewQueryReadType|ViewQueryReadOptions): Observable<any> {
+    const _options = (isObject(options) ? options : { type: options }) as ViewQueryReadOptions;
+    const {
+      type = ViewQueryReadType.COMPONENT, 
+      when = [ ViewContainerStatus.READY ], 
+      until = [ ViewContainerStatus.FAILED ]
+    } = _options;
+    
     return Observable.create((observer: Observer<any>) => {
       if (type === ViewQueryReadType.OBSERVABLE) {
         observer.next(query);
@@ -96,42 +105,39 @@ export class ViewLinker {
         return;
       } 
       
-      const subscription = query.subscribe(container => {
+      return query.subscribe(container => {
         if (type === ViewQueryReadType.COMPONENT) {
-          container.ready().then(() => {
-            observer.next(container.component);
+          container.ready({ when, until }).subscribe({
+            next: () => observer.next(container.component),
+            complete: () => observer.complete()
           });
         } else {
           observer.next(container);
+          observer.complete();
         }
       });
-
-      return () => subscription.unsubscribe();
     });
   }
 
-  private _insert<T>(instance: object, config: ViewInsertConfig): Promise<any> {
+  private _insert<T>(instance: object, config: ViewInsertConfig): Observable<any> {
     const from = this._viewManager.query<T>(config.from)[0];
     const view = from ? from.view : null;
-    const { query, read = ViewQueryReadType.COMPONENT } = config;
+    const { query, read } = config;
 
-    return new Promise((resolve, reject) => {
+    return Observable.create((observer: Observer<any>) => {
       if (view) {
-        this._manipulator.insert({ ...config, from: view })
-          .subscribe(child => {
-            this.readQuery(this._viewManager.subscribeToQuery(query), read)
-              .first()
-              .subscribe(resolve);
-          });  
+        this._manipulator.insert({ ...config, from: view }).subscribe(() => {
+          this.readQuery(this._viewManager.subscribeToQuery(query), read).subscribe(observer);
+        });  
+      } else {
+        observer.complete();
       }
     });
   }
 
-  private _resolve<T>(instance: object, config: ViewResolveConfig): Promise<any> {
-    const { query, read = ViewQueryReadType.COMPONENT } = config;
+  private _resolve<T>(instance: object, config: ViewResolveConfig): Observable<any> {
+    const { query, read } = config;
     
-    return this.readQuery(this._viewManager.subscribeToQuery(query), read)
-      .first()
-      .toPromise();
+    return this.readQuery(this._viewManager.subscribeToQuery(query), read);
   }
 }

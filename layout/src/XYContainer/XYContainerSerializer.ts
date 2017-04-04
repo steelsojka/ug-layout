@@ -10,6 +10,7 @@ export interface SerializedXYContainerItem {
   use: Serialized;
   tags: string[];
   ratio: number|null;
+  initialSize?: number;
   minSizeX: number;
   maxSizeX: number;
   minSizeY: number;
@@ -20,6 +21,7 @@ export interface SerializedXYContainerItem {
 
 export interface SerializedXYContainer extends SerializedRenderable {
   direction: XYDirection;
+  static: boolean;
   splitterSize: number;
   children: SerializedXYContainerItem[];
 }
@@ -33,6 +35,7 @@ export class XYContainerSerializer implements Serializer<XYContainer, Serialized
     return {
       name: 'XYContainer',
       tags: [ ...node.tags ],
+      static: node.isStatic,
       direction: node.direction,
       splitterSize: node.splitterSize,
       children: node.getChildren().map(item => {
@@ -40,6 +43,7 @@ export class XYContainerSerializer implements Serializer<XYContainer, Serialized
           use: this._container.serialize(item.item),
           tags: [ ...item.tags ],
           ratio: item.ratio === UNALLOCATED ? null : item.ratio as number,
+          initialSize: item.initialSize ? item.initialSize : undefined,
           minimized: item.isMinimized,
           minSizeX: item.minSizeX,
           maxSizeX: item.maxSizeX,
@@ -56,12 +60,14 @@ export class XYContainerSerializer implements Serializer<XYContainer, Serialized
     
     return Ctor.configure({
       splitterSize: node.splitterSize,
+      static: node.static,
       tags: node.tags,
       children: node.children.map(child => {
         return {
           use: this._container.deserialize(child.use),
           ratio: child.ratio == null ? undefined : child.ratio as number,
           tags: child.tags,
+          initialSize: child.initialSize,
           minSizeX: child.minSizeX,
           maxSizeX: child.maxSizeX,
           minSizeY: child.minSizeY,

@@ -79,7 +79,7 @@ export function ViewResolve(config: ViewResolveConfigArgs): PropertyDecorator {
   };
 }
 
-function getDefaultMetadata(): ViewQueryMetadata {
+export function getDefaultMetadata(): ViewQueryMetadata {
   return {
     queries: [],
     inits: [],

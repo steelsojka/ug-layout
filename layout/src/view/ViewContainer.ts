@@ -18,6 +18,25 @@ export enum ViewContainerAttachedStatus {
   DETACHED
 }
 
+export interface ViewContainerReadyOptions {
+  /**
+   * Whether to initiale the component.
+   * @type {boolean}
+   */
+  init?: boolean;
+  /**
+   * Statuses that tell when the component is ready.
+   * @type {ViewContainerStatus[]}
+   */
+  when?: ViewContainerStatus[];
+  /**
+   * When the view transitions to one of these statuses then it will stop listening for status
+   * updates and the observable will complete without the component being emitted as ready.
+   * @type {ViewContainerStatus[]}
+   */
+  until?: ViewContainerStatus[];
+}
+
 /**
  * A container that holds a 1 to 1 relationship with a component instance. This instance
  * is the main API for a component to interact with the layout framework.
@@ -46,6 +65,7 @@ export class ViewContainer<T> {
   private _initialized: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   private _isInitialized: boolean = false;
   private _retry: Function|null = null;
+  private _statusInternal: ViewContainerStatus;
   
   /**
    * A unique identifier for this instance.
@@ -79,11 +99,6 @@ export class ViewContainer<T> {
    * @type {Observable<ViewContainerStatus>}
    */
   status: Observable<ViewContainerStatus> = this._status.asObservable();
-  /**
-   * Notifies when the component is ready.
-   * @type {Observable<ViewContainerStatus>}
-   */
-  statusReady: Observable<ViewContainerStatus> = this.status.filter(eq(ViewContainerStatus.READY));
   /**
    * Contains the state of ths views initialized state.
    * @type {Observable<boolean>}
@@ -125,6 +140,7 @@ export class ViewContainer<T> {
 
     // Reset the retry function when the component is no longer failed.
     this.status.filter(eq(ViewContainerStatus.READY)).subscribe(() => this._retry = null);
+    this.status.subscribe(s => this._statusInternal = s);
   }
 
   /**
@@ -210,27 +226,28 @@ export class ViewContainer<T> {
    * @param {{ init?: boolean }} [options={}] 
    * @returns {Promise<ViewContainer<T>>} 
    */
-  ready(options: { init?: boolean } = {}): Promise<ViewContainer<T>> {
-    const deferred = new Deferred();
-    const resolved = Observable.fromPromise(deferred.promise);
+  ready(options: ViewContainerReadyOptions = {}): Observable<ViewContainer<T>> {
+    return Observable.create(observer => {
+      const { 
+        init = true, 
+        when = [ ViewContainerStatus.READY, ViewContainerStatus.FAILED ],
+        until = []
+      } = options;
 
-    const { init = true } = options;
-    
-    if (!this._isInitialized && init !== false) {
-      this.initialize();  
-    }
-    
-    this.statusReady
-      .takeUntil(resolved)
-      .subscribe(() => deferred.resolve(this));
-      
-    this.status
-      .takeUntil(resolved)
-      .filter(eq(ViewContainerStatus.FAILED))
-      .subscribe(() => deferred.reject());
-    
+      if (!this._isInitialized && init !== false) {
+        this.initialize();  
+      }
 
-    return deferred.promise;
+      return this.status
+        .subscribe(status => {
+          if (when.indexOf(status) !== -1) {
+            observer.next(this);
+            observer.complete();
+          } else if (until.indexOf(status) !== -1) {
+            observer.complete();
+          }
+        });
+    });
   }
 
   /**
@@ -431,6 +448,10 @@ export class ViewContainer<T> {
    */
   private async _onComponentReady(component: T): Promise<void> {
     this._component = component;
+
+    if (this._statusInternal === ViewContainerStatus.FAILED) {
+      return;
+    }
 
     const result = this._executeHook('ugOnResolve', this);
 

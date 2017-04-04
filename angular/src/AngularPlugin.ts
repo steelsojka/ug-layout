@@ -9,17 +9,39 @@ export interface AngularPluginConfig {
 }
 
 export class AngularPlugin extends UgPlugin {
-  constructor(private _config: AngularPluginConfig) {
+  private _viewContainerRef: ViewContainerRef;
+  private _injector: Injector;
+
+  constructor(config: AngularPluginConfig) {
     super();
+
+    this.setInjector(config.ngInjector);
+    this.setViewContainerRef(config.viewContainerRef);
   }
   
   initialize(root: RootLayout): void {
     const renderer = root.injector.get(Renderer);
     
-    root.injector.registerProvider({ provide: AngularPluginConfigRef, useValue: this._config });
+    root.injector.registerProvider({ provide: AngularPlugin, useValue: this });
     root.destroyed.subscribe(() => {
-      this._config.viewContainerRef.clear();
+      this._viewContainerRef.clear();
       renderer.detach();
     });
+  }
+
+  get viewContainerRef(): ViewContainerRef {
+    return this._viewContainerRef;
+  }
+
+  get injector(): Injector {
+    return this._injector;
+  }
+
+  setInjector(value: Injector): void {
+    this._injector = value;
+  }
+
+  setViewContainerRef(value: ViewContainerRef): void {
+    this._viewContainerRef = value;
   }
 }

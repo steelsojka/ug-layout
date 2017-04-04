@@ -7,7 +7,8 @@ import {
   ApplicationRef,
   ElementRef,
   Type,
-  Provider
+  Provider,
+  ViewContainerRef
 } from '@angular/core';
 import {
   Renderable,
@@ -30,8 +31,7 @@ import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/toPromise';
 
-import { AngularRootLayoutConfig } from './RootLayout';
-import { AngularPluginConfigRef, AngularPluginConfig } from './AngularPlugin';
+import { AngularPlugin } from './AngularPlugin';
 import {
   COMPONENT_REF_KEY,
   ViewComponentConfig,
@@ -47,20 +47,17 @@ export class AngularView extends View {
   protected _ng1Bootstrapped: Subject<void> = new Subject<void>();
   protected _isNg1Bootstrapped: boolean = false;
   protected _isCheckingForNg1: boolean = false;
-  protected _injector: Injector;
 
   constructor(
-    @Inject(RootConfigRef) protected _rootConfig: AngularRootLayoutConfig,
     @Inject(ContainerRef) protected _container: Renderable,
     @Inject(ConfigurationRef) _configuration: ViewConfig,
     @Inject(ViewManager) _viewManager: ViewManager,
     @Inject(ViewFactory) _viewFactory: ViewFactory,
     @Inject(DocumentRef) _document: Document,
-    @Inject(AngularPluginConfigRef) private _pluginConfig: AngularPluginConfig
+    @Inject(AngularPlugin) private _plugin: AngularPlugin
   ) {
     super(_container, _configuration, _viewManager, _viewFactory, _document);
     
-    this._injector = this._pluginConfig.ngInjector;
     this._componentFactoryResolver = this._injector.get(ComponentFactoryResolver);
     this.component = this._viewFactory.getTokenFrom(this._configuration);
     
@@ -70,6 +67,14 @@ export class AngularView extends View {
       useFactory: this.factory.bind(this),
       deps: [ ViewContainer ]
     };
+  }
+
+  protected get _injector(): Injector {
+    return this._plugin.injector;
+  }
+
+  protected get _viewContainerRef(): ViewContainerRef {
+    return this._plugin.viewContainerRef;
   }
 
   /**
@@ -171,10 +176,10 @@ export class AngularView extends View {
         ],
         viewContainer
       ), 
-      this._rootConfig.ngInjector
+      this._injector
     );
     
-    const componentRef = this._rootConfig.viewContainerRef.createComponent(
+    const componentRef = this._viewContainerRef.createComponent(
       componentFactory,
       undefined,
       injector
@@ -208,10 +213,10 @@ export class AngularView extends View {
   }
 
   private _onComponentDestroy<T>(componentRef: ComponentRef<T>): void {
-    const index = this._rootConfig.viewContainerRef.indexOf(componentRef.hostView);
+    const index = this._viewContainerRef.indexOf(componentRef.hostView);
     
     if (index !== -1) {
-      this._rootConfig.viewContainerRef.remove(index);
+      this._viewContainerRef.remove(index);
     }
   }
 

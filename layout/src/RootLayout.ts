@@ -152,6 +152,12 @@ export class RootLayout extends Renderable {
     return true;
   }
 
+  getPlugins<T extends UgPlugin>(type?: Type<T>): T[] {
+    return this._rootConfig.plugins.filter(plugin => {
+      return type ? plugin instanceof type : true;
+    }) as T[];
+  }
+
   static create<T extends RootLayout>(config: RootLayoutCreationConfigArgs): T {
     const _config = defaults(config, {
       plugins: [],

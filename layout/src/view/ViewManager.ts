@@ -271,13 +271,11 @@ export class ViewManager {
         observer.next(container);
       }
 
-      const sub = this.viewInit
+      return this.viewInit
         .filter(propEq('token', token))
         .filter(e => id ? id === e.container.id : true)
         .map(e => e.container)
         .subscribe(observer);
-
-      return () => sub.unsubscribe();
     });
   }
 
@@ -289,13 +287,11 @@ export class ViewManager {
         observer.next(result[0]);
       }
 
-      const sub = this.refChanges
+      return this.refChanges
         .filter(propEq('type', 'add'))
         .filter(propEq('ref', ref))
         .map(e => e.container)
         .subscribe(observer);
-        
-      return () => sub.unsubscribe();
     });
   }
 

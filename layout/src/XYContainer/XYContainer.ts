@@ -27,8 +27,17 @@ import { get, isNumber, clamp, round } from '../utils';
 import { Stack, StackItemContainer } from '../stack';
 
 export interface XYContainerConfig extends RenderableConfig {
+  /**
+   * The size in pixels of the splitter.
+   * @type {number}
+   */
   splitterSize?: number;
-  keepOnSingleItem?: boolean;
+  /**
+   * Determines whether the Row or Column should persist when only a single item remains.
+   * The default behavior is to unwrap and destroy the row or column.
+   * @type {boolean}
+   */
+  static?: boolean;
   children: XYItemContainerConfig[];
 }
 
@@ -83,6 +92,10 @@ export class XYContainer extends Renderable {
 
   get splitterSize(): number {
     return get(this._config, 'splitterSize', SPLITTER_SIZE);
+  }
+
+  get isStatic(): boolean {
+    return get(this._config, 'static', false);
   }
 
   protected get _totalSplitterSize(): number {
@@ -171,7 +184,7 @@ export class XYContainer extends Renderable {
 
     super.removeChild(item, { render: false });
 
-    if (this._contentItems.length === 1 && this.container && get(this._config, 'keepOnSingleItem') !== true) {
+    if (this._contentItems.length === 1 && this.container && get(this._config, 'static') !== true) {
       const container = this._contentItems[0];
       const item = container.item;
       
