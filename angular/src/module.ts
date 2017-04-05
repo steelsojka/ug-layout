@@ -4,7 +4,6 @@ import {
   ApplicationRef
 } from '@angular/core';
 
-import { RootLayoutProviders, AngularInjectorRef } from './common';
 import { UgLayoutOutletComponent } from './UgLayoutOutlet.component';
 
 @NgModule({
@@ -13,15 +12,6 @@ import { UgLayoutOutletComponent } from './UgLayoutOutlet.component';
   ],
   exports: [
     UgLayoutOutletComponent
-  ],
-  providers: [{
-    provide: RootLayoutProviders,
-    useFactory: ngInjector => {
-      return [
-        { provide: AngularInjectorRef, useValue: ngInjector }
-      ]
-    },
-    deps: [ Injector ]
-  }]
+  ]
 })
 export class UgLayoutModule {}

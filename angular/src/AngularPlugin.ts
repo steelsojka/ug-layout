@@ -1,8 +1,6 @@
 import { Renderer, UgPlugin, RootLayout, Token } from 'ug-layout';
 import { ViewContainerRef, Injector } from '@angular/core';
 
-export const AngularPluginConfigRef = new Token('AngularPluginConfigRef');
-
 export interface AngularPluginConfig {
   viewContainerRef: ViewContainerRef;
   ngInjector: Injector;

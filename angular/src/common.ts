@@ -1,12 +1,8 @@
-import { OpaqueToken, Type } from '@angular/core';
+import { Type } from '@angular/core';
 import {
   ViewComponentConfig as _ViewComponentConfig,
   Token
 } from 'ug-layout';
-
-export const UgLayoutModuleConfigRef = new OpaqueToken('UgLayoutModuleConfig');
-export const RootLayoutProviders = new OpaqueToken('RootLayoutProviders');
-export const AngularInjectorRef = new Token('AngularInjectorRef');
 
 export const PRIVATE_PREFIX = '__$'
 export const COMPONENT_REF_KEY = `${PRIVATE_PREFIX}componentRef__`;

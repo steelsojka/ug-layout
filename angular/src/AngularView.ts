@@ -35,8 +35,7 @@ import { AngularPlugin } from './AngularPlugin';
 import {
   COMPONENT_REF_KEY,
   ViewComponentConfig,
-  SCOPE_REF_KEY,
-  AngularInjectorRef
+  SCOPE_REF_KEY
 } from './common';
 
 export class AngularView extends View {

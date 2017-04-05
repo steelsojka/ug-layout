@@ -14,7 +14,6 @@ import {
 import { RootLayout, ProviderArg, Renderable, ConfiguredRenderable, Layout } from 'ug-layout';
 
 import { AngularPlugin } from './AngularPlugin';
-import { RootLayoutProviders } from './common';
 
 @Component({
   selector: 'ug-layout-outlet',
