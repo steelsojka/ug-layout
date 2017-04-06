@@ -46,6 +46,7 @@ export class Renderer {
   setContainer(containerEl: Node): void { 
     this._containerEl = containerEl;
     this._containerEl.appendChild(this._mountPoint);
+    this.reset();
   }
 
   /**
@@ -80,6 +81,13 @@ export class Renderer {
   destroy(): void {
     this.detach();
     this._rendered.complete();
+  }
+
+  /**
+   * Resets the render state. A full rerender of the DOM will apply on the next render.
+   */
+  reset(): void {
+    this._lastVNode = null;
   }
 
   /**

@@ -11,6 +11,7 @@ import { Subject, Observable, BeforeDestroyEvent, BehaviorSubject } from '../eve
 import { MakeVisibleCommand, MinimizeCommand } from '../commands';
 import { ViewManager } from './ViewManager';
 import { ViewFactory } from './ViewFactory';
+import { CustomViewHookEvent } from './CustomViewHookEvent';
 import { get } from '../utils';
 
 /**
@@ -23,6 +24,8 @@ export class View extends Renderable {
   protected _viewContainer: ViewContainer<any>;
   protected _visibilityChanges: BehaviorSubject<boolean> = new BehaviorSubject(true);
   protected _sizeChanges: BehaviorSubject<{ width: number, height: number }> = new BehaviorSubject({ width: 0, height: 0 });
+  protected _viewContainerCreated: Subject<ViewContainer<any>> = new Subject();
+  protected _initialCreate: boolean = true;
   
   /**
    * Notifies when the visibility of this view changes.
@@ -36,6 +39,8 @@ export class View extends Renderable {
   sizeChanges: Observable<{ width: number, height: number }> = this._sizeChanges.asObservable().distinctUntilChanged((p, c) => {
     return p.width === c.width && p.height === c.height;
   });
+
+  viewContainerCreated: Observable<ViewContainer<any>> = this._viewContainerCreated.asObservable();
   
   /**
    * Creates an instance of View.
@@ -202,6 +207,8 @@ export class View extends Renderable {
         config: this._configuration,
         injector: this.injector
       });
+
+      this._viewContainerCreated.next(this._viewContainer);
     }
 
     this._viewContainer.setView(this);

@@ -132,13 +132,12 @@ export class RootLayout extends Renderable {
     this._contentItems = [ this.createChild(this._config.use) ];
     
     this.resize();
-    this._renderer.render();
+    this.update();
   }
 
   setContainingNode(node: Node): void {
     this._renderer.setContainer(node);
-    this.resize();
-    this.update();
+    this._containerEl = node as HTMLElement;
   }
 
   destroy(): void {

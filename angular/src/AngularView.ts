@@ -25,13 +25,16 @@ import {
   ContainerRef,
   ViewManager,
   DocumentRef,
-  ConfiguredRenderable
+  ConfiguredRenderable,
+  ViewContainerStatus
 } from 'ug-layout';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/toPromise';
+import 'rxjs/add/operator/mergeMap';
 
 import { AngularPlugin } from './AngularPlugin';
+import { DestroyNotifyEvent } from './DestroyNotifyEvent';
 import {
   COMPONENT_REF_KEY,
   ViewComponentConfig,
@@ -46,6 +49,7 @@ export class AngularView extends View {
   protected _ng1Bootstrapped: Subject<void> = new Subject<void>();
   protected _isNg1Bootstrapped: boolean = false;
   protected _isCheckingForNg1: boolean = false;
+  protected _destroyNotified: Subject<void> = new Subject<void>();
 
   constructor(
     @Inject(ContainerRef) protected _container: Renderable,
@@ -66,6 +70,7 @@ export class AngularView extends View {
       useFactory: this.factory.bind(this),
       deps: [ ViewContainer ]
     };
+
   }
 
   protected get _injector(): Injector {
@@ -74,6 +79,39 @@ export class AngularView extends View {
 
   protected get _viewContainerRef(): ViewContainerRef {
     return this._plugin.viewContainerRef;
+  }
+
+  initialize(): void {
+    this.viewContainerCreated
+      .mergeMap(container => container.initialized.filter(Boolean))
+      .map(() => this._viewContainer)
+      .subscribe(this._onComponentCreated.bind(this));
+  }
+
+  protected _onComponentCreated<T>(viewContainer: ViewContainer<T>): void {
+    if (viewContainer.component) {
+      if (viewContainer.component[COMPONENT_REF_KEY]) {
+        const componentRef = viewContainer.component[COMPONENT_REF_KEY] as ComponentRef<T>;
+
+        viewContainer.destroyed
+          .takeUntil(this._destroyed)
+          .subscribe(this._onComponentDestroy.bind(this, componentRef));
+
+        viewContainer.attached
+          .takeUntil(this._destroyed)
+          .subscribe(this._onAttachChange.bind(this, true, componentRef, viewContainer));
+
+        viewContainer.detached
+          .takeUntil(this._destroyed)
+          .subscribe(this._onAttachChange.bind(this, false, componentRef, viewContainer));
+
+        this.subscribe(DestroyNotifyEvent, this._onDestroyNotify.bind(this, componentRef, viewContainer));
+
+        componentRef.changeDetectorRef.detectChanges();
+      } else if (viewContainer.component[SCOPE_REF_KEY]) {
+        viewContainer.destroyed.subscribe(() => this._onNg1ComponentDestroyed((<any>viewContainer.component)[SCOPE_REF_KEY], viewContainer));
+      }
+    }
   }
 
   /**
@@ -154,7 +192,6 @@ export class AngularView extends View {
     const $el = linkFn(scope);
 
     viewContainer.mount($el[0]);
-    viewContainer.destroyed.subscribe(() => this._onNg1ComponentDestroyed(scope, viewContainer));
 
     if (typeof ctrl['$postLink'] === 'function') {
       ctrl['$postLink']();
@@ -185,14 +222,32 @@ export class AngularView extends View {
     );
     
     componentRef.instance[COMPONENT_REF_KEY] = componentRef;
-    
     viewContainer.mount(componentRef.location.nativeElement);
-    viewContainer.destroyed.subscribe(this._onComponentDestroy.bind(this, componentRef));
-    viewContainer.attached.subscribe(this._onAttachChange.bind(this, true, componentRef));
-    viewContainer.detached.subscribe(this._onAttachChange.bind(this, false, componentRef));
-    componentRef.changeDetectorRef.detectChanges();
     
     return componentRef.instance;
+  }
+
+  private _getComponentInfo<T>(): { container: ViewContainer<T>, componentRef: ComponentRef<T> }|null {
+    if (this._viewContainer && this._viewContainer.component && this._viewContainer.component[COMPONENT_REF_KEY]) {
+      return {
+        container: this._viewContainer,
+        componentRef: this._viewContainer.component[COMPONENT_REF_KEY]
+      };
+    }
+
+    return null;
+  }
+
+  private _onDestroyNotify<T>(componentRef: ComponentRef<T>, viewContainer: ViewContainer<T>): void {
+    const index = this._viewContainerRef.indexOf(componentRef.hostView);
+
+    if (viewContainer.isCacheable) {
+      componentRef.hostView.detach();
+
+      if (index !== -1) {
+        this._viewContainerRef.detach(index);
+      }
+    }
   }
 
   private _onNg1ComponentDestroyed<T>(scope: ng.IScope, container: ViewContainer<T>): void {
@@ -203,11 +258,24 @@ export class AngularView extends View {
     scope.$destroy();
   }
 
-  private _onAttachChange<T>(isAttached: boolean, componentRef: ComponentRef<T>): void {
+  private _onAttachChange<T>(isAttached: boolean, componentRef: ComponentRef<T>, viewContainer: ViewContainer<T>): void {
+    const index = this._viewContainerRef.indexOf(componentRef.hostView);
+    const hasViewRef = index !== -1;
+
     if (isAttached) {
-      componentRef.changeDetectorRef.reattach();
+      componentRef.hostView.reattach();
+
+      // The view container ref could have changed, so if we reattach, attach to the correct container.
+      if (!hasViewRef) {
+        this._viewContainerRef.insert(componentRef.hostView);
+        viewContainer.mount(componentRef.location.nativeElement);
+      }
     } else {
-      componentRef.changeDetectorRef.detach();
+      componentRef.hostView.detach();
+
+      if (hasViewRef) {
+        this._viewContainerRef.detach(index);
+      }
     }
   }
 
@@ -217,6 +285,8 @@ export class AngularView extends View {
     if (index !== -1) {
       this._viewContainerRef.remove(index);
     }
+
+    componentRef.destroy();
   }
 
   protected getNg1Providers(providers: { [key: string]: any }, viewContainer: ViewContainer<any>): { [key: string]: any } {

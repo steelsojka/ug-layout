@@ -12,8 +12,11 @@ import {
   OnDestroy
 } from '@angular/core';
 import { RootLayout, ProviderArg, Renderable, ConfiguredRenderable, Layout } from 'ug-layout';
+import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
 
 import { AngularPlugin } from './AngularPlugin';
+import { DestroyNotifyEvent } from './DestroyNotifyEvent';
 
 @Component({
   selector: 'ug-layout-outlet',
@@ -29,12 +32,14 @@ export class UgLayoutOutletComponent implements OnChanges, OnDestroy {
   @Input() config?: ConfiguredRenderable<RootLayout>;
   @Input() persist?: boolean = false;
   @Input() root?: RootLayout;
+  @Input() destroyNotifier?: Observable<void>;
   @Output() initialized: EventEmitter<RootLayout> = new EventEmitter();
 
   @ViewChild('container', { read: ViewContainerRef })
   private _viewContainerRef: ViewContainerRef;
   private _isInitialized: boolean = false;
   private _rootLayout: RootLayout;
+  private _destroyed: Subject<void> = new Subject<void>();
 
   constructor(
     @Inject(Injector) private _injector: Injector
@@ -68,18 +73,24 @@ export class UgLayoutOutletComponent implements OnChanges, OnDestroy {
       this._rootLayout.initialize();
     }
 
+    if (this.destroyNotifier) {
+      this.destroyNotifier
+        .takeUntil(this._destroyed)
+        .subscribe(() => this._notifyDestroy());
+    }
+
     if (this.config) {
       this._construct(this.config);
     }
-
+    
     this.initialized.emit(this._rootLayout);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['root'] 
-      && changes['root'].currentValue instanceof ConfiguredRenderable
-      && !changes['root'].isFirstChange()) {
-      this._construct(changes['root'].currentValue);
+    if (changes.config 
+      && changes.config.currentValue instanceof ConfiguredRenderable
+      && !changes.config.isFirstChange()) {
+      this._construct(changes.config.currentValue);
     }
   }
 
@@ -87,17 +98,22 @@ export class UgLayoutOutletComponent implements OnChanges, OnDestroy {
     if (!this.persist) {
       this._rootLayout.destroy();
     }
+
+    this._destroyed.next();
+    this._destroyed.complete();
+  }
+
+  private _notifyDestroy(): void {
+    if (this._rootLayout) {
+      this._rootLayout.emitDown(new DestroyNotifyEvent(undefined));
+    }
   }
 
   private _construct(root: ConfiguredRenderable<RootLayout>): void {
     this._rootLayout.load(root);
   }
 
-  static downgrade(): any {
-    return {
-      component: UgLayoutOutletComponent,
-      inputs: [ 'root', 'config', 'persist' ],
-      outputs: [ 'initialized' ]
-    };
+  static downgrade(): { component: typeof UgLayoutOutletComponent } {
+    return { component: UgLayoutOutletComponent };
   }
 }
