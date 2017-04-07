@@ -3,11 +3,11 @@ import h from 'snabbdom/h';
 
 import { Type, ProviderArg, Inject, Injector, Optional, forwardRef } from '../di';
 import { Renderer, Renderable, ConfiguredRenderable } from '../dom';
-import { ContainerRef, ConfigurationRef, ElementRef, DocumentRef } from '../common';
+import { ContainerRef, ConfigurationRef, ElementRef, DocumentRef, DestroyContext } from '../common';
 import { Stack } from '../stack';
 import { ViewContainer } from './ViewContainer';
-import { ViewConfig, ResolverStrategy } from './common';
-import { Subject, Observable, BeforeDestroyEvent, BehaviorSubject } from '../events';
+import { ViewConfig, ResolverStrategy, CacheStrategy } from './common';
+import { Subject, Observable, BeforeDestroyEvent, BehaviorSubject, DestroyContextEvent } from '../events';
 import { MakeVisibleCommand, MinimizeCommand } from '../commands';
 import { ViewManager } from './ViewManager';
 import { ViewFactory } from './ViewFactory';
@@ -26,6 +26,7 @@ export class View extends Renderable {
   protected _sizeChanges: BehaviorSubject<{ width: number, height: number }> = new BehaviorSubject({ width: 0, height: 0 });
   protected _viewContainerCreated: Subject<ViewContainer<any>> = new Subject();
   protected _initialCreate: boolean = true;
+  protected _destroyContext: DestroyContext = DestroyContext.NONE;
   
   /**
    * Notifies when the visibility of this view changes.
@@ -82,8 +83,19 @@ export class View extends Renderable {
    * @readonly
    * @type {(boolean|null)}
    */
-  get isCacheable(): boolean|null {
-    return this.resolveConfigProperty<boolean>('cacheable');
+  get isCacheable(): boolean {
+    const cacheStrategy = this.caching;
+
+    if ((cacheStrategy === CacheStrategy.RELOAD && this._destroyContext === DestroyContext.NONE) 
+      || cacheStrategy === CacheStrategy.PERSITENT) {
+      return true;
+    }
+
+    return false;
+  }
+
+  get caching(): CacheStrategy|null {
+    return this.resolveConfigProperty<CacheStrategy>('caching');
   }
   
   /**
@@ -119,6 +131,10 @@ export class View extends Renderable {
     this._renderer.rendered
       .takeUntil(this.destroyed)
       .subscribe(this._postRender.bind(this));
+
+    this.subscribe(DestroyContextEvent, event => {
+      this._destroyContext = event.target;
+    });
   }
 
   render(): VNode {
@@ -203,11 +219,18 @@ export class View extends Renderable {
    */
   private _onCreate(element: HTMLElement): void {
     if (!this._viewContainer) {
-      this._viewContainer = this._viewManager.resolveOrCreate<any>({
-        config: this._configuration,
-        injector: this.injector
-      });
+      let container = this._viewManager.resolve<any>(this._configuration);
 
+      if (container) {
+        container.resolve({ fromCache: true });
+      } else {
+        container = this._viewManager.create({
+          config: this._configuration,
+          injector: this.injector
+        });
+      }
+
+      this._viewContainer = container;
       this._viewContainerCreated.next(this._viewContainer);
     }
 

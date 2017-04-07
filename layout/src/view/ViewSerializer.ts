@@ -3,12 +3,12 @@ import { Inject } from '../di';
 import { GenericSerializer, SerializerContainer, Serializer, Serialized } from '../serialization';
 import { View } from './View';
 import { isBoolean, isNumber } from '../utils';
-import { ResolverStrategy } from './common';
+import { ResolverStrategy, CacheStrategy } from './common';
 
 export interface SerializedView extends SerializedRenderable {
   lazy: boolean|null;
   ref: string|null;
-  cacheable: boolean|null;
+  caching?: CacheStrategy|null;
   token: string;
   useClass: string;
   resolution: ResolverStrategy|null;
@@ -31,7 +31,7 @@ export class ViewSerializer implements Serializer<View, SerializedView> {
       name: 'View',
       tags: [ ...node.tags ],
       ref: node.ref,
-      cacheable: node.isCacheable,
+      caching: node.caching != null ? node.caching : undefined,
       lazy: node.lazy,
       useClass: token,
       resolution: node.resolution
@@ -48,7 +48,7 @@ export class ViewSerializer implements Serializer<View, SerializedView> {
     
     return View.configure({
       token, useClass,
-      cacheable: isBoolean(node.cacheable) ? node.cacheable : undefined,
+      caching: node.caching != null ? node.caching : undefined,
       lazy: isBoolean(node.lazy) ? node.lazy : undefined,
       resolution: isNumber(node.resolution) ? node.resolution : undefined,
       ref: node.ref,

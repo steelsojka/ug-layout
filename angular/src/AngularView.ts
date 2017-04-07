@@ -35,6 +35,7 @@ import 'rxjs/add/operator/mergeMap';
 
 import { AngularPlugin } from './AngularPlugin';
 import { DestroyNotifyEvent } from './DestroyNotifyEvent';
+import { Angular1ComponentFactory } from './Angular1ComponentFactory';
 import {
   COMPONENT_REF_KEY,
   ViewComponentConfig,
@@ -82,36 +83,49 @@ export class AngularView extends View {
   }
 
   initialize(): void {
+    super.initialize();
+
     this.viewContainerCreated
-      .mergeMap(container => container.initialized.filter(Boolean))
+      .mergeMap(container => container.componentReady.filter(Boolean))
       .map(() => this._viewContainer)
-      .subscribe(this._onComponentCreated.bind(this));
+      .subscribe(this._onComponentInitialized.bind(this));
   }
 
-  protected _onComponentCreated<T>(viewContainer: ViewContainer<T>): void {
+  protected _onComponentInitialized<T>(viewContainer: ViewContainer<T>): void {
     if (viewContainer.component) {
-      if (viewContainer.component[COMPONENT_REF_KEY]) {
-        const componentRef = viewContainer.component[COMPONENT_REF_KEY] as ComponentRef<T>;
+      const componentRef = viewContainer.component[COMPONENT_REF_KEY];
 
-        viewContainer.destroyed
-          .takeUntil(this._destroyed)
-          .subscribe(this._onComponentDestroy.bind(this, componentRef));
-
-        viewContainer.attached
-          .takeUntil(this._destroyed)
-          .subscribe(this._onAttachChange.bind(this, true, componentRef, viewContainer));
-
-        viewContainer.detached
-          .takeUntil(this._destroyed)
-          .subscribe(this._onAttachChange.bind(this, false, componentRef, viewContainer));
-
-        this.subscribe(DestroyNotifyEvent, this._onDestroyNotify.bind(this, componentRef, viewContainer));
-
-        componentRef.changeDetectorRef.detectChanges();
-      } else if (viewContainer.component[SCOPE_REF_KEY]) {
-        viewContainer.destroyed.subscribe(() => this._onNg1ComponentDestroyed((<any>viewContainer.component)[SCOPE_REF_KEY], viewContainer));
+      if (componentRef) {
+        if (componentRef instanceof ComponentRef) {
+          this._onNg2ComponentInitialized(viewContainer, componentRef);
+        } else if (componentRef instanceof Angular1ComponentFactory) {
+          this._onNg1ComponentInitialized(viewContainer, componentRef);
+        }
       }
     }
+  }
+
+  protected _onNg1ComponentInitialized<T>(viewContainer: ViewContainer<T>, componentRef: Angular1ComponentFactory<T>): void {
+    viewContainer.destroyed
+      .takeUntil(this.destroyed)
+      .subscribe(() => this._onNg1ComponentDestroyed(componentRef.scope, viewContainer));
+  }
+  
+  protected _onNg2ComponentInitialized<T>(viewContainer: ViewContainer<T>, componentRef: ComponentRef<T>): void {
+    viewContainer.destroyed
+      .takeUntil(this.destroyed)
+      .subscribe(() => this._onComponentDestroy(componentRef));
+
+    viewContainer.attached
+      .takeUntil(this.destroyed)
+      .subscribe(() => this._onAttachChange(true, componentRef, viewContainer));
+
+    viewContainer.detached
+      .takeUntil(this.destroyed)
+      .subscribe(() => this._onAttachChange(false, componentRef, viewContainer));
+
+    this.subscribe(DestroyNotifyEvent, this._onDestroyNotify.bind(this, componentRef, viewContainer));
+    componentRef.changeDetectorRef.detectChanges();
   }
 
   /**
@@ -153,51 +167,14 @@ export class AngularView extends View {
     const token = this.component;
     const metadata = Reflect.getOwnMetadata(VIEW_CONFIG_KEY, token) as ViewComponentConfig;
     const ng1Injector = this._injector.get('$injector') as ng.auto.IInjectorService;
-    const $rootScope = ng1Injector.get('$rootScope') as ng.IRootScopeService;
-    const $compile = ng1Injector.get('$compile') as ng.ICompileService;
-    const $templateCache = ng1Injector.get('$templateCache') as ng.ITemplateCacheService;
-    const scope = $rootScope.$new();
-    let linkFn: ng.ITemplateLinkingFunction;
+    const componentRef = ng1Injector.instantiate<Angular1ComponentFactory<T>>(Angular1ComponentFactory, {
+      viewContainer,
+      Component: token,
+      config: metadata,
+      providers: this.getNg1Providers({}, viewContainer)
+    })
 
-    if (metadata.template) {
-      linkFn = $compile(metadata.template);
-    } else if (metadata.templateUrl) {
-      const template = $templateCache.get<string>(metadata.templateUrl);
-
-      if (!template) {
-        throw new Error(`Could not find template at path ${template}`);
-      }
-
-      linkFn = $compile(template);
-    } else {
-      throw new Error('A template is required for upgraded NG1 components!');
-    }
-
-    // Instaniate our controller for the component.
-    const ctrl = ng1Injector.instantiate(token, this.getNg1Providers({
-      $element: viewContainer.element, 
-      $scope: scope,
-      viewContainer
-    }, viewContainer)) as T;
-
-    // Assign it to scope.
-    scope[metadata.controllerAs || '$ctrl'] = ctrl;
-    ctrl[SCOPE_REF_KEY] = scope;
-    
-    if (typeof ctrl['$onInit'] === 'function') {
-      ctrl['$onInit']();
-    }
-
-    // Link the view to the controller.
-    const $el = linkFn(scope);
-
-    viewContainer.mount($el[0]);
-
-    if (typeof ctrl['$postLink'] === 'function') {
-      ctrl['$postLink']();
-    }
-
-    return ctrl;
+    return componentRef.create();
   }
 
   private async _ng2Factory<T>(viewContainer: ViewContainer<T>): Promise<T> {

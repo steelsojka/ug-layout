@@ -23,6 +23,12 @@ export enum ViewQueryReadType {
   COMPONENT  
 }
 
+export enum CacheStrategy {
+  NONE,
+  PERSITENT,
+  RELOAD 
+}
+
 export interface ViewQueryArgs {
   ref?: string;
   token?: any;
@@ -86,7 +92,7 @@ export interface ViewQueryConfig {
 export interface ViewComponentConfig {
   name: string;
   ref: string|null;
-  cacheable: boolean;
+  caching: CacheStrategy|null;
   lazy: boolean;
   resolution: ResolverStrategy;
   container: Type<ViewContainer<any>>|null;
@@ -98,7 +104,7 @@ export type ViewComponentConfigArgs = {
 
 export interface ViewConfig extends RenderableConfig {
   lazy?: boolean;
-  cacheable?: boolean;
+  caching?: CacheStrategy|null;
   token?: any;
   ref?: string|null;
   resolution?: ResolverStrategy;
@@ -106,6 +112,14 @@ export interface ViewConfig extends RenderableConfig {
   useValue?: any;
   useClass?: Type<any>;
   deps?: any[];
+}
+
+export interface OnResolve {
+  ugOnResolve(viewContainer: ViewContainer<any>): void|Promise<any>;
+}
+
+export interface OnCacheResolve {
+  ugOnCacheResolve(viewContainer: ViewContainer<any>): void|Promise<any>;
 }
 
 export interface OnAttach {

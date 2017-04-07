@@ -94,12 +94,12 @@ export class Renderer {
    * Detatches the renderer and it's DOM node from the containing element.
    */
   detach(): void {
-    if (this._lastVNode) {
-      if (this._lastVNode.elm) {
-        this._containerEl.removeChild(this._lastVNode.elm);
+    if (this._containerEl) {
+      const el = this._lastVNode && this._lastVNode.elm ? this._lastVNode.elm : this._mountPoint;
+
+      if (this._containerEl.contains(el)) {
+        this._containerEl.removeChild(el);
       }
-    } else {
-      this._containerEl.removeChild(this._mountPoint);
     }
   }
 }

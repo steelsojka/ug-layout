@@ -8,6 +8,11 @@ export enum XYDirection {
   Y
 }
 
+export enum DestroyContext {
+  NONE,
+  LOAD
+}
+
 /**
  * Symbol that signifies that an XYItemContainer's ratio is unallocated.
  * @type {Symbol}

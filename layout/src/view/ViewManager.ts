@@ -98,18 +98,6 @@ export class ViewManager {
     return this._refs.get(ref) || null;
   }
 
-  initView<T>(args: ViewFactoryArgs, options: ViewResolutionOptions = {}): ViewContainer<T> {
-    const container = this.resolveOrCreate<T>(args, options);
-
-    this._viewInit.next({
-      container,
-      ref: args.config.ref,
-      token: this._viewFactory.getTokenFrom(args.config)
-    });
-
-    return container;
-  }
-
   resolve<T>(config: ViewConfig, options: ViewResolutionOptions = {}): ViewContainer<T>|null {
     const token = this._viewFactory.getTokenFrom(config);
     const metadata = this._assertAndReadComponent(token);

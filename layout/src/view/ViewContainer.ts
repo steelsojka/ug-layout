@@ -63,6 +63,7 @@ export class ViewContainer<T> {
   private _sizeChanges: BehaviorSubject<{ width: number, height: number }> = new BehaviorSubject({ width: 0, height: 0 });
   private _attached: Subject<boolean> = new Subject();
   private _initialized: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  private _componentReady: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   private _isInitialized: boolean = false;
   private _retry: Function|null = null;
   private _statusInternal: ViewContainerStatus;
@@ -119,6 +120,11 @@ export class ViewContainer<T> {
    * @type {Observable<boolean>}
    */
   detached: Observable<boolean> = this._attached.asObservable().filter(eq(false));
+  /**
+   * Notifies when the component is assigned to the container and ready for access.
+   * @type {Observable<boolean>}
+   */
+  componentReady: Observable<boolean> = this._componentReady.asObservable();
   
   /**
    * Creates an instance of ViewContainer.
@@ -176,7 +182,7 @@ export class ViewContainer<T> {
    * @type {boolean}
    */
   get isCacheable(): boolean {
-    return this._container ? Boolean(this._container.resolveConfigProperty('cacheable')) : false;
+    return this._container ? this._container.isCacheable : false;
   }
 
   /**
@@ -282,25 +288,25 @@ export class ViewContainer<T> {
 
     if (this._container) {
       this._container.destroyed
-        .takeUntil(this._containerChange)
+        .takeUntil(this.containerChange)
         .subscribe(() => this._onViewDestroy());
       
       this._container
         .scope(BeforeDestroyEvent)
-        .takeUntil(this._containerChange)
+        .takeUntil(this.containerChange)
         .subscribe(e => this._beforeDestroy.next(e));
       
       this._container.visibilityChanges
-        .takeUntil(this._containerChange)
+        .takeUntil(this.containerChange)
         .subscribe(e => this._visibilityChanges.next(e));
       
       this._container.sizeChanges
-        .takeUntil(this._containerChange)
+        .takeUntil(this.containerChange)
         .subscribe(e => this._sizeChanges.next(e));
 
       this._container
         .scope(CustomViewHookEvent)
-        .takeUntil(this._containerChange)
+        .takeUntil(this.containerChange)
         .subscribe(event => this._executeHook(event.name, ...event.args));
     }
 
@@ -403,6 +409,30 @@ export class ViewContainer<T> {
     }
   }
 
+  async resolve(options: { fromCache?: boolean } = {}): Promise<void> {
+    const { fromCache = false } = options;
+    let result: any;
+
+    this._status.next(ViewContainerStatus.PENDING);
+
+    if (this._hasHook('ugOnCacheResolve') && fromCache) {
+      result = this._executeHook('ugOnCacheResolve', this);
+    } else {
+      result = this._executeHook('ugOnResolve', this);
+    }
+
+    // Allow the `ugOnResolve` hook to run async tasks.
+    if (isPromise(result)) {
+      try {
+        await result;
+        this._status.next(ViewContainerStatus.READY);
+      } catch(e) {
+        this.fail(() => this.resolve(options));
+        throw e;
+      }
+    }
+  }
+
   /**
    * Invoked when the view renderable is destroyed.
    * @private
@@ -448,25 +478,18 @@ export class ViewContainer<T> {
    */
   private async _onComponentReady(component: T): Promise<void> {
     this._component = component;
+    this._componentReady.next(true);
 
     if (this._statusInternal === ViewContainerStatus.FAILED) {
       return;
     }
 
-    const result = this._executeHook('ugOnResolve', this);
-
-    // Allow the `ugOnResolve` hook to run async tasks.
-    if (isPromise(result)) {
-      try {
-        await result;
-      } catch(e) {
-        this.fail(() => this._onComponentReady(component));
-
-        return;
-      }
+    try {
+      await this.resolve();
+    } catch (e) {
+      return;
     }
-    
-    this._status.next(ViewContainerStatus.READY);
+
     this._executeHook('ugOnInit', this);
   }
 }

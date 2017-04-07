@@ -10,7 +10,7 @@ import {
   ViewQueryReadOptions
 } from './common';
 import { ViewContainer, ViewContainerStatus } from './ViewContainer';
-import { Subscription, Observable, Observer } from '../events';
+import { Subscription, Observable, Observer, Subject } from '../events';
 import { get, isFunction, isObject } from '../utils';
 import { LayoutManipulator } from '../layout';
 import { getDefaultMetadata } from './decorators';
@@ -52,13 +52,25 @@ export class ViewLinker {
 
   wireQuery(instance: object, config: ViewQueryConfig): Subscription {
     const { read, method } = config;
+    const subscription = new Subscription();
+    const _unsubscribed = new Subject<void>();
+    const unsubscribed = _unsubscribed.asObservable();
+
+    subscription.add(() => {
+      _unsubscribed.next();
+      _unsubscribed.complete();
+    });
     
     if (!isFunction(instance[method])) {
       throw new Error(`Can not wire method '${method}'. Method does not exist.`);
     }
 
-    return this.readQuery(this._viewManager.subscribeToQuery(config), read)
-      .subscribe(arg => instance[method](arg));
+    subscription.add(
+      this.readQuery(this._viewManager.subscribeToQuery(config), read)
+        .subscribe(arg => subscription.add(instance[method](arg, unsubscribed)))
+    );
+
+    return subscription;
   }
 
   wireInsert(instance: object, config: ViewInsertConfig): void {

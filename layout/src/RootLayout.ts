@@ -7,13 +7,15 @@ import { Layout } from './layout';
 import { Serialized } from './serialization';
 import { ViewManager } from './view';
 import { defaults } from './utils';
+import { DestroyContextEvent } from './events';
 import { Renderer, Renderable, ConfiguredRenderable, RenderableInjector } from './dom';
 import { 
   ConfigurationRef,
   ContainerRef, 
   RootConfigRef,
   RenderableArg,
-  ElementRef
+  ElementRef,
+  DestroyContext
 } from './common';
 import { UgPlugin } from './UgPlugin';
 
@@ -125,6 +127,7 @@ export class RootLayout extends Renderable {
   }
 
   load(config: ConfiguredRenderable<RootLayout>|RootLayoutConfig): void {
+    this.emitDown(new DestroyContextEvent(DestroyContext.LOAD));
     this._contentItems.forEach(item => item.destroy());
     
     this._config = ConfiguredRenderable.resolveConfiguration(config);
@@ -138,6 +141,10 @@ export class RootLayout extends Renderable {
   setContainingNode(node: Node): void {
     this._renderer.setContainer(node);
     this._containerEl = node as HTMLElement;
+  }
+
+  detach(): void {
+    this._renderer.detach();
   }
 
   destroy(): void {

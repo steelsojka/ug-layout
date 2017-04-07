@@ -9,13 +9,14 @@ import {
   ViewQueryInitConfig,
   ViewQueryMetadata,
   ViewInsertConfigArgs,
-  ViewResolveConfigArgs
+  ViewResolveConfigArgs,
+  CacheStrategy
 } from './common';
 
 export function ViewComponent(config: ViewComponentConfigArgs = {}): ClassDecorator {
   return (target: Function): void => {
     config = Object.assign({
-      cacheable: false,
+      caching: null,
       lazy: false,
       resolution: ResolverStrategy.TRANSIENT,
       name: null,

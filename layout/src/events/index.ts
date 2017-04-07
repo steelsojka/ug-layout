@@ -10,6 +10,7 @@ export * from './Cancellable';
 export * from './EventBus';
 export * from './BusEvent';
 export * from './BeforeDestroyEvent';
+export * from './DestroyContextEvent';
 
 import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/map';
