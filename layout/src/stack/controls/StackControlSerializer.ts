@@ -1,7 +1,7 @@
 import { ConfiguredRenderable } from '../../dom';
 import { Inject, Type } from '../../di';
 import { GenericSerializer, SerializerContainer, Serializer, Serialized } from '../../serialization';
-import { XYDirection, RenderableArg, ConfigureableType } from '../../common';
+import { XYDirection, RenderableConstructorArg, ConfigureableType } from '../../common';
 import { StackControlPosition, StackControl } from './StackControl';
 
 export interface SerializedStackControl extends Serialized {
@@ -16,7 +16,7 @@ export class StackControlSerializer<R extends StackControl> extends GenericSeria
     };
   }
 
-  deserialize(node: SerializedStackControl): RenderableArg<R> {
+  deserialize(node: SerializedStackControl): RenderableConstructorArg<R> {
     return this._Class.configure ? this._Class.configure(node) : this._Class;
   }
 }

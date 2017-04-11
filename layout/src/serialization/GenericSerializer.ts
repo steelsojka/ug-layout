@@ -1,7 +1,7 @@
 import { Serializer, Serialized } from './common';
 import { SerializerContainer } from './SerializerContainer';
 import { Renderable } from '../dom';
-import { RenderableArg, ConfigureableType } from '../common';
+import { RenderableConstructorArg, ConfigureableType } from '../common';
 
 /**
  * A serializer that can be used for renderables that don't container
@@ -36,7 +36,7 @@ export class GenericSerializer<R extends Renderable> implements Serializer<R, Se
    * @param {Serialized} node 
    * @returns {RenderableArg<R>} 
    */
-  deserialize(node: Serialized): RenderableArg<R> {
+  deserialize(node: Serialized): RenderableConstructorArg<R> {
     return this._Class;
   }
 

@@ -211,7 +211,7 @@ export class Injector {
       return this.get(ForwardRef.resolve(provider.useExisting));
     }
 
-    throw new Error('Injector -> could not resolve provider ${provider.provide}');
+    throw new Error(`Injector -> could not resolve provider ${(<Provider>provider).provide}`);
   }
       
   private getDependencies(metadata: any[]): any[] {

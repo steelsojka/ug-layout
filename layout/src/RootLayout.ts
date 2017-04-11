@@ -126,8 +126,10 @@ export class RootLayout extends Renderable {
     }
   }
 
-  load(config: ConfiguredRenderable<RootLayout>|RootLayoutConfig): void {
-    this.emitDown(new DestroyContextEvent(DestroyContext.LOAD));
+  load(config: ConfiguredRenderable<RootLayout>|RootLayoutConfig, options: { context?: string } = {}): void {
+    const { context = DestroyContext.LOAD } = options;
+
+    this.emitDown(new DestroyContextEvent(context));
     this._contentItems.forEach(item => item.destroy());
     
     this._config = ConfiguredRenderable.resolveConfiguration(config);

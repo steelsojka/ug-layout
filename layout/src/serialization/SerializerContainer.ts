@@ -2,7 +2,7 @@ import { Injector, Type } from '../di';
 import { Renderable } from '../dom';
 import { Serializer, Serialized } from './common';
 import { isFunction, isString } from '../utils';
-import { RenderableArg } from '../common';
+import { RenderableConstructorArg } from '../common';
 
 export interface Constructable<T> {
   constructor: Function;
@@ -166,7 +166,7 @@ export class SerializerContainer {
    * @param {S} serialized 
    * @returns {R} The renderable argument.
    */
-  deserialize<R extends Renderable, S extends Serialized>(serialized: S): RenderableArg<R> {
+  deserialize<R extends Renderable, S extends Serialized>(serialized: S): RenderableConstructorArg<R> {
     const serializer = this.resolveFromSerialized(serialized) as Serializer<R, S>|null;
 
     if (!serializer) {
@@ -174,6 +174,40 @@ export class SerializerContainer {
     }
 
     return serializer.deserialize(serialized);
+  }
+
+  serializeList<R extends Renderable & Constructable<any>, S extends Serialized>(instances: R[]): S[] {
+    return instances.reduce<S[]>((result, instance) => {
+      const serializer = this.resolveFromInstance(instance) as Serializer<R, S>|null;
+
+      if (serializer && !this.isExcluded(instance)) {
+        result.push(serializer.serialize(instance));
+      }
+
+      return result;
+    }, []);
+  }
+
+  deserializeList<R extends Renderable, S extends Serialized>(serialized: S[]): RenderableConstructorArg<R>[] {
+    return serialized.reduce<RenderableConstructorArg<R>[]>((result, instance) => {
+      const serializer = this.resolveFromSerialized(instance) as Serializer<R, S>|null;
+
+      if (serializer) {
+        result.push(serializer.deserialize(instance));
+      }
+
+      return result;
+    }, []);
+  }
+
+  isExcluded<R extends Renderable & Constructable<any>>(instance: R): boolean {
+    const serializer = this.resolveFromInstance(instance) as Serializer<R, any>|null;
+
+    if (serializer && serializer.exclude) {
+      return serializer.exclude(instance);
+    }
+
+    return false;
   }
 
   /**

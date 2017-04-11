@@ -26,7 +26,7 @@ export class View extends Renderable {
   protected _sizeChanges: BehaviorSubject<{ width: number, height: number }> = new BehaviorSubject({ width: 0, height: 0 });
   protected _viewContainerCreated: Subject<ViewContainer<any>> = new Subject();
   protected _initialCreate: boolean = true;
-  protected _destroyContext: DestroyContext = DestroyContext.NONE;
+  protected _destroyContext: string = DestroyContext.NONE;
   
   /**
    * Notifies when the visibility of this view changes.
@@ -155,6 +155,8 @@ export class View extends Renderable {
     this._visibilityChanges.complete();
 
     super.destroy();
+
+    this._destroyContext = DestroyContext.NONE;
   }
 
   /**

@@ -25,6 +25,7 @@ import { Splitter } from './Splitter';
 export interface XYItemContainerConfig {
   use: RenderableArg<Renderable>;
   ratio?: number;
+  persist?: boolean;
   initialSize?: number;
   minSizeX?: number;
   maxSizeX?: number;
@@ -32,6 +33,7 @@ export interface XYItemContainerConfig {
   maxSizeY?: number;
   fixed?: boolean;
   minimized?: boolean;
+  tags?: string[];
 }
 
 export class XYItemContainer extends Renderable {
@@ -108,6 +110,10 @@ export class XYItemContainer extends Renderable {
 
   get isUnallocated(): boolean {
     return this.ratio === UNALLOCATED;
+  }
+
+  get persist(): boolean {
+    return this._config.persist !== false;
   }
 
   get offsetX(): number {

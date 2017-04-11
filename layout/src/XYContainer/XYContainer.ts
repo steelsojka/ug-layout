@@ -15,6 +15,7 @@ import {
   XYDirection,
   ConfigurationRef,
   RenderableArg,
+  RenderableConstructorArg,
   UNALLOCATED,
   DragStatus,
   DragEvent
@@ -38,7 +39,7 @@ export interface XYContainerConfig extends RenderableConfig {
    * @type {boolean}
    */
   static?: boolean;
-  children: XYItemContainerConfig[];
+  children: Array<XYItemContainerConfig|RenderableConstructorArg<XYItemContainer>>;
 }
 
 export interface XYSizingOptions {
@@ -118,7 +119,11 @@ export class XYContainer extends Renderable {
     const children = this._config && this._config.children ? this._config.children : [];
     
     children.forEach(config => {
-      return this.addChild(this.createChildItem(config), { render: false, resize: false });
+      const item = ConfiguredRenderable.isRenderableConstructor<XYItemContainer>(config)
+        ? this.createChild(config) 
+        : this.createChildItem(config as any);
+
+      return this.addChild(item, { render: false, resize: false });
     });
   }
 

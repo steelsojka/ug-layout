@@ -1,6 +1,7 @@
 import { Type } from '../di';
 import { Renderable } from './Renderable'
 import { RenderableArg } from '../common';
+import { isFunction } from '../utils';
 
 /**
  * A container that holds a Renderable class and a configuration to
@@ -62,6 +63,14 @@ export class ConfiguredRenderable<T extends Renderable> {
     }
 
     return item;
+  }
+
+  static isRenderableArg<T>(config: any): config is RenderableArg<T> {
+    return config instanceof ConfiguredRenderable || isFunction(config) || config instanceof Renderable;
+  }
+
+  static isRenderableConstructor<T>(arg: any): arg is ConfiguredRenderable<T>|Type<T> {
+    return ConfiguredRenderable.isRenderableArg(arg) && !(arg instanceof Renderable);
   }
 
   /**

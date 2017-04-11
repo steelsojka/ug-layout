@@ -8,10 +8,10 @@ export enum XYDirection {
   Y
 }
 
-export enum DestroyContext {
-  NONE,
-  LOAD
-}
+export const DestroyContext: { [key: string]: string } = {
+  NONE: 'NONE',
+  LOAD: 'LOAD'
+};
 
 /**
  * Symbol that signifies that an XYItemContainer's ratio is unallocated.
@@ -19,6 +19,7 @@ export enum DestroyContext {
  */
 export const UNALLOCATED = Symbol('UNALLOCATED');
 
+export type RenderableConstructorArg<T extends Renderable> = Type<T>|ConfiguredRenderable<T>;
 export type RenderableArg<T extends Renderable> = Type<T>|ConfiguredRenderable<T>|T;
 export type Patch = (oldVNode: VNode|Node, newVNode: VNode) => VNode;
 

@@ -430,6 +430,8 @@ export class ViewContainer<T> {
         this.fail(() => this.resolve(options));
         throw e;
       }
+    } else {
+      this._status.next(ViewContainerStatus.READY);
     }
   }
 

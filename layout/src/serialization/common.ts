@@ -1,5 +1,5 @@
 import { Renderable } from '../dom';
-import { RenderableArg } from '../common';
+import { RenderableConstructorArg } from '../common';
 import { isObject, isFunction } from '../utils';
 
 export interface Serialized {
@@ -8,5 +8,6 @@ export interface Serialized {
 
 export interface Serializer<R extends Renderable, S extends Serialized> {
   serialize(node: R): S;
-  deserialize(serialized: S): RenderableArg<R>;
+  deserialize(serialized: S): RenderableConstructorArg<R>;
+  exclude?(node: R): boolean;
 }
