@@ -7,6 +7,7 @@ import { DocumentRef, ContainerRef, XYDirection, ConfigurationRef, DragEvent } f
 import { XYContainer } from './XYContainer';
 import { Observable, ReplaySubject } from '../events';
 import { Draggable } from '../Draggable';
+import { LockState, LOCK_RESIZING } from '../LockState';
 
 export const SPLITTER_SIZE = 5;
 
@@ -30,7 +31,8 @@ export class Splitter extends Renderable {
     @Inject(ConfigurationRef) private _config: SplitterConfig,
     @Inject(DocumentRef) private _document: Document,
     @Inject(ContainerRef) protected _container: XYContainer,
-    @Inject(Draggable) protected _draggable: Draggable<Splitter>
+    @Inject(Draggable) protected _draggable: Draggable<Splitter>,
+    @Inject(LockState) protected _lockState: LockState
   ) {
     super();
     
@@ -89,6 +91,10 @@ export class Splitter extends Renderable {
     this._draggable.drag
       .filter(Draggable.isDragStartEvent)
       .subscribe(this._onDragStart.bind(this));
+
+    this._lockState
+      .scope(LOCK_RESIZING)
+      .subscribe(isLocked => isLocked ? this.disable() : this.enable());
   }
 
   dragTo(x = this.x, y = this.y): void {

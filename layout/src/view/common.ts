@@ -6,10 +6,10 @@ import { ViewContainer, ViewContainerStatus } from './ViewContainer';
 import { LayoutInsertPosition } from '../layout';
 import { RenderableArg } from '../common';
 
-export const ViewFactoriesRef = new Token('ViewFactoriesToken');
 export const ViewComponentRef = new Token('ViewComponentRef');
+export const LinkerMetatdataRef = new Token('LinkerMetadataRef');
 export const VIEW_CONFIG_KEY = 'ugLayout:viewConfig';
-export const VIEW_QUERY_METADATA = 'ugLayout:ViewQueryMetadata';
+export const VIEW_LINKER_METADATA = 'ugLayout:ViewLinkerMetadata';
 
 export enum ResolverStrategy {
   SINGLETON,
@@ -25,7 +25,7 @@ export enum ViewQueryReadType {
 
 export enum CacheStrategy {
   NONE,
-  PERSITENT,
+  PERSISTENT,
   RELOAD 
 }
 
@@ -50,7 +50,7 @@ export interface ViewResolveConfig extends ViewResolveConfigArgs {
   method: string;
 }
 
-export interface ViewQueryMetadata {
+export interface ViewLinkerMetadata {
   queries: ViewQueryConfig[];
   inits: ViewQueryInitConfig[];
   inserts: ViewInsertConfig[];

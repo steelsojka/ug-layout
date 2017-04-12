@@ -8,7 +8,7 @@ export enum XYDirection {
   Y
 }
 
-export const DestroyContext: { [key: string]: string } = {
+export const ContextType: { [key: string]: string } = {
   NONE: 'NONE',
   LOAD: 'LOAD'
 };

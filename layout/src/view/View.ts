@@ -3,16 +3,17 @@ import h from 'snabbdom/h';
 
 import { Type, ProviderArg, Inject, Injector, Optional, forwardRef } from '../di';
 import { Renderer, Renderable, ConfiguredRenderable } from '../dom';
-import { ContainerRef, ConfigurationRef, ElementRef, DocumentRef, DestroyContext } from '../common';
+import { ContainerRef, ConfigurationRef, ElementRef, DocumentRef, ContextType } from '../common';
 import { Stack } from '../stack';
 import { ViewContainer } from './ViewContainer';
 import { ViewConfig, ResolverStrategy, CacheStrategy } from './common';
-import { Subject, Observable, BeforeDestroyEvent, BehaviorSubject, DestroyContextEvent } from '../events';
+import { Subject, Observable, BeforeDestroyEvent, BehaviorSubject } from '../events';
 import { MakeVisibleCommand, MinimizeCommand } from '../commands';
 import { ViewManager } from './ViewManager';
 import { ViewFactory } from './ViewFactory';
 import { CustomViewHookEvent } from './CustomViewHookEvent';
 import { get } from '../utils';
+import { StateContext } from '../StateContext';
 
 /**
  * A renderable that renders a component.
@@ -26,7 +27,6 @@ export class View extends Renderable {
   protected _sizeChanges: BehaviorSubject<{ width: number, height: number }> = new BehaviorSubject({ width: 0, height: 0 });
   protected _viewContainerCreated: Subject<ViewContainer<any>> = new Subject();
   protected _initialCreate: boolean = true;
-  protected _destroyContext: string = DestroyContext.NONE;
   
   /**
    * Notifies when the visibility of this view changes.
@@ -56,7 +56,8 @@ export class View extends Renderable {
     @Inject(ConfigurationRef) protected _configuration: ViewConfig,
     @Inject(ViewManager) protected _viewManager: ViewManager,
     @Inject(ViewFactory) protected _viewFactory: ViewFactory,
-    @Inject(DocumentRef) protected _document: Document
+    @Inject(DocumentRef) protected _document: Document,
+    @Inject(StateContext) protected _stateContext: StateContext
   ) {
     super();
   }
@@ -86,8 +87,8 @@ export class View extends Renderable {
   get isCacheable(): boolean {
     const cacheStrategy = this.caching;
 
-    if ((cacheStrategy === CacheStrategy.RELOAD && this._destroyContext === DestroyContext.NONE) 
-      || cacheStrategy === CacheStrategy.PERSITENT) {
+    if ((cacheStrategy === CacheStrategy.RELOAD && this._stateContext.context === ContextType.NONE) 
+      || cacheStrategy === CacheStrategy.PERSISTENT) {
       return true;
     }
 
@@ -131,10 +132,6 @@ export class View extends Renderable {
     this._renderer.rendered
       .takeUntil(this.destroyed)
       .subscribe(this._postRender.bind(this));
-
-    this.subscribe(DestroyContextEvent, event => {
-      this._destroyContext = event.target;
-    });
   }
 
   render(): VNode {
@@ -155,8 +152,6 @@ export class View extends Renderable {
     this._visibilityChanges.complete();
 
     super.destroy();
-
-    this._destroyContext = DestroyContext.NONE;
   }
 
   /**

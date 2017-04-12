@@ -16,7 +16,6 @@ import {
   ViewContainer,
   ViewFactoryArgs,
   ViewConfig,
-  ViewFactoriesRef,
   RootConfigRef,
   Inject,
   VIEW_CONFIG_KEY,
@@ -26,7 +25,8 @@ import {
   ViewManager,
   DocumentRef,
   ConfiguredRenderable,
-  ViewContainerStatus
+  ViewContainerStatus,
+  StateContext
 } from 'ug-layout';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
@@ -58,9 +58,10 @@ export class AngularView extends View {
     @Inject(ViewManager) _viewManager: ViewManager,
     @Inject(ViewFactory) _viewFactory: ViewFactory,
     @Inject(DocumentRef) _document: Document,
+    @Inject(StateContext) _stateContext: StateContext,
     @Inject(AngularPlugin) private _plugin: AngularPlugin
   ) {
-    super(_container, _configuration, _viewManager, _viewFactory, _document);
+    super(_container, _configuration, _viewManager, _viewFactory, _document, _stateContext);
     
     this._componentFactoryResolver = this._injector.get(ComponentFactoryResolver);
     this.component = this._viewFactory.getTokenFrom(this._configuration);

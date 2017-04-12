@@ -2,12 +2,12 @@ import {
   VIEW_CONFIG_KEY, 
   ViewComponentConfigArgs,
   ResolverStrategy,
-  VIEW_QUERY_METADATA,
+  VIEW_LINKER_METADATA,
   ViewQueryConfig,
   ViewQueryConfigArgs,
   ViewQueryReadType,
   ViewQueryInitConfig,
-  ViewQueryMetadata,
+  ViewLinkerMetadata,
   ViewInsertConfigArgs,
   ViewResolveConfigArgs,
   CacheStrategy
@@ -29,7 +29,7 @@ export function ViewComponent(config: ViewComponentConfigArgs = {}): ClassDecora
 
 export function ViewQuery(config: ViewQueryConfigArgs = {}): MethodDecorator {
   return (target: Object, key: string) => {
-    const metadata: ViewQueryMetadata = Reflect.getOwnMetadata(VIEW_QUERY_METADATA, target) || getDefaultMetadata();
+    const metadata: ViewLinkerMetadata = Reflect.getOwnMetadata(VIEW_LINKER_METADATA, target) || getDefaultMetadata();
 
     metadata.queries.push({
       read: ViewQueryReadType.COMPONENT,
@@ -37,50 +37,50 @@ export function ViewQuery(config: ViewQueryConfigArgs = {}): MethodDecorator {
       ...config,
     });
 
-    Reflect.defineMetadata(VIEW_QUERY_METADATA, metadata, target);
+    Reflect.defineMetadata(VIEW_LINKER_METADATA, metadata, target);
   };
 }
 
 export function ViewLinkInit(...injections: any[]): MethodDecorator {
   return (target: Object, key: string) => {
-    const metadata: ViewQueryMetadata = Reflect.getOwnMetadata(VIEW_QUERY_METADATA, target) || getDefaultMetadata();
+    const metadata: ViewLinkerMetadata = Reflect.getOwnMetadata(VIEW_LINKER_METADATA, target) || getDefaultMetadata();
 
     metadata.inits.push({
       injections,
       method: key,
     });
 
-    Reflect.defineMetadata(VIEW_QUERY_METADATA, metadata, target);
+    Reflect.defineMetadata(VIEW_LINKER_METADATA, metadata, target);
   };
 }
 
 export function ViewInsert(config: ViewInsertConfigArgs): PropertyDecorator {
   return (target: Object, key: string) => {
-    const metadata: ViewQueryMetadata = Reflect.getOwnMetadata(VIEW_QUERY_METADATA, target) || getDefaultMetadata();
+    const metadata: ViewLinkerMetadata = Reflect.getOwnMetadata(VIEW_LINKER_METADATA, target) || getDefaultMetadata();
 
     metadata.inserts.push({
       ...config,
       method: key
     });
 
-    Reflect.defineMetadata(VIEW_QUERY_METADATA, metadata, target);
+    Reflect.defineMetadata(VIEW_LINKER_METADATA, metadata, target);
   };
 }
 
 export function ViewResolve(config: ViewResolveConfigArgs): PropertyDecorator {
   return (target: Object, key: string) => {
-    const metadata: ViewQueryMetadata = Reflect.getOwnMetadata(VIEW_QUERY_METADATA, target) || getDefaultMetadata();
+    const metadata: ViewLinkerMetadata = Reflect.getOwnMetadata(VIEW_LINKER_METADATA, target) || getDefaultMetadata();
 
     metadata.resolves.push({
       ...config,
       method: key
     });
 
-    Reflect.defineMetadata(VIEW_QUERY_METADATA, metadata, target);
+    Reflect.defineMetadata(VIEW_LINKER_METADATA, metadata, target);
   };
 }
 
-export function getDefaultMetadata(): ViewQueryMetadata {
+export function getDefaultMetadata(): ViewLinkerMetadata {
   return {
     queries: [],
     inits: [],

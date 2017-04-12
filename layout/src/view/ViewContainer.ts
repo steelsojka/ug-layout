@@ -3,7 +3,7 @@ import { Renderable } from '../dom';
 import { ReplaySubject, Observable, Subject, BeforeDestroyEvent, BehaviorSubject } from '../events';
 import { ContainerRef, ConfigurationRef, DocumentRef } from '../common';
 import { View } from './View';
-import { ViewFactoriesRef, ViewComponentRef } from './common';
+import { ViewComponentRef } from './common';
 import { CustomViewHookEvent } from './CustomViewHookEvent';
 import { isFunction, get, uid, eq, isPromise, isObject, Deferred } from '../utils';
 

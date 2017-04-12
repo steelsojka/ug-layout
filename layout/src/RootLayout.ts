@@ -7,7 +7,6 @@ import { Layout } from './layout';
 import { Serialized } from './serialization';
 import { ViewManager } from './view';
 import { defaults } from './utils';
-import { DestroyContextEvent } from './events';
 import { Renderer, Renderable, ConfiguredRenderable, RenderableInjector } from './dom';
 import { 
   ConfigurationRef,
@@ -15,9 +14,11 @@ import {
   RootConfigRef,
   RenderableArg,
   ElementRef,
-  DestroyContext
+  ContextType
 } from './common';
 import { UgPlugin } from './UgPlugin';
+import { StateContext } from './StateContext';
+import { LockState, LOCK_DRAGGING, LOCK_RESIZING } from './LockState';
 
 export interface RootLayoutConfig {
   use: RenderableArg<Layout>;
@@ -50,7 +51,9 @@ export class RootLayout extends Renderable {
     @Inject(Renderer) protected _renderer: Renderer,
     @Inject(ElementRef) protected _containerEl: HTMLElement,
     @Inject(ViewManager) protected _viewManager: ViewManager,
-    @Inject(RootConfigRef) protected _rootConfig: RootLayoutCreationConfig
+    @Inject(RootConfigRef) protected _rootConfig: RootLayoutCreationConfig,
+    @Inject(StateContext) protected _stateContext: StateContext,
+    @Inject(LockState) protected _lockState: LockState
   ) {
     super();
   }
@@ -77,6 +80,10 @@ export class RootLayout extends Renderable {
   
   get offsetY(): number {
     return this._offsetY;
+  }
+
+  get lockState(): LockState {
+    return this._lockState;
   }
 
   makeVisible(): void {
@@ -117,6 +124,9 @@ export class RootLayout extends Renderable {
   }
 
   initialize(): void {
+    this._lockState.set(LOCK_DRAGGING, false);
+    this._lockState.set(LOCK_RESIZING, false);
+
     this._renderer.initialize(this._containerEl);
     this._renderer.useNodeGenerator(() => this.render());
     this._isInitialized = true;
@@ -127,13 +137,11 @@ export class RootLayout extends Renderable {
   }
 
   load(config: ConfiguredRenderable<RootLayout>|RootLayoutConfig, options: { context?: string } = {}): void {
-    const { context = DestroyContext.LOAD } = options;
+    const { context = ContextType.LOAD } = options;
 
-    this.emitDown(new DestroyContextEvent(context));
+    this._stateContext.setContext(context);
     this._contentItems.forEach(item => item.destroy());
-    
     this._config = ConfiguredRenderable.resolveConfiguration(config);
-
     this._contentItems = [ this.createChild(this._config.use) ];
     
     this.resize();

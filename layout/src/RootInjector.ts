@@ -10,6 +10,8 @@ import { Renderer, RenderableInjector } from './dom';
 import { ViewFactory, ViewManager, ViewLinker } from './view';
 import { DocumentRef, PatchRef } from './common';
 import { LayoutManipulator } from './layout';
+import { StateContext } from './StateContext';
+import { LockState } from './LockState';
 
 const patch = snabbdom.init([
   DOMClass,
@@ -27,6 +29,8 @@ export class RootInjector extends RenderableInjector {
       ViewManager,
       ViewLinker,
       LayoutManipulator,
+      StateContext,
+      LockState,
       { provide: PatchRef, useValue: patch },
       { provide: DocumentRef, useValue: document },
       { provide: RootInjector, useValue: forwardRef(() => this) },

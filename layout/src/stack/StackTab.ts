@@ -20,6 +20,7 @@ import { StackItemContainer } from './StackItemContainer';
 import { DragHost } from '../DragHost';
 import { get } from '../utils';
 import { TabControl } from './tabControls';
+import { LockState, LOCK_DRAGGING } from '../LockState';
 
 export interface StackTabConfig extends RenderableConfig {
   maxSize: number;
@@ -52,7 +53,8 @@ export class StackTab extends Renderable {
     @Inject(ConfigurationRef) private _config: StackTabConfig,
     @Inject(Draggable) private _draggable: Draggable<StackTab>,
     @Inject(DragHost) private _dragHost: DragHost,
-    @Inject(DocumentRef) private _document: Document
+    @Inject(DocumentRef) private _document: Document,
+    @Inject(LockState) private _lockState: LockState
   ) {
     super();
     
@@ -126,6 +128,16 @@ export class StackTab extends Renderable {
     return item ? item.controls : [];
   }
 
+  get isDraggable(): boolean {
+    const { item } = this
+
+    if (this._lockState.get(LOCK_DRAGGING) || !item) {
+      return false;
+    }
+
+    return true;
+  }
+
   private get _resizeHashId(): string {
     return [
       get(this.item, 'title'),
@@ -179,7 +191,7 @@ export class StackTab extends Renderable {
         'ug-layout__stack-tab-distributed': this._container.isDistributed,
         'ug-layout__stack-tab-x': this._container.isHorizontal,
         'ug-layout__stack-tab-y': !this._container.isHorizontal,
-        'ug-layout__stack-tab-draggable': item ? item.draggable : true
+        'ug-layout__stack-tab-draggable': this.isDraggable
       },
       hook: {
         create: (oldNode, newNode) => this._element = newNode.elm as HTMLElement,
@@ -225,7 +237,7 @@ export class StackTab extends Renderable {
   private _onMouseDown(e: MouseEvent): void {
     const { item } = this;
     
-    if (item && !item.draggable) {
+    if (!this.isDraggable) {
       return;  
     }
     

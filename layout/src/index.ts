@@ -13,3 +13,5 @@ export * from './RootSerializer';
 export * from './RootLayoutSerializer';
 export * from './UgPlugin';
 export * from './TagUtil';
+export * from './LockState';
+export * from './StateContext';

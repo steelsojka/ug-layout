@@ -1,10 +1,10 @@
 import { Inject, Injector } from '../di';
 import { ViewManager } from './ViewManager';
 import { 
-  VIEW_QUERY_METADATA, 
+  VIEW_LINKER_METADATA, 
   ViewQueryConfig, 
   ViewQueryReadType, 
-  ViewQueryMetadata,
+  ViewLinkerMetadata,
   ViewInsertConfig,
   ViewResolveConfig,
   ViewQueryReadOptions
@@ -91,14 +91,8 @@ export class ViewLinker {
     })
   }
 
-  readMetadata(instance: object): ViewQueryMetadata {
-    const target = get(instance, 'constructor.prototype', null);
-    
-    if (!target) {
-      return getDefaultMetadata();
-    }
-
-    return Reflect.getOwnMetadata(VIEW_QUERY_METADATA, target) || getDefaultMetadata();
+  readMetadata(instance: object): ViewLinkerMetadata {
+    return ViewLinker.readMetadata(get(instance, 'constructor.prototype', null));
   }
 
   readQuery<T>(query: Observable<ViewContainer<T>>, options?: ViewQueryReadType|ViewQueryReadOptions): Observable<any> {
@@ -151,5 +145,13 @@ export class ViewLinker {
     const { query, read } = config;
     
     return this.readQuery(this._viewManager.subscribeToQuery(query), read);
+  }
+
+  static readMetadata(target: any): ViewLinkerMetadata {
+    if (!target) {
+      return getDefaultMetadata();
+    }
+
+    return Reflect.getOwnMetadata(VIEW_LINKER_METADATA, target) || getDefaultMetadata();
   }
 }
