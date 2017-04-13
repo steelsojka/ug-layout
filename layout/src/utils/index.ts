@@ -1,3 +1,5 @@
+import { Observer } from '../events';
+
 export * from './Deferred';
 
 export function isNumber(val: any): val is number {
@@ -14,6 +16,10 @@ export function clamp(val, min, max): number {
 
 export function isObject(val: any): boolean {
   return (typeof val === 'object' || isFunction(val)) && val !== null;
+}
+
+export function isObserver<T>(val: any): val is Observer<T> {
+  return isObject(val) && isFunction(val['next']);
 }
 
 export function isFunction(val: any): val is Function {

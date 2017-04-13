@@ -5,6 +5,7 @@ import { ContainerRef, ConfigurationRef, DocumentRef } from '../common';
 import { View } from './View';
 import { ViewComponentRef } from './common';
 import { CustomViewHookEvent } from './CustomViewHookEvent';
+import { ViewHookExecutor, ViewOnResolveConfig, ViewHookMetadata } from './hooks';
 import { isFunction, get, uid, eq, isPromise, isObject, Deferred } from '../utils';
 
 export enum ViewContainerStatus {
@@ -133,7 +134,8 @@ export class ViewContainer<T> {
    */
   constructor(
     @Inject(DocumentRef) protected _document: Document,
-    @Inject(Injector) protected _injector: Injector
+    @Inject(Injector) protected _injector: Injector,
+    @Inject(ViewHookExecutor) protected _viewHookExecutor: ViewHookExecutor
   ) {
     this._element.classList.add('ug-layout__view-container-mount');
 
@@ -307,7 +309,7 @@ export class ViewContainer<T> {
       this._container
         .scope(CustomViewHookEvent)
         .takeUntil(this.containerChange)
-        .subscribe(event => this._executeHook(event.name, ...event.args));
+        .subscribe(e => this._onCustomViewHook(e));
     }
 
     this._attached.next(Boolean(this._container));
@@ -411,27 +413,31 @@ export class ViewContainer<T> {
 
   async resolve(options: { fromCache?: boolean } = {}): Promise<void> {
     const { fromCache = false } = options;
+
+    if (!this._component) {
+      throw new Error('Can not resolve container without component being ready.');
+    }
+
+    const hooks: ViewHookMetadata<ViewOnResolveConfig>[] = this._viewHookExecutor.read(this._component.constructor.prototype, 'ugOnResolve');
     let result: any;
 
     this._status.next(ViewContainerStatus.PENDING);
 
-    if (this._hasHook('ugOnCacheResolve') && fromCache) {
-      result = this._executeHook('ugOnCacheResolve', this);
-    } else {
-      result = this._executeHook('ugOnResolve', this);
-    }
+    const tasks = hooks.map(hook => {
+      const { whenCached = true, cachedOnly = false } = hook.config || {};
+      const canExecute = Boolean(fromCache ? whenCached || cachedOnly : !cachedOnly);
 
-    // Allow the `ugOnResolve` hook to run async tasks.
-    if (isPromise(result)) {
-      try {
-        await result;
-        this._status.next(ViewContainerStatus.READY);
-      } catch(e) {
-        this.fail(() => this.resolve(options));
-        throw e;
+      if (canExecute) {
+        return this._viewHookExecutor.execute(this._component, hook, this);
       }
-    } else {
+    });
+    
+    try {
+      await Promise.all(tasks);
       this._status.next(ViewContainerStatus.READY);
+    } catch(e) {
+      this.fail(() => this.resolve(options));
+      throw e;
     }
   }
 
@@ -455,20 +461,23 @@ export class ViewContainer<T> {
    * @param {...any[]} args 
    * @returns {*} 
    */
-  private _executeHook(name: string, ...args: any[]): any {
-    if (this._component && this._hasHook(name)) {
-      return this._component[name].apply(this._component, args);
+  private _executeHook(name: string, arg?: any): any {
+    if (this._component) {
+      this._viewHookExecutor.readAndExecute<T>(
+        this._component, 
+        this._component.constructor.prototype,
+        name, 
+        arg
+      );
     }
   }
 
-  /**
-   * Determines whether a component has a hook.
-   * @private
-   * @param {string} name 
-   * @returns {boolean} 
-   */
-  private _hasHook(name: string): boolean {
-   return Boolean(this._component && isObject(this._component) && isFunction(this._component[name]));
+  private _onCustomViewHook(event: CustomViewHookEvent<any>): void {
+    if (event.execute) {
+      event.execute(this, this._viewHookExecutor, event);
+    } else {
+      this._executeHook(event.name, event.arg);
+    }
   }
 
   /**
@@ -480,6 +489,9 @@ export class ViewContainer<T> {
    */
   private async _onComponentReady(component: T): Promise<void> {
     this._component = component;
+
+    // Link up any hooks right when the component is instantiated.
+    this._viewHookExecutor.link(this, this._component.constructor.prototype);
     this._componentReady.next(true);
 
     if (this._statusInternal === ViewContainerStatus.FAILED) {

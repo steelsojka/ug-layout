@@ -58,9 +58,9 @@ export class ViewFactory {
 
     // If this view is lazy and it is not already visible wait for the
     // view to become visible before initializing the view container.
-    if (isLazy && !viewContainer.isVisible()) {
+    if (isLazy) {
       viewContainer.visibilityChanges
-        .takeUntil(viewContainer.initialized.filter(Boolean))
+        .first(Boolean)
         .subscribe(() => viewContainer.initialize());
     } else {
       viewContainer.initialize();

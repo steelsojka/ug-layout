@@ -113,31 +113,3 @@ export interface ViewConfig extends RenderableConfig {
   useClass?: Type<any>;
   deps?: any[];
 }
-
-export interface OnResolve {
-  ugOnResolve(viewContainer: ViewContainer<any>): void|Promise<any>;
-}
-
-export interface OnCacheResolve {
-  ugOnCacheResolve(viewContainer: ViewContainer<any>): void|Promise<any>;
-}
-
-export interface OnAttach {
-  ugOnAttach(view: View): void;
-}
-
-export interface OnDetach {
-  ugOnDetach(): void;
-}
-
-export interface OnResize {
-  ugOnResize(dimensions: { width: number, height: number }): void;
-}
-
-export interface OnVisiblityChange {
-  ugOnVisiblityChange(isVisible: boolean): void;
-}
-
-export interface OnBeforeDestroy {
-  ugOnBeforeDestroy(event: BeforeDestroyEvent<any>): void;
-}

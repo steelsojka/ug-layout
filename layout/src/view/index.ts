@@ -6,6 +6,7 @@ export * from './ViewManager';
 export * from './ViewSerializer';
 export * from './CustomViewHookEvent';
 export * from './ViewLinker';
+export * from './hooks';
 export {
   ViewComponent,
   ViewInsert,
