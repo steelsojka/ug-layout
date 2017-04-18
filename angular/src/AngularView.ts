@@ -172,6 +172,7 @@ export class AngularView extends View {
       viewContainer,
       Component: token,
       config: metadata,
+      $scope: this._plugin.scope || ng1Injector.get('$rootScope'),
       providers: this.getNg1Providers({}, viewContainer)
     })
 

@@ -4,17 +4,20 @@ import { ViewContainerRef, Injector } from '@angular/core';
 export interface AngularPluginConfig {
   viewContainerRef: ViewContainerRef;
   ngInjector: Injector;
+  scope?: ng.IScope;
 }
 
 export class AngularPlugin extends UgPlugin {
   private _viewContainerRef: ViewContainerRef;
   private _injector: Injector;
+  private _scope: ng.IScope|null;
 
   constructor(config: AngularPluginConfig) {
     super();
 
     this.setInjector(config.ngInjector);
     this.setViewContainerRef(config.viewContainerRef);
+    this._scope = config.scope || null;
   }
   
   initialize(root: RootLayout): void {
@@ -33,6 +36,10 @@ export class AngularPlugin extends UgPlugin {
 
   get injector(): Injector {
     return this._injector;
+  }
+
+  get scope(): ng.IScope|null {
+    return this._scope;
   }
 
   setInjector(value: Injector): void {

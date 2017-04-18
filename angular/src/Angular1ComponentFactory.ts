@@ -21,7 +21,7 @@ export class Angular1ComponentFactory<T> {
 
   constructor(
     private _$compile: ng.ICompileService,
-    private _$rootScope: ng.IRootScopeService,
+    private _$scope: ng.IScope,
     private _$templateCache: ng.ITemplateCacheService,
     private _$injector: ng.auto.IInjectorService,
     private _viewContainer: ViewContainer<T>,
@@ -43,7 +43,7 @@ export class Angular1ComponentFactory<T> {
   }
 
   create(): T {
-    this._scope = this._$rootScope.$new();
+    this._scope = this._$scope.$new();
 
     let linkFn: ng.ITemplateLinkingFunction;
 

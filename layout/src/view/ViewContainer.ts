@@ -187,6 +187,10 @@ export class ViewContainer<T> {
     return this._container ? this._container.isCacheable : false;
   }
 
+  get isLazy(): boolean {
+    return this._container ? Boolean(this._container.lazy) : false;
+  }
+
   /**
    * The HTML element for this container.
    * @readonly
@@ -262,6 +266,10 @@ export class ViewContainer<T> {
    * Initializes the component. This creates the component. 
    */
   initialize(): void {
+    if (this._isInitialized) {
+      return;
+    }
+
     const component = this._injector.get(ViewComponentRef);
     
     if (isPromise<T>(component)) {

@@ -100,7 +100,8 @@ export class ViewLinker {
     const {
       type = ViewQueryReadType.COMPONENT, 
       when = [ ViewContainerStatus.READY ], 
-      until = [ ViewContainerStatus.FAILED ]
+      until = [ ViewContainerStatus.FAILED ],
+      lazy = true
     } = _options;
     
     return Observable.create((observer: Observer<any>) => {
@@ -113,7 +114,7 @@ export class ViewLinker {
       
       return query.subscribe(container => {
         if (type === ViewQueryReadType.COMPONENT) {
-          container.ready({ when, until }).subscribe({
+          container.ready({ when, until, init: !lazy }).subscribe({
             next: () => observer.next(container.component),
             complete: () => observer.complete()
           });
@@ -141,10 +142,15 @@ export class ViewLinker {
     });
   }
 
-  private _resolve<T>(instance: object, config: ViewResolveConfig): Observable<any> {
+  private _resolve<T>(instance: object, config: ViewResolveConfig, options: ViewQueryReadOptions = {}): Observable<any> {
     const { query, read } = config;
+    const _options = {
+      lazy: false,
+      ...(isObject(read) ? read : { type: read }),
+      ...options
+    };
     
-    return this.readQuery(this._viewManager.subscribeToQuery(query), read);
+    return this.readQuery(this._viewManager.subscribeToQuery(query), options);
   }
 
   static readMetadata(target: any): ViewLinkerMetadata {

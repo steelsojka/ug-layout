@@ -5,13 +5,19 @@ import {
 } from '@angular/core';
 
 import { UgLayoutOutletComponent } from './UgLayoutOutlet.component';
+import { UgLayoutContainerDirective } from './UgLayoutContainer.directive';
+import { UgLayoutItemDirective } from './UgLayoutItem.directive';
 
 @NgModule({
   declarations: [
-    UgLayoutOutletComponent
+    UgLayoutOutletComponent,
+    UgLayoutItemDirective,
+    UgLayoutContainerDirective
   ],
   exports: [
-    UgLayoutOutletComponent
+    UgLayoutOutletComponent,
+    UgLayoutItemDirective,
+    UgLayoutContainerDirective
   ]
 })
 export class UgLayoutModule {}

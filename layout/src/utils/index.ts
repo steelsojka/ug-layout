@@ -14,7 +14,7 @@ export function clamp(val, min, max): number {
   return Math.min(max, Math.max(min, val));
 }
 
-export function isObject(val: any): boolean {
+export function isObject(val: any): val is object {
   return (typeof val === 'object' || isFunction(val)) && val !== null;
 }
 
@@ -72,7 +72,7 @@ export function round(val: number, precision: number = 0): number {
 }
 
 export function isPromise<T>(value: any): value is Promise<T> {
-  return isObject(value) && isFunction(value.then) && isFunction(value.catch);
+  return isObject(value) && isFunction(value['then']) && isFunction(value['catch']);
 }
 
 export function partition<T>(list: T[], predicate: (v: T) => boolean): [T[], T[]] {

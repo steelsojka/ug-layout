@@ -39,6 +39,7 @@ export interface ViewQueryReadOptions {
   type?: ViewQueryReadType;
   when?: ViewContainerStatus[];
   until?: ViewContainerStatus[];
+  lazy?: boolean;
 }
 
 export interface ViewResolveConfigArgs {

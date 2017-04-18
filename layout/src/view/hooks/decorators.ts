@@ -5,6 +5,6 @@ export const ViewOnResolve = viewHookDecoratorFactory<ViewOnResolveConfig>('ugOn
 export const ViewOnAttach = viewHookDecoratorFactory<ViewHookConfig>('ugOnAttach');
 export const ViewOnDetach = viewHookDecoratorFactory<ViewHookConfig>('ugOnDetach');
 export const ViewOnResize = viewHookDecoratorFactory<ViewHookConfig>('ugOnResize');
-export const ViewOnVisibilityChanges = viewHookDecoratorFactory<ViewHookConfig>('ugOnVisibilityChanges');
+export const ViewOnVisibilityChange = viewHookDecoratorFactory<ViewHookConfig>('ugOnVisibilityChange');
 export const ViewOnBeforeDestroy = viewHookDecoratorFactory<ViewHookConfig>('ugOnBeforeDestroy');
 export const ViewOnInit = viewHookDecoratorFactory<ViewHookConfig>('ugOnInit');
