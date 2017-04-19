@@ -426,22 +426,10 @@ export class ViewContainer<T> {
       throw new Error('Can not resolve container without component being ready.');
     }
 
-    const hooks: ViewHookMetadata<ViewOnResolveConfig>[] = this._viewHookExecutor.read(this._component.constructor.prototype, 'ugOnResolve');
-    let result: any;
-
     this._status.next(ViewContainerStatus.PENDING);
-
-    const tasks = hooks.map(hook => {
-      const { whenCached = true, cachedOnly = false } = hook.config || {};
-      const canExecute = Boolean(fromCache ? whenCached || cachedOnly : !cachedOnly);
-
-      if (canExecute) {
-        return this._viewHookExecutor.execute(this._component, hook, this);
-      }
-    });
     
     try {
-      await Promise.all(tasks);
+      await this._executeHook('ugOnResolve', { fromCache });
       this._status.next(ViewContainerStatus.READY);
     } catch(e) {
       this.fail(() => this.resolve(options));
@@ -471,12 +459,7 @@ export class ViewContainer<T> {
    */
   private _executeHook(name: string, arg?: any): any {
     if (this._component) {
-      this._viewHookExecutor.readAndExecute<T>(
-        this._component, 
-        this._component.constructor.prototype,
-        name, 
-        arg
-      );
+      this._viewHookExecutor.execute<T>(this._component, name, arg);
     }
   }
 
@@ -506,11 +489,7 @@ export class ViewContainer<T> {
       return;
     }
 
-    try {
-      await this.resolve();
-    } catch (e) {
-      return;
-    }
+    await this.resolve();
 
     this._executeHook('ugOnInit', this);
   }

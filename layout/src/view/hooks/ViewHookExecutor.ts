@@ -1,38 +1,47 @@
-import { VIEW_HOOK_METADATA, ViewHookMetadata, ViewHookConfig } from './common';
-import { isObserver, isFunction, get } from '../../utils';
+import { VIEW_HOOK_METADATA, ViewHookMetadata } from './common';
+import { isFunction, get } from '../../utils';
 import { ViewContainer } from '../ViewContainer';
 import { Subject } from '../../events';
 
 export class ViewHookExecutor {
-  readAll(target: Object): { [key: string]: ViewHookMetadata<ViewHookConfig>[] } {
+  private _interceptors = new WeakMap<any, { [key: string]: Function[] }>();
+
+  readAll(target: Object): ViewHookMetadata {
     return Reflect.getOwnMetadata(VIEW_HOOK_METADATA, target) || {};
   }
 
-  read(target: Object, name: string): ViewHookMetadata<ViewHookConfig>[] {
+  read(target: Object, name: string): string[] {
     return this.readAll(target)[name] || [];
   }
 
-  execute<T>(instance: T, hook: ViewHookMetadata<any>, arg?: any): any {
-    const target = hook.observer ? instance[hook.observer] : instance[hook.key];
+  execute<T>(instance: T, method: string, arg?: any): any {
+    const target = instance[method];
+    let returnValue;
 
-    if (isObserver(target)) {
-      target.next(arg);
-    } else if (isFunction(target)) {
-      return target.call(instance, arg);
+    if (isFunction(target)) {
+      returnValue = target.call(instance, arg);
     }
+
+    const interceptorMap = this._interceptors.get(instance) || {};
+    const interceptors = interceptorMap[method] || [];
+
+    for (const interceptor of interceptors) {
+      interceptor(arg);
+    }
+
+    return returnValue;
   }
 
-  executeList<T>(instance: T, hooks: ViewHookMetadata<any>[], arg?: any): any[] {
-    return hooks.map(hook => this.execute(instance, hook, arg));
+  registerInterceptor(instance: any, hook: string, fn: Function): void {
+    const map = this._interceptors.get(instance) || {};
+    const list = map[hook] = map[hook] || [];
+
+    list.push(fn);
+
+    this._interceptors.set(instance, map);
   }
 
-  readAndExecute<T>(instance: T, target: Object, name: string, arg?: any): any[] {
-    const hooks = this.read(target, name);
-
-    return this.executeList(instance, hooks, arg);
-  }
-
-  readFromContainer(viewContainer: ViewContainer<any>): { [key: string]: ViewHookMetadata<any>[] } {
+  readFromContainer(viewContainer: ViewContainer<any>): ViewHookMetadata {
     const target = get(viewContainer, 'component.constructor.prototype');
 
     if (target) {
@@ -44,33 +53,31 @@ export class ViewHookExecutor {
 
   link<T>(viewContainer: ViewContainer<T>, target: Object): void {
     const hooks = this.readAll(target);
+    const { component } = viewContainer;
 
-    for (const hookName of Object.keys(hooks)) {
-      const hookMetaList = hooks[hookName] || [];
+    if (!component) {
+      return;
+    }
 
-      for (const hookMeta of hookMetaList) {
-        const { component } = viewContainer;
+    for (const hookObservableName of Object.keys(hooks)) {
+      const hookNames = hooks[hookObservableName] || [];
+      let subject = component[hookObservableName];
 
-        if (hookMeta.observer && component) {
-          const subject = new Subject();
+      if (!subject) {
+        subject = new Subject<any>();
 
-          Object.defineProperties(component, {
-            [hookMeta.observer]: {
-              writable: false,
-              enumerable: false,
-              configurable: true,
-              value: subject
-            },
-            [hookMeta.key]: {
-              writable: false,
-              enumerable: true,
-              configurable: true,
-              value: subject.asObservable()
-            }
-          });
+        Object.defineProperty(component, name, {
+          writable: true,
+          configurable: true,
+          enumerable: true,
+          value: subject.asObservable()
+        });
 
-          viewContainer.destroyed.subscribe(() => subject.complete());
-        }
+        viewContainer.destroyed.subscribe(() => subject.complete());
+      } 
+
+      for (const name of hookNames) {
+        this.registerInterceptor(component, name, arg => subject.next(arg));
       }
     }
   }

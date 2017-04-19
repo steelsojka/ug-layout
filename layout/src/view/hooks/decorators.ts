@@ -1,10 +1,15 @@
-import { viewHookDecoratorFactory } from './viewHookDecoratorFactory';
-import { ViewOnResolveConfig, ViewHookConfig } from './common';
+import { VIEW_HOOK_METADATA } from './common';
 
-export const ViewOnResolve = viewHookDecoratorFactory<ViewOnResolveConfig>('ugOnResolve');
-export const ViewOnAttach = viewHookDecoratorFactory<ViewHookConfig>('ugOnAttach');
-export const ViewOnDetach = viewHookDecoratorFactory<ViewHookConfig>('ugOnDetach');
-export const ViewOnResize = viewHookDecoratorFactory<ViewHookConfig>('ugOnResize');
-export const ViewOnVisibilityChange = viewHookDecoratorFactory<ViewHookConfig>('ugOnVisibilityChange');
-export const ViewOnBeforeDestroy = viewHookDecoratorFactory<ViewHookConfig>('ugOnBeforeDestroy');
-export const ViewOnInit = viewHookDecoratorFactory<ViewHookConfig>('ugOnInit');
+export function ViewHookObservable(hook: string): PropertyDecorator {
+  return (target: Object, key: string) => {
+    const metadata = Reflect.getOwnMetadata(VIEW_HOOK_METADATA, target) || {};
+
+    if (!metadata[key]) {
+      metadata[key] = [];
+    }
+
+    metadata[key].push(hook);
+
+    Reflect.defineMetadata(VIEW_HOOK_METADATA, metadata, target);
+  };
+}

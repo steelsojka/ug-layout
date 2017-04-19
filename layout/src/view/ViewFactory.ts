@@ -61,6 +61,7 @@ export class ViewFactory {
     if (isLazy) {
       viewContainer.visibilityChanges
         .first(() => viewContainer.isVisible())
+        .delay(0)
         .subscribe(() => viewContainer.initialize());
     } else {
       viewContainer.initialize();

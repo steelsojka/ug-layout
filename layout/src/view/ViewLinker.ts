@@ -150,7 +150,7 @@ export class ViewLinker {
       ...options
     };
     
-    return this.readQuery(this._viewManager.subscribeToQuery(query), options);
+    return this.readQuery(this._viewManager.subscribeToQuery(query), _options);
   }
 
   static readMetadata(target: any): ViewLinkerMetadata {
