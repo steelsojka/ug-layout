@@ -1,6 +1,6 @@
 import { VIEW_HOOK_METADATA } from './common';
 
-export function ViewHookObservable(hook: string): PropertyDecorator {
+export function ObserveViewHook(hook: string): PropertyDecorator {
   return (target: Object, key: string) => {
     const metadata = Reflect.getOwnMetadata(VIEW_HOOK_METADATA, target) || {};
 

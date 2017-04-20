@@ -24,7 +24,7 @@ import { StateContext } from '../StateContext';
 export class View extends Renderable {
   protected _viewContainer: ViewContainer<any>;
   protected _visibilityChanges: BehaviorSubject<boolean> = new BehaviorSubject(true);
-  protected _sizeChanges: BehaviorSubject<{ width: number, height: number }> = new BehaviorSubject({ width: 0, height: 0 });
+  protected _sizeChanges: BehaviorSubject<{ width: number, height: number }> = new BehaviorSubject({ width: -1, height: -1 });
   protected _viewContainerCreated: Subject<ViewContainer<any>> = new Subject();
   protected _initialCreate: boolean = true;
   
@@ -37,9 +37,7 @@ export class View extends Renderable {
    * Notifies when the dimensions of this view changes.
    * @type {Observable<{ width: number, height: number }>}
    */
-  sizeChanges: Observable<{ width: number, height: number }> = this._sizeChanges.asObservable().distinctUntilChanged((p, c) => {
-    return p.width === c.width && p.height === c.height;
-  });
+  sizeChanges: Observable<{ width: number, height: number }> = this._sizeChanges.asObservable();
 
   viewContainerCreated: Observable<ViewContainer<any>> = this._viewContainerCreated.asObservable();
   
@@ -219,7 +217,9 @@ export class View extends Renderable {
       let container = this._viewManager.resolve<any>(this._configuration);
 
       if (container) {
-        container.resolve({ fromCache: true });
+        if (container.hasComponent) {
+          container.resolve({ fromCache: true });
+        }
       } else {
         container = this._viewManager.create({
           config: this._configuration,

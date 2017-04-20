@@ -5,7 +5,7 @@ import { ContainerRef, ConfigurationRef, DocumentRef } from '../common';
 import { View } from './View';
 import { ViewComponentRef } from './common';
 import { CustomViewHookEvent } from './CustomViewHookEvent';
-import { ViewHookExecutor, ViewOnResolveConfig, ViewHookMetadata } from './hooks';
+import { ViewHookExecutor, ViewHookMetadata } from './hooks';
 import { isFunction, get, uid, eq, isPromise, isObject, Deferred } from '../utils';
 
 export enum ViewContainerStatus {
@@ -61,10 +61,11 @@ export class ViewContainer<T> {
   private _beforeDestroy: Subject<BeforeDestroyEvent<Renderable>> = new Subject();
   private _containerChange: Subject<View|null> = new Subject<View|null>();
   private _visibilityChanges: BehaviorSubject<boolean> = new BehaviorSubject(true);
-  private _sizeChanges: BehaviorSubject<{ width: number, height: number }> = new BehaviorSubject({ width: 0, height: 0 });
+  private _sizeChanges: BehaviorSubject<{ width: number, height: number }> = new BehaviorSubject({ width: -1, height: -1 });
   private _attached: Subject<boolean> = new Subject();
   private _initialized: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   private _componentReady: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  private _componentInitialized: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   private _isInitialized: boolean = false;
   private _retry: Function|null = null;
   private _statusInternal: ViewContainerStatus;
@@ -95,7 +96,10 @@ export class ViewContainer<T> {
    * Notifies when the dimensions of this views container has changed.
    * @type {Observable<{ width: number, height: number }>}
    */
-  sizeChanges: Observable<{ width: number, height: number }> = this._sizeChanges.asObservable();
+  sizeChanges: Observable<{ width: number, height: number }> = this._sizeChanges
+    .asObservable()
+    .filter(e => e.height !== -1 && e.width !== -1)
+    .distinctUntilChanged((p, c) => p.width === c.width && p.height === c.height)
   /**
    * Notifies when the status of this component changes.
    * @type {Observable<ViewContainerStatus>}
@@ -126,6 +130,11 @@ export class ViewContainer<T> {
    * @type {Observable<boolean>}
    */
   componentReady: Observable<boolean> = this._componentReady.asObservable();
+  /**
+   * Notifies when the component is initialized.
+   * @type {Observable<boolean>}
+   */
+  componentInitialized: Observable<boolean> = this._componentInitialized.asObservable();
   
   /**
    * Creates an instance of ViewContainer.
@@ -141,7 +150,7 @@ export class ViewContainer<T> {
 
     this.attached.subscribe(() => this._executeHook('ugOnAttach', this._container));
     this.detached.subscribe(() => this._executeHook('ugOnDetach'));
-    this.sizeChanges.subscribe(dimensions => this._executeHook('ugOnResize', dimensions));
+    this.sizeChanges.subscribe(dimensions => this._executeHook('ugOnSizeChange', dimensions));
     this.visibilityChanges.subscribe(isVisible => this._executeHook('ugOnVisibilityChange', isVisible));
     this.beforeDestroy.subscribe(event => this._executeHook('ugOnBeforeDestroy', event));
     this.initialized.subscribe(v => this._isInitialized = v);
@@ -149,6 +158,10 @@ export class ViewContainer<T> {
     // Reset the retry function when the component is no longer failed.
     this.status.filter(eq(ViewContainerStatus.READY)).subscribe(() => this._retry = null);
     this.status.subscribe(s => this._statusInternal = s);
+  }
+
+  get hasComponent(): boolean {
+    return Boolean(this._component);
   }
 
   /**
@@ -422,7 +435,7 @@ export class ViewContainer<T> {
   async resolve(options: { fromCache?: boolean } = {}): Promise<void> {
     const { fromCache = false } = options;
 
-    if (!this._component) {
+    if (!this.hasComponent) {
       throw new Error('Can not resolve container without component being ready.');
     }
 
@@ -459,7 +472,7 @@ export class ViewContainer<T> {
    */
   private _executeHook(name: string, arg?: any): any {
     if (this._component) {
-      this._viewHookExecutor.execute<T>(this._component, name, arg);
+      return this._viewHookExecutor.execute<T>(this._component, name, arg);
     }
   }
 
@@ -492,5 +505,6 @@ export class ViewContainer<T> {
     await this.resolve();
 
     this._executeHook('ugOnInit', this);
+    this._componentInitialized.next(true);
   }
 }

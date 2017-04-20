@@ -60,7 +60,8 @@ export class ViewFactory {
     // view to become visible before initializing the view container.
     if (isLazy) {
       viewContainer.visibilityChanges
-        .first(() => viewContainer.isVisible())
+        .first(() => viewContainer.isVisible(), v => v, false)
+        .filter(Boolean)
         .delay(0)
         .subscribe(() => viewContainer.initialize());
     } else {

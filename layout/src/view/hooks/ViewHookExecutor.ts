@@ -61,20 +61,16 @@ export class ViewHookExecutor {
 
     for (const hookObservableName of Object.keys(hooks)) {
       const hookNames = hooks[hookObservableName] || [];
-      let subject = component[hookObservableName];
+      const subject = new Subject<any>();
 
-      if (!subject) {
-        subject = new Subject<any>();
+      Object.defineProperty(component, hookObservableName, {
+        writable: true,
+        configurable: true,
+        enumerable: true,
+        value: subject.asObservable()
+      });
 
-        Object.defineProperty(component, name, {
-          writable: true,
-          configurable: true,
-          enumerable: true,
-          value: subject.asObservable()
-        });
-
-        viewContainer.destroyed.subscribe(() => subject.complete());
-      } 
+      viewContainer.destroyed.subscribe(() => subject.complete());
 
       for (const name of hookNames) {
         this.registerInterceptor(component, name, arg => subject.next(arg));

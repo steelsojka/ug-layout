@@ -8,7 +8,8 @@ import {
   ElementRef,
   Type,
   Provider,
-  ViewContainerRef
+  ViewContainerRef,
+  ComponentFactory
 } from '@angular/core';
 import {
   Renderable,
@@ -199,11 +200,43 @@ export class AngularView extends View {
       undefined,
       injector
     );
+
+    this._setupInputs<T>(componentFactory, componentRef);
     
     componentRef.instance[COMPONENT_REF_KEY] = componentRef;
     viewContainer.mount(componentRef.location.nativeElement);
     
     return componentRef.instance;
+  }
+
+  private _setupInputs<T>(factory: ComponentFactory<T>, componentRef: ComponentRef<T>): void {
+    for (const input of factory.inputs) {
+      const descriptor = Object.getOwnPropertyDescriptor(componentRef.instance, input.propName) 
+        // Account for getter/setters
+        || Object.getOwnPropertyDescriptor(componentRef.componentType.prototype, input.propName);
+
+      if (descriptor) {
+        let { set, get, value } = descriptor;
+
+        if (!set && !get) {
+          set = v => value = v;
+          get = () => value;
+        }
+
+        Object.defineProperty(componentRef.instance, input.propName, {
+          get,
+          enumerable: descriptor.enumerable,
+          configurable: true,
+          set(value) {
+            if (set) {
+              set.call(this, value);
+            }
+
+            componentRef.changeDetectorRef.detectChanges();
+          }
+        });
+      }
+    }
   }
 
   private _getComponentInfo<T>(): { container: ViewContainer<T>, componentRef: ComponentRef<T> }|null {
