@@ -7,6 +7,7 @@ import { ViewComponentRef } from './common';
 import { CustomViewHookEvent } from './CustomViewHookEvent';
 import { ViewHookExecutor, ViewHookMetadata } from './hooks';
 import { isFunction, get, uid, eq, isPromise, isObject, Deferred } from '../utils';
+import { ViewFailReason } from './ViewFailReason';
 
 export enum ViewContainerStatus {
   READY,
@@ -18,6 +19,8 @@ export enum ViewContainerAttachedStatus {
   ATTACHED,
   DETACHED
 }
+
+export const FAILED_RESOLVE = new ViewFailReason('Failed resolve hook');
 
 export interface ViewContainerReadyOptions {
   /**
@@ -69,6 +72,7 @@ export class ViewContainer<T> {
   private _isInitialized: boolean = false;
   private _retry: Function|null = null;
   private _statusInternal: ViewContainerStatus;
+  private _failedReason: ViewFailReason|null = null;
   
   /**
    * A unique identifier for this instance.
@@ -156,12 +160,19 @@ export class ViewContainer<T> {
     this.initialized.subscribe(v => this._isInitialized = v);
 
     // Reset the retry function when the component is no longer failed.
-    this.status.filter(eq(ViewContainerStatus.READY)).subscribe(() => this._retry = null);
+    this.status.filter(eq(ViewContainerStatus.READY)).subscribe(() => {
+      this._retry = null;
+      this._failedReason = null;
+    });
     this.status.subscribe(s => this._statusInternal = s);
   }
 
   get hasComponent(): boolean {
     return Boolean(this._component);
+  }
+
+  get failedReason(): ViewFailReason|null {
+    return this._failedReason;
   }
 
   /**
@@ -417,12 +428,13 @@ export class ViewContainer<T> {
     this.setView(null);
   }
 
-  fail(retry?: Function|null): void {
+  fail(reason: ViewFailReason, retry?: Function|null): void {
     // Can be nulled with explicit null value
     if (retry || retry === null) {
       this._retry = retry;
     }
 
+    this._failedReason = reason;
     this._status.next(ViewContainerStatus.FAILED);
   }
 
@@ -445,7 +457,7 @@ export class ViewContainer<T> {
       await this._executeHook('ugOnResolve', { fromCache });
       this._status.next(ViewContainerStatus.READY);
     } catch(e) {
-      this.fail(() => this.resolve(options));
+      this.fail(FAILED_RESOLVE, () => this.resolve({ fromCache }));
       throw e;
     }
   }
