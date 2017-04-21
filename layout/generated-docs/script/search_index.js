@@ -72,6 +72,12 @@ window.esdocSearchIndex = [
     "variable"
   ],
   [
+    "ug-layout/common~contexttype",
+    "variable/index.html#static-variable-ContextType",
+    "<span>ContextType</span> <span class=\"search-result-import-path\">ug-layout/common</span>",
+    "variable"
+  ],
+  [
     "ug-layout/view/customviewhookevent~customviewhookevent",
     "class/docs/view/CustomViewHookEvent.js~CustomViewHookEvent.html",
     "<span>CustomViewHookEvent</span> <span class=\"search-result-import-path\">ug-layout/view/CustomViewHookEvent</span>",
@@ -204,10 +210,28 @@ window.esdocSearchIndex = [
     "class"
   ],
   [
+    "ug-layout/lockstate~lock_dragging",
+    "variable/index.html#static-variable-LOCK_DRAGGING",
+    "<span>LOCK_DRAGGING</span> <span class=\"search-result-import-path\">ug-layout/LockState</span>",
+    "variable"
+  ],
+  [
+    "ug-layout/lockstate~lock_resizing",
+    "variable/index.html#static-variable-LOCK_RESIZING",
+    "<span>LOCK_RESIZING</span> <span class=\"search-result-import-path\">ug-layout/LockState</span>",
+    "variable"
+  ],
+  [
     "ug-layout/layout/layout~layout",
     "variable/index.html#static-variable-Layout",
     "<span>Layout</span> <span class=\"search-result-import-path\">ug-layout/layout/Layout</span>",
     "variable"
+  ],
+  [
+    "ug-layout/layout/layoutmanipulator~layoutmanipulator",
+    "class/docs/layout/LayoutManipulator.js~LayoutManipulator.html",
+    "<span>LayoutManipulator</span> <span class=\"search-result-import-path\">ug-layout/layout/LayoutManipulator</span>",
+    "class"
   ],
   [
     "ug-layout/layout/layoutserializer~layoutserializer",
@@ -220,6 +244,24 @@ window.esdocSearchIndex = [
     "function/index.html#static-function-Lazy",
     "<span>Lazy</span> <span class=\"search-result-import-path\">ug-layout/di/decorators</span>",
     "function"
+  ],
+  [
+    "ug-layout/view/common~linkermetatdataref",
+    "variable/index.html#static-variable-LinkerMetatdataRef",
+    "<span>LinkerMetatdataRef</span> <span class=\"search-result-import-path\">ug-layout/view/common</span>",
+    "variable"
+  ],
+  [
+    "ug-layout/lockstate~lockstate",
+    "class/docs/LockState.js~LockState.html",
+    "<span>LockState</span> <span class=\"search-result-import-path\">ug-layout/LockState</span>",
+    "class"
+  ],
+  [
+    "ug-layout/lockstate~lockstatechangeevent",
+    "class/docs/LockState.js~LockStateChangeEvent.html",
+    "<span>LockStateChangeEvent</span> <span class=\"search-result-import-path\">ug-layout/LockState</span>",
+    "class"
   ],
   [
     "ug-layout/xycontainer/xycontainer~max_ratio_distribution_iterations",
@@ -250,6 +292,12 @@ window.esdocSearchIndex = [
     "class/docs/stack/controls/MinimizeStackControl.js~MinimizeStackControl.html",
     "<span>MinimizeStackControl</span> <span class=\"search-result-import-path\">ug-layout/stack/controls/MinimizeStackControl</span>",
     "class"
+  ],
+  [
+    "ug-layout/view/hooks/decorators~observeviewhook",
+    "function/index.html#static-function-ObserveViewHook",
+    "<span>ObserveViewHook</span> <span class=\"search-result-import-path\">ug-layout/view/hooks/decorators</span>",
+    "function"
   ],
   [
     "ug-layout/di/decorators~optional",
@@ -402,6 +450,12 @@ window.esdocSearchIndex = [
     "class"
   ],
   [
+    "ug-layout/statecontext~statecontext",
+    "class/docs/StateContext.js~StateContext.html",
+    "<span>StateContext</span> <span class=\"search-result-import-path\">ug-layout/StateContext</span>",
+    "class"
+  ],
+  [
     "ug-layout/stack/tabcloseevent~tabcloseevent",
     "class/docs/stack/TabCloseEvent.js~TabCloseEvent.html",
     "<span>TabCloseEvent</span> <span class=\"search-result-import-path\">ug-layout/stack/TabCloseEvent</span>",
@@ -423,6 +477,12 @@ window.esdocSearchIndex = [
     "ug-layout/stack/tabselectionevent~tabselectionevent",
     "class/docs/stack/TabSelectionEvent.js~TabSelectionEvent.html",
     "<span>TabSelectionEvent</span> <span class=\"search-result-import-path\">ug-layout/stack/TabSelectionEvent</span>",
+    "class"
+  ],
+  [
+    "ug-layout/tagutil~tagutil",
+    "class/docs/TagUtil.js~TagUtil.html",
+    "<span>TagUtil</span> <span class=\"search-result-import-path\">ug-layout/TagUtil</span>",
     "class"
   ],
   [
@@ -456,6 +516,18 @@ window.esdocSearchIndex = [
     "variable"
   ],
   [
+    "ug-layout/view/hooks/common~view_hook_metadata",
+    "variable/index.html#static-variable-VIEW_HOOK_METADATA",
+    "<span>VIEW_HOOK_METADATA</span> <span class=\"search-result-import-path\">ug-layout/view/hooks/common</span>",
+    "variable"
+  ],
+  [
+    "ug-layout/view/common~view_linker_metadata",
+    "variable/index.html#static-variable-VIEW_LINKER_METADATA",
+    "<span>VIEW_LINKER_METADATA</span> <span class=\"search-result-import-path\">ug-layout/view/common</span>",
+    "variable"
+  ],
+  [
     "ug-layout/di~valueprovider",
     "class/docs/di/esdoc.js~ValueProvider.html",
     "<span>ValueProvider</span> <span class=\"search-result-import-path\">ug-layout/di</span>",
@@ -486,15 +558,33 @@ window.esdocSearchIndex = [
     "class"
   ],
   [
-    "ug-layout/view/common~viewfactoriesref",
-    "variable/index.html#static-variable-ViewFactoriesRef",
-    "<span>ViewFactoriesRef</span> <span class=\"search-result-import-path\">ug-layout/view/common</span>",
-    "variable"
-  ],
-  [
     "ug-layout/view/viewfactory~viewfactory",
     "class/docs/view/ViewFactory.js~ViewFactory.html",
     "<span>ViewFactory</span> <span class=\"search-result-import-path\">ug-layout/view/ViewFactory</span>",
+    "class"
+  ],
+  [
+    "ug-layout/view/hooks/viewhookexecutor~viewhookexecutor",
+    "class/docs/view/hooks/ViewHookExecutor.js~ViewHookExecutor.html",
+    "<span>ViewHookExecutor</span> <span class=\"search-result-import-path\">ug-layout/view/hooks/ViewHookExecutor</span>",
+    "class"
+  ],
+  [
+    "ug-layout/view/decorators~viewinsert",
+    "function/index.html#static-function-ViewInsert",
+    "<span>ViewInsert</span> <span class=\"search-result-import-path\">ug-layout/view/decorators</span>",
+    "function"
+  ],
+  [
+    "ug-layout/view/decorators~viewlinkinit",
+    "function/index.html#static-function-ViewLinkInit",
+    "<span>ViewLinkInit</span> <span class=\"search-result-import-path\">ug-layout/view/decorators</span>",
+    "function"
+  ],
+  [
+    "ug-layout/view/viewlinker~viewlinker",
+    "class/docs/view/ViewLinker.js~ViewLinker.html",
+    "<span>ViewLinker</span> <span class=\"search-result-import-path\">ug-layout/view/ViewLinker</span>",
     "class"
   ],
   [
@@ -502,6 +592,18 @@ window.esdocSearchIndex = [
     "class/docs/view/ViewManager.js~ViewManager.html",
     "<span>ViewManager</span> <span class=\"search-result-import-path\">ug-layout/view/ViewManager</span>",
     "class"
+  ],
+  [
+    "ug-layout/view/decorators~viewquery",
+    "function/index.html#static-function-ViewQuery",
+    "<span>ViewQuery</span> <span class=\"search-result-import-path\">ug-layout/view/decorators</span>",
+    "function"
+  ],
+  [
+    "ug-layout/view/decorators~viewresolve",
+    "function/index.html#static-function-ViewResolve",
+    "<span>ViewResolve</span> <span class=\"search-result-import-path\">ug-layout/view/decorators</span>",
+    "function"
   ],
   [
     "ug-layout/view/viewserializer~viewserializer",
@@ -525,6 +627,12 @@ window.esdocSearchIndex = [
     "ug-layout/xycontainer/xyitemcontainer~xyitemcontainer",
     "class/docs/XYContainer/XYItemContainer.js~XYItemContainer.html",
     "<span>XYItemContainer</span> <span class=\"search-result-import-path\">ug-layout/XYContainer/XYItemContainer</span>",
+    "class"
+  ],
+  [
+    "ug-layout/xycontainer/xyitemcontainerserializer~xyitemcontainerserializer",
+    "class/docs/XYContainer/XYItemContainerSerializer.js~XYItemContainerSerializer.html",
+    "<span>XYItemContainerSerializer</span> <span class=\"search-result-import-path\">ug-layout/XYContainer/XYItemContainerSerializer</span>",
     "class"
   ],
   [
@@ -558,6 +666,12 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
+    "ug-layout/view/decorators~getdefaultmetadata",
+    "function/index.html#static-function-getDefaultMetadata",
+    "<span>getDefaultMetadata</span> <span class=\"search-result-import-path\">ug-layout/view/decorators</span>",
+    "function"
+  ],
+  [
     "ug-layout/utils/index~isboolean",
     "function/index.html#static-function-isBoolean",
     "<span>isBoolean</span> <span class=\"search-result-import-path\">ug-layout/utils/index</span>",
@@ -579,6 +693,12 @@ window.esdocSearchIndex = [
     "ug-layout/utils/index~isobject",
     "function/index.html#static-function-isObject",
     "<span>isObject</span> <span class=\"search-result-import-path\">ug-layout/utils/index</span>",
+    "function"
+  ],
+  [
+    "ug-layout/utils/index~isobserver",
+    "function/index.html#static-function-isObserver",
+    "<span>isObserver</span> <span class=\"search-result-import-path\">ug-layout/utils/index</span>",
     "function"
   ],
   [
@@ -967,13 +1087,13 @@ window.esdocSearchIndex = [
   ],
   [
     "docs/draghost.js~draghost#bounds",
-    "class/docs/DragHost.js~DragHost.html#instance-get-bounds",
+    "class/docs/DragHost.js~DragHost.html#instance-set-bounds",
     "docs/DragHost.js~DragHost#bounds",
     "member"
   ],
   [
     "docs/draghost.js~draghost#bounds",
-    "class/docs/DragHost.js~DragHost.html#instance-set-bounds",
+    "class/docs/DragHost.js~DragHost.html#instance-get-bounds",
     "docs/DragHost.js~DragHost#bounds",
     "member"
   ],
@@ -1068,6 +1188,66 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
+    "docs/lockstate.js",
+    "file/docs/LockState.js.html",
+    "docs/LockState.js",
+    "file"
+  ],
+  [
+    "docs/lockstate.js~lockstate#changes",
+    "class/docs/LockState.js~LockState.html#instance-member-changes",
+    "docs/LockState.js~LockState#changes",
+    "member"
+  ],
+  [
+    "docs/lockstate.js~lockstate#constructor",
+    "class/docs/LockState.js~LockState.html#instance-constructor-constructor",
+    "docs/LockState.js~LockState#constructor",
+    "method"
+  ],
+  [
+    "docs/lockstate.js~lockstate#get",
+    "class/docs/LockState.js~LockState.html#instance-method-get",
+    "docs/LockState.js~LockState#get",
+    "method"
+  ],
+  [
+    "docs/lockstate.js~lockstate#islocked",
+    "class/docs/LockState.js~LockState.html#instance-get-isLocked",
+    "docs/LockState.js~LockState#isLocked",
+    "member"
+  ],
+  [
+    "docs/lockstate.js~lockstate#scope",
+    "class/docs/LockState.js~LockState.html#instance-method-scope",
+    "docs/LockState.js~LockState#scope",
+    "method"
+  ],
+  [
+    "docs/lockstate.js~lockstate#set",
+    "class/docs/LockState.js~LockState.html#instance-method-set",
+    "docs/LockState.js~LockState#set",
+    "method"
+  ],
+  [
+    "docs/lockstate.js~lockstatechangeevent#constructor",
+    "class/docs/LockState.js~LockStateChangeEvent.html#instance-constructor-constructor",
+    "docs/LockState.js~LockStateChangeEvent#constructor",
+    "method"
+  ],
+  [
+    "docs/lockstate.js~lockstatechangeevent#name",
+    "class/docs/LockState.js~LockStateChangeEvent.html#instance-member-name",
+    "docs/LockState.js~LockStateChangeEvent#name",
+    "member"
+  ],
+  [
+    "docs/lockstate.js~lockstatechangeevent#value",
+    "class/docs/LockState.js~LockStateChangeEvent.html#instance-member-value",
+    "docs/LockState.js~LockStateChangeEvent#value",
+    "member"
+  ],
+  [
     "docs/rootinjector.js",
     "file/docs/RootInjector.js.html",
     "docs/RootInjector.js",
@@ -1104,6 +1284,18 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
+    "docs/rootlayout.js~rootlayout#detach",
+    "class/docs/RootLayout.js~RootLayout.html#instance-method-detach",
+    "docs/RootLayout.js~RootLayout#detach",
+    "method"
+  ],
+  [
+    "docs/rootlayout.js~rootlayout#getplugins",
+    "class/docs/RootLayout.js~RootLayout.html#instance-method-getPlugins",
+    "docs/RootLayout.js~RootLayout#getPlugins",
+    "method"
+  ],
+  [
     "docs/rootlayout.js~rootlayout#height",
     "class/docs/RootLayout.js~RootLayout.html#instance-get-height",
     "docs/RootLayout.js~RootLayout#height",
@@ -1134,6 +1326,12 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
+    "docs/rootlayout.js~rootlayout#lockstate",
+    "class/docs/RootLayout.js~RootLayout.html#instance-get-lockState",
+    "docs/RootLayout.js~RootLayout#lockState",
+    "member"
+  ],
+  [
     "docs/rootlayout.js~rootlayout#makevisible",
     "class/docs/RootLayout.js~RootLayout.html#instance-method-makeVisible",
     "docs/RootLayout.js~RootLayout#makeVisible",
@@ -1161,6 +1359,12 @@ window.esdocSearchIndex = [
     "docs/rootlayout.js~rootlayout#resize",
     "class/docs/RootLayout.js~RootLayout.html#instance-method-resize",
     "docs/RootLayout.js~RootLayout#resize",
+    "method"
+  ],
+  [
+    "docs/rootlayout.js~rootlayout#setcontainingnode",
+    "class/docs/RootLayout.js~RootLayout.html#instance-method-setContainingNode",
+    "docs/RootLayout.js~RootLayout#setContainingNode",
     "method"
   ],
   [
@@ -1245,6 +1449,48 @@ window.esdocSearchIndex = [
     "docs/rootserializer.js~rootserializer.fromroot",
     "class/docs/RootSerializer.js~RootSerializer.html#static-method-fromRoot",
     "docs/RootSerializer.js~RootSerializer.fromRoot",
+    "method"
+  ],
+  [
+    "docs/statecontext.js",
+    "file/docs/StateContext.js.html",
+    "docs/StateContext.js",
+    "file"
+  ],
+  [
+    "docs/statecontext.js~statecontext#context",
+    "class/docs/StateContext.js~StateContext.html#instance-get-context",
+    "docs/StateContext.js~StateContext#context",
+    "member"
+  ],
+  [
+    "docs/statecontext.js~statecontext#setcontext",
+    "class/docs/StateContext.js~StateContext.html#instance-method-setContext",
+    "docs/StateContext.js~StateContext#setContext",
+    "method"
+  ],
+  [
+    "docs/tagutil.js",
+    "file/docs/TagUtil.js.html",
+    "docs/TagUtil.js",
+    "file"
+  ],
+  [
+    "docs/tagutil.js~tagutil.matches",
+    "class/docs/TagUtil.js~TagUtil.html#static-method-matches",
+    "docs/TagUtil.js~TagUtil.matches",
+    "method"
+  ],
+  [
+    "docs/tagutil.js~tagutil.matchestags",
+    "class/docs/TagUtil.js~TagUtil.html#static-method-matchesTags",
+    "docs/TagUtil.js~TagUtil.matchesTags",
+    "method"
+  ],
+  [
+    "docs/tagutil.js~tagutil.query",
+    "class/docs/TagUtil.js~TagUtil.html#static-method-query",
+    "docs/TagUtil.js~TagUtil.query",
     "method"
   ],
   [
@@ -1470,6 +1716,12 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
+    "docs/xycontainer/xycontainer.js~xycontainer#isstatic",
+    "class/docs/XYContainer/XYContainer.js~XYContainer.html#instance-get-isStatic",
+    "docs/XYContainer/XYContainer.js~XYContainer#isStatic",
+    "member"
+  ],
+  [
     "docs/xycontainer/xycontainer.js~xycontainer#removechild",
     "class/docs/XYContainer/XYContainer.js~XYContainer.html#instance-method-removeChild",
     "docs/XYContainer/XYContainer.js~XYContainer#removeChild",
@@ -1578,6 +1830,12 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
+    "docs/xycontainer/xyitemcontainer.js~xyitemcontainer#initialsize",
+    "class/docs/XYContainer/XYItemContainer.js~XYItemContainer.html#instance-get-initialSize",
+    "docs/XYContainer/XYItemContainer.js~XYItemContainer#initialSize",
+    "member"
+  ],
+  [
     "docs/xycontainer/xyitemcontainer.js~xyitemcontainer#initialize",
     "class/docs/XYContainer/XYItemContainer.js~XYItemContainer.html#instance-method-initialize",
     "docs/XYContainer/XYItemContainer.js~XYItemContainer#initialize",
@@ -1662,6 +1920,12 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
+    "docs/xycontainer/xyitemcontainer.js~xyitemcontainer#persist",
+    "class/docs/XYContainer/XYItemContainer.js~XYItemContainer.html#instance-get-persist",
+    "docs/XYContainer/XYItemContainer.js~XYItemContainer#persist",
+    "member"
+  ],
+  [
     "docs/xycontainer/xyitemcontainer.js~xyitemcontainer#ratio",
     "class/docs/XYContainer/XYItemContainer.js~XYItemContainer.html#instance-member-ratio",
     "docs/XYContainer/XYItemContainer.js~XYItemContainer#ratio",
@@ -1690,6 +1954,48 @@ window.esdocSearchIndex = [
     "class/docs/XYContainer/XYItemContainer.js~XYItemContainer.html#instance-get-width",
     "docs/XYContainer/XYItemContainer.js~XYItemContainer#width",
     "member"
+  ],
+  [
+    "docs/xycontainer/xyitemcontainer.js~xyitemcontainer.configure",
+    "class/docs/XYContainer/XYItemContainer.js~XYItemContainer.html#static-method-configure",
+    "docs/XYContainer/XYItemContainer.js~XYItemContainer.configure",
+    "method"
+  ],
+  [
+    "docs/xycontainer/xyitemcontainerserializer.js",
+    "file/docs/XYContainer/XYItemContainerSerializer.js.html",
+    "docs/XYContainer/XYItemContainerSerializer.js",
+    "file"
+  ],
+  [
+    "docs/xycontainer/xyitemcontainerserializer.js~xyitemcontainerserializer#constructor",
+    "class/docs/XYContainer/XYItemContainerSerializer.js~XYItemContainerSerializer.html#instance-constructor-constructor",
+    "docs/XYContainer/XYItemContainerSerializer.js~XYItemContainerSerializer#constructor",
+    "method"
+  ],
+  [
+    "docs/xycontainer/xyitemcontainerserializer.js~xyitemcontainerserializer#deserialize",
+    "class/docs/XYContainer/XYItemContainerSerializer.js~XYItemContainerSerializer.html#instance-method-deserialize",
+    "docs/XYContainer/XYItemContainerSerializer.js~XYItemContainerSerializer#deserialize",
+    "method"
+  ],
+  [
+    "docs/xycontainer/xyitemcontainerserializer.js~xyitemcontainerserializer#exclude",
+    "class/docs/XYContainer/XYItemContainerSerializer.js~XYItemContainerSerializer.html#instance-method-exclude",
+    "docs/XYContainer/XYItemContainerSerializer.js~XYItemContainerSerializer#exclude",
+    "method"
+  ],
+  [
+    "docs/xycontainer/xyitemcontainerserializer.js~xyitemcontainerserializer#serialize",
+    "class/docs/XYContainer/XYItemContainerSerializer.js~XYItemContainerSerializer.html#instance-method-serialize",
+    "docs/XYContainer/XYItemContainerSerializer.js~XYItemContainerSerializer#serialize",
+    "method"
+  ],
+  [
+    "docs/xycontainer/xyitemcontainerserializer.js~xyitemcontainerserializer.register",
+    "class/docs/XYContainer/XYItemContainerSerializer.js~XYItemContainerSerializer.html#static-method-register",
+    "docs/XYContainer/XYItemContainerSerializer.js~XYItemContainerSerializer.register",
+    "method"
   ],
   [
     "docs/xycontainer/index.js",
@@ -1797,6 +2103,12 @@ window.esdocSearchIndex = [
     "docs/di/injector.js~injector#instantiate",
     "class/docs/di/Injector.js~Injector.html#instance-method-instantiate",
     "docs/di/Injector.js~Injector#instantiate",
+    "method"
+  ],
+  [
+    "docs/di/injector.js~injector#invoke",
+    "class/docs/di/Injector.js~Injector.html#instance-method-invoke",
+    "docs/di/Injector.js~Injector#invoke",
     "method"
   ],
   [
@@ -2040,6 +2352,18 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
+    "docs/dom/configuredrenderable.js~configuredrenderable.isrenderablearg",
+    "class/docs/dom/ConfiguredRenderable.js~ConfiguredRenderable.html#static-method-isRenderableArg",
+    "docs/dom/ConfiguredRenderable.js~ConfiguredRenderable.isRenderableArg",
+    "method"
+  ],
+  [
+    "docs/dom/configuredrenderable.js~configuredrenderable.isrenderableconstructor",
+    "class/docs/dom/ConfiguredRenderable.js~ConfiguredRenderable.html#static-method-isRenderableConstructor",
+    "docs/dom/ConfiguredRenderable.js~ConfiguredRenderable.isRenderableConstructor",
+    "method"
+  ],
+  [
     "docs/dom/configuredrenderable.js~configuredrenderable.resolve",
     "class/docs/dom/ConfiguredRenderable.js~ConfiguredRenderable.html#static-method-resolve",
     "docs/dom/ConfiguredRenderable.js~ConfiguredRenderable.resolve",
@@ -2086,6 +2410,12 @@ window.esdocSearchIndex = [
     "class/docs/dom/Renderable.js~Renderable.html#instance-method-contains",
     "docs/dom/Renderable.js~Renderable#contains",
     "method"
+  ],
+  [
+    "docs/dom/renderable.js~renderable#contentitems",
+    "class/docs/dom/Renderable.js~Renderable.html#instance-get-contentItems",
+    "docs/dom/Renderable.js~Renderable#contentItems",
+    "member"
   ],
   [
     "docs/dom/renderable.js~renderable#createchild",
@@ -2274,6 +2604,12 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
+    "docs/dom/renderable.js~renderable#tags",
+    "class/docs/dom/Renderable.js~Renderable.html#instance-member-tags",
+    "docs/dom/Renderable.js~Renderable#tags",
+    "member"
+  ],
+  [
     "docs/dom/renderable.js~renderable#uid",
     "class/docs/dom/Renderable.js~Renderable.html#instance-get-uid",
     "docs/dom/Renderable.js~Renderable#uid",
@@ -2329,13 +2665,13 @@ window.esdocSearchIndex = [
   ],
   [
     "docs/dom/renderablearea.js~renderablearea#x",
-    "class/docs/dom/RenderableArea.js~RenderableArea.html#instance-get-x",
+    "class/docs/dom/RenderableArea.js~RenderableArea.html#instance-set-x",
     "docs/dom/RenderableArea.js~RenderableArea#x",
     "member"
   ],
   [
     "docs/dom/renderablearea.js~renderablearea#x",
-    "class/docs/dom/RenderableArea.js~RenderableArea.html#instance-set-x",
+    "class/docs/dom/RenderableArea.js~RenderableArea.html#instance-get-x",
     "docs/dom/RenderableArea.js~RenderableArea#x",
     "member"
   ],
@@ -2430,10 +2766,28 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
+    "docs/dom/renderer.js~renderer#reset",
+    "class/docs/dom/Renderer.js~Renderer.html#instance-method-reset",
+    "docs/dom/Renderer.js~Renderer#reset",
+    "method"
+  ],
+  [
+    "docs/dom/renderer.js~renderer#setcontainer",
+    "class/docs/dom/Renderer.js~Renderer.html#instance-method-setContainer",
+    "docs/dom/Renderer.js~Renderer#setContainer",
+    "method"
+  ],
+  [
     "docs/dom/renderer.js~renderer#usenodegenerator",
     "class/docs/dom/Renderer.js~Renderer.html#instance-method-useNodeGenerator",
     "docs/dom/Renderer.js~Renderer#useNodeGenerator",
     "method"
+  ],
+  [
+    "docs/dom/common.js",
+    "file/docs/dom/common.js.html",
+    "docs/dom/common.js",
+    "file"
   ],
   [
     "docs/dom/decorators.js",
@@ -2748,6 +3102,18 @@ window.esdocSearchIndex = [
     "file"
   ],
   [
+    "docs/layout/layoutmanipulator.js",
+    "file/docs/layout/LayoutManipulator.js.html",
+    "docs/layout/LayoutManipulator.js",
+    "file"
+  ],
+  [
+    "docs/layout/layoutmanipulator.js~layoutmanipulator#insert",
+    "class/docs/layout/LayoutManipulator.js~LayoutManipulator.html#instance-method-insert",
+    "docs/layout/LayoutManipulator.js~LayoutManipulator#insert",
+    "method"
+  ],
+  [
     "docs/layout/layoutserializer.js",
     "file/docs/layout/LayoutSerializer.js.html",
     "docs/layout/LayoutSerializer.js",
@@ -2850,6 +3216,18 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
+    "docs/serialization/serializercontainer.js~serializercontainer#deserializelist",
+    "class/docs/serialization/SerializerContainer.js~SerializerContainer.html#instance-method-deserializeList",
+    "docs/serialization/SerializerContainer.js~SerializerContainer#deserializeList",
+    "method"
+  ],
+  [
+    "docs/serialization/serializercontainer.js~serializercontainer#isexcluded",
+    "class/docs/serialization/SerializerContainer.js~SerializerContainer.html#instance-method-isExcluded",
+    "docs/serialization/SerializerContainer.js~SerializerContainer#isExcluded",
+    "method"
+  ],
+  [
     "docs/serialization/serializercontainer.js~serializercontainer#registerclass",
     "class/docs/serialization/SerializerContainer.js~SerializerContainer.html#instance-method-registerClass",
     "docs/serialization/SerializerContainer.js~SerializerContainer#registerClass",
@@ -2907,6 +3285,12 @@ window.esdocSearchIndex = [
     "docs/serialization/serializercontainer.js~serializercontainer#serialize",
     "class/docs/serialization/SerializerContainer.js~SerializerContainer.html#instance-method-serialize",
     "docs/serialization/SerializerContainer.js~SerializerContainer#serialize",
+    "method"
+  ],
+  [
+    "docs/serialization/serializercontainer.js~serializercontainer#serializelist",
+    "class/docs/serialization/SerializerContainer.js~SerializerContainer.html#instance-method-serializeList",
+    "docs/serialization/SerializerContainer.js~SerializerContainer#serializeList",
     "method"
   ],
   [
@@ -3492,6 +3876,12 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
+    "docs/stack/stacktab.js~stacktab#isdraggable",
+    "class/docs/stack/StackTab.js~StackTab.html#instance-get-isDraggable",
+    "docs/stack/StackTab.js~StackTab#isDraggable",
+    "member"
+  ],
+  [
     "docs/stack/stacktab.js~stacktab#isdragging",
     "class/docs/stack/StackTab.js~StackTab.html#instance-get-isDragging",
     "docs/stack/StackTab.js~StackTab#isDragging",
@@ -3798,9 +4188,9 @@ window.esdocSearchIndex = [
     "file"
   ],
   [
-    "docs/view/customviewhookevent.js~customviewhookevent#args",
-    "class/docs/view/CustomViewHookEvent.js~CustomViewHookEvent.html#instance-get-args",
-    "docs/view/CustomViewHookEvent.js~CustomViewHookEvent#args",
+    "docs/view/customviewhookevent.js~customviewhookevent#arg",
+    "class/docs/view/CustomViewHookEvent.js~CustomViewHookEvent.html#instance-get-arg",
+    "docs/view/CustomViewHookEvent.js~CustomViewHookEvent#arg",
     "member"
   ],
   [
@@ -3808,6 +4198,12 @@ window.esdocSearchIndex = [
     "class/docs/view/CustomViewHookEvent.js~CustomViewHookEvent.html#instance-constructor-constructor",
     "docs/view/CustomViewHookEvent.js~CustomViewHookEvent#constructor",
     "method"
+  ],
+  [
+    "docs/view/customviewhookevent.js~customviewhookevent#execute",
+    "class/docs/view/CustomViewHookEvent.js~CustomViewHookEvent.html#instance-get-execute",
+    "docs/view/CustomViewHookEvent.js~CustomViewHookEvent#execute",
+    "member"
   ],
   [
     "docs/view/customviewhookevent.js~customviewhookevent#name",
@@ -3820,6 +4216,12 @@ window.esdocSearchIndex = [
     "file/docs/view/View.js.html",
     "docs/view/View.js",
     "file"
+  ],
+  [
+    "docs/view/view.js~view#caching",
+    "class/docs/view/View.js~View.html#instance-get-caching",
+    "docs/view/View.js~View#caching",
+    "member"
   ],
   [
     "docs/view/view.js~view#close",
@@ -3912,6 +4314,12 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
+    "docs/view/view.js~view#viewcontainercreated",
+    "class/docs/view/View.js~View.html#instance-member-viewContainerCreated",
+    "docs/view/View.js~View#viewContainerCreated",
+    "member"
+  ],
+  [
     "docs/view/view.js~view#visibilitychanges",
     "class/docs/view/View.js~View.html#instance-member-visibilityChanges",
     "docs/view/View.js~View#visibilityChanges",
@@ -3960,6 +4368,18 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
+    "docs/view/viewcontainer.js~viewcontainer#componentinitialized",
+    "class/docs/view/ViewContainer.js~ViewContainer.html#instance-member-componentInitialized",
+    "docs/view/ViewContainer.js~ViewContainer#componentInitialized",
+    "member"
+  ],
+  [
+    "docs/view/viewcontainer.js~viewcontainer#componentready",
+    "class/docs/view/ViewContainer.js~ViewContainer.html#instance-member-componentReady",
+    "docs/view/ViewContainer.js~ViewContainer#componentReady",
+    "member"
+  ],
+  [
     "docs/view/viewcontainer.js~viewcontainer#constructor",
     "class/docs/view/ViewContainer.js~ViewContainer.html#instance-constructor-constructor",
     "docs/view/ViewContainer.js~ViewContainer#constructor",
@@ -4002,6 +4422,12 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
+    "docs/view/viewcontainer.js~viewcontainer#fail",
+    "class/docs/view/ViewContainer.js~ViewContainer.html#instance-method-fail",
+    "docs/view/ViewContainer.js~ViewContainer#fail",
+    "method"
+  ],
+  [
     "docs/view/viewcontainer.js~viewcontainer#get",
     "class/docs/view/ViewContainer.js~ViewContainer.html#instance-method-get",
     "docs/view/ViewContainer.js~ViewContainer#get",
@@ -4018,6 +4444,12 @@ window.esdocSearchIndex = [
     "class/docs/view/ViewContainer.js~ViewContainer.html#instance-method-getParents",
     "docs/view/ViewContainer.js~ViewContainer#getParents",
     "method"
+  ],
+  [
+    "docs/view/viewcontainer.js~viewcontainer#hascomponent",
+    "class/docs/view/ViewContainer.js~ViewContainer.html#instance-get-hasComponent",
+    "docs/view/ViewContainer.js~ViewContainer#hasComponent",
+    "member"
   ],
   [
     "docs/view/viewcontainer.js~viewcontainer#height",
@@ -4047,6 +4479,12 @@ window.esdocSearchIndex = [
     "docs/view/viewcontainer.js~viewcontainer#iscacheable",
     "class/docs/view/ViewContainer.js~ViewContainer.html#instance-get-isCacheable",
     "docs/view/ViewContainer.js~ViewContainer#isCacheable",
+    "member"
+  ],
+  [
+    "docs/view/viewcontainer.js~viewcontainer#islazy",
+    "class/docs/view/ViewContainer.js~ViewContainer.html#instance-get-isLazy",
+    "docs/view/ViewContainer.js~ViewContainer#isLazy",
     "member"
   ],
   [
@@ -4086,6 +4524,18 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
+    "docs/view/viewcontainer.js~viewcontainer#resolve",
+    "class/docs/view/ViewContainer.js~ViewContainer.html#instance-method-resolve",
+    "docs/view/ViewContainer.js~ViewContainer#resolve",
+    "method"
+  ],
+  [
+    "docs/view/viewcontainer.js~viewcontainer#retry",
+    "class/docs/view/ViewContainer.js~ViewContainer.html#instance-method-retry",
+    "docs/view/ViewContainer.js~ViewContainer#retry",
+    "method"
+  ],
+  [
     "docs/view/viewcontainer.js~viewcontainer#setview",
     "class/docs/view/ViewContainer.js~ViewContainer.html#instance-method-setView",
     "docs/view/ViewContainer.js~ViewContainer#setView",
@@ -4104,9 +4554,9 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
-    "docs/view/viewcontainer.js~viewcontainer#statusready",
-    "class/docs/view/ViewContainer.js~ViewContainer.html#instance-member-statusReady",
-    "docs/view/ViewContainer.js~ViewContainer#statusReady",
+    "docs/view/viewcontainer.js~viewcontainer#view",
+    "class/docs/view/ViewContainer.js~ViewContainer.html#instance-get-view",
+    "docs/view/ViewContainer.js~ViewContainer#view",
     "member"
   ],
   [
@@ -4126,6 +4576,12 @@ window.esdocSearchIndex = [
     "file/docs/view/ViewFactory.js.html",
     "docs/view/ViewFactory.js",
     "file"
+  ],
+  [
+    "docs/view/viewfactory.js~viewfactory#constructor",
+    "class/docs/view/ViewFactory.js~ViewFactory.html#instance-constructor-constructor",
+    "docs/view/ViewFactory.js~ViewFactory#constructor",
+    "method"
   ],
   [
     "docs/view/viewfactory.js~viewfactory#create",
@@ -4149,6 +4605,66 @@ window.esdocSearchIndex = [
     "docs/view/viewfactory.js~viewfactory#resolveconfigproperty",
     "class/docs/view/ViewFactory.js~ViewFactory.html#instance-method-resolveConfigProperty",
     "docs/view/ViewFactory.js~ViewFactory#resolveConfigProperty",
+    "method"
+  ],
+  [
+    "docs/view/viewfactory.js~viewfactory#resolvemetaconfigproperty",
+    "class/docs/view/ViewFactory.js~ViewFactory.html#instance-method-resolveMetaConfigProperty",
+    "docs/view/ViewFactory.js~ViewFactory#resolveMetaConfigProperty",
+    "method"
+  ],
+  [
+    "docs/view/viewlinker.js",
+    "file/docs/view/ViewLinker.js.html",
+    "docs/view/ViewLinker.js",
+    "file"
+  ],
+  [
+    "docs/view/viewlinker.js~viewlinker#autowire",
+    "class/docs/view/ViewLinker.js~ViewLinker.html#instance-method-autowire",
+    "docs/view/ViewLinker.js~ViewLinker#autowire",
+    "method"
+  ],
+  [
+    "docs/view/viewlinker.js~viewlinker#constructor",
+    "class/docs/view/ViewLinker.js~ViewLinker.html#instance-constructor-constructor",
+    "docs/view/ViewLinker.js~ViewLinker#constructor",
+    "method"
+  ],
+  [
+    "docs/view/viewlinker.js~viewlinker#readmetadata",
+    "class/docs/view/ViewLinker.js~ViewLinker.html#instance-method-readMetadata",
+    "docs/view/ViewLinker.js~ViewLinker#readMetadata",
+    "method"
+  ],
+  [
+    "docs/view/viewlinker.js~viewlinker#readquery",
+    "class/docs/view/ViewLinker.js~ViewLinker.html#instance-method-readQuery",
+    "docs/view/ViewLinker.js~ViewLinker#readQuery",
+    "method"
+  ],
+  [
+    "docs/view/viewlinker.js~viewlinker#wireinsert",
+    "class/docs/view/ViewLinker.js~ViewLinker.html#instance-method-wireInsert",
+    "docs/view/ViewLinker.js~ViewLinker#wireInsert",
+    "method"
+  ],
+  [
+    "docs/view/viewlinker.js~viewlinker#wirequery",
+    "class/docs/view/ViewLinker.js~ViewLinker.html#instance-method-wireQuery",
+    "docs/view/ViewLinker.js~ViewLinker#wireQuery",
+    "method"
+  ],
+  [
+    "docs/view/viewlinker.js~viewlinker#wireresolve",
+    "class/docs/view/ViewLinker.js~ViewLinker.html#instance-method-wireResolve",
+    "docs/view/ViewLinker.js~ViewLinker#wireResolve",
+    "method"
+  ],
+  [
+    "docs/view/viewlinker.js~viewlinker.readmetadata",
+    "class/docs/view/ViewLinker.js~ViewLinker.html#static-method-readMetadata",
+    "docs/view/ViewLinker.js~ViewLinker.readMetadata",
     "method"
   ],
   [
@@ -4176,10 +4692,22 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
+    "docs/view/viewmanager.js~viewmanager#created",
+    "class/docs/view/ViewManager.js~ViewManager.html#instance-member-created",
+    "docs/view/ViewManager.js~ViewManager#created",
+    "member"
+  ],
+  [
     "docs/view/viewmanager.js~viewmanager#destroy",
     "class/docs/view/ViewManager.js~ViewManager.html#instance-method-destroy",
     "docs/view/ViewManager.js~ViewManager#destroy",
     "method"
+  ],
+  [
+    "docs/view/viewmanager.js~viewmanager#destroyed",
+    "class/docs/view/ViewManager.js~ViewManager.html#instance-member-destroyed",
+    "docs/view/ViewManager.js~ViewManager#destroyed",
+    "member"
   ],
   [
     "docs/view/viewmanager.js~viewmanager#get",
@@ -4206,6 +4734,30 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
+    "docs/view/viewmanager.js~viewmanager#query",
+    "class/docs/view/ViewManager.js~ViewManager.html#instance-method-query",
+    "docs/view/ViewManager.js~ViewManager#query",
+    "method"
+  ],
+  [
+    "docs/view/viewmanager.js~viewmanager#queryref",
+    "class/docs/view/ViewManager.js~ViewManager.html#instance-method-queryRef",
+    "docs/view/ViewManager.js~ViewManager#queryRef",
+    "method"
+  ],
+  [
+    "docs/view/viewmanager.js~viewmanager#querytoken",
+    "class/docs/view/ViewManager.js~ViewManager.html#instance-method-queryToken",
+    "docs/view/ViewManager.js~ViewManager#queryToken",
+    "method"
+  ],
+  [
+    "docs/view/viewmanager.js~viewmanager#refchanges",
+    "class/docs/view/ViewManager.js~ViewManager.html#instance-member-refChanges",
+    "docs/view/ViewManager.js~ViewManager#refChanges",
+    "member"
+  ],
+  [
     "docs/view/viewmanager.js~viewmanager#register",
     "class/docs/view/ViewManager.js~ViewManager.html#instance-method-register",
     "docs/view/ViewManager.js~ViewManager#register",
@@ -4230,10 +4782,28 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
+    "docs/view/viewmanager.js~viewmanager#resolved",
+    "class/docs/view/ViewManager.js~ViewManager.html#instance-member-resolved",
+    "docs/view/ViewManager.js~ViewManager#resolved",
+    "member"
+  ],
+  [
+    "docs/view/viewmanager.js~viewmanager#subscribetoquery",
+    "class/docs/view/ViewManager.js~ViewManager.html#instance-method-subscribeToQuery",
+    "docs/view/ViewManager.js~ViewManager#subscribeToQuery",
+    "method"
+  ],
+  [
     "docs/view/viewmanager.js~viewmanager#unregister",
     "class/docs/view/ViewManager.js~ViewManager.html#instance-method-unregister",
     "docs/view/ViewManager.js~ViewManager#unregister",
     "method"
+  ],
+  [
+    "docs/view/viewmanager.js~viewmanager#viewinit",
+    "class/docs/view/ViewManager.js~ViewManager.html#instance-member-viewInit",
+    "docs/view/ViewManager.js~ViewManager#viewInit",
+    "member"
   ],
   [
     "docs/view/viewserializer.js",
@@ -4275,6 +4845,54 @@ window.esdocSearchIndex = [
     "docs/view/decorators.js",
     "file/docs/view/decorators.js.html",
     "docs/view/decorators.js",
+    "file"
+  ],
+  [
+    "docs/view/hooks/viewhookexecutor.js",
+    "file/docs/view/hooks/ViewHookExecutor.js.html",
+    "docs/view/hooks/ViewHookExecutor.js",
+    "file"
+  ],
+  [
+    "docs/view/hooks/viewhookexecutor.js~viewhookexecutor#constructor",
+    "class/docs/view/hooks/ViewHookExecutor.js~ViewHookExecutor.html#instance-constructor-constructor",
+    "docs/view/hooks/ViewHookExecutor.js~ViewHookExecutor#constructor",
+    "method"
+  ],
+  [
+    "docs/view/hooks/viewhookexecutor.js~viewhookexecutor#execute",
+    "class/docs/view/hooks/ViewHookExecutor.js~ViewHookExecutor.html#instance-method-execute",
+    "docs/view/hooks/ViewHookExecutor.js~ViewHookExecutor#execute",
+    "method"
+  ],
+  [
+    "docs/view/hooks/viewhookexecutor.js~viewhookexecutor#linkobservers",
+    "class/docs/view/hooks/ViewHookExecutor.js~ViewHookExecutor.html#instance-method-linkObservers",
+    "docs/view/hooks/ViewHookExecutor.js~ViewHookExecutor#linkObservers",
+    "method"
+  ],
+  [
+    "docs/view/hooks/viewhookexecutor.js~viewhookexecutor#registerinterceptor",
+    "class/docs/view/hooks/ViewHookExecutor.js~ViewHookExecutor.html#instance-method-registerInterceptor",
+    "docs/view/hooks/ViewHookExecutor.js~ViewHookExecutor#registerInterceptor",
+    "method"
+  ],
+  [
+    "docs/view/hooks/common.js",
+    "file/docs/view/hooks/common.js.html",
+    "docs/view/hooks/common.js",
+    "file"
+  ],
+  [
+    "docs/view/hooks/decorators.js",
+    "file/docs/view/hooks/decorators.js.html",
+    "docs/view/hooks/decorators.js",
+    "file"
+  ],
+  [
+    "docs/view/hooks/index.js",
+    "file/docs/view/hooks/index.js.html",
+    "docs/view/hooks/index.js",
     "file"
   ],
   [

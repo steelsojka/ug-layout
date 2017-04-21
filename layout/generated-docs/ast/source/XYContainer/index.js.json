@@ -1,28 +1,28 @@
 {
   "type": "File",
   "start": 0,
-  "end": 217,
+  "end": 262,
   "loc": {
     "start": {
       "line": 1,
       "column": 0
     },
     "end": {
-      "line": 7,
+      "line": 8,
       "column": 33
     }
   },
   "program": {
     "type": "Program",
     "start": 0,
-    "end": 217,
+    "end": 262,
     "loc": {
       "start": {
         "line": 1,
         "column": 0
       },
       "end": {
-        "line": 7,
+        "line": 8,
         "column": 33
       }
     },
@@ -236,20 +236,55 @@
             "raw": "'./XYContainerSerializer'"
           },
           "value": "./XYContainerSerializer"
+        }
+      },
+      {
+        "type": "ExportAllDeclaration",
+        "start": 184,
+        "end": 228,
+        "loc": {
+          "start": {
+            "line": 7,
+            "column": 0
+          },
+          "end": {
+            "line": 7,
+            "column": 44
+          }
+        },
+        "source": {
+          "type": "StringLiteral",
+          "start": 198,
+          "end": 227,
+          "loc": {
+            "start": {
+              "line": 7,
+              "column": 14
+            },
+            "end": {
+              "line": 7,
+              "column": 43
+            }
+          },
+          "extra": {
+            "rawValue": "./XYItemContainerSerializer",
+            "raw": "'./XYItemContainerSerializer'"
+          },
+          "value": "./XYItemContainerSerializer"
         },
         "trailingComments": [
           {
             "type": "CommentLine",
             "value": "# sourceMappingURL=index.js.map",
-            "start": 184,
-            "end": 217,
+            "start": 229,
+            "end": 262,
             "loc": {
               "start": {
-                "line": 7,
+                "line": 8,
                 "column": 0
               },
               "end": {
-                "line": 7,
+                "line": 8,
                 "column": 33
               }
             }
@@ -263,15 +298,15 @@
     {
       "type": "CommentLine",
       "value": "# sourceMappingURL=index.js.map",
-      "start": 184,
-      "end": 217,
+      "start": 229,
+      "end": 262,
       "loc": {
         "start": {
-          "line": 7,
+          "line": 8,
           "column": 0
         },
         "end": {
-          "line": 7,
+          "line": 8,
           "column": 33
         }
       }
@@ -1083,10 +1118,22 @@
       }
     },
     {
-      "type": "CommentLine",
-      "value": "# sourceMappingURL=index.js.map",
+      "type": {
+        "label": "export",
+        "keyword": "export",
+        "beforeExpr": false,
+        "startsExpr": false,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null,
+        "updateContext": null
+      },
+      "value": "export",
       "start": 184,
-      "end": 217,
+      "end": 190,
       "loc": {
         "start": {
           "line": 7,
@@ -1094,6 +1141,128 @@
         },
         "end": {
           "line": 7,
+          "column": 6
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "*",
+        "beforeExpr": true,
+        "startsExpr": false,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": 10,
+        "updateContext": null
+      },
+      "value": "*",
+      "start": 191,
+      "end": 192,
+      "loc": {
+        "start": {
+          "line": 7,
+          "column": 7
+        },
+        "end": {
+          "line": 7,
+          "column": 8
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "name",
+        "beforeExpr": false,
+        "startsExpr": true,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null
+      },
+      "value": "from",
+      "start": 193,
+      "end": 197,
+      "loc": {
+        "start": {
+          "line": 7,
+          "column": 9
+        },
+        "end": {
+          "line": 7,
+          "column": 13
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "string",
+        "beforeExpr": false,
+        "startsExpr": true,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null,
+        "updateContext": null
+      },
+      "value": "./XYItemContainerSerializer",
+      "start": 198,
+      "end": 227,
+      "loc": {
+        "start": {
+          "line": 7,
+          "column": 14
+        },
+        "end": {
+          "line": 7,
+          "column": 43
+        }
+      }
+    },
+    {
+      "type": {
+        "label": ";",
+        "beforeExpr": true,
+        "startsExpr": false,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null,
+        "updateContext": null
+      },
+      "start": 227,
+      "end": 228,
+      "loc": {
+        "start": {
+          "line": 7,
+          "column": 43
+        },
+        "end": {
+          "line": 7,
+          "column": 44
+        }
+      }
+    },
+    {
+      "type": "CommentLine",
+      "value": "# sourceMappingURL=index.js.map",
+      "start": 229,
+      "end": 262,
+      "loc": {
+        "start": {
+          "line": 8,
+          "column": 0
+        },
+        "end": {
+          "line": 8,
           "column": 33
         }
       }
@@ -1111,15 +1280,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 217,
-      "end": 217,
+      "start": 262,
+      "end": 262,
       "loc": {
         "start": {
-          "line": 7,
+          "line": 8,
           "column": 33
         },
         "end": {
-          "line": 7,
+          "line": 8,
           "column": 33
         }
       }
