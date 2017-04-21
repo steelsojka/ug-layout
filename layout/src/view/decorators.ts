@@ -13,6 +13,12 @@ import {
   CacheStrategy
 } from './common';
 
+/**
+ * Registers view metadata with a component class.
+ * @export
+ * @param {ViewComponentConfigArgs} [config={}] 
+ * @returns {ClassDecorator} 
+ */
 export function ViewComponent(config: ViewComponentConfigArgs = {}): ClassDecorator {
   return (target: Function): void => {
     config = Object.assign({
@@ -27,6 +33,12 @@ export function ViewComponent(config: ViewComponentConfigArgs = {}): ClassDecora
   };
 }
 
+/**
+ * Sets up a view query with the decorated method as the callback to receive the query results. 
+ * @export
+ * @param {ViewQueryConfigArgs} [config={}] 
+ * @returns {MethodDecorator} 
+ */
 export function ViewQuery(config: ViewQueryConfigArgs = {}): MethodDecorator {
   return (target: Object, key: string) => {
     const metadata: ViewLinkerMetadata = Reflect.getOwnMetadata(VIEW_LINKER_METADATA, target) || getDefaultMetadata();
@@ -41,6 +53,13 @@ export function ViewQuery(config: ViewQueryConfigArgs = {}): MethodDecorator {
   };
 }
 
+/**
+ * Sets up an init method that is invoked at the time a view is linked by the {@link ViewLinker}. Any dependencies need
+ * from the Layouts DI can be injected.
+ * @export
+ * @param {...any[]} injections Injection tokens for services needing to be injected into the controller.
+ * @returns {MethodDecorator} 
+ */
 export function ViewLinkInit(...injections: any[]): MethodDecorator {
   return (target: Object, key: string) => {
     const metadata: ViewLinkerMetadata = Reflect.getOwnMetadata(VIEW_LINKER_METADATA, target) || getDefaultMetadata();
@@ -54,6 +73,13 @@ export function ViewLinkInit(...injections: any[]): MethodDecorator {
   };
 }
 
+/**
+ * Sets up a view insert method.
+ * @export
+ * @see {@link ViewLinker#wireInsert}
+ * @param {ViewInsertConfigArgs} config 
+ * @returns {PropertyDecorator} 
+ */
 export function ViewInsert(config: ViewInsertConfigArgs): PropertyDecorator {
   return (target: Object, key: string) => {
     const metadata: ViewLinkerMetadata = Reflect.getOwnMetadata(VIEW_LINKER_METADATA, target) || getDefaultMetadata();
@@ -67,6 +93,13 @@ export function ViewInsert(config: ViewInsertConfigArgs): PropertyDecorator {
   };
 }
 
+/**
+ * Sets up a view resolve method.
+ * @export
+ * @see {@link ViewLinker#wireResolve}
+ * @param {ViewResolveConfigArgs} config 
+ * @returns {PropertyDecorator} 
+ */
 export function ViewResolve(config: ViewResolveConfigArgs): PropertyDecorator {
   return (target: Object, key: string) => {
     const metadata: ViewLinkerMetadata = Reflect.getOwnMetadata(VIEW_LINKER_METADATA, target) || getDefaultMetadata();

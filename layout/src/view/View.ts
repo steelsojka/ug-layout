@@ -14,6 +14,7 @@ import { ViewFactory } from './ViewFactory';
 import { CustomViewHookEvent } from './CustomViewHookEvent';
 import { get } from '../utils';
 import { StateContext } from '../StateContext';
+import { SizeChanges } from './hooks';
 
 /**
  * A renderable that renders a component.
@@ -24,7 +25,7 @@ import { StateContext } from '../StateContext';
 export class View extends Renderable {
   protected _viewContainer: ViewContainer<any>;
   protected _visibilityChanges: BehaviorSubject<boolean> = new BehaviorSubject(true);
-  protected _sizeChanges: BehaviorSubject<{ width: number, height: number }> = new BehaviorSubject({ width: -1, height: -1 });
+  protected _sizeChanges: BehaviorSubject<SizeChanges> = new BehaviorSubject({ width: -1, height: -1 });
   protected _viewContainerCreated: Subject<ViewContainer<any>> = new Subject();
   protected _initialCreate: boolean = true;
   
@@ -37,8 +38,12 @@ export class View extends Renderable {
    * Notifies when the dimensions of this view changes.
    * @type {Observable<{ width: number, height: number }>}
    */
-  sizeChanges: Observable<{ width: number, height: number }> = this._sizeChanges.asObservable();
+  sizeChanges: Observable<SizeChanges> = this._sizeChanges.asObservable();
 
+  /**
+   * Notifies when the view container is resolved.
+   * @type {Observable<ViewContainer<any>>}
+   */
   viewContainerCreated: Observable<ViewContainer<any>> = this._viewContainerCreated.asObservable();
   
   /**

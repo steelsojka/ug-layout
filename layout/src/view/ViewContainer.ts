@@ -495,7 +495,7 @@ export class ViewContainer<T> {
     this._component = component;
 
     // Link up any hooks right when the component is instantiated.
-    this._viewHookExecutor.link(this, this._component.constructor.prototype);
+    this._viewHookExecutor.linkObservers(this, this._component.constructor.prototype);
     this._componentReady.next(true);
 
     if (this._statusInternal === ViewContainerStatus.FAILED) {
