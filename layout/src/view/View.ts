@@ -26,7 +26,7 @@ export class View extends Renderable {
   protected _viewContainer: ViewContainer<any>;
   protected _visibilityChanges: BehaviorSubject<boolean> = new BehaviorSubject(true);
   protected _sizeChanges: BehaviorSubject<SizeChanges> = new BehaviorSubject({ width: -1, height: -1 });
-  protected _viewContainerCreated: Subject<ViewContainer<any>> = new Subject();
+  protected _viewContainerCreated: Subject<{ fromCache: boolean, container: ViewContainer<any> }> = new Subject();
   protected _initialCreate: boolean = true;
   
   /**
@@ -44,7 +44,7 @@ export class View extends Renderable {
    * Notifies when the view container is resolved.
    * @type {Observable<ViewContainer<any>>}
    */
-  viewContainerCreated: Observable<ViewContainer<any>> = this._viewContainerCreated.asObservable();
+  viewContainerCreated: Observable<{ fromCache: boolean, container: ViewContainer<any> }> = this._viewContainerCreated.asObservable();
   
   /**
    * Creates an instance of View.
@@ -220,8 +220,11 @@ export class View extends Renderable {
   private _onCreate(element: HTMLElement): void {
     if (!this._viewContainer) {
       let container = this._viewManager.resolve<any>(this._configuration);
+      let fromCache = false;
 
       if (container) {
+        fromCache = true;
+
         if (container.hasComponent) {
           container.resolve({ fromCache: true });
         }
@@ -233,7 +236,7 @@ export class View extends Renderable {
       }
 
       this._viewContainer = container;
-      this._viewContainerCreated.next(this._viewContainer);
+      this._viewContainerCreated.next({ fromCache, container: this._viewContainer });
     }
 
     this._viewContainer.setView(this);
