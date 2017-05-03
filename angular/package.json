@@ -1,6 +1,6 @@
 {
   "name": "ug-layout-angular",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "",
   "main": "dist/es5/index.js",
   "typings": "dist/es5/index.d.ts",
@@ -47,6 +47,6 @@
     "zone.js": "^0.8.4"
   },
   "dependencies": {
-    "tslib": "^1.6.1"
+    "tslib": "^1.6.0"
   }
 }
