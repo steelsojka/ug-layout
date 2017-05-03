@@ -2,7 +2,13 @@ import { VNode } from 'snabbdom/vnode';
 import { PartialObserver } from 'rxjs/Observer';
 import { Subscription } from 'rxjs/Subscription';
 
-import { Type, Injector, ProviderArg } from '../di';
+import { 
+  Type, 
+  Injector, 
+  ProviderArg, 
+  PostConstruct,
+  Inject
+} from '../di';
 import { 
   Observable, 
   Subject, 
@@ -90,7 +96,9 @@ export abstract class Renderable {
   protected _container: Renderable|null;
   protected _containerChange: Subject<Renderable|null> = new Subject<Renderable|null>();
   protected _contentItems: Renderable[] = [];
-  protected _renderer: Renderer;
+
+  @Inject(Renderer) protected _renderer: Renderer;
+  @Inject(Injector) protected _injector: Injector;
 
   constructor() {
     this.destroyed = this._destroyed.asObservable();
@@ -175,11 +183,11 @@ export abstract class Renderable {
    * @type {Injector}
    */
   get injector(): Injector {
-    if (!this[INJECTOR_KEY]) {
+    if (!this._injector) {
       throw new Error('Trying to access injector before it is set. Did you create his renderable through a RenderableInjector?');
     }
     
-    return this[INJECTOR_KEY];
+    return this._injector;
   }
 
   get contentItems(): Renderable[] {
@@ -196,9 +204,9 @@ export abstract class Renderable {
   /**
    * Invoked when the Injector has been assigned and ready for use.
    */
+  @PostConstruct()
   initialize(): void {
-    this._renderer = this.injector.get(Renderer);
-    this.setContainer(this.injector.get(ContainerRef, null));
+    this.setContainer(this.injector.get<Renderable|null>(ContainerRef, null));
     
     const config = this.injector.get(ConfigurationRef, null) as RenderableConfig|null;
 
@@ -537,7 +545,7 @@ export abstract class Renderable {
       ],
       this.injector
     )
-      .get(ConfiguredRenderable) as T;
+      .get<T>(ConfiguredRenderable as any);
   }
 
   /**

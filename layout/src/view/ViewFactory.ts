@@ -21,9 +21,7 @@ export interface ViewFactoryArgs {
  * @class ViewFactory
  */
 export class ViewFactory {
-  constructor(
-    @Inject(Injector) private _injector: Injector
-  ) {}
+  @Inject(Injector) private _injector: Injector;
 
   /**
    * Creates a view container from the given configuration.
@@ -52,7 +50,7 @@ export class ViewFactory {
     }
 
     const viewInjector = Injector.fromInjectable(ViewContainer, providers, injector);
-    const viewContainer = viewInjector.get(ViewContainer) as ViewContainer<any>;
+    const viewContainer = viewInjector.get(ViewContainer);
     
     viewInjector.registerProvider({ provide: ElementRef, useValue: viewContainer.element });
 

@@ -4,8 +4,7 @@ import { DocumentRef, DragEvent, DragStatus, DragOptions } from './common';
 import { propEq } from './utils';
 
 export class Draggable<T> {
-  drag: Observable<DragEvent<T>>;
-  
+  @Inject(DocumentRef) private _document: Document;
   private _host: T;
   private _drag: Subject<DragEvent<T>> = new Subject();
   private _isDragging: boolean = false;
@@ -14,14 +13,13 @@ export class Draggable<T> {
   private _pastThreshold: boolean = false;
   private _threshold: number = 100;
 
+  drag: Observable<DragEvent<T>> = this._drag.asObservable();
+
   static isDraggingEvent = propEq('status', DragStatus.DRAGGING);
   static isDragStartEvent = propEq('status', DragStatus.START);
   static isDragStopEvent = propEq('status', DragStatus.STOP);
 
-  constructor(
-    @Inject(DocumentRef) private _document: Document
-  ) {
-    this.drag = this._drag.asObservable();
+  constructor() {
     this._onMouseMove = this._onMouseMove.bind(this);
     this._onMouseUp = this._onMouseUp.bind(this);
   }

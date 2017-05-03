@@ -1,7 +1,7 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
-import { Inject, Injector } from '../di'
+import { Inject, Injector, PostConstruct } from '../di'
 import { Renderer, Renderable, AddChildArgs, RenderableInjector, ConfiguredRenderable, RenderableArea, RenderableConfig } from '../dom';
 import { BeforeDestroyEvent, Cancellable, Subject, Observable } from '../events';
 import { MakeVisibleCommand } from '../commands';
@@ -41,19 +41,10 @@ export interface StackItemContainerConfig extends RenderableConfig {
  */
 export class StackItemContainer extends Renderable implements DropTarget {
   private _controls: TabControl[] = [];
-  
-  /**
-   * Creates an instance of StackItemContainer.
-   * @param {StackItemContainerConfig} _config 
-   * @param {Stack} _container 
-   */
-  constructor(
-    @Inject(ConfigurationRef) private _config: StackItemContainerConfig,
-    @Inject(ContainerRef) protected _container: Stack
-  ) {
-    super();
-  }
 
+  @Inject(ConfigurationRef) private _config: StackItemContainerConfig;
+  @Inject(ContainerRef) protected _container: Stack;
+  
   get container(): Stack {
     return this._container as Stack;
   }
@@ -122,6 +113,7 @@ export class StackItemContainer extends Renderable implements DropTarget {
     return this._contentItems[0];
   }
 
+  @PostConstruct()
   initialize(): void {
     super.initialize();
     

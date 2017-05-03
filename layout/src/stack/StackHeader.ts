@@ -1,7 +1,7 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
-import { Inject, Injector } from '../di';
+import { Inject, Injector, PostConstruct } from '../di';
 import { 
   Renderable, 
   RenderableInjector, 
@@ -49,11 +49,12 @@ export class StackHeader extends Renderable implements DropTarget {
   private _controls: StackControl[] = [];
   private _config: StackHeaderConfig;
   private _tabAreas: RenderableArea[];
+
+  @Inject(ContainerRef) protected _container: Stack;
+  @Inject(DragHost) protected _dragHost: DragHost;
   
   constructor(
     @Inject(ConfigurationRef) _config: StackHeaderConfigArgs|null,
-    @Inject(ContainerRef) protected _container: Stack,
-    @Inject(DragHost) protected _dragHost: DragHost
   ) {
     super();
     
@@ -93,6 +94,7 @@ export class StackHeader extends Renderable implements DropTarget {
     return this._controls.slice(0);
   }
 
+  @PostConstruct()
   initialize(): void {
     super.initialize();
     

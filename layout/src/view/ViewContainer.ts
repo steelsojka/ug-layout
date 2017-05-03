@@ -1,4 +1,4 @@
-import { Injector, Type, Inject, Optional } from '../di';
+import { Injector, Type, Inject, Optional, PostConstruct } from '../di';
 import { Renderable } from '../dom';
 import { ReplaySubject, Observable, Subject, BeforeDestroyEvent, BehaviorSubject } from '../events';
 import { ContainerRef, ConfigurationRef, DocumentRef } from '../common';
@@ -56,7 +56,7 @@ export class ViewContainer<T> {
    * @private
    * @type {HTMLElement}
    */
-  private _element: HTMLElement = this._document.createElement('div');
+  private _element: HTMLElement;
   private _component: T|null = null;
   private _container: View|null;
   private _status: BehaviorSubject<ViewContainerStatus> = new BehaviorSubject(ViewContainerStatus.PENDING);
@@ -73,6 +73,10 @@ export class ViewContainer<T> {
   private _retry: Function|null = null;
   private _statusInternal: ViewContainerStatus;
   private _failedReason: ViewFailReason|null = null;
+
+  @Inject(DocumentRef) protected _document: Document;
+  @Inject(Injector) protected _injector: Injector;
+  @Inject(ViewHookExecutor) protected _viewHookExecutor: ViewHookExecutor;
   
   /**
    * A unique identifier for this instance.
@@ -145,26 +149,7 @@ export class ViewContainer<T> {
    * @param {Document} _document 
    * @param {Injector} _injector 
    */
-  constructor(
-    @Inject(DocumentRef) protected _document: Document,
-    @Inject(Injector) protected _injector: Injector,
-    @Inject(ViewHookExecutor) protected _viewHookExecutor: ViewHookExecutor
-  ) {
-    this._element.classList.add('ug-layout__view-container-mount');
-
-    this.attached.subscribe(() => this._executeHook('ugOnAttach', this._container));
-    this.detached.subscribe(() => this._executeHook('ugOnDetach'));
-    this.sizeChanges.subscribe(dimensions => this._executeHook('ugOnSizeChange', dimensions));
-    this.visibilityChanges.subscribe(isVisible => this._executeHook('ugOnVisibilityChange', isVisible));
-    this.beforeDestroy.subscribe(event => this._executeHook('ugOnBeforeDestroy', event));
-    this.initialized.subscribe(v => this._isInitialized = v);
-
-    // Reset the retry function when the component is no longer failed.
-    this.status.filter(eq(ViewContainerStatus.READY)).subscribe(() => {
-      this._retry = null;
-      this._failedReason = null;
-    });
-    this.status.subscribe(s => this._statusInternal = s);
+  constructor() {
   }
 
   get hasComponent(): boolean {
@@ -227,6 +212,26 @@ export class ViewContainer<T> {
   get view(): View|null {
     return this._container;
   }
+  
+  @PostConstruct()
+  init(): void {
+    this._element = this._document.createElement('div');
+    this._element.classList.add('ug-layout__view-container-mount');
+
+    this.attached.subscribe(() => this._executeHook('ugOnAttach', this._container));
+    this.detached.subscribe(() => this._executeHook('ugOnDetach'));
+    this.sizeChanges.subscribe(dimensions => this._executeHook('ugOnSizeChange', dimensions));
+    this.visibilityChanges.subscribe(isVisible => this._executeHook('ugOnVisibilityChange', isVisible));
+    this.beforeDestroy.subscribe(event => this._executeHook('ugOnBeforeDestroy', event));
+    this.initialized.subscribe(v => this._isInitialized = v);
+
+    // Reset the retry function when the component is no longer failed.
+    this.status.filter(eq(ViewContainerStatus.READY)).subscribe(() => {
+      this._retry = null;
+      this._failedReason = null;
+    });
+    this.status.subscribe(s => this._statusInternal = s);
+  }
 
   /**
    * Get's a token from this containers injector. Note, this should not be used to grab
@@ -236,7 +241,7 @@ export class ViewContainer<T> {
    * @returns {(U|null)} 
    */
   get<U>(token: any): U|null {
-    return this._injector.get(token, null);
+    return this._injector.get<U>(token, null);
   }
 
   /**

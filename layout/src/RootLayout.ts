@@ -1,7 +1,7 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
-import { Type, Injector, Inject, Optional, forwardRef, ProviderArg } from './di';
+import { Type, Injector, Inject, Optional, forwardRef, ProviderArg, PostConstruct } from './di';
 import { RootInjector } from './RootInjector';
 import { Layout } from './layout';
 import { Serialized } from './serialization';
@@ -45,18 +45,14 @@ export class RootLayout extends Renderable {
   protected _lastVNode: VNode|null = null;
   protected _offsetX: number = 0;
   protected _offsetY: number = 0;
-  
-  constructor(
-    @Inject(ConfigurationRef) protected _config: RootLayoutConfig,
-    @Inject(Renderer) protected _renderer: Renderer,
-    @Inject(ElementRef) protected _containerEl: HTMLElement,
-    @Inject(ViewManager) protected _viewManager: ViewManager,
-    @Inject(RootConfigRef) protected _rootConfig: RootLayoutCreationConfig,
-    @Inject(StateContext) protected _stateContext: StateContext,
-    @Inject(LockState) protected _lockState: LockState
-  ) {
-    super();
-  }
+
+  @Inject(ConfigurationRef) protected _config: RootLayoutConfig;
+  @Inject(Renderer) protected _renderer: Renderer;
+  @Inject(ElementRef) protected _containerEl: HTMLElement;
+  @Inject(ViewManager) protected _viewManager: ViewManager;
+  @Inject(RootConfigRef) protected _rootConfig: RootLayoutCreationConfig;
+  @Inject(StateContext) protected _stateContext: StateContext;
+  @Inject(LockState) protected _lockState: LockState;
 
   get height(): number {
     return this._height;
@@ -123,11 +119,12 @@ export class RootLayout extends Renderable {
     this._renderer.render();
   }
 
+  @PostConstruct()
   initialize(): void {
     this._lockState.set(LOCK_DRAGGING, false);
     this._lockState.set(LOCK_RESIZING, false);
 
-    this._renderer.initialize(this._containerEl);
+    this._renderer.setContainer(this._containerEl);
     this._renderer.useNodeGenerator(() => this.render());
     this._isInitialized = true;
 
@@ -193,7 +190,7 @@ export class RootLayout extends Renderable {
       ], 
       rootInjector
     )
-      .get(ConfiguredRenderable);
+      .get<T>(ConfiguredRenderable as any);
   }
 
   static configure(config: RootLayoutConfig): ConfiguredRenderable<RootLayout> {

@@ -1,6 +1,6 @@
 import { VNode } from 'snabbdom/vnode';
 
-import { Inject } from '../di';
+import { Inject, PostConstruct } from '../di';
 import { Subject, Observable } from '../events';
 import { DocumentRef, PatchRef, Patch } from '../common';
 
@@ -10,37 +10,28 @@ import { DocumentRef, PatchRef, Patch } from '../common';
  * @class Renderer
  */
 export class Renderer {
-  /**
-   * Notifies when a render cycle has finished.
-   * @type {Observable<void>}
-   */
-  rendered: Observable<void>;
-  
   private _rendered: Subject<void> = new Subject<void>();
   private _lastVNode: VNode|null = null;
   private _containerEl: Node;
   private _nodeGenerator: () => VNode;
   private _mountPoint: HTMLElement;
 
+  @Inject(DocumentRef) private _document: Document;
+  @Inject(PatchRef) private _patch: Patch;
+
   /**
-   * Creates an instance of Renderer.
-   * @param {Document} _document 
-   * @param {Patch} _patch 
+   * Notifies when a render cycle has finished.
+   * @type {Observable<void>}
    */
-  constructor(
-    @Inject(DocumentRef) private _document: Document,
-    @Inject(PatchRef) private _patch: Patch
-  ) {
-    this.rendered = this._rendered.asObservable();
-  }
+  rendered: Observable<void> = this._rendered.asObservable();
 
   /**
    * Initializes the renderer with the containing DOM element to mount to.
    * @param {Node} containerEl 
    */
-  initialize(containerEl: Node): void {
+  @PostConstruct()
+  initialize(): void {
     this._mountPoint = this._document.createElement('div');
-    this.setContainer(containerEl);
   }
 
   setContainer(containerEl: Node): void { 

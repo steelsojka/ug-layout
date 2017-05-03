@@ -1,7 +1,7 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
-import { Inject, Injector } from '../di';
+import { Inject, Injector, PostConstruct } from '../di';
 import { Renderable, Renderer } from '../dom';
 import { DocumentRef, ContainerRef, XYDirection, ConfigurationRef, DragEvent } from '../common';
 import { XYContainer } from './XYContainer';
@@ -26,18 +26,12 @@ export class Splitter extends Renderable {
   private _isDragging: boolean = false;
   private _element: HTMLElement;
   private _isDisabled: boolean = false;
-  
-  constructor(
-    @Inject(ConfigurationRef) private _config: SplitterConfig,
-    @Inject(DocumentRef) private _document: Document,
-    @Inject(ContainerRef) protected _container: XYContainer,
-    @Inject(Draggable) protected _draggable: Draggable<Splitter>,
-    @Inject(LockState) protected _lockState: LockState
-  ) {
-    super();
-    
-    this.dragStatus = this._draggable.drag;
-  }
+
+  @Inject(ConfigurationRef) private _config: SplitterConfig;
+  @Inject(DocumentRef) private _document: Document;
+  @Inject(ContainerRef) protected _container: XYContainer;
+  @Inject(Draggable) protected _draggable: Draggable<Splitter>;
+  @Inject(LockState) protected _lockState: LockState;
   
   get height(): number {
     return this._isRow ? this._container.height : this._config.size;
@@ -81,9 +75,12 @@ export class Splitter extends Renderable {
     return this._container.isRow;
   }
 
+  @PostConstruct()
   initialize(): void {
     super.initialize();
     
+    this.dragStatus = this._draggable.drag;
+
     this._draggable.drag
       .filter(Draggable.isDragStopEvent)
       .subscribe(() => this._isDragging = false);

@@ -33,7 +33,7 @@ test('creating from a renderable', t => {
   const renderable = new MyClass();
   const injector = RenderableInjector.fromRenderable(renderable);
 
-  t.is(injector.get(ConfiguredRenderable), renderable);
+  t.is(injector.get<Renderable>(ConfiguredRenderable as any), renderable);
   t.is(injector.get(ConfigurationRef), null);
 });
 

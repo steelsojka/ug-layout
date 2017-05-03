@@ -170,7 +170,7 @@ export class XYItemContainer extends Renderable {
         ], 
         this.injector
       )
-        .get(ConfiguredRenderable)
+        .get<Renderable>(ConfiguredRenderable as any)
     ];
 
     this._isMinimized = Boolean(this._config.minimized);

@@ -15,7 +15,7 @@ export function getRenderable<T>(Ctor: Type<T>, providers: ProviderArg[] = []): 
     undefined,
     { skipInit: true }
   )
-    .get(ConfiguredRenderable);
+    .get<T>(ConfiguredRenderable as any);
 }
 
 export function getRenderableClass(): { new (): Renderable } {

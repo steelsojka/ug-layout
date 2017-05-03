@@ -21,9 +21,7 @@ export interface SerializedXYItemContainer {
 }
 
 export class XYItemContainerSerializer implements Serializer<XYItemContainer, SerializedXYItemContainer> {
-  constructor(
-    @Inject(SerializerContainer) private _container: SerializerContainer
-  ) {}
+  @Inject(SerializerContainer) private _container: SerializerContainer;
   
   serialize(node: XYItemContainer): SerializedXYItemContainer {
     return {

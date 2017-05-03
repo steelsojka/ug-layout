@@ -3,3 +3,7 @@ src
 dist/test
 dist/docs
 generated-docs
+tsconfig*
+webpack*
+esdoc-plugin.js
+.esdoc.json

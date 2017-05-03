@@ -1,7 +1,7 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
-import { Inject, Injector } from '../di'
+import { Inject, Injector, PostConstruct } from '../di'
 import { 
   Subject, 
   Observable, 
@@ -41,6 +41,11 @@ export class StackTab extends Renderable {
   private _element: HTMLElement;
   private _isDragging: boolean = false;
   protected _container: StackHeader;
+
+  @Inject(Draggable) private _draggable: Draggable<StackTab>;
+  @Inject(DragHost) private _dragHost: DragHost;
+  @Inject(DocumentRef) private _document: Document;
+  @Inject(LockState) private _lockState: LockState;
   
   /**
    * Creates an instance of StackTab.
@@ -51,10 +56,6 @@ export class StackTab extends Renderable {
    */
   constructor(
     @Inject(ConfigurationRef) private _config: StackTabConfig,
-    @Inject(Draggable) private _draggable: Draggable<StackTab>,
-    @Inject(DragHost) private _dragHost: DragHost,
-    @Inject(DocumentRef) private _document: Document,
-    @Inject(LockState) private _lockState: LockState
   ) {
     super();
     
@@ -146,6 +147,7 @@ export class StackTab extends Renderable {
     ].join(':');
   }
 
+  @PostConstruct()
   initialize(): void {
     super.initialize();
     

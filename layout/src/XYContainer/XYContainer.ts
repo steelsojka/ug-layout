@@ -9,7 +9,7 @@ import {
   AddChildArgs,
   RenderableConfig
 } from '../dom';
-import { Inject, Injector, Optional } from '../di';
+import { Inject, Injector, Optional, PostConstruct } from '../di';
 import { 
   ContainerRef, 
   XYDirection,
@@ -65,11 +65,9 @@ export class XYContainer extends Renderable {
   protected _dragLimitMax: number = 0;
   protected _container: Renderable|null;
 
-  constructor(
-    @Inject(ConfigurationRef) @Optional() protected _config: XYContainerConfig|null
-  ) {
-    super();
-  }
+  @Inject(ConfigurationRef) 
+  @Optional() 
+  protected _config: XYContainerConfig|null;
 
   get height(): number {
     return this._height;
@@ -113,6 +111,7 @@ export class XYContainer extends Renderable {
       : this._container.height - this._totalSplitterSize;
   }
 
+  @PostConstruct()
   initialize(): void {
     super.initialize();
     

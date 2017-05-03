@@ -38,17 +38,7 @@ export class RenderableInjector extends Injector {
     const { skipInit = false } = options;
     let Ctor = renderable;
     let config: any = null;
-    let factory = (injector: Injector) => {
-      const instance = injector.resolveAndInstantiate(Ctor) as Renderable;
-
-      instance[INJECTOR_KEY] = injector;
-
-      if (isFunction(instance.initialize) && skipInit !== true) {
-        instance.initialize();
-      }
-
-      return instance;
-    };
+    let factory = (injector: Injector) => injector.resolveAndInstantiate<Renderable>(Ctor, { skipInit });
     
     if (renderable instanceof ConfiguredRenderable) {
       Ctor = renderable.renderable;

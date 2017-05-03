@@ -28,9 +28,7 @@ export interface SerializedStack extends SerializedRenderable {
 }
 
 export class StackSerializer implements Serializer<Stack, SerializedStack> {
-  constructor(
-    @Inject(SerializerContainer) private _container: SerializerContainer
-  ) {}
+  @Inject(SerializerContainer) private _container: SerializerContainer;
   
   serialize(node: Stack): SerializedStack {
     return {

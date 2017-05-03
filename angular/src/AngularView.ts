@@ -27,13 +27,15 @@ import {
   DocumentRef,
   ConfiguredRenderable,
   ViewContainerStatus,
-  StateContext
+  StateContext,
+  PostConstruct
 } from 'ug-layout';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/mergeMap';
 
+import * as angular from './angular';
 import { AngularPlugin } from './AngularPlugin';
 import { DestroyNotifyEvent } from './DestroyNotifyEvent';
 import { Angular1ComponentFactory } from './Angular1ComponentFactory';
@@ -53,30 +55,9 @@ export class AngularView extends View {
   protected _isCheckingForNg1: boolean = false;
   protected _destroyNotified: Subject<void> = new Subject<void>();
 
-  constructor(
-    @Inject(ContainerRef) protected _container: Renderable,
-    @Inject(ConfigurationRef) _configuration: ViewConfig,
-    @Inject(ViewManager) _viewManager: ViewManager,
-    @Inject(ViewFactory) _viewFactory: ViewFactory,
-    @Inject(DocumentRef) _document: Document,
-    @Inject(StateContext) _stateContext: StateContext,
-    @Inject(AngularPlugin) private _plugin: AngularPlugin
-  ) {
-    super(_container, _configuration, _viewManager, _viewFactory, _document, _stateContext);
-    
-    this._componentFactoryResolver = this._injector.get(ComponentFactoryResolver);
-    this.component = this._viewFactory.getTokenFrom(this._configuration);
-    
-    this._configuration = {
-      ..._configuration,
-      token: this.component,
-      useFactory: this.factory.bind(this),
-      deps: [ ViewContainer ]
-    };
+  @Inject(AngularPlugin) private _plugin: AngularPlugin;
 
-  }
-
-  protected get _injector(): Injector {
+  protected get _ng2Injector(): Injector {
     return this._plugin.injector;
   }
 
@@ -84,10 +65,22 @@ export class AngularView extends View {
     return this._plugin.viewContainerRef;
   }
 
+  @PostConstruct()
   initialize(): void {
+    this._componentFactoryResolver = this._ng2Injector.get(ComponentFactoryResolver);
+    this.component = this._viewFactory.getTokenFrom(this._configuration);
+    
+    this._configuration = {
+      ...this._configuration,
+      token: this.component,
+      useFactory: this.factory.bind(this),
+      deps: [ ViewContainer ]
+    };
+
     super.initialize();
 
     this.viewContainerCreated
+      .map(event => event.container)
       .mergeMap(container => container.componentReady.filter(Boolean))
       .map(() => this._viewContainer)
       .subscribe(this._onComponentInitialized.bind(this));
@@ -138,7 +131,7 @@ export class AngularView extends View {
   protected _checkForNg1Init(): void {
     this._isCheckingForNg1 = true;
     
-    if (this._injector.get('$injector', null)) {
+    if (this._ng2Injector.get('$injector', null)) {
       this._isNg1Bootstrapped = true;
       this._ng1Bootstrapped.next();
       this._ng1Bootstrapped.complete();
@@ -168,12 +161,12 @@ export class AngularView extends View {
 
     const token = this.component;
     const metadata = Reflect.getOwnMetadata(VIEW_CONFIG_KEY, token) as ViewComponentConfig;
-    const ng1Injector = this._injector.get('$injector') as ng.auto.IInjectorService;
+    const ng1Injector = this._ng2Injector.get('$injector') as angular.Injector;
     const componentRef = ng1Injector.instantiate<Angular1ComponentFactory<T>>(Angular1ComponentFactory, {
       viewContainer,
       Component: token,
       config: metadata,
-      $scope: this._plugin.scope || ng1Injector.get('$rootScope'),
+      $scope: this._plugin.scope || ng1Injector.get<angular.Scope>('$rootScope'),
       providers: this.getNg1Providers({}, viewContainer)
     })
 
@@ -192,7 +185,7 @@ export class AngularView extends View {
         ],
         viewContainer
       ), 
-      this._injector
+      this._ng2Injector
     );
     
     const componentRef = this._viewContainerRef.createComponent(
@@ -262,7 +255,7 @@ export class AngularView extends View {
     }
   }
 
-  private _onNg1ComponentDestroyed<T>(scope: ng.IScope, container: ViewContainer<T>): void {
+  private _onNg1ComponentDestroyed<T>(scope: angular.Scope, container: ViewContainer<T>): void {
     if (container.component && typeof container.component['$onDestroy'] === 'function') {
       container.component['$onDestroy']();
     }

@@ -15,14 +15,7 @@ import { BusEvent } from './BusEvent';
  */
 export class EventBus {
   private _bus: Subject<any> = new Subject();
-  private _observable: Observable<any>;
-
-  /**
-   * Creates an instance of EventBus.
-   */
-  constructor() {
-    this._observable = this._bus.asObservable();
-  }
+  private _observable: Observable<any> = this._bus.asObservable();
 
   /**
    * Subscribes to a specific event type.

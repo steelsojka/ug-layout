@@ -1,7 +1,7 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
-import { Type, Inject, Injector } from '../di';
+import { Type, Inject, Injector, PostConstruct } from '../di';
 import { 
   RenderableInjector, 
   Renderable, 
@@ -56,6 +56,8 @@ export class Stack extends Renderable {
   private _activeIndex: number = 0;
   protected _contentItems: StackItemContainer[] = [];
   protected _config: StackConfig;
+
+  @Inject(ContainerRef) protected _container: Renderable;
   
   /**
    * Creates an instance of Stack.
@@ -64,7 +66,6 @@ export class Stack extends Renderable {
    */
   constructor(
     @Inject(ConfigurationRef) _config: StackConfigArgs,
-    @Inject(ContainerRef) protected _container: Renderable
   ) {
     super();
     
@@ -154,6 +155,7 @@ export class Stack extends Renderable {
    * @listens {TabSelectionEvent}
    * @listens {TabDragEvent}
    */
+  @PostConstruct()
   initialize(): void {
     super.initialize();
     

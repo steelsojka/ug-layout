@@ -1,5 +1,7 @@
 import test from 'ava';
 import { stub, spy } from 'sinon';
+import { getRenderable } from '../../test/unit/helpers';
+import { DocumentRef, PatchRef } from '../common';
 
 import { Renderer } from './Renderer';
 
@@ -10,7 +12,10 @@ const document = {
 const patch = stub();
 
 function getRenderer(): Renderer {
-  return new Renderer(document as any, patch);
+  return getRenderable(Renderer, [
+    { provide: DocumentRef, useValue: document },
+    { provide: PatchRef, useValue: patch }
+  ]);
 }
 
 test('initializing', t => {
@@ -21,12 +26,9 @@ test('initializing', t => {
   const mount = {};
   
   document.createElement.returns(mount);
-  renderer.initialize(el as any);
+  renderer.initialize();
 
   t.is((<any>renderer)._mountPoint, mount);
-  t.is((<any>renderer)._containerEl, el);
-  t.true(el.appendChild.called);
-  t.is(el.appendChild.firstCall.args[0], mount);
 });
 
 test('setting the node generator', t => {

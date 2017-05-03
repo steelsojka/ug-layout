@@ -1,10 +1,14 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "target": "es2015",
-    "outDir": "dist/es2015",
+    "target": "es5",
+    "outDir": "dist/es5",
     "declaration": true,
-    "declarationDir": "dist/es2015"
+    "declarationDir": "dist/es5",
+    "lib": [
+      "ES2015",
+      "DOM"
+    ]
   },
   "include": [
     "src/**/*"

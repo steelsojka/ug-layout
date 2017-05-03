@@ -22,7 +22,7 @@
     "build:docs": "tsc -p tsconfig.docs.json",
     "build:test": "tsc -p tsconfig.test.json",
     "build:es2015": "tsc -p tsconfig.es2015.json",
-    "build:es5": "babel dist/es2015 --copy-files --ignore .map --out-dir dist/es5 --source-maps",
+    "build:es5": "tsc -p tsconfig.es5.json",
     "build:styles": "cp -R src/styles dist",
     "start": "webpack-dev-server"
   },
@@ -37,11 +37,6 @@
     "@types/reflect-metadata": "0.0.5",
     "@types/sinon": "^1.16.34",
     "ava": "^0.18.2",
-    "babel-cli": "^6.22.2",
-    "babel-core": "^6.22.1",
-    "babel-loader": "^6.2.10",
-    "babel-polyfill": "^6.23.0",
-    "babel-preset-es2015": "^6.22.0",
     "chokidar-cli": "^1.2.0",
     "css-loader": "^0.26.1",
     "esdoc": "^0.5.2",
@@ -55,15 +50,15 @@
     "ts-loader": "^2.0.0",
     "ts-node": "^2.1.0",
     "typedoc": "^0.5.7",
-    "typescript": "^2.2.1",
+    "typescript": "^2.3.0",
     "webpack": "^2.2.1",
     "webpack-dev-server": "^2.2.1"
   },
   "dependencies": {
-    "mindi": "^2.0.2",
+    "mindi": "^2.4.1",
     "rxjs": "^5.1.0",
     "snabbdom": "^0.6.3",
-    "tslib": "^1.5.0"
+    "tslib": "^1.6.1"
   },
   "ava": {
     "files": [

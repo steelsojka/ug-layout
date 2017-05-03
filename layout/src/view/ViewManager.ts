@@ -29,6 +29,8 @@ export interface ViewResolutionOptions {
 }
 
 export class ViewManager {
+  @Inject(ViewFactory) private _viewFactory: ViewFactory;
+
   private _views: Map<any, { [key: string]: ViewContainer<any> }> = new Map();
   private _refs: Map<string, ViewContainer<any>> = new Map();
   private _resolved: Subject<ViewManagerEvent<any>> = new Subject();
@@ -42,10 +44,6 @@ export class ViewManager {
   destroyed: Observable<void> = this._destroyed.asObservable();
   refChanges: Observable<RefChangeEvent<any>> = this._refChanges.asObservable();
   viewInit: Observable<ViewManagerEvent<any>> = this._viewInit.asObservable();
-  
-  constructor(
-    @Inject(ViewFactory) private _viewFactory: ViewFactory
-  ) {}
 
   has(token: any, id?: number): boolean {
     const map = this.getAll(token);

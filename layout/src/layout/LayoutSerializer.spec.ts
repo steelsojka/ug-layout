@@ -4,13 +4,17 @@ import { spy } from 'sinon';
 import { Layout } from './Layout';
 import { LayoutSerializer } from './LayoutSerializer';
 import { ConfiguredRenderable } from '../dom';
+import { ContainerRef } from '../common';
+import { getRenderable } from '../../test/unit/helpers';
 
 let container;
 let serializer: LayoutSerializer;
 
 test.beforeEach(() => {
   container = {};
-  serializer = new LayoutSerializer(container as any);
+  serializer = getRenderable(LayoutSerializer, [
+    { provide: ContainerRef, useValue: container }
+  ]);
 });
 
 

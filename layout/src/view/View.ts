@@ -1,7 +1,7 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
-import { Type, ProviderArg, Inject, Injector, Optional, forwardRef } from '../di';
+import { Type, ProviderArg, Inject, Injector, Optional, forwardRef, PostConstruct } from '../di';
 import { Renderer, Renderable, ConfiguredRenderable } from '../dom';
 import { ContainerRef, ConfigurationRef, ElementRef, DocumentRef, ContextType } from '../common';
 import { Stack } from '../stack';
@@ -28,6 +28,13 @@ export class View extends Renderable {
   protected _sizeChanges: BehaviorSubject<SizeChanges> = new BehaviorSubject({ width: -1, height: -1 });
   protected _viewContainerCreated: Subject<{ fromCache: boolean, container: ViewContainer<any> }> = new Subject();
   protected _initialCreate: boolean = true;
+
+  @Inject(ContainerRef) protected _container: Renderable;
+  @Inject(ConfigurationRef) protected _configuration: ViewConfig;
+  @Inject(ViewManager) protected _viewManager: ViewManager;
+  @Inject(ViewFactory) protected _viewFactory: ViewFactory;
+  @Inject(DocumentRef) protected _document: Document;
+  @Inject(StateContext) protected _stateContext: StateContext;
   
   /**
    * Notifies when the visibility of this view changes.
@@ -45,25 +52,6 @@ export class View extends Renderable {
    * @type {Observable<ViewContainer<any>>}
    */
   viewContainerCreated: Observable<{ fromCache: boolean, container: ViewContainer<any> }> = this._viewContainerCreated.asObservable();
-  
-  /**
-   * Creates an instance of View.
-   * @param {Renderable} _container 
-   * @param {ViewConfig} _configuration 
-   * @param {ViewManager} _viewManager 
-   * @param {ViewFactory} _viewFactory 
-   * @param {Document} _document 
-   */
-  constructor(
-    @Inject(ContainerRef) protected _container: Renderable,
-    @Inject(ConfigurationRef) protected _configuration: ViewConfig,
-    @Inject(ViewManager) protected _viewManager: ViewManager,
-    @Inject(ViewFactory) protected _viewFactory: ViewFactory,
-    @Inject(DocumentRef) protected _document: Document,
-    @Inject(StateContext) protected _stateContext: StateContext
-  ) {
-    super();
-  }
 
   get width(): number {
     return this._container.width;
@@ -129,6 +117,7 @@ export class View extends Renderable {
     return this._viewFactory.getTokenFrom(this._configuration);
   }
 
+  @PostConstruct()
   initialize(): void {
     super.initialize();
     

@@ -10,9 +10,7 @@ export interface SerializedRootLayout extends Serialized {
 }
 
 export class RootLayoutSerializer implements Serializer<RootLayout, SerializedRootLayout> {
-  constructor(
-    @Inject(SerializerContainer) private _container: SerializerContainer
-  ) {}
+  @Inject(SerializerContainer) private _container: SerializerContainer;
   
   serialize(node: RootLayout): SerializedRootLayout {
     return {

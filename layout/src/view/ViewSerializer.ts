@@ -15,9 +15,7 @@ export interface SerializedView extends SerializedRenderable {
 }
 
 export class ViewSerializer implements Serializer<View, SerializedView> {
-  constructor(
-    @Inject(SerializerContainer) private _container: SerializerContainer
-  ) {}
+  @Inject(SerializerContainer) private _container: SerializerContainer;
   
   serialize(node: View): SerializedView {
     const token = this._container.resolveClassString(node.token);

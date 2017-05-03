@@ -1,6 +1,7 @@
 import { ViewContainer } from 'ug-layout';
 import { Type } from '@angular/core';
 
+import * as angular from './angular';
 import { ViewComponentConfig, COMPONENT_REF_KEY } from './common';
 
 export class Angular1ComponentFactory<T> {
@@ -15,22 +16,22 @@ export class Angular1ComponentFactory<T> {
     'providers'
   ];
 
-  private _scope: ng.IScope;
+  private _scope: angular.Scope;
   private _instance: T;
   private _element: HTMLElement;
 
   constructor(
-    private _$compile: ng.ICompileService,
-    private _$scope: ng.IScope,
-    private _$templateCache: ng.ITemplateCacheService,
-    private _$injector: ng.auto.IInjectorService,
+    private _$compile: angular.CompileService,
+    private _$scope: angular.Scope,
+    private _$templateCache: angular.TemplateCache,
+    private _$injector: angular.Injector,
     private _viewContainer: ViewContainer<T>,
     private _Component: Type<any>,
     private _config: ViewComponentConfig,
     private _providers: { [key: string]: any }
   ) {}
 
-  get scope(): ng.IScope {
+  get scope(): angular.Scope {
     return this._scope;
   }
 
@@ -45,7 +46,7 @@ export class Angular1ComponentFactory<T> {
   create(): T {
     this._scope = this._$scope.$new();
 
-    let linkFn: ng.ITemplateLinkingFunction;
+    let linkFn: angular.TemplateLinkingFunction;
 
     if (this._config.template) {
       linkFn = this._$compile(this._config.template);
@@ -62,12 +63,12 @@ export class Angular1ComponentFactory<T> {
     }
 
     // Instaniate our controller for the component.
-    this._instance = this._$injector.instantiate(this._Component, {
+    this._instance = this._$injector.instantiate<T>(this._Component, {
       ...this._providers,
       $element: this._viewContainer.element, 
       $scope: this.scope,
       viewContainer: this._viewContainer
-    }) as T;
+    });
 
     // Assign it to scope.
     this.scope[this._config.controllerAs || '$ctrl'] = this.instance;

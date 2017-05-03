@@ -51,11 +51,9 @@ import { getDefaultMetadata } from './decorators';
  * viewLinker.autowire(myController);
  */
 export class ViewLinker {
-  constructor(
-    @Inject(ViewManager) private _viewManager: ViewManager,
-    @Inject(Injector) private _injector: Injector,
-    @Inject(LayoutManipulator) private _manipulator: LayoutManipulator
-  ) {}
+  @Inject(ViewManager) private _viewManager: ViewManager;
+  @Inject(Injector) private _injector: Injector;
+  @Inject(LayoutManipulator) private _manipulator: LayoutManipulator;
   
   /**
    * Wires all types of custom behavior for linker

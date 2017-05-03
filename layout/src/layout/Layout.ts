@@ -1,7 +1,7 @@
 import h from 'snabbdom/h';
 import { VNode } from 'snabbdom/vnode';
 
-import { Injector, Inject, Optional, Injectable } from '../di';
+import { Injector, Inject, Optional, Injectable, PostConstruct } from '../di';
 import { 
   Renderable, 
   RenderableInjector,
@@ -32,13 +32,9 @@ export interface LayoutConfig extends RenderableConfig {
   providers: [ DragHost ]
 })
 export class Layout extends Renderable {
-  constructor(
-    @Inject(ConfigurationRef) private _config: LayoutConfig|null,
-    @Inject(ContainerRef) protected _container: Renderable,
-    @Inject(DragHost) protected _dragHost: DragHost
-  ) {
-    super();
-  }  
+  @Inject(ConfigurationRef) private _config: LayoutConfig|null;
+  @Inject(ContainerRef) protected _container: Renderable;
+  @Inject(DragHost) protected _dragHost: DragHost;
 
   /**
    * The height of the layout in pixels.
@@ -58,6 +54,7 @@ export class Layout extends Renderable {
     return this._container.width;
   }
 
+  @PostConstruct()
   initialize(): void {
     super.initialize();
     

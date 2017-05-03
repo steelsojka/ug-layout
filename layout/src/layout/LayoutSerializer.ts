@@ -14,13 +14,7 @@ export interface SerializedLayout extends SerializedRenderable {
  * @implements {Serializer<Layout, SerializedLayout>}
  */
 export class LayoutSerializer implements Serializer<Layout, SerializedLayout> {
-  /**
-   * Creates an instance of LayoutSerializer.
-   * @param {SerializerContainer} _container 
-   */
-  constructor(
-    @Inject(SerializerContainer) private _container: SerializerContainer
-  ) {}
+  @Inject(SerializerContainer) private _container: SerializerContainer;
   
   /**
    * Serializes a Layout renderable.

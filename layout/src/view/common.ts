@@ -6,8 +6,8 @@ import { ViewContainer, ViewContainerStatus } from './ViewContainer';
 import { LayoutInsertPosition } from '../layout';
 import { RenderableArg } from '../common';
 
-export const ViewComponentRef = new Token('ViewComponentRef');
-export const LinkerMetatdataRef = new Token('LinkerMetadataRef');
+export const ViewComponentRef = new Token<any>('ViewComponentRef');
+export const LinkerMetatdataRef = new Token<any>('LinkerMetadataRef');
 export const VIEW_CONFIG_KEY = 'ugLayout:viewConfig';
 export const VIEW_LINKER_METADATA = 'ugLayout:ViewLinkerMetadata';
 

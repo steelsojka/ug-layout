@@ -1,4 +1,4 @@
-import { Inject } from './di';
+import { Inject, PostConstruct } from './di';
 import { 
   DocumentRef, 
   DropTarget, 
@@ -19,11 +19,7 @@ export class DragHostContainer {
 }
 
 export class DragHost {
-  dropped: Observable<DropArea>;
-  start: Observable<DragHostContainer>;
-  fail: Observable<Renderable>;
-  success: Observable<Renderable>;
-  
+  @Inject(DocumentRef) private _document: Document;
   private _item: Renderable;
   private _dropped: Subject<DropArea> = new Subject();
   private _start: Subject<DragHostContainer> = new Subject();
@@ -31,9 +27,14 @@ export class DragHost {
   private _success: Subject<Renderable> = new Subject();
   private _areas: DropArea[]|null = null;
   private _dropArea: DropArea|null = null;
-  private _element: HTMLElement = this._document.createElement('div');
   private _bounds: RenderableArea|null = null;
   private _dragArea: RenderableArea;
+  private _element: HTMLElement;
+
+  dropped: Observable<DropArea> = this._dropped.asObservable();
+  start: Observable<DragHostContainer> = this._start.asObservable();
+  fail: Observable<Renderable> = this._fail.asObservable();
+  success: Observable<Renderable> = this._success.asObservable();
 
   get bounds(): RenderableArea|null {
     return this._bounds;
@@ -43,23 +44,18 @@ export class DragHost {
     this._bounds = val;
   }
 
-  constructor(
-    @Inject(DocumentRef) private _document: Document
-  ) {
-    this.dropped = this._dropped.asObservable();
-    this.start = this._start.asObservable();
-    this.fail = this._fail.asObservable();
-    this.success = this._success.asObservable();
-    
-    this._element.classList.add('ug-layout__drop-indicator');
-    this._element.hidden = true;
-    this._document.body.appendChild(this._element);
-  }
-
   destroy(): void {
     if (this._document.body.contains(this._element)) {
       this._document.body.removeChild(this._element);
     }
+  }
+
+  @PostConstruct()
+  init(): void {
+    this._element = this._document.createElement('div');
+    this._element.classList.add('ug-layout__drop-indicator');
+    this._element.hidden = true;
+    this._document.body.appendChild(this._element);
   }
 
   initialize(container: DragHostContainer): void {

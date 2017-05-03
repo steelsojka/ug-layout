@@ -1,16 +1,18 @@
 import { Renderer, UgPlugin, RootLayout, Token } from 'ug-layout';
 import { ViewContainerRef, Injector } from '@angular/core';
 
+import * as angular from './angular';
+
 export interface AngularPluginConfig {
   viewContainerRef: ViewContainerRef;
   ngInjector: Injector;
-  scope?: ng.IScope;
+  scope?: angular.Scope;
 }
 
 export class AngularPlugin extends UgPlugin {
   private _viewContainerRef: ViewContainerRef;
   private _injector: Injector;
-  private _scope: ng.IScope|null;
+  private _scope: angular.Scope|null;
 
   constructor(config: AngularPluginConfig) {
     super();
@@ -38,7 +40,7 @@ export class AngularPlugin extends UgPlugin {
     return this._injector;
   }
 
-  get scope(): ng.IScope|null {
+  get scope(): angular.Scope|null {
     return this._scope;
   }
 
