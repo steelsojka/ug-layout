@@ -31,7 +31,7 @@ export interface RootLayoutCreationConfig {
 }
 
 export interface RootLayoutCreationConfigArgs {
-  container: HTMLElement;
+  container?: HTMLElement;
   plugins?: UgPlugin[];
   providers?: ProviderArg[];
   interceptors?: ProviderArg[];
@@ -129,20 +129,27 @@ export class RootLayout extends Renderable {
     this._isInitialized = true;
 
     for (const plugin of this._rootConfig.plugins) {
-      plugin.initialize(this);
+      if (plugin.initialize) {
+        plugin.initialize(this);
+      }
     }
   }
 
   load(config: ConfiguredRenderable<RootLayout>|RootLayoutConfig, options: { context?: string } = {}): void {
     const { context = ContextType.LOAD } = options;
 
-    this._stateContext.setContext(context);
-    this._contentItems.forEach(item => item.destroy());
+    this.reset(context);
     this._config = ConfiguredRenderable.resolveConfiguration(config);
     this._contentItems = [ this.createChild(this._config.use) ];
     
     this.resize();
     this.update();
+  }
+
+  reset(context: string = ContextType.NONE): void {
+    this._stateContext.setContext(context);
+    this._contentItems.forEach(item => item.destroy());
+    this._contentItems = [];
   }
 
   setContainingNode(node: Node): void {
@@ -171,17 +178,25 @@ export class RootLayout extends Renderable {
     }) as T[];
   }
 
-  static create<T extends RootLayout>(config: RootLayoutCreationConfigArgs): T {
+  static create<T extends RootLayout>(config: RootLayoutCreationConfigArgs = {}): T {
     const _config = defaults(config, {
       plugins: [],
       providers: [] 
     }) as RootLayoutCreationConfig;
-    
-    const rootInjector = new RootInjector([
+
+    const providers = _config.plugins.reduce((result, plugin) => {
+      if (plugin.configureProviders) {
+        return plugin.configureProviders(result);
+      }
+
+      return result;
+    }, [
       { provide: ElementRef, useValue: config.container },
       { provide: RootConfigRef, useValue: config },
       ..._config.providers
     ]);
+    
+    const rootInjector = new RootInjector(providers);
 
     return RenderableInjector.fromRenderable(
       RootLayout, 

@@ -1,11 +1,13 @@
 import { Token, Type } from '../di';
 import { View } from './View';
 import { BeforeDestroyEvent } from '../events';
-import { Renderable, RenderableConfig } from '../dom';
+import { Renderable, RenderableConfig, ConfiguredRenderable } from '../dom';
 import { ViewContainer, ViewContainerStatus } from './ViewContainer';
 import { LayoutInsertPosition } from '../layout';
 import { RenderableArg } from '../common';
+import { ConfiguredItem } from '../ConfiguredItem';
 
+export const VIEW_COMPONENT_CONFIG = new Token<any>('ViewComponentConfig');
 export const ViewComponentRef = new Token<any>('ViewComponentRef');
 export const LinkerMetatdataRef = new Token<any>('LinkerMetadataRef');
 export const VIEW_CONFIG_KEY = 'ugLayout:viewConfig';
@@ -109,8 +111,8 @@ export interface ViewConfig extends RenderableConfig {
   token?: any;
   ref?: string|null;
   resolution?: ResolverStrategy;
-  useFactory?: () => any;
+  useFactory?: (() => any)|ConfiguredItem<any, any>;
   useValue?: any;
-  useClass?: Type<any>;
+  useClass?: Type<any>|ConfiguredItem<any, any>;
   deps?: any[];
 }

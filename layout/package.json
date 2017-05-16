@@ -55,12 +55,13 @@
     "webpack-dev-server": "^2.2.1"
   },
   "dependencies": {
-    "mindi": "^2.4.2",
+    "mindi": "^2.6.1",
     "snabbdom": "^0.6.3",
     "tslib": "^1.6.0"
   },
   "peerDependencies": {
-    "rxjs": "^5.0.0"
+    "rxjs": "^5.0.0",
+    "reflect-metadata": "^0.1.9"
   },
   "ava": {
     "files": [

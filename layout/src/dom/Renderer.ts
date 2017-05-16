@@ -35,6 +35,10 @@ export class Renderer {
   }
 
   setContainer(containerEl: Node): void { 
+    if (this._containerEl === containerEl) {
+      return;
+    }
+
     this._containerEl = containerEl;
     this._containerEl.appendChild(this._mountPoint);
     this.reset();

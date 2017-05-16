@@ -2,10 +2,12 @@ import {
   ViewComponentConfig, 
   ViewConfig, 
   ViewComponentRef, 
-  VIEW_CONFIG_KEY
+  VIEW_CONFIG_KEY,
+  VIEW_COMPONENT_CONFIG
 } from './common';
 import { Injector, Inject, Optional, ProviderArg, Type } from '../di';
 import { View } from './View';
+import { ConfiguredItem } from '../ConfiguredItem';
 import { ViewContainer } from './ViewContainer';
 import { ElementRef, ContainerRef } from '../common';
 import { get, isFunction } from '../utils';
@@ -21,7 +23,7 @@ export interface ViewFactoryArgs {
  * @class ViewFactory
  */
 export class ViewFactory {
-  @Inject(Injector) private _injector: Injector;
+  @Inject(Injector) protected _injector: Injector;
 
   /**
    * Creates a view container from the given configuration.
@@ -31,23 +33,33 @@ export class ViewFactory {
    */
   create<T>(args: ViewFactoryArgs): ViewContainer<T> {
     let { config } = args;
+    let viewConfig = null;
     const { injector = this._injector } = args;
     const isLazy = this.resolveConfigProperty(config, 'lazy');
     const providers: ProviderArg[] = [ this._getViewContainerProvider(config) ];
 
     if (config.useFactory) {
+      viewConfig = ConfiguredItem.resolveConfig<any>(config.useFactory, null);
+
       providers.push({
         provide: ViewComponentRef, 
-        useFactory: config.useFactory,
+        useFactory: ConfiguredItem.resolveItem(config.useFactory),
         deps: config.deps
       });
     } else if (config.useClass) {
-      providers.push({ provide: ViewComponentRef, useClass: config.useClass });
+      viewConfig = ConfiguredItem.resolveConfig<any>(config.useClass, null);
+
+      providers.push({ provide: ViewComponentRef, useClass: ConfiguredItem.resolveItem(config.useClass) });
     } else if (config.useValue) {
       providers.push({ provide: ViewComponentRef, useValue: config.useValue });
     } else {
       throw new Error('View config has no creatable view.');
     }
+
+    providers.push({
+      provide: VIEW_COMPONENT_CONFIG,
+      useValue: viewConfig != null ? viewConfig : undefined // Use undefined to allow for default assignment
+    });
 
     const viewInjector = Injector.fromInjectable(ViewContainer, providers, injector);
     const viewContainer = viewInjector.get(ViewContainer);
@@ -81,9 +93,9 @@ export class ViewFactory {
     }
     
     if (config.useClass) {
-      return config.useClass;
+      return ConfiguredItem.resolveItem(config.useClass);
     } else if (config.useFactory) {
-      return config.useFactory;
+      return ConfiguredItem.resolveItem(config.useFactory);
     } else if (config.useValue) {
       return config.useValue;
     }
@@ -129,7 +141,7 @@ export class ViewFactory {
 
   destroy(): void {}
 
-  private _getViewContainerProvider(config: ViewConfig): ProviderArg {
+  protected _getViewContainerProvider(config: ViewConfig): ProviderArg {
     let viewContainerProvider = this.resolveMetaConfigProperty<ProviderArg>(this.getTokenFrom(config), 'container') || ViewContainer;
 
     if (isFunction(viewContainerProvider)) {

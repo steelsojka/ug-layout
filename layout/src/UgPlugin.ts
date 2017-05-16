@@ -1,5 +1,7 @@
+import { ProviderArg } from './di';
 import { RootLayout } from './RootLayout';
 
-export class UgPlugin {
-  initialize(root: RootLayout): void {}
+export interface UgPlugin {
+  initialize?(root: RootLayout): void; 
+  configureProviders?(providers: ProviderArg[]): ProviderArg[];
 }

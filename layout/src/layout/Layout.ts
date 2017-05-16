@@ -104,15 +104,7 @@ export class Layout extends Renderable {
       });
   }
 
-  private _onDragHostStart(container: DragHostContainer): void {
-    const { offsetX, offsetY, height, width } = this;
-    const { dragArea, item } = container;
-    
-    this._dragHost.bounds = new RenderableArea(offsetX, width + offsetX - dragArea.width, offsetY, height + offsetY - dragArea.height);
-    this._dragHost.setDropAreas(this._getDropTargets(item));
-  }
-
-  private _getDropTargets(target: Renderable): DropArea[] {
+  getDropTargets(target: Renderable): DropArea[] {
     return this.getItemVisibleAreas()
       .filter(({ item }) => {
         return DragHost.isDropTarget(item) 
@@ -121,6 +113,14 @@ export class Layout extends Renderable {
           && !target.contains(item)
           && !target.isContainedWithin(item);
       }) as any; 
+  }
+
+  private _onDragHostStart(container: DragHostContainer): void {
+    const { offsetX, offsetY, height, width } = this;
+    const { dragArea, item } = container;
+    
+    this._dragHost.bounds = new RenderableArea(offsetX, width + offsetX - dragArea.width, offsetY, height + offsetY - dragArea.height);
+    this._dragHost.setDropAreas(this.getDropTargets(item));
   }
 
   /**

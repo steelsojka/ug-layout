@@ -7,6 +7,8 @@ import {
 export const PRIVATE_PREFIX = '__$'
 export const COMPONENT_REF_KEY = `${PRIVATE_PREFIX}componentRef__`;
 export const SCOPE_REF_KEY = `${PRIVATE_PREFIX}scope__`;
+export const ANGULAR_TAG = 'ANGUALR_VIEW_TAG';
+export const ANGULAR_PLUGIN = new Token('ANGULAR_PLUGIN');
 
 export interface ViewComponentConfig extends _ViewComponentConfig {
   /**

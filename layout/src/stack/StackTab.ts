@@ -130,7 +130,7 @@ export class StackTab extends Renderable {
   }
 
   get isDraggable(): boolean {
-    const { item } = this
+    const { item } = this;
 
     if (this._lockState.get(LOCK_DRAGGING) || !item || !item.draggable) {
       return false;

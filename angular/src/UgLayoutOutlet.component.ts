@@ -9,13 +9,14 @@ import {
   SimpleChanges,
   ViewChild,
   EventEmitter,
-  OnDestroy
+  OnDestroy,
+  Type
 } from '@angular/core';
 import { RootLayout, ProviderArg, Renderable, ConfiguredRenderable, Layout } from 'ug-layout';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
-import { AngularPlugin } from './AngularPlugin';
+import { AngularPlugin, AngularPluginConfig } from './AngularPlugin';
 import { DestroyNotifyEvent } from './DestroyNotifyEvent';
 
 @Component({
@@ -33,6 +34,7 @@ export class UgLayoutOutletComponent implements OnChanges, OnDestroy {
   @Input() persist?: boolean = false;
   @Input() root?: RootLayout;
   @Input() destroyNotifier?: Observable<void>;
+  @Input() pluginFactory?: (config: AngularPluginConfig) => AngularPlugin;
   @Output() initialized: EventEmitter<RootLayout> = new EventEmitter();
 
   @ViewChild('container', { read: ViewContainerRef })
@@ -60,13 +62,15 @@ export class UgLayoutOutletComponent implements OnChanges, OnDestroy {
 
       this._rootLayout.setContainingNode(this._viewContainerRef.element.nativeElement);
     } else {
+      const pluginConfig = {
+        ngInjector: this._injector,
+        viewContainerRef: this._viewContainerRef
+      };
+
+      const plugin = this.pluginFactory ? this.pluginFactory(pluginConfig) : new AngularPlugin(pluginConfig);
+
       this._rootLayout = RootLayout.create({
-        plugins: [
-          new AngularPlugin({
-            ngInjector: this._injector,
-            viewContainerRef: this._viewContainerRef
-          })  
-        ],
+        plugins: [ plugin ],
         container: this._viewContainerRef.element.nativeElement
       });
 
