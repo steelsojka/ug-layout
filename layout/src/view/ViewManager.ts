@@ -7,7 +7,8 @@ import {
   ViewConfig, 
   ViewComponentConfig, 
   ResolverStrategy,
-  ViewQueryArgs
+  ViewQueryArgs,
+  ViewQueryResolveType
 } from './common';
 import { propEq } from '../utils';
 
@@ -17,10 +18,8 @@ export interface ViewManagerEvent<T> {
   container: ViewContainer<T>;
 }
 
-export interface RefChangeEvent<T> {
+export interface RefChangeEvent<T> extends ViewManagerEvent<T> {
   ref: string;
-  container: ViewContainer<T>;
-  token: any;
   type: 'add'|'remove';
 }
 
@@ -240,24 +239,24 @@ export class ViewManager {
    * @returns {Observable<ViewContainer<T>>} 
    */
   subscribeToQuery<T>(query: ViewQueryArgs = {}): Observable<ViewContainer<T>> {
-    const { ref, token, id } = query;
+    const { ref, token, id, type = [ ViewQueryResolveType.INIT ] } = query;
   
     if (ref) {
-      return this.queryRef(ref);
+      return this.queryRef(ref, type);
     } else if (token) {
-      return this.queryToken(token, id);
+      return this.queryToken(token, id, type);
     }
 
     return Observable.empty();
   }
 
-  queryToken<T>(token: any, id?: number): Observable<ViewContainer<T>> {
+  queryToken<T>(token: any, id?: number, types: ViewQueryResolveType[] = [ ViewQueryResolveType.INIT ]): Observable<ViewContainer<T>> {
     return Observable.create((observer: Observer<ViewContainer<T>>) => {
       for (const container of this.query<T>({ token, id })) {
         observer.next(container);
       }
 
-      return this.viewInit
+      return this._resolveViewQueryStream(types)
         .filter(propEq('token', token))
         .filter(e => id ? id === e.container.id : true)
         .map(e => e.container)
@@ -265,7 +264,7 @@ export class ViewManager {
     });
   }
 
-  queryRef<T>(ref: string): Observable<ViewContainer<T>> {
+  queryRef<T>(ref: string, types: ViewQueryResolveType[] = [ ViewQueryResolveType.INIT ]): Observable<ViewContainer<T>> {
     return Observable.create((observer: Observer<ViewContainer<T>>) => {
       const result = this.query<T>({ ref });
       
@@ -273,7 +272,7 @@ export class ViewManager {
         observer.next(result[0]);
       }
 
-      return this.refChanges
+      return this._resolveViewQueryStream(types)
         .filter(propEq('type', 'add'))
         .filter(propEq('ref', ref))
         .map(e => e.container)
@@ -303,6 +302,20 @@ export class ViewManager {
     }
 
     return [];
+  }
+
+  private _resolveViewQueryStream<T>(types: ViewQueryResolveType[]): Observable<ViewManagerEvent<T>> {
+    const streams: Observable<ViewManagerEvent<T>>[] = [];
+
+    if (types.indexOf(ViewQueryResolveType.INIT) !== -1) {
+      streams.push(this.viewInit);
+    }
+
+    if (types.indexOf(ViewQueryResolveType.RESOLVE) !== -1) {
+      streams.push(this.resolved);
+    }
+
+    return streams.length > 0 ? Observable.merge(...streams) : Observable.empty();
   }
 
   private _assertAndReadComponent(token: any): ViewComponentConfig {

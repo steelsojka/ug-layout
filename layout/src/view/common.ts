@@ -31,10 +31,16 @@ export enum CacheStrategy {
   RELOAD 
 }
 
+export enum ViewQueryResolveType {
+  INIT,
+  RESOLVE
+}
+
 export interface ViewQueryArgs {
   ref?: string;
   token?: any;
   id?: number;
+  type?: ViewQueryResolveType[];
 }
 
 export interface ViewQueryReadOptions {

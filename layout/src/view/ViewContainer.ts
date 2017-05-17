@@ -73,6 +73,7 @@ export class ViewContainer<T> {
   private _retry: Function|null = null;
   private _statusInternal: ViewContainerStatus;
   private _failedReason: ViewFailReason|null = null;
+  private _isAttached: boolean = true;
 
   @Inject(DocumentRef) protected _document: Document;
   @Inject(Injector) protected _injector: Injector;
@@ -348,8 +349,6 @@ export class ViewContainer<T> {
         .takeUntil(this.containerChange)
         .subscribe(e => this._onCustomViewHook(e));
     }
-
-    this._attached.next(Boolean(this._container));
   }
 
   /**
@@ -427,10 +426,23 @@ export class ViewContainer<T> {
   }
 
   /**
-   * Detaches this container from it's view.
+   * Detaches this container.
    */
   detach(): void {
-    this.setView(null);
+    if (this._isAttached) {
+      this._isAttached = false;
+      this._attached.next(false);
+    }
+  }
+
+  /**
+   * Attaches this container.
+   */
+  attach(): void {
+    if (!this._isAttached) {
+      this._isAttached = true;
+      this._attached.next(true);
+    }
   }
 
   fail(reason: ViewFailReason, retry?: Function|null): void {

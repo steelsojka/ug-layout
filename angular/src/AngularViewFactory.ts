@@ -30,10 +30,17 @@ import * as angular from './angular';
 import { AngularPlugin } from './AngularPlugin';
 import { DestroyNotifyEvent } from './DestroyNotifyEvent';
 import { Angular1ComponentFactory } from './Angular1ComponentFactory';
-import { ANGULAR_TAG, ViewComponentConfig, COMPONENT_REF_KEY, ANGULAR_PLUGIN } from './common';
+import { 
+  ANGULAR_TAG, 
+  ViewComponentConfig, 
+  COMPONENT_REF_KEY, 
+  ANGULAR_PLUGIN,
+  ANGULAR_GLOBAL
+} from './common';
 
 export class AngularViewFactory extends ViewFactory {
   @Inject(ANGULAR_PLUGIN) protected _plugin: AngularPlugin;
+  @Inject(ANGULAR_GLOBAL) protected _angularGlobal: any;
 
   protected _componentFactoryResolver: ComponentFactoryResolver;
   protected _ng1Bootstrapped: Subject<void> = new Subject<void>();
@@ -245,6 +252,12 @@ export class AngularViewFactory extends ViewFactory {
     }
 
     scope.$destroy();
+
+    // Angular 1 emits a `$destroy` event when a node is removed from the DOM.
+    // We need to simulate this event.
+    if (this._angularGlobal) {
+      this._angularGlobal.element(container.element).remove();
+    }
   }
 
   private _onComponentDestroy<T>(componentRef: ComponentRef<T>): void {

@@ -8,7 +8,7 @@ import {
 } from 'ug-layout';
 import { ViewContainerRef, Injector } from '@angular/core';
 
-import { ANGULAR_PLUGIN } from './common';
+import { ANGULAR_PLUGIN, ANGULAR_GLOBAL } from './common';
 import * as angular from './angular';
 import { AngularViewFactory } from './AngularViewFactory';
 
@@ -16,16 +16,19 @@ export interface AngularPluginConfig {
   viewContainerRef: ViewContainerRef;
   ngInjector: Injector;
   scope?: angular.Scope;
+  angularGlobal?: any
 }
 
 export class AngularPlugin implements UgPlugin {
   private _viewContainerRef: ViewContainerRef;
   private _injector: Injector;
   private _scope: angular.Scope|null;
+  private _angularGlobal: any;
 
   constructor(config: AngularPluginConfig) {
     this.setInjector(config.ngInjector);
     this.setViewContainerRef(config.viewContainerRef);
+    this._angularGlobal = config.angularGlobal || null;
     this._scope = config.scope || null;
   }
   
@@ -42,7 +45,8 @@ export class AngularPlugin implements UgPlugin {
     return [
       ...providers,
       { provide: ANGULAR_PLUGIN, useValue: this },
-      { provide: ViewFactory, useClass: AngularViewFactory }
+      { provide: ViewFactory, useClass: AngularViewFactory },
+      { provide: ANGULAR_GLOBAL, useValue: this._angularGlobal }
     ];
   }
 

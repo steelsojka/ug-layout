@@ -229,6 +229,7 @@ export class View extends Renderable {
     }
 
     this._viewContainer.setView(this);
+    this._viewContainer.attach();
     this._viewContainer.mountTo(element);
   }
 
