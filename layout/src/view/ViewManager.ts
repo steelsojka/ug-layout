@@ -36,13 +36,11 @@ export class ViewManager {
   private _created: Subject<ViewManagerEvent<any>> = new Subject();
   private _destroyed: Subject<void> = new Subject<void>();
   private _refChanges: Subject<RefChangeEvent<any>> = new Subject();
-  private _viewInit: Subject<ViewManagerEvent<any>> = new Subject();
 
   resolved: Observable<ViewManagerEvent<any>> = this._resolved.asObservable();
   created: Observable<ViewManagerEvent<any>> = this._created.asObservable();
   destroyed: Observable<void> = this._destroyed.asObservable();
   refChanges: Observable<RefChangeEvent<any>> = this._refChanges.asObservable();
-  viewInit: Observable<ViewManagerEvent<any>> = this._viewInit.asObservable();
 
   has(token: any, id?: number): boolean {
     const map = this.getAll(token);
@@ -88,7 +86,6 @@ export class ViewManager {
     this._created.complete();
     this._resolved.complete();
     this._refChanges.complete();
-    this._viewInit.complete();
   }
 
   getRef<T>(ref: string): ViewContainer<T>|null {
@@ -198,6 +195,86 @@ export class ViewManager {
     }
   }
 
+  /**
+   * Notifies when the a view is registered matching the given query.
+   * @template T 
+   * @param {{ token?: any, ref?: string }} [query={}] 
+   * @returns {Observable<ViewContainer<T>>} 
+   */
+  subscribeToQuery<T>(query: ViewQueryArgs = {}): Observable<ViewContainer<T>> {
+    const { ref, token, id, type = [ ViewQueryResolveType.INIT ] } = query;
+  
+    if (ref) {
+      return this.queryRef(ref, type);
+    } else if (token) {
+      return this.queryToken(token, id, type);
+    }
+
+    return Observable.empty();
+  }
+
+  queryToken<T>(token: any, id?: number, types: ViewQueryResolveType[] = [ ViewQueryResolveType.INIT ]): Observable<ViewContainer<T>> {
+    return Observable.create((observer: Observer<ViewContainer<T>>) => {
+      const hasInit = types.indexOf(ViewQueryResolveType.INIT) !== -1;
+
+      if (hasInit) {
+        for (const container of this.query<T>({ token, id })) {
+          observer.next(container);
+        }
+      }
+
+      return this._resolveViewQueryStream(types, this.created)
+        .filter(propEq('token', token))
+        .filter(e => id ? id === e.container.id : true)
+        .map(e => e.container)
+        .subscribe(observer);
+    });
+  }
+
+  queryRef<T>(ref: string, types: ViewQueryResolveType[] = [ ViewQueryResolveType.INIT ]): Observable<ViewContainer<T>> {
+    return Observable.create((observer: Observer<ViewContainer<T>>) => {
+      const hasInit = types.indexOf(ViewQueryResolveType.INIT) !== -1;
+
+      if (hasInit) {
+        const result = this.query<T>({ ref });
+        
+        if (result.length) {
+          observer.next(result[0]);
+        }
+      }
+
+      return this._resolveViewQueryStream(types, this.refChanges)
+        .filter(e => e['type'] == null || e['type'] === 'add')
+        .filter(propEq('ref', ref))
+        .map(e => e.container)
+        .subscribe(observer);
+    });
+  }
+
+  query<T>(query: ViewQueryArgs): ViewContainer<T>[] {
+    const { ref, id, token } = query;
+    
+    if (ref && this._refs.has(ref)) {
+      return [ this._refs.get(ref) as ViewContainer<T> ];
+    } else if (token) {
+      if (this.has(token)) {
+        const containers = this.getAll(token) as { [key: number]: ViewContainer<T> };
+
+        if (!id) {
+          return Object.keys(containers).map(id => containers[id]);
+        }
+        
+        for (const containerId of Object.keys(containers)) {
+          if (id && containerId === id.toString()) {
+            return [ containers[containerId] ];
+          }
+        }
+      }
+    }
+
+    return [];
+  }
+
   private _resolve<T>(config: ViewConfig, metadata: ViewComponentConfig, options: ViewResolutionOptions): ViewContainer<T>|null {
     const resolution = this._viewFactory.resolveConfigProperty(config, 'resolution');
     let result: ViewContainer<T>|null = null;
@@ -232,83 +309,12 @@ export class ViewManager {
     return result;
   }
 
-  /**
-   * Notifies when the a view is registered matching the given query.
-   * @template T 
-   * @param {{ token?: any, ref?: string }} [query={}] 
-   * @returns {Observable<ViewContainer<T>>} 
-   */
-  subscribeToQuery<T>(query: ViewQueryArgs = {}): Observable<ViewContainer<T>> {
-    const { ref, token, id, type = [ ViewQueryResolveType.INIT ] } = query;
-  
-    if (ref) {
-      return this.queryRef(ref, type);
-    } else if (token) {
-      return this.queryToken(token, id, type);
-    }
 
-    return Observable.empty();
-  }
-
-  queryToken<T>(token: any, id?: number, types: ViewQueryResolveType[] = [ ViewQueryResolveType.INIT ]): Observable<ViewContainer<T>> {
-    return Observable.create((observer: Observer<ViewContainer<T>>) => {
-      for (const container of this.query<T>({ token, id })) {
-        observer.next(container);
-      }
-
-      return this._resolveViewQueryStream(types)
-        .filter(propEq('token', token))
-        .filter(e => id ? id === e.container.id : true)
-        .map(e => e.container)
-        .subscribe(observer);
-    });
-  }
-
-  queryRef<T>(ref: string, types: ViewQueryResolveType[] = [ ViewQueryResolveType.INIT ]): Observable<ViewContainer<T>> {
-    return Observable.create((observer: Observer<ViewContainer<T>>) => {
-      const result = this.query<T>({ ref });
-      
-      if (result.length) {
-        observer.next(result[0]);
-      }
-
-      return this._resolveViewQueryStream(types)
-        .filter(propEq('type', 'add'))
-        .filter(propEq('ref', ref))
-        .map(e => e.container)
-        .subscribe(observer);
-    });
-  }
-
-  query<T>(query: ViewQueryArgs): ViewContainer<T>[] {
-    const { ref, id, token } = query;
-    
-    if (ref && this._refs.has(ref)) {
-      return [ this._refs.get(ref) as ViewContainer<T> ];
-    } else if (token) {
-      if (this.has(token)) {
-        const containers = this.getAll(token) as { [key: number]: ViewContainer<T> };
-
-        if (!id) {
-          return Object.keys(containers).map(id => containers[id]);
-        }
-        
-        for (const containerId of Object.keys(containers)) {
-          if (id && containerId === id.toString()) {
-            return [ containers[containerId] ];
-          }
-        }
-      }
-    }
-
-    return [];
-  }
-
-  private _resolveViewQueryStream<T>(types: ViewQueryResolveType[]): Observable<ViewManagerEvent<T>> {
+  private _resolveViewQueryStream<T>(types: ViewQueryResolveType[], initStream: Observable<ViewManagerEvent<T>>): Observable<ViewManagerEvent<T>> {
     const streams: Observable<ViewManagerEvent<T>>[] = [];
 
     if (types.indexOf(ViewQueryResolveType.INIT) !== -1) {
-      streams.push(this.viewInit);
+      streams.push(initStream);
     }
 
     if (types.indexOf(ViewQueryResolveType.RESOLVE) !== -1) {

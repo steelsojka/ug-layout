@@ -4,6 +4,7 @@ import { GenericSerializer, SerializerContainer, Serializer, Serialized } from '
 import { View } from './View';
 import { isBoolean, isNumber } from '../utils';
 import { ResolverStrategy, CacheStrategy } from './common';
+import { ConfiguredItem } from '../ConfiguredItem';
 
 export interface SerializedView extends SerializedRenderable {
   lazy: boolean|null;
@@ -12,6 +13,7 @@ export interface SerializedView extends SerializedRenderable {
   token: string;
   useClass: string;
   resolution: ResolverStrategy|null;
+  viewComponentConfig: any;
 }
 
 export class ViewSerializer implements Serializer<View, SerializedView> {
@@ -32,7 +34,8 @@ export class ViewSerializer implements Serializer<View, SerializedView> {
       caching: node.caching != null ? node.caching : undefined,
       lazy: node.lazy,
       useClass: token,
-      resolution: node.resolution
+      resolution: node.resolution,
+      viewComponentConfig: node.viewComponentConfig
     };
   }
 
@@ -45,7 +48,8 @@ export class ViewSerializer implements Serializer<View, SerializedView> {
     }
     
     return View.configure({
-      token, useClass,
+      token, 
+      useClass: new ConfiguredItem(useClass, node.viewComponentConfig),
       caching: node.caching != null ? node.caching : undefined,
       lazy: isBoolean(node.lazy) ? node.lazy : undefined,
       resolution: isNumber(node.resolution) ? node.resolution : undefined,

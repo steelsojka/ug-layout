@@ -117,6 +117,10 @@ export class View extends Renderable {
     return this._viewFactory.getTokenFrom(this._configuration);
   }
 
+  get viewComponentConfig(): any | null {
+    return this._viewContainer ? this._viewContainer.viewComponentConfig : null;
+  }
+
   @PostConstruct()
   initialize(): void {
     super.initialize();

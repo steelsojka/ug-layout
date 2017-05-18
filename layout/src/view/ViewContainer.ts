@@ -3,9 +3,9 @@ import { Renderable } from '../dom';
 import { ReplaySubject, Observable, Subject, BeforeDestroyEvent, BehaviorSubject } from '../events';
 import { ContainerRef, ConfigurationRef, DocumentRef } from '../common';
 import { View } from './View';
-import { ViewComponentRef } from './common';
+import { ViewComponentRef, VIEW_COMPONENT_CONFIG } from './common';
 import { CustomViewHookEvent } from './CustomViewHookEvent';
-import { ViewHookExecutor, ViewHookMetadata } from './hooks';
+import { ViewHookExecutor, ViewHookMetadata, SizeChanges } from './hooks';
 import { isFunction, get, uid, eq, isPromise, isObject, Deferred } from '../utils';
 import { ViewFailReason } from './ViewFailReason';
 
@@ -64,7 +64,7 @@ export class ViewContainer<T> {
   private _beforeDestroy: Subject<BeforeDestroyEvent<Renderable>> = new Subject();
   private _containerChange: Subject<View|null> = new Subject<View|null>();
   private _visibilityChanges: BehaviorSubject<boolean> = new BehaviorSubject(true);
-  private _sizeChanges: BehaviorSubject<{ width: number, height: number }> = new BehaviorSubject({ width: -1, height: -1 });
+  private _sizeChanges: BehaviorSubject<SizeChanges> = new BehaviorSubject({ width: -1, height: -1 });
   private _attached: Subject<boolean> = new Subject();
   private _initialized: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   private _componentReady: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -78,6 +78,7 @@ export class ViewContainer<T> {
   @Inject(DocumentRef) protected _document: Document;
   @Inject(Injector) protected _injector: Injector;
   @Inject(ViewHookExecutor) protected _viewHookExecutor: ViewHookExecutor;
+  @Inject(VIEW_COMPONENT_CONFIG) protected _viewComponentConfig: any;
   
   /**
    * A unique identifier for this instance.
@@ -144,14 +145,6 @@ export class ViewContainer<T> {
    * @type {Observable<boolean>}
    */
   componentInitialized: Observable<boolean> = this._componentInitialized.asObservable();
-  
-  /**
-   * Creates an instance of ViewContainer.
-   * @param {Document} _document 
-   * @param {Injector} _injector 
-   */
-  constructor() {
-  }
 
   get hasComponent(): boolean {
     return Boolean(this._component);
@@ -159,6 +152,10 @@ export class ViewContainer<T> {
 
   get failedReason(): ViewFailReason|null {
     return this._failedReason;
+  }
+
+  get viewComponentConfig(): any {
+    return this._viewComponentConfig;
   }
 
   /**
@@ -477,6 +474,25 @@ export class ViewContainer<T> {
       this.fail(FAILED_RESOLVE, () => this.resolve({ fromCache }));
       throw e;
     }
+  }
+
+  /**
+   * Triggers a size change event. This doesn't resize the view. This is merely
+   * to force a resize event to a component. This is useful for sizing a component
+   * that has now view attached to it.
+   * @param {SizeChanges} event 
+   */
+  triggerSizeChange(event: SizeChanges): void {
+    this._sizeChanges.next(event);
+  }
+
+  /**
+   * Triggers a visibility change event. This is merely
+   * to force a visibility event to a component. 
+   * @param {SizeChanges} event 
+   */
+  triggerVisibilityChange(isVisible: boolean): void {
+    this._visibilityChanges.next(isVisible);
   }
 
   /**
