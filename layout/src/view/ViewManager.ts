@@ -18,6 +18,10 @@ export interface ViewManagerEvent<T> {
   container: ViewContainer<T>;
 }
 
+export interface ViewManagerQueryEvent<T> extends ViewManagerEvent<T> {
+  initial: boolean;
+}
+
 export interface RefChangeEvent<T> extends ViewManagerEvent<T> {
   ref: string;
   type: 'add'|'remove';
@@ -167,7 +171,10 @@ export class ViewManager {
       }
       
       this._refs.set(ref, container);
-      this._refChanges.next({ ref, container, token, type: 'add' });
+      this._refChanges.next({ 
+        ref, container, token, 
+        type: 'add',
+      });
     }
   }
   
@@ -191,7 +198,10 @@ export class ViewManager {
 
     if (ref && this._refs.has(ref)) {
       this._refs.delete(ref);
-      this._refChanges.next({ ref, container, token, type: 'remove' });
+      this._refChanges.next({ 
+        ref, container, token, 
+        type: 'remove'
+      });
     }
   }
 
@@ -201,52 +211,59 @@ export class ViewManager {
    * @param {{ token?: any, ref?: string }} [query={}] 
    * @returns {Observable<ViewContainer<T>>} 
    */
-  subscribeToQuery<T>(query: ViewQueryArgs = {}): Observable<ViewContainer<T>> {
-    const { ref, token, id, type = [ ViewQueryResolveType.INIT ] } = query;
+  subscribeToQuery<T>(query: ViewQueryArgs = {}): Observable<ViewManagerQueryEvent<T>> {
+    const { ref, token, id } = query;
   
     if (ref) {
-      return this.queryRef(ref, type);
+      return this.queryRef(ref);
     } else if (token) {
-      return this.queryToken(token, id, type);
+      return this.queryToken(token, id);
     }
 
     return Observable.empty();
   }
 
-  queryToken<T>(token: any, id?: number, types: ViewQueryResolveType[] = [ ViewQueryResolveType.INIT ]): Observable<ViewContainer<T>> {
-    return Observable.create((observer: Observer<ViewContainer<T>>) => {
-      const hasInit = types.indexOf(ViewQueryResolveType.INIT) !== -1;
-
-      if (hasInit) {
-        for (const container of this.query<T>({ token, id })) {
-          observer.next(container);
-        }
+  queryToken<T>(token: any, id?: number): Observable<ViewManagerQueryEvent<T>> {
+    return Observable.create((observer: Observer<ViewManagerQueryEvent<T>>) => {
+      for (const container of this.query<T>({ token, id })) {
+        observer.next({
+          token,
+          container,
+          initial: true
+        });
       }
 
-      return this._resolveViewQueryStream(types, this.created)
+      return Observable.merge(
+        this.created.map(event => ({ ...event, initial: true })),
+        this.resolved.map(event => ({ ...event, initial: false }))
+      ) 
         .filter(propEq('token', token))
         .filter(e => id ? id === e.container.id : true)
-        .map(e => e.container)
         .subscribe(observer);
     });
   }
 
-  queryRef<T>(ref: string, types: ViewQueryResolveType[] = [ ViewQueryResolveType.INIT ]): Observable<ViewContainer<T>> {
-    return Observable.create((observer: Observer<ViewContainer<T>>) => {
-      const hasInit = types.indexOf(ViewQueryResolveType.INIT) !== -1;
-
-      if (hasInit) {
-        const result = this.query<T>({ ref });
-        
-        if (result.length) {
-          observer.next(result[0]);
-        }
+  queryRef<T>(ref: string): Observable<ViewManagerQueryEvent<T>> {
+    return Observable.create((observer: Observer<ViewManagerQueryEvent<T>>) => {
+      const result = this.query<T>({ ref });
+      
+      if (result.length) {
+        observer.next({
+          ref,
+          token: this._viewFactory.getTokenFrom(result[0].config),
+          initial: true,
+          container: result[0]  
+        });
       }
 
-      return this._resolveViewQueryStream(types, this.refChanges)
-        .filter(e => e['type'] == null || e['type'] === 'add')
+      return Observable.merge(
+        this.refChanges
+          .filter(propEq('type', 'add'))
+          .map(event => ({ ...event, initial: true })),
+        this.resolved
+          .map(event => ({ ...event, initial: false }))
+      )
         .filter(propEq('ref', ref))
-        .map(e => e.container)
         .subscribe(observer);
     });
   }

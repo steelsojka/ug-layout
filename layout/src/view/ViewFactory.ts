@@ -3,7 +3,8 @@ import {
   ViewConfig, 
   ViewComponentRef, 
   VIEW_CONFIG_KEY,
-  VIEW_COMPONENT_CONFIG
+  VIEW_COMPONENT_CONFIG,
+  VIEW_CONFIG
 } from './common';
 import { Injector, Inject, Optional, ProviderArg, Type } from '../di';
 import { View } from './View';
@@ -36,7 +37,10 @@ export class ViewFactory {
     let viewConfig = null;
     const { injector = this._injector } = args;
     const isLazy = this.resolveConfigProperty(config, 'lazy');
-    const providers: ProviderArg[] = [ this._getViewContainerProvider(config) ];
+    const providers: ProviderArg[] = [
+      this._getViewContainerProvider(config),
+      { provide: VIEW_CONFIG, useValue: config }
+    ];
 
     if (config.useFactory) {
       viewConfig = ConfiguredItem.resolveConfig<any>(config.useFactory, null);

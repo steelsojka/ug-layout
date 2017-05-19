@@ -3,7 +3,7 @@ import { Renderable } from '../dom';
 import { ReplaySubject, Observable, Subject, BeforeDestroyEvent, BehaviorSubject } from '../events';
 import { ContainerRef, ConfigurationRef, DocumentRef } from '../common';
 import { View } from './View';
-import { ViewComponentRef, VIEW_COMPONENT_CONFIG } from './common';
+import { ViewComponentRef, VIEW_COMPONENT_CONFIG, VIEW_CONFIG, ViewConfig } from './common';
 import { CustomViewHookEvent } from './CustomViewHookEvent';
 import { ViewHookExecutor, ViewHookMetadata, SizeChanges } from './hooks';
 import { isFunction, get, uid, eq, isPromise, isObject, Deferred } from '../utils';
@@ -79,6 +79,7 @@ export class ViewContainer<T> {
   @Inject(Injector) protected _injector: Injector;
   @Inject(ViewHookExecutor) protected _viewHookExecutor: ViewHookExecutor;
   @Inject(VIEW_COMPONENT_CONFIG) protected _viewComponentConfig: any;
+  @Inject(VIEW_CONFIG) protected _viewConfig: ViewConfig;
   
   /**
    * A unique identifier for this instance.
@@ -156,6 +157,10 @@ export class ViewContainer<T> {
 
   get viewComponentConfig(): any {
     return this._viewComponentConfig;
+  }
+
+  get config(): ViewConfig {
+    return this._viewConfig;
   }
 
   /**

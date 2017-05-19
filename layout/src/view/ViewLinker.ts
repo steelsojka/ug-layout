@@ -1,5 +1,5 @@
 import { Inject, Injector } from '../di';
-import { ViewManager } from './ViewManager';
+import { ViewManager, ViewManagerQueryEvent } from './ViewManager';
 import { 
   VIEW_LINKER_METADATA, 
   ViewQueryConfig, 
@@ -161,7 +161,7 @@ export class ViewLinker {
    * @param {(ViewQueryReadType|ViewQueryReadOptions)} [options] 
    * @returns {Observable<any>} 
    */
-  readQuery<T>(query: Observable<ViewContainer<T>>, options?: ViewQueryReadType|ViewQueryReadOptions): Observable<any> {
+  readQuery<T>(query: Observable<ViewManagerQueryEvent<T>>, options?: ViewQueryReadType|ViewQueryReadOptions): Observable<any> {
     const _options = (isObject(options) ? options : { type: options }) as ViewQueryReadOptions;
     const {
       type = ViewQueryReadType.COMPONENT, 
@@ -178,8 +178,13 @@ export class ViewLinker {
         return;
       } 
       
-      return query.subscribe(container => {
-        if (type === ViewQueryReadType.COMPONENT) {
+      return query.subscribe(event => {
+        const { container } = event;
+
+        if (type === ViewQueryReadType.EVENT) {
+          observer.next(event);
+          observer.complete();
+        } else if (type === ViewQueryReadType.COMPONENT) {
           container.ready({ when, until, init: !lazy }).subscribe({
             next: () => observer.next(container.component),
             complete: () => observer.complete()
