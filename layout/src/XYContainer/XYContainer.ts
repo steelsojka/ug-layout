@@ -43,7 +43,8 @@ export interface XYContainerConfig extends RenderableConfig {
 }
 
 export interface XYSizingOptions {
-  distribute?: boolean;
+  render?: boolean;
+  resize?: boolean;
 }
 
 export interface ContainerAddChildArgs extends AddChildArgs {
@@ -233,7 +234,7 @@ export class XYContainer extends Renderable {
   }
 
   setSizeOf(item: XYItemContainer, size: number, options: XYSizingOptions = {}): void {
-    const { distribute = false } = options;
+    const { resize = true, render = true } = options;
     const { before, after } = this.getAdjacentItems(item);
     const prevRatio = item.ratio;
     
@@ -245,8 +246,13 @@ export class XYContainer extends Renderable {
       before.ratio = Math.max(0, before.ratio + (<number>prevRatio - item.ratio));
     }
 
-    this.resize();
-    this._renderer.render();
+    if (resize) {
+      this.resize();
+    }
+
+    if (render) {
+      this._renderer.render();
+    }
   }
 
   getChildren(): XYItemContainer[] {
@@ -397,6 +403,7 @@ export class XYContainer extends Renderable {
   private _calculateRatios(): void {
     let total = 0;
     const unallocatedChildren: XYItemContainer[] = [];
+    const minimizedItems: XYItemContainer[] = [];
 
     if (!this._contentItems.length) {
       return;
@@ -408,29 +415,33 @@ export class XYContainer extends Renderable {
       } else {
         unallocatedChildren.push(child);
       }
-    }
 
-    if (Math.round(total) === 100) {
-      this._distributeRatios();
-    
-      return;
-    }
-
-    if (Math.round(total) < 100 && unallocatedChildren.length) {
-      for (const child of unallocatedChildren) {
-        child.ratio = (100 - total) / unallocatedChildren.length
+      if (child.isMinimized) {
+        minimizedItems.push(child);
       }
-    } else {
-      if (Math.round(total) > 100) {
+    }
+
+    if (Math.round(total) !== 100) {
+      if (Math.round(total) < 100 && unallocatedChildren.length) {
         for (const child of unallocatedChildren) {
-          child.ratio = 50;
-          total += 50;
+          child.ratio = (100 - total) / unallocatedChildren.length
         }
-      } 
-      
-      for (const child of this._contentItems) {
-        child.ratio = (<number>child.ratio / total) * 100;
+      } else {
+        if (Math.round(total) > 100) {
+          for (const child of unallocatedChildren) {
+            child.ratio = 50;
+            total += 50;
+          }
+        } 
+        
+        for (const child of this._contentItems) {
+          child.ratio = (<number>child.ratio / total) * 100;
+        }
       }
+    }
+
+    for (const child of minimizedItems) {
+      this.setSizeOf(child, child.getMinimizedSize(), { render: false, resize: false });
     }
 
     this._distributeRatios();

@@ -379,6 +379,10 @@ export class Stack extends Renderable {
     this.setActiveIndex(this.getIndexOfTab(tab));
   }
 
+  getMinimizedSize(): number {
+    return this._header.size;
+  }
+
   /**
    * Handles a renderable being dropped on the stack within a certain region.
    * @param {StackRegion} region The region the item was dropped in.

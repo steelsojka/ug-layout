@@ -16,7 +16,7 @@ import {
   UNALLOCATED,
   RenderableArg
 } from '../common';
-import { isNumber } from '../utils';
+import { isNumber, isFunction } from '../utils';
 import { BeforeDestroyEvent } from '../events';
 import { XYContainer } from './XYContainer';
 import { MinimizeCommand } from '../commands';
@@ -203,9 +203,20 @@ export class XYItemContainer extends Renderable {
     this._container.addChild(item, options);
   }
 
+  getMinimizedSize(): number {
+    const item = this._contentItems[0];
+
+    if (item) {
+      return item.getMinimizedSize();
+    }
+
+    return 0;
+  }
+
   private _minimize(e: MinimizeCommand<Renderable>): void {
     const minimize = e.minimize == null ? !this._isMinimized : e.minimize;
     let size: number|null = null;
+    const lastSize = (this._lastSize != null ? this._lastSize : this._config.initialSize) || null;
     
     e.stopPropagation();
     
@@ -213,8 +224,8 @@ export class XYItemContainer extends Renderable {
       size = e.size;
       this._lastSize = this.size;
       this._isMinimized = true;
-    } else if (!minimize && this._isMinimized && this._lastSize != null) {
-      size = this._lastSize;
+    } else if (!minimize && this._isMinimized && lastSize != null) {
+      size = lastSize;
       this._isMinimized = false;
       this._lastSize = null;
     }

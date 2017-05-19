@@ -553,6 +553,10 @@ export abstract class Renderable {
    */
   handleDropCleanup(): void {}
 
+  getMinimizedSize(): number {
+    return 0;
+  }
+
   /**
    * Whether this renderable can be dropped on.
    * @param {Renderable} target 
