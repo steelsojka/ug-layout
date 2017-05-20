@@ -6,6 +6,7 @@ import { propEq } from './utils';
 export class Draggable<T> {
   @Inject(DocumentRef) private _document: Document;
   private _host: T;
+
   private _drag: Subject<DragEvent<T>> = new Subject();
   private _isDragging: boolean = false;
   private _startX: number = 0;

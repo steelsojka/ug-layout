@@ -1,6 +1,7 @@
 import { VNode } from 'snabbdom/vnode';
 import { PartialObserver } from 'rxjs/Observer';
 import { Subscription } from 'rxjs/Subscription';
+import { CompleteOn } from 'rx-decorators/completeOn';
 
 import { 
   Type, 
@@ -91,9 +92,13 @@ export abstract class Renderable {
   protected _width: number;  
   protected _height: number;
   protected _isDestroyed: boolean = false;
-  protected _destroyed: Subject<this> = new Subject();
   protected _uid: number = uid();
   protected _container: Renderable|null;
+
+  @CompleteOn('destroy')
+  protected _destroyed: Subject<this> = new Subject();
+
+  @CompleteOn('destroy')
   protected _containerChange: Subject<Renderable|null> = new Subject<Renderable|null>();
   protected _contentItems: Renderable[] = [];
 

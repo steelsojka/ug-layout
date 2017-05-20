@@ -1,3 +1,5 @@
+import { CompleteOn } from 'rx-decorators/completeOn';
+
 import { Injector, Type, Inject, Optional, PostConstruct } from '../di';
 import { Renderable } from '../dom';
 import { ReplaySubject, Observable, Subject, BeforeDestroyEvent, BehaviorSubject } from '../events';
@@ -59,15 +61,35 @@ export class ViewContainer<T> {
   private _element: HTMLElement;
   private _component: T|null = null;
   private _container: View|null;
+
+  @CompleteOn('destroy')
   private _status: BehaviorSubject<ViewContainerStatus> = new BehaviorSubject(ViewContainerStatus.PENDING);
+
+  @CompleteOn('destroy')
   private _destroyed: Subject<ViewContainer<T>> = new Subject();
+
+  @CompleteOn('destroy')
   private _beforeDestroy: Subject<BeforeDestroyEvent<Renderable>> = new Subject();
+
+  @CompleteOn('destroy')
   private _containerChange: Subject<View|null> = new Subject<View|null>();
+
+  @CompleteOn('destroy')
   private _visibilityChanges: BehaviorSubject<boolean> = new BehaviorSubject(true);
+
+  @CompleteOn('destroy')
   private _sizeChanges: BehaviorSubject<SizeChanges> = new BehaviorSubject({ width: -1, height: -1 });
+
+  @CompleteOn('destroy')
   private _attached: Subject<boolean> = new Subject();
+
+  @CompleteOn('destroy')
   private _initialized: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+
+  @CompleteOn('destroy')
   private _componentReady: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+
+  @CompleteOn('destroy')
   private _componentInitialized: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   private _isInitialized: boolean = false;
   private _retry: Function|null = null;
@@ -252,14 +274,6 @@ export class ViewContainer<T> {
    */
   destroy(): void {
     this._destroyed.next();
-    
-    this._destroyed.complete();
-    this._status.complete();
-    this._beforeDestroy.complete();
-    this._containerChange.complete();
-    this._visibilityChanges.complete();
-    this._sizeChanges.complete();
-    this._initialized.complete();
   }
   
   /**

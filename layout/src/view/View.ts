@@ -1,5 +1,6 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
+import { CompleteOn } from 'rx-decorators/completeOn';
 
 import { Type, ProviderArg, Inject, Injector, Optional, forwardRef, PostConstruct } from '../di';
 import { Renderer, Renderable, ConfiguredRenderable } from '../dom';
@@ -24,11 +25,17 @@ import { SizeChanges } from './hooks';
  */
 export class View extends Renderable {
   protected _viewContainer: ViewContainer<any>;
-  protected _visibilityChanges: BehaviorSubject<boolean> = new BehaviorSubject(true);
-  protected _sizeChanges: BehaviorSubject<SizeChanges> = new BehaviorSubject({ width: -1, height: -1 });
-  protected _viewContainerCreated: Subject<{ fromCache: boolean, container: ViewContainer<any> }> = new Subject();
-  protected _initialCreate: boolean = true;
 
+  @CompleteOn('destroy')
+  protected _visibilityChanges: BehaviorSubject<boolean> = new BehaviorSubject(true);
+
+  @CompleteOn('destroy')
+  protected _sizeChanges: BehaviorSubject<SizeChanges> = new BehaviorSubject({ width: -1, height: -1 });
+
+  @CompleteOn('destroy')
+  protected _viewContainerCreated: Subject<{ fromCache: boolean, container: ViewContainer<any> }> = new Subject();
+
+  protected _initialCreate: boolean = true;
   @Inject(ContainerRef) protected _container: Renderable;
   @Inject(ConfigurationRef) protected _configuration: ViewConfig;
   @Inject(ViewManager) protected _viewManager: ViewManager;
@@ -141,13 +148,6 @@ export class View extends Renderable {
         create: (oldNode, newNode) => this._onCreate(newNode.elm as HTMLElement)
       }
     });
-  }
-
-  destroy(): void {
-    this._sizeChanges.complete();
-    this._visibilityChanges.complete();
-
-    super.destroy();
   }
 
   /**

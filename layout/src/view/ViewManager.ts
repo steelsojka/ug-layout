@@ -1,3 +1,5 @@
+import { CompleteOn } from 'rx-decorators/completeOn';
+
 import { Inject, Type } from '../di';
 import { ViewFactory, ViewFactoryArgs } from './ViewFactory';
 import { ViewContainer } from './ViewContainer';
@@ -36,9 +38,17 @@ export class ViewManager {
 
   private _views: Map<any, { [key: string]: ViewContainer<any> }> = new Map();
   private _refs: Map<string, ViewContainer<any>> = new Map();
+
+  @CompleteOn('destroy') 
   private _resolved: Subject<ViewManagerEvent<any>> = new Subject();
+
+  @CompleteOn('destroy') 
   private _created: Subject<ViewManagerEvent<any>> = new Subject();
+
+  @CompleteOn('destroy') 
   private _destroyed: Subject<void> = new Subject<void>();
+
+  @CompleteOn('destroy') 
   private _refChanges: Subject<RefChangeEvent<any>> = new Subject();
 
   resolved: Observable<ViewManagerEvent<any>> = this._resolved.asObservable();
@@ -86,10 +96,6 @@ export class ViewManager {
     }      
 
     this._destroyed.next();
-    this._destroyed.complete();
-    this._created.complete();
-    this._resolved.complete();
-    this._refChanges.complete();
   }
 
   getRef<T>(ref: string): ViewContainer<T>|null {

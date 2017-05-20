@@ -1,4 +1,5 @@
 import { VNode } from 'snabbdom/vnode';
+import { CompleteOn } from 'rx-decorators/completeOn';
 
 import { Inject, PostConstruct } from '../di';
 import { Subject, Observable } from '../events';
@@ -10,6 +11,7 @@ import { DocumentRef, PatchRef, Patch } from '../common';
  * @class Renderer
  */
 export class Renderer {
+  @CompleteOn('destroy')
   private _rendered: Subject<void> = new Subject<void>();
   private _lastVNode: VNode|null = null;
   private _containerEl: Node;
@@ -75,7 +77,6 @@ export class Renderer {
    */
   destroy(): void {
     this.detach();
-    this._rendered.complete();
   }
 
   /**
