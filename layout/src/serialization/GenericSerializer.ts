@@ -1,7 +1,14 @@
-import { Serializer, Serialized } from './common';
+import { PostConstruct } from '../di';
+import { Serializer, Serialized } from './Serializer';
 import { SerializerContainer } from './SerializerContainer';
-import { Renderable } from '../dom';
+import { Renderable, RenderableConfig } from '../dom';
 import { RenderableConstructorArg, ConfigureableType } from '../common';
+import { ConfiguredItem } from '../ConfiguredItem';
+
+export interface GenericSerializerConfig<R extends Renderable> {
+  name: string;
+  type: ConfigureableType<R>;
+}
 
 /**
  * A serializer that can be used for renderables that don't container
@@ -11,24 +18,22 @@ import { RenderableConstructorArg, ConfigureableType } from '../common';
  * @implements {Serializer<R, Serialized>}
  * @template R The renderable type.
  */
-export class GenericSerializer<R extends Renderable> implements Serializer<R, Serialized> {
-  /**
-   * Creates an instance of GenericSerializer.
-   * @param {string} _name 
-   * @param {ConfigureableType<R>} _Class 
-   */
-  constructor(
-    protected _name: string,
-    protected _Class: ConfigureableType<R>
-  ) {}
-  
+export class GenericSerializer<R extends Renderable> extends Serializer<R, Serialized> {
+  protected config: GenericSerializerConfig<R>;
+
+  @PostConstruct()
+  initialize(): void {
+    if (!this.config) {
+      throw new Error('GenericSerializer requires a config.');
+    }
+  }
   /**
    * Serializes the renderable.
    * @param {R} node 
    * @returns {Serialized} 
    */
   serialize(node: R): Serialized {
-    return { name: this._name } ;
+    return { name: this.config.name } ;
   }
 
   /**
@@ -36,8 +41,8 @@ export class GenericSerializer<R extends Renderable> implements Serializer<R, Se
    * @param {Serialized} node 
    * @returns {RenderableArg<R>} 
    */
-  deserialize(node: Serialized): RenderableConstructorArg<R> {
-    return this._Class;
+  deserialize(node: Serialized): any {
+    return this.config.type;
   }
 
   /**
@@ -45,6 +50,10 @@ export class GenericSerializer<R extends Renderable> implements Serializer<R, Se
    * @param {SerializerContainer} container 
    */
   register(container: SerializerContainer): void {
-    container.registerClass(this._name, this._Class);
+    container.registerClass(this.config.name, this.config.type);
+  }
+
+  static configure<R extends Renderable>(config: GenericSerializerConfig<R>): ConfiguredItem<typeof GenericSerializer, GenericSerializerConfig<R>> {
+    return new ConfiguredItem(GenericSerializer, config);
   }
 }

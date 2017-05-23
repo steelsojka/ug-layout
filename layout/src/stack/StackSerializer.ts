@@ -1,7 +1,7 @@
 import { ConfiguredRenderable, SerializedRenderable } from '../dom';
 import { Inject } from '../di';
 import { GenericSerializer, SerializerContainer, Serializer, Serialized } from '../serialization';
-import { Stack } from './Stack';
+import { Stack, StackConfig } from './Stack';
 import { StackTab } from './StackTab';
 import { StackHeaderConfig } from './StackHeader';
 import { StackControl, MinimizeStackControl, CloseStackControl, StackControlSerializer } from './controls'
@@ -27,9 +27,7 @@ export interface SerializedStack extends SerializedRenderable {
   controls: Serialized[];
 }
 
-export class StackSerializer implements Serializer<Stack, SerializedStack> {
-  @Inject(SerializerContainer) private _container: SerializerContainer;
-  
+export class StackSerializer extends Serializer<Stack, SerializedStack> {
   serialize(node: Stack): SerializedStack {
     return {
       name: 'Stack',
@@ -43,18 +41,18 @@ export class StackSerializer implements Serializer<Stack, SerializedStack> {
         distribute: node.header.isDistributed
       },
       controls: !node.header ? [] : node.header.controls.map(control => {
-        return this._container.serialize(control);
+        return this.container.serialize(control);
       }),
       children: node.items.map(item => {
         return {
-          use: this._container.serialize(item.getChildren()[0]),
+          use: this.container.serialize(item.getChildren()[0]),
           tags: [ ...item.tags ],
           title: item.title,
           draggable: item.draggable,
           droppable: item.droppable,
           closeable: item.closeable,
           tabControls: item.controls.map(control => {
-            return this._container.serialize(control);
+            return this.container.serialize(control);
           })
         };
       })
@@ -73,7 +71,7 @@ export class StackSerializer implements Serializer<Stack, SerializedStack> {
         distribute: node.header.distribute
       },
       controls: node.controls.map(control => {
-        return this._container.deserialize<StackControl, Serialized>(control);
+        return this.container.deserialize<StackControl, Serialized>(control);
       }),
       children: node.children.map(child => {
         return {
@@ -82,9 +80,9 @@ export class StackSerializer implements Serializer<Stack, SerializedStack> {
           draggable: child.draggable,
           droppable: child.droppable,
           closeable: child.closeable,
-          use: this._container.deserialize(child.use),
+          use: this.container.deserialize(child.use),
           tabControls: child.tabControls.map(tabCtrl => {
-            return this._container.deserialize<TabControl, Serialized>(tabCtrl);
+            return this.container.deserialize<TabControl, Serialized>(tabCtrl);
           })
         };
       })
@@ -93,8 +91,8 @@ export class StackSerializer implements Serializer<Stack, SerializedStack> {
 
   static register(container: SerializerContainer): void {
     container.registerClass('Stack', Stack);  
-    container.registerSerializer(MinimizeStackControl, new StackControlSerializer('MinimizeStackControl', MinimizeStackControl));
-    container.registerSerializer(CloseStackControl, new StackControlSerializer('CloseStackControl', CloseStackControl));
-    container.registerSerializer(CloseTabControl, new GenericSerializer('CloseTabControl', CloseTabControl));
+    container.registerSerializer(MinimizeStackControl, StackControlSerializer.configure({ name: 'MinimizeStackControl', type: MinimizeStackControl }));
+    container.registerSerializer(CloseStackControl, StackControlSerializer.configure({ name: 'CloseStackControl', type: CloseStackControl }));
+    container.registerSerializer(CloseTabControl, GenericSerializer.configure({ name: 'CloseTabControl', type: CloseTabControl }));
   }
 }

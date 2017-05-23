@@ -20,13 +20,11 @@ export interface SerializedXYItemContainer {
   minimized: boolean;
 }
 
-export class XYItemContainerSerializer implements Serializer<XYItemContainer, SerializedXYItemContainer> {
-  @Inject(SerializerContainer) private _container: SerializerContainer;
-  
+export class XYItemContainerSerializer extends Serializer<XYItemContainer, SerializedXYItemContainer> {
   serialize(node: XYItemContainer): SerializedXYItemContainer {
     return {
       name: 'XYItemContainer',
-      use: this._container.serialize(node.item),
+      use: this.container.serialize(node.item),
       tags: [ ...node.tags ],
       ratio: node.ratio === UNALLOCATED ? null : node.ratio as number,
       initialSize: node.initialSize ? node.initialSize : undefined,
@@ -41,7 +39,7 @@ export class XYItemContainerSerializer implements Serializer<XYItemContainer, Se
 
   deserialize(node: SerializedXYItemContainer): ConfiguredRenderable<XYItemContainer> {
     return XYItemContainer.configure({
-      use: this._container.deserialize(node.use),
+      use: this.container.deserialize(node.use),
       ratio: node.ratio == null ? undefined : node.ratio as number,
       tags: node.tags,
       initialSize: node.initialSize,

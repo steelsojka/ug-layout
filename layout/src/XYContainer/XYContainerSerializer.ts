@@ -15,11 +15,7 @@ export interface SerializedXYContainer extends SerializedRenderable {
   children: SerializedXYItemContainer[];
 }
 
-export class XYContainerSerializer implements Serializer<XYContainer, SerializedXYContainer> {
-  constructor(
-    @Inject(SerializerContainer) private _container: SerializerContainer
-  ) {}
-  
+export class XYContainerSerializer extends Serializer<XYContainer, SerializedXYContainer> {
   serialize(node: XYContainer): SerializedXYContainer {
     return {
       name: 'XYContainer',
@@ -27,7 +23,7 @@ export class XYContainerSerializer implements Serializer<XYContainer, Serialized
       static: node.isStatic,
       direction: node.direction,
       splitterSize: node.splitterSize,
-      children: this._container.serializeList<XYItemContainer, SerializedXYItemContainer>(node.getChildren())
+      children: this.container.serializeList<XYItemContainer, SerializedXYItemContainer>(node.getChildren())
     };    
   }
 
@@ -38,7 +34,7 @@ export class XYContainerSerializer implements Serializer<XYContainer, Serialized
       splitterSize: node.splitterSize,
       static: node.static,
       tags: node.tags,
-      children: this._container.deserializeList<XYItemContainer, SerializedXYItemContainer>(node.children)
+      children: this.container.deserializeList<XYItemContainer, SerializedXYItemContainer>(node.children)
     });
   }
 

@@ -24,6 +24,7 @@ import { Renderer } from './Renderer';
 import { INJECTOR_KEY, RenderableInjector } from './RenderableInjector';
 import { ConfiguredRenderable } from './ConfiguredRenderable';
 import { RenderableConfig } from './common';
+import { BaseSerializerArg } from '../serialization';
 
 export interface BaseModificationArgs {
   /**
@@ -560,6 +561,14 @@ export abstract class Renderable {
 
   getMinimizedSize(): number {
     return 0;
+  }
+
+  /**
+   * Returns a serializer, serializer class or a configured serializer specifically for this renderable.
+   * @returns {(BaseSerializerArg | null)} 
+   */
+  getSerializer(): BaseSerializerArg | null {
+    return null;
   }
 
   /**

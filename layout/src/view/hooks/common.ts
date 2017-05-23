@@ -4,7 +4,10 @@ import { ViewContainer } from '../ViewContainer';
 
 export const VIEW_HOOK_METADATA = 'ugLayout:ViewHookMetadata';
 
-export type ViewHookMetadata = { [key: string]: string[] };
+export interface ViewHookMetadata { 
+  observers: { [key: string]: string[] };
+  containerProps: Array<{ prop: string, key: string }>;
+};
 
 export interface ResolveState {
   fromCache: boolean;

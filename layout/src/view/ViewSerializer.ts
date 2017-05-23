@@ -16,11 +16,9 @@ export interface SerializedView extends SerializedRenderable {
   viewComponentConfig: any;
 }
 
-export class ViewSerializer implements Serializer<View, SerializedView> {
-  @Inject(SerializerContainer) private _container: SerializerContainer;
-  
+export class ViewSerializer extends Serializer<View, SerializedView> {
   serialize(node: View): SerializedView {
-    const token = this._container.resolveClassString(node.token);
+    const token = this.container.resolveClassString(node.token);
 
     if (!token) {
       throw new Error('Can not serialize view with no registered token.');
@@ -40,8 +38,8 @@ export class ViewSerializer implements Serializer<View, SerializedView> {
   }
 
   deserialize(node: SerializedView): ConfiguredRenderable<View> {
-    const token = this._container.resolveClass(node.token);
-    const useClass = this._container.resolveClass(node.useClass);
+    const token = this.container.resolveClass(node.token);
+    const useClass = this.container.resolveClass(node.useClass);
 
     if (!token || !useClass) {
       throw new Error('Could not resolve view classes.');

@@ -1,7 +1,8 @@
 import { Injector, Type } from '../di';
-import { Renderable } from '../dom';
-import { Serializer, Serialized } from './common';
+import { Renderable, RenderableConfig } from '../dom';
+import { Serializer, Serialized, SERIALIZER_CONFIG } from './Serializer';
 import { isFunction, isString } from '../utils';
+import { ConfiguredItem } from '../ConfiguredItem';
 import { RenderableConstructorArg } from '../common';
 
 export interface Constructable<T> {
@@ -9,6 +10,7 @@ export interface Constructable<T> {
 }
 
 export type BaseSerializer = Serializer<Renderable, Serialized>;
+export type BaseSerializerArg = BaseSerializer | Type<BaseSerializer> | ConfiguredItem<BaseSerializer | typeof Serializer, any>;
 
 export interface SerializerContainerConfig {
   /**
@@ -36,16 +38,16 @@ export interface SerializerContainerConfig {
  */
 export class SerializerContainer {
   protected _injector;
-  protected _serializers: Map<Type<any>, BaseSerializer|Type<BaseSerializer>> = new Map();
+  protected _serializers: Map<Type<any>, BaseSerializerArg> = new Map();
   protected _classToStringMap: Map<Type<any>, string> = new Map();
+  protected _instanceCache: WeakMap<any, Serializer<any, any>> = new WeakMap();
 
   /**
    * Creates an instance of SerializerContainer.
    * @param {SerializerContainerConfig} [config={}] 
    */
   constructor(config: SerializerContainerConfig = {}) {
-    this._injector = new Injector([], config.injector || null);
-    this._injector.registerProvider({ provide: SerializerContainer, useValue: this });
+    this._injector = new Injector([ { provide: SerializerContainer, useValue: this } ], config.injector || null);
   }
 
   /**
@@ -54,15 +56,44 @@ export class SerializerContainer {
    * @param {(BaseSerializer|Type<BaseSerializer>)} serializer 
    * @param {{ skipRegister?: boolean }} [options={}] 
    */
-  registerSerializer(_Class: Type<any>, serializer: BaseSerializer|Type<BaseSerializer>, options: { skipRegister?: boolean } = {}): void {
+  registerSerializer(_Class: Type<any>, serializer: BaseSerializerArg, options: { skipRegister?: boolean } = {}): void {
     const { skipRegister = false } = options;
-    
+
     this._serializers.set(_Class, serializer);
-    this._injector.registerProvider(isFunction(serializer) ? serializer : { provide: serializer, useValue: serializer });
+
+    this._injector.registerProvider({
+      provide: serializer, 
+      useFactory: () => this.constructSerializer(serializer)
+    });
 
     if (!skipRegister && isFunction(serializer['register'])) {
       serializer['register'](this);
     }
+  }
+
+  constructSerializer(serializer: BaseSerializerArg): Serializer<any, any> {
+    let token: Type<BaseSerializer> | BaseSerializer;   
+    let config: any = null;
+
+    if (serializer instanceof ConfiguredItem) {
+      token = ConfiguredItem.resolveItem<Type<BaseSerializer>>(serializer);
+      config = ConfiguredItem.resolveConfig(serializer);
+    } else {
+      token = serializer;
+    }
+
+    if (config != null) {
+      return this._injector.resolveAndCreateChild([
+        { provide: SERIALIZER_CONFIG, useValue: config }
+      ])
+        .resolveAndInstantiate(token)
+    }
+
+    if (isFunction(serializer)) {
+      return this._injector.resolveAndInstantiate(token);
+    }
+
+    return serializer as Serializer<any, any>;
   }
 
   /**
@@ -130,6 +161,18 @@ export class SerializerContainer {
    * @returns {(BaseSerializer|null)} 
    */
   resolveFromInstance(instance: Renderable & Constructable<any>): BaseSerializer|null {
+    if (this._instanceCache.has(instance)) {
+      return this._instanceCache.get(instance) as BaseSerializer;
+    }
+
+    const serializer = instance.getSerializer();
+
+    if (serializer) {
+      this._instanceCache.set(instance, this.constructSerializer(serializer));
+
+      return this._instanceCache.get(instance) as BaseSerializer;
+    }
+
     return this.resolveFromClass(instance.constructor as Type<any>);
   }
 
@@ -156,7 +199,7 @@ export class SerializerContainer {
       throw new Error(`Serializer for class '${instance.constructor.name}' is not registered.`);
     }
 
-    return serializer.serialize(instance);
+    return this._serialize(serializer, instance);
   }
   
   /**
@@ -173,7 +216,8 @@ export class SerializerContainer {
       throw new Error(`Serializer for node '${serialized.name}' is not registered.`);
     }
 
-    return serializer.deserialize(serialized);
+
+    return this._deserialize(serializer, serialized);
   }
 
   serializeList<R extends Renderable & Constructable<any>, S extends Serialized>(instances: R[]): S[] {
@@ -181,7 +225,7 @@ export class SerializerContainer {
       const serializer = this.resolveFromInstance(instance) as Serializer<R, S>|null;
 
       if (serializer && !this.isExcluded(instance)) {
-        result.push(serializer.serialize(instance));
+        result.push(this._serialize(serializer, instance));
       }
 
       return result;
@@ -193,7 +237,7 @@ export class SerializerContainer {
       const serializer = this.resolveFromSerialized(instance) as Serializer<R, S>|null;
 
       if (serializer) {
-        result.push(serializer.deserialize(instance));
+        result.push(this._deserialize(serializer, instance));
       }
 
       return result;
@@ -218,5 +262,13 @@ export class SerializerContainer {
    */
   resolve<T>(token: any): T|null {
     return this._injector.get(token, null);
+  }
+
+  private _deserialize<R extends Renderable, S extends Serialized>(serializer: Serializer<R, S>, serialized: S): RenderableConstructorArg<R> {
+    return serializer.postDeserialized(serialized, serializer.deserialize(serialized));
+  }
+
+  private _serialize<R extends Renderable & Constructable<any>, S extends Serialized>(serializer: Serializer<R, S>, instance: R): S {
+    return serializer.postSerialized(instance, serializer.serialize(instance));
   }
 }

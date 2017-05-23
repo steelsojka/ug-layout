@@ -1,3 +1,6 @@
 export * from './common';
-export * from './decorators';
+export {
+  ObserveViewHook,
+  ViewContainerProp
+} from './decorators';
 export * from './ViewHookExecutor';

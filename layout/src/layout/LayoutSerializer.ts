@@ -13,9 +13,7 @@ export interface SerializedLayout extends SerializedRenderable {
  * @class LayoutSerializer
  * @implements {Serializer<Layout, SerializedLayout>}
  */
-export class LayoutSerializer implements Serializer<Layout, SerializedLayout> {
-  @Inject(SerializerContainer) private _container: SerializerContainer;
-  
+export class LayoutSerializer extends Serializer<Layout, SerializedLayout> {
   /**
    * Serializes a Layout renderable.
    * @param {Layout} node 
@@ -25,7 +23,7 @@ export class LayoutSerializer implements Serializer<Layout, SerializedLayout> {
     return {
       name: 'Layout',
       tags: [ ...node.tags ],
-      child: this._container.serialize(node.getChildren()[0])
+      child: this.container.serialize(node.getChildren()[0])
     };
   }
 
@@ -37,7 +35,7 @@ export class LayoutSerializer implements Serializer<Layout, SerializedLayout> {
   deserialize(node: SerializedLayout): ConfiguredRenderable<Layout> {
     return Layout.configure({
       tags: [ ...node.tags ],
-      child: this._container.deserialize(node.child)
+      child: this.container.deserialize(node.child)
     });
   }
 

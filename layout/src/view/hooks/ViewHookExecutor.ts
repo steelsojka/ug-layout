@@ -2,6 +2,7 @@ import { VIEW_HOOK_METADATA, ViewHookMetadata } from './common';
 import { isFunction, get } from '../../utils';
 import { ViewContainer } from '../ViewContainer';
 import { Subject } from '../../events';
+import { getDefaultMetadata } from './decorators';
 
 /**
  * Executes view hooks on a component instance.
@@ -60,16 +61,23 @@ export class ViewHookExecutor {
    * @param {ViewContainer<T>} viewContainer 
    * @param {Object} target 
    */
-  linkObservers<T>(viewContainer: ViewContainer<T>, target: Object): void {
-    const hooks = Reflect.getOwnMetadata(VIEW_HOOK_METADATA, target) || {};
+  link<T>(viewContainer: ViewContainer<T>, target: Object): void {
+    const metadata = Reflect.getOwnMetadata(VIEW_HOOK_METADATA, target) || getDefaultMetadata();
     const { component } = viewContainer;
 
     if (!component) {
       return;
     }
 
-    for (const hookObservableName of Object.keys(hooks)) {
-      const hookNames = hooks[hookObservableName] || [];
+    for (const { prop, key } of metadata.containerProps) {
+      Object.defineProperty(component, key, {
+        configurable: true,
+        get: () => viewContainer[key]
+      });
+    }
+
+    for (const hookObservableName of Object.keys(metadata.observers)) {
+      const hookNames = metadata.observers[hookObservableName] || [];
       const subject = new Subject<any>();
 
       Object.defineProperty(component, hookObservableName, {

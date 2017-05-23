@@ -7,7 +7,8 @@ import {
   Renderable, 
   RenderableInjector, 
   ConfiguredRenderable,
-  AddChildArgs
+  AddChildArgs,
+  RenderableConfigArgs
 } from '../dom';
 import { 
   ConfigurationRef, 
@@ -22,7 +23,7 @@ import { XYContainer } from './XYContainer';
 import { MinimizeCommand } from '../commands';
 import { Splitter } from './Splitter';
 
-export interface XYItemContainerConfig {
+export interface XYItemContainerConfig extends RenderableConfigArgs {
   use: RenderableArg<Renderable>;
   ratio?: number;
   persist?: boolean;
@@ -33,7 +34,6 @@ export interface XYItemContainerConfig {
   maxSizeY?: number;
   fixed?: boolean;
   minimized?: boolean;
-  tags?: string[];
 }
 
 export class XYItemContainer extends Renderable {
