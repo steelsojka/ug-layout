@@ -5,11 +5,11 @@ import {
   SerializerContainer, 
   Serializer, 
   Serialized, 
-  GenericSerializerConfig
+  GenericSerializerConfig,
+  ConfiguredSerializer
 } from '../../serialization';
 import { XYDirection, RenderableConstructorArg, ConfigureableType } from '../../common';
 import { StackControlPosition, StackControl } from './StackControl';
-import { ConfiguredItem } from '../../ConfiguredItem';
 
 export interface SerializedStackControl extends Serialized {
   position: StackControlPosition;
@@ -25,9 +25,5 @@ export class StackControlSerializer<R extends StackControl> extends GenericSeria
 
   deserialize(node: SerializedStackControl): RenderableConstructorArg<R> {
     return this.config.type.configure ? this.config.type.configure(node) : this.config.type;
-  }
-
-  static configure<R extends Renderable>(config: GenericSerializerConfig<R>): ConfiguredItem<typeof StackControlSerializer, GenericSerializerConfig<R>> {
-    return new ConfiguredItem(StackControlSerializer, config);
   }
 }

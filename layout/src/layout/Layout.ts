@@ -32,7 +32,7 @@ export interface LayoutConfig extends RenderableConfig {
   providers: [ DragHost ]
 })
 export class Layout extends Renderable {
-  @Inject(ConfigurationRef) private _config: LayoutConfig|null;
+  @Inject(ConfigurationRef) protected _config: LayoutConfig|null;
   @Inject(ContainerRef) protected _container: Renderable;
   @Inject(DragHost) protected _dragHost: DragHost;
 

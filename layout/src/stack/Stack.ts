@@ -55,29 +55,9 @@ export class Stack extends Renderable {
   private _header: StackHeader;
   private _activeIndex: number = 0;
   protected _contentItems: StackItemContainer[] = [];
-  protected _config: StackConfig;
 
+  @Inject(ConfigurationRef) protected _config: StackConfig;
   @Inject(ContainerRef) protected _container: Renderable;
-  
-  /**
-   * Creates an instance of Stack.
-   * @param {StackConfigArgs} _config 
-   * @param {Renderable} _container 
-   */
-  constructor(
-    @Inject(ConfigurationRef) _config: StackConfigArgs,
-  ) {
-    super();
-    
-    this._config = Object.assign({
-      controls: [],
-      header: null,
-      children: [],
-      startIndex: 0,
-      direction: XYDirection.X,
-      reverse: false
-    }, _config);
-  }
 
   /**
    * The direction of the stack.
@@ -157,6 +137,15 @@ export class Stack extends Renderable {
    */
   @PostConstruct()
   initialize(): void {
+    this._config = Object.assign({
+      controls: [],
+      header: null,
+      children: [],
+      startIndex: 0,
+      direction: XYDirection.X,
+      reverse: false
+    }, this._config);
+
     super.initialize();
     
     this._header = this.createChild(new ConfiguredRenderable(StackHeader, this._config ? this._config.header : null));

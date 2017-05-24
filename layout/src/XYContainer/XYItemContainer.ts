@@ -38,6 +38,8 @@ export interface XYItemContainerConfig extends RenderableConfigArgs {
 
 export class XYItemContainer extends Renderable {
   ratio: number|typeof UNALLOCATED = UNALLOCATED;
+
+  @Inject(ConfigurationRef) protected _config: XYItemContainerConfig
   
   protected _height: number = 0;
   protected _width: number = 0;
@@ -45,12 +47,6 @@ export class XYItemContainer extends Renderable {
   
   private _lastSize: number|null = null;
   private _isMinimized: boolean = false;
-
-  constructor(
-    @Inject(ConfigurationRef) private _config: XYItemContainerConfig
-  ) {
-    super();
-  }
 
   get size(): number {
     return this._container.isRow ? this.width : this.height;

@@ -1,9 +1,9 @@
-import { Token, Inject, Optional } from '../di';
-import { Renderable, RenderableConfig } from '../dom';
+import { Token, Inject, Optional, Type } from '../di';
+import { Renderable, RenderableConfig, ConfiguredRenderable } from '../dom';
 import { RenderableConstructorArg } from '../common';
-import { isObject, isFunction } from '../utils';
-import { SerializerContainer } from './SerializerContainer';
-import { ConfiguredItem } from '../ConfiguredItem';
+import { isObject, isFunction, get } from '../utils';
+import { SerializerContainer, BaseSerializerArg, BaseSerializer } from './SerializerContainer';
+import { ConfiguredSerializer } from './ConfiguredSerializer';
 
 export const SERIALIZER_CONFIG = new Token<any>('SERIALIZER_CONFIG');
 
@@ -14,7 +14,10 @@ export interface SerializerConfig {
 
 export interface Serialized {
   name: string;
+  serializer?: SerializedSerializerConfig;
 }
+
+export interface SerializedSerializerConfig extends Serialized, SerializerConfig {}
 
 export abstract class Serializer<R extends Renderable, S extends Serialized> {
   @Inject(SerializerContainer) protected container: SerializerContainer;
@@ -27,6 +30,22 @@ export abstract class Serializer<R extends Renderable, S extends Serialized> {
   abstract deserialize(serialized: S): RenderableConstructorArg<R>;
 
   postDeserialized(serialized: S, node: RenderableConstructorArg<R>): RenderableConstructorArg<R> {
+    if (node instanceof ConfiguredRenderable) {
+      const config = ConfiguredRenderable.resolveConfiguration(node) as RenderableConfig;
+      const renderableClass = ConfiguredRenderable.resolve(node);
+
+      if (serialized.serializer) {
+        const serializerClass = this.container.resolveClass(serialized.serializer.name) as typeof Serializer | null;
+
+        if (serializerClass) {
+          return new ConfiguredRenderable(renderableClass, {
+            ...config,
+            serializer: serializerClass.configure(serialized.serializer)
+          });
+        }
+      }
+    }
+
     return node;
   }
 
@@ -45,14 +64,55 @@ export abstract class Serializer<R extends Renderable, S extends Serialized> {
       }
     }
 
+    const nodeSerializer = node.getSerializer();
+
+    if (nodeSerializer) {
+      serialized.serializer = Serializer.resolveAndSerialize(nodeSerializer);
+    }
+
     return serialized;
+  }
+
+  getConfig(): SerializerConfig | null {
+    return this.config;
   }
 
   exclude(node: R): boolean {
     return false;
   }
 
-  static configure<T extends typeof Serializer>(config: SerializerConfig): ConfiguredItem<T, SerializerConfig> {
-    return new ConfiguredItem(this as T, config);
+  static resolve(serializer: BaseSerializerArg): { config: SerializerConfig | null, type: typeof Serializer } {
+    if (serializer instanceof ConfiguredSerializer) {
+      return {
+        config: ConfiguredSerializer.resolveConfig(serializer),
+        type: ConfiguredSerializer.resolveItem<typeof Serializer>(serializer)
+      };
+    }
+
+    if (serializer instanceof Serializer) {
+      return {
+        config: serializer.getConfig(),
+        type: serializer.constructor as typeof Serializer
+      };
+    }
+
+    return { config: null, type: serializer };
+  }
+
+  static resolveAndSerialize(serializer: BaseSerializerArg): SerializedSerializerConfig {
+    const { config, type } = this.resolve(serializer);
+
+    return {
+      ...config,
+      name: type.name
+    };
+  }
+
+  static configure<T extends typeof Serializer>(config: SerializerConfig): ConfiguredSerializer<T, SerializerConfig> {
+    return new ConfiguredSerializer(this as T, config, container => this.register(container));
+  }
+
+  static register(container: SerializerContainer): void {
+    container.registerClass(this.name, this as any);
   }
 }

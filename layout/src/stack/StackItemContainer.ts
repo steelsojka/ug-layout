@@ -29,6 +29,7 @@ export interface StackItemContainerConfig extends RenderableConfig {
   droppable?: boolean;
   draggable?: boolean;
   closeable?: boolean;
+  persist?: boolean;
   tabControls?: RenderableArg<TabControl>[];
 }
 
@@ -42,7 +43,7 @@ export interface StackItemContainerConfig extends RenderableConfig {
 export class StackItemContainer extends Renderable implements DropTarget {
   private _controls: TabControl[] = [];
 
-  @Inject(ConfigurationRef) private _config: StackItemContainerConfig;
+  @Inject(ConfigurationRef) protected _config: StackItemContainerConfig;
   @Inject(ContainerRef) protected _container: Stack;
   
   get container(): Stack {
@@ -107,6 +108,10 @@ export class StackItemContainer extends Renderable implements DropTarget {
     }
     
     return this.container.offsetX;
+  }
+
+  get persist(): boolean {
+    return this._config ? this._config.persist !== false : true;
   }
 
   protected get _item(): Renderable {

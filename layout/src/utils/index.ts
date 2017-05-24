@@ -1,6 +1,7 @@
 import { Observer } from '../events';
 
 export * from './Deferred';
+export * from './ReversibleMap';
 
 export function isNumber(val: any): val is number {
   return typeof val === 'number';

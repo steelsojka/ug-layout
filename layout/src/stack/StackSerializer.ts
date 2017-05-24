@@ -16,6 +16,7 @@ export interface SerializedStackItem {
   draggable: boolean;
   closeable: boolean;
   tabControls: Serialized[];
+  persist?: boolean;
 }
 
 export interface SerializedStack extends SerializedRenderable {
@@ -25,6 +26,7 @@ export interface SerializedStack extends SerializedRenderable {
   reverse: boolean;
   header: StackHeaderConfig|null;
   controls: Serialized[];
+  persist?: boolean;
 }
 
 export class StackSerializer extends Serializer<Stack, SerializedStack> {
@@ -43,19 +45,21 @@ export class StackSerializer extends Serializer<Stack, SerializedStack> {
       controls: !node.header ? [] : node.header.controls.map(control => {
         return this.container.serialize(control);
       }),
-      children: node.items.map(item => {
-        return {
-          use: this.container.serialize(item.getChildren()[0]),
-          tags: [ ...item.tags ],
-          title: item.title,
-          draggable: item.draggable,
-          droppable: item.droppable,
-          closeable: item.closeable,
-          tabControls: item.controls.map(control => {
-            return this.container.serialize(control);
-          })
-        };
-      })
+      children: node.items
+        .filter(item => item.persist)
+        .map(item => {
+          return {
+            use: this.container.serialize(item.getChildren()[0]),
+            tags: [ ...item.tags ],
+            title: item.title,
+            draggable: item.draggable,
+            droppable: item.droppable,
+            closeable: item.closeable,
+            tabControls: item.controls.map(control => {
+              return this.container.serialize(control);
+            })
+          };
+        })
     }  
   }
 
@@ -94,5 +98,7 @@ export class StackSerializer extends Serializer<Stack, SerializedStack> {
     container.registerSerializer(MinimizeStackControl, StackControlSerializer.configure({ name: 'MinimizeStackControl', type: MinimizeStackControl }));
     container.registerSerializer(CloseStackControl, StackControlSerializer.configure({ name: 'CloseStackControl', type: CloseStackControl }));
     container.registerSerializer(CloseTabControl, GenericSerializer.configure({ name: 'CloseTabControl', type: CloseTabControl }));
+
+    Serializer.register.call(this, container);
   }
 }

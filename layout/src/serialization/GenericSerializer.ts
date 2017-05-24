@@ -3,7 +3,7 @@ import { Serializer, Serialized } from './Serializer';
 import { SerializerContainer } from './SerializerContainer';
 import { Renderable, RenderableConfig } from '../dom';
 import { RenderableConstructorArg, ConfigureableType } from '../common';
-import { ConfiguredItem } from '../ConfiguredItem';
+import { ConfiguredSerializer } from './ConfiguredSerializer';
 
 export interface GenericSerializerConfig<R extends Renderable> {
   name: string;
@@ -45,15 +45,9 @@ export class GenericSerializer<R extends Renderable> extends Serializer<R, Seria
     return this.config.type;
   }
 
-  /**
-   * Registers this class with the container.
-   * @param {SerializerContainer} container 
-   */
-  register(container: SerializerContainer): void {
-    container.registerClass(this.config.name, this.config.type);
-  }
-
-  static configure<R extends Renderable>(config: GenericSerializerConfig<R>): ConfiguredItem<typeof GenericSerializer, GenericSerializerConfig<R>> {
-    return new ConfiguredItem(GenericSerializer, config);
+  static configure<R extends Renderable>(config: GenericSerializerConfig<R>): ConfiguredSerializer<typeof GenericSerializer, GenericSerializerConfig<R>> {
+    return new ConfiguredSerializer(this, config, container => {
+      container.registerClass(config.name, config.type);
+    });
   }
 }

@@ -27,7 +27,7 @@ export class Splitter extends Renderable {
   private _element: HTMLElement;
   private _isDisabled: boolean = false;
 
-  @Inject(ConfigurationRef) private _config: SplitterConfig;
+  @Inject(ConfigurationRef) protected _config: SplitterConfig;
   @Inject(DocumentRef) private _document: Document;
   @Inject(ContainerRef) protected _container: XYContainer;
   @Inject(Draggable) protected _draggable: Draggable<Splitter>;

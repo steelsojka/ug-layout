@@ -58,5 +58,7 @@ export class ViewSerializer extends Serializer<View, SerializedView> {
 
   static register(container: SerializerContainer): void {
     container.registerClass('View', View);
+
+    Serializer.register.call(this, container);
   }
 }

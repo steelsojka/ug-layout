@@ -47,24 +47,11 @@ export const DEFAULT_STACK_HEADER_SIZE = 25;
 export class StackHeader extends Renderable implements DropTarget {
   protected _contentItems: StackTab[] = [];
   private _controls: StackControl[] = [];
-  private _config: StackHeaderConfig;
   private _tabAreas: RenderableArea[];
 
+  @Inject(ConfigurationRef) protected _config: StackHeaderConfig;
   @Inject(ContainerRef) protected _container: Stack;
   @Inject(DragHost) protected _dragHost: DragHost;
-  
-  constructor(
-    @Inject(ConfigurationRef) _config: StackHeaderConfigArgs|null,
-  ) {
-    super();
-    
-    this._config = Object.assign({
-      controls: [],
-      size: DEFAULT_STACK_HEADER_SIZE,
-      droppable: true,
-      distribute: false
-    }, _config);
-  } 
 
   get width(): number {
     return this._container.isHorizontal ? this._container.width : this._config.size;
@@ -96,6 +83,13 @@ export class StackHeader extends Renderable implements DropTarget {
 
   @PostConstruct()
   initialize(): void {
+    this._config = Object.assign({
+      controls: [],
+      size: DEFAULT_STACK_HEADER_SIZE,
+      droppable: true,
+      distribute: false
+    }, this._config);
+
     super.initialize();
     
     this._dragHost.start

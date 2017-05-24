@@ -42,5 +42,7 @@ export class XYContainerSerializer extends Serializer<XYContainer, SerializedXYC
     container.registerClass('XYContainer', XYContainer);
     container.registerSerializer(Row, XYContainerSerializer, { skipRegister: true });
     container.registerSerializer(Column, XYContainerSerializer, { skipRegister: true });
+
+    Serializer.register.call(this, container);
   }
 }

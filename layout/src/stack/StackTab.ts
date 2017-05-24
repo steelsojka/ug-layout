@@ -46,24 +46,7 @@ export class StackTab extends Renderable {
   @Inject(DragHost) private _dragHost: DragHost;
   @Inject(DocumentRef) private _document: Document;
   @Inject(LockState) private _lockState: LockState;
-  
-  /**
-   * Creates an instance of StackTab.
-   * @param {StackTabConfig} _config 
-   * @param {Draggable<StackTab>} _draggable 
-   * @param {DragHost} _dragHost 
-   * @param {Document} _document 
-   */
-  constructor(
-    @Inject(ConfigurationRef) private _config: StackTabConfig,
-  ) {
-    super();
-    
-    this._config = Object.assign({
-      maxSize: 150,
-      title: ''   
-    }, this._config || {});
-  }
+  @Inject(ConfigurationRef) protected _config: StackTabConfig;
   
   get width(): number {
     return this._container.isHorizontal ? this._width : this._container.width;
@@ -149,6 +132,11 @@ export class StackTab extends Renderable {
 
   @PostConstruct()
   initialize(): void {
+    this._config = Object.assign({
+      maxSize: 150,
+      title: ''   
+    }, this._config || {});
+
     super.initialize();
     
     this._draggable.drag

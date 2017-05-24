@@ -1,7 +1,7 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
-import { Type, Injector } from '../../di';
+import { Type, Injector, PostConstruct, Inject } from '../../di';
 import { Renderable, ConfiguredRenderable } from '../../dom';
 import { RenderableArg, ConfigurationRef } from '../../common';
 import { defaults } from '../../utils';
@@ -29,16 +29,18 @@ export type StackControlConfigArgs = {
 export class StackControl extends Renderable {
   container: StackHeader;
   
+  @Inject(ConfigurationRef)
   protected _config: StackControlConfig;
 
   get position(): StackControlPosition {
     return this._config.position;
   }
   
+  @PostConstruct()
   initialize(): void {
     super.initialize();
     
-    this._config = defaults(this.injector.get(ConfigurationRef, {}), {
+    this._config = defaults(this._config, {
       position: StackControlPosition.POST_TAB  
     });
   }

@@ -1,8 +1,8 @@
 import { Injector, Type } from '../di';
 import { Renderable, RenderableConfig } from '../dom';
 import { Serializer, Serialized, SERIALIZER_CONFIG } from './Serializer';
-import { isFunction, isString } from '../utils';
-import { ConfiguredItem } from '../ConfiguredItem';
+import { isFunction, isString, ReversibleMap } from '../utils';
+import { ConfiguredSerializer } from './ConfiguredSerializer';
 import { RenderableConstructorArg } from '../common';
 
 export interface Constructable<T> {
@@ -10,7 +10,7 @@ export interface Constructable<T> {
 }
 
 export type BaseSerializer = Serializer<Renderable, Serialized>;
-export type BaseSerializerArg = BaseSerializer | Type<BaseSerializer> | ConfiguredItem<BaseSerializer | typeof Serializer, any>;
+export type BaseSerializerArg = BaseSerializer | typeof Serializer | ConfiguredSerializer<typeof Serializer, any>;
 
 export interface SerializerContainerConfig {
   /**
@@ -39,7 +39,7 @@ export interface SerializerContainerConfig {
 export class SerializerContainer {
   protected _injector;
   protected _serializers: Map<Type<any>, BaseSerializerArg> = new Map();
-  protected _classToStringMap: Map<Type<any>, string> = new Map();
+  protected _classMap: ReversibleMap<Type<any>, string> = new ReversibleMap<Type<any>, string>();
   protected _instanceCache: WeakMap<any, Serializer<any, any>> = new WeakMap();
 
   /**
@@ -72,12 +72,12 @@ export class SerializerContainer {
   }
 
   constructSerializer(serializer: BaseSerializerArg): Serializer<any, any> {
-    let token: Type<BaseSerializer> | BaseSerializer;   
+    let token: typeof Serializer | BaseSerializer;   
     let config: any = null;
 
-    if (serializer instanceof ConfiguredItem) {
-      token = ConfiguredItem.resolveItem<Type<BaseSerializer>>(serializer);
-      config = ConfiguredItem.resolveConfig(serializer);
+    if (serializer instanceof ConfiguredSerializer) {
+      token = ConfiguredSerializer.resolveItem<typeof Serializer>(serializer);
+      config = ConfiguredSerializer.resolveConfig(serializer);
     } else {
       token = serializer;
     }
@@ -86,7 +86,7 @@ export class SerializerContainer {
       return this._injector.resolveAndCreateChild([
         { provide: SERIALIZER_CONFIG, useValue: config }
       ])
-        .resolveAndInstantiate(token)
+        .resolveAndInstantiate(token);
     }
 
     if (isFunction(serializer)) {
@@ -102,8 +102,7 @@ export class SerializerContainer {
    * @param {Type<any>} _Class 
    */
   registerClass(name: string, _Class: Type<any>): void {
-    this._classToStringMap.set(_Class, name);
-    this._injector.registerProvider({ provide: name, useValue: _Class });
+    this._classMap.set(_Class, name);
   }
   
   /**
@@ -122,7 +121,7 @@ export class SerializerContainer {
    * @returns {(string|null)} 
    */
   resolveClassString(_Class: Type<any>): string|null {
-    return this._classToStringMap.get(_Class) || null;
+    return this._classMap.has(_Class) ? this._classMap.get(_Class) as string : null;
   }
 
   /**
@@ -130,7 +129,7 @@ export class SerializerContainer {
    * @param {Serialized} node 
    * @returns {(BaseSerializer|null)} 
    */
-  resolveFromSerialized(node: Serialized): BaseSerializer|null {
+  resolveFromSerialized(node: Serialized): Serializer<any, any>|null {
     const _Class = this.resolveClass(node.name);
 
     if (_Class) {
@@ -147,9 +146,9 @@ export class SerializerContainer {
    * @param {Type<any>} _Class 
    * @returns {(BaseSerializer|null)} 
    */
-  resolveFromClass(_Class: Type<any>): BaseSerializer|null {
+  resolveFromClass(_Class: Type<any>): Serializer<any, any>|null {
     if (this._serializers.has(_Class)) {
-      return this.resolve<BaseSerializer>(this._serializers.get(_Class));
+      return this.resolve<Serializer<any, any>>(this._serializers.get(_Class));
     }
 
     return null;
@@ -181,8 +180,8 @@ export class SerializerContainer {
    * @param {string} name 
    * @returns {(Type<any>|null)} 
    */
-  resolveClass(name: string): Type<any>|null {
-    return this.resolve<Type<any>>(name);
+  resolveClass<T>(name: string): Type<T>|null {
+    return this._classMap.has(name) ? this._classMap.get(name) as Type<T> : null;
   }
 
   /**

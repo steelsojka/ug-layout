@@ -105,6 +105,7 @@ export abstract class Renderable {
 
   @Inject(Renderer) protected _renderer: Renderer;
   @Inject(Injector) protected _injector: Injector;
+  @Inject(ConfigurationRef) protected _config: RenderableConfig | null;
 
   constructor() {
     this.destroyed = this._destroyed.asObservable();
@@ -568,7 +569,7 @@ export abstract class Renderable {
    * @returns {(BaseSerializerArg | null)} 
    */
   getSerializer(): BaseSerializerArg | null {
-    return null;
+    return this._config && this._config.serializer ? this._config.serializer : null;
   }
 
   /**

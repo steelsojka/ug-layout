@@ -58,5 +58,7 @@ export class XYItemContainerSerializer extends Serializer<XYItemContainer, Seria
 
   static register(container: SerializerContainer): void {
     container.registerClass('XYItemContainer', XYItemContainer);
+
+    Serializer.register.call(this, container);
   }
 }
