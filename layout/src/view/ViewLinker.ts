@@ -64,10 +64,6 @@ export class ViewLinker {
     const metadata = this.readMetadata(instance);
     const subscription = new Subscription();
 
-    for (const init of metadata.inits) {
-      this._injector.invoke((...args) => instance[init.method](...args), init.injections);
-    }
-
     for (const insert of metadata.inserts) {
       this.wireInsert(instance, insert);
     }
@@ -79,7 +75,20 @@ export class ViewLinker {
     for (const query of metadata.queries) {
       subscription.add(this.wireQuery(instance, query));
     }
-    
+
+    for (const unlink of metadata.unlinks) {
+      instance[unlink] = Observable.create(observer => {
+        subscription.add(() => {
+          observer.next();
+          observer.complete();
+        });
+      });
+    }
+
+    for (const init of metadata.inits) {
+      this._injector.invoke((...args) => instance[init.method](...args), init.injections);
+    }
+
     return subscription;
   }
 

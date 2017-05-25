@@ -1,7 +1,7 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
-import { Inject, Injector } from '../di'
+import { Inject, Injector, PostConstruct } from '../di'
 import { 
   Renderer, 
   Renderable, 
@@ -17,6 +17,7 @@ import {
   UNALLOCATED,
   RenderableArg
 } from '../common';
+import { MakeVisibleCommand } from '../commands';
 import { isNumber, isFunction } from '../utils';
 import { BeforeDestroyEvent } from '../events';
 import { XYContainer } from './XYContainer';
@@ -150,6 +151,7 @@ export class XYItemContainer extends Renderable {
     return this._contentItems[0];
   }
 
+  @PostConstruct()
   initialize(): void {
     super.initialize();
     
@@ -172,6 +174,7 @@ export class XYItemContainer extends Renderable {
     this._isMinimized = Boolean(this._config.minimized);
 
     this.subscribe(MinimizeCommand, this._minimize.bind(this));
+    this.subscribe(MakeVisibleCommand, this.makeVisible.bind(this));
   }
 
   render(): VNode {
@@ -207,6 +210,12 @@ export class XYItemContainer extends Renderable {
     }
 
     return 0;
+  }
+
+  makeVisible(command: MakeVisibleCommand<Renderable>): void {
+    if (this.isMinimized) {
+      this.emit(new MinimizeCommand(this, { minimize: false }));
+    }
   }
 
   private _minimize(e: MinimizeCommand<Renderable>): void {

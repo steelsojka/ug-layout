@@ -221,15 +221,17 @@ export class ViewManager {
     const { ref, token, id } = query;
   
     if (ref) {
-      return this.queryRef(ref);
+      return this.queryRef(ref, query);
     } else if (token) {
-      return this.queryToken(token, id);
+      return this.queryToken(token, id, query);
     }
 
     return Observable.empty();
   }
 
-  queryToken<T>(token: any, id?: number): Observable<ViewManagerQueryEvent<T>> {
+  queryToken<T>(token: any, id?: number, options: ViewQueryArgs = {}): Observable<ViewManagerQueryEvent<T>> {
+    const { immediate = false } = options;
+
     return Observable.create((observer: Observer<ViewManagerQueryEvent<T>>) => {
       for (const container of this.query<T>({ token, id })) {
         observer.next({
@@ -237,6 +239,12 @@ export class ViewManager {
           container,
           initial: true
         });
+      }
+
+      if (immediate) {
+        observer.complete();
+
+        return;
       }
 
       return Observable.merge(
@@ -249,7 +257,9 @@ export class ViewManager {
     });
   }
 
-  queryRef<T>(ref: string): Observable<ViewManagerQueryEvent<T>> {
+  queryRef<T>(ref: string, options: ViewQueryArgs = {}): Observable<ViewManagerQueryEvent<T>> {
+    const { immediate = false } = options;
+
     return Observable.create((observer: Observer<ViewManagerQueryEvent<T>>) => {
       const result = this.query<T>({ ref });
       
@@ -260,6 +270,12 @@ export class ViewManager {
           initial: true,
           container: result[0]  
         });
+      }
+
+      if (immediate) {
+        observer.complete();
+
+        return;
       }
 
       return Observable.merge(

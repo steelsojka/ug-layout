@@ -73,6 +73,16 @@ export function ViewLinkInit(...injections: any[]): MethodDecorator {
   };
 }
 
+export function ViewUnlink(): PropertyDecorator {
+  return (target: Object, key: string) => {
+    const metadata: ViewLinkerMetadata = Reflect.getOwnMetadata(VIEW_LINKER_METADATA, target) || getDefaultMetadata();
+
+    metadata.unlinks.push(key);
+
+    Reflect.defineMetadata(VIEW_LINKER_METADATA, metadata, target);
+  };
+}
+
 /**
  * Sets up a view insert method.
  * @export
@@ -118,6 +128,7 @@ export function getDefaultMetadata(): ViewLinkerMetadata {
     queries: [],
     inits: [],
     inserts: [],
-    resolves: []
+    resolves: [],
+    unlinks: []
   };
 }

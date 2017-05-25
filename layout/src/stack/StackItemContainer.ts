@@ -255,4 +255,8 @@ export class StackItemContainer extends Renderable implements DropTarget {
   private _onTabClose(e: StackItemCloseEvent): void {
     this.emitDown(e.delegate(BeforeDestroyEvent, this));
   }
+
+  static configure(config: StackItemContainerConfig): ConfiguredRenderable<StackItemContainer> {
+    return new ConfiguredRenderable(StackItemContainer, config);
+  }
 }

@@ -13,7 +13,6 @@ import { MakeVisibleCommand, MinimizeCommand } from '../commands';
 import { ViewManager } from './ViewManager';
 import { ViewFactory } from './ViewFactory';
 import { CustomViewHookEvent } from './CustomViewHookEvent';
-import { get } from '../utils';
 import { StateContext } from '../StateContext';
 import { SizeChanges } from './hooks';
 

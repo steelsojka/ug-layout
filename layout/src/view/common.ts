@@ -43,6 +43,7 @@ export interface ViewQueryArgs {
   token?: any;
   id?: number;
   type?: ViewQueryResolveType[];
+  immediate?: boolean;
 }
 
 export interface ViewQueryReadOptions {
@@ -66,6 +67,7 @@ export interface ViewLinkerMetadata {
   inits: ViewQueryInitConfig[];
   inserts: ViewInsertConfig[];
   resolves: ViewResolveConfig[];
+  unlinks: string[];
 }
 
 export interface ViewQueryInitConfig {

@@ -56,7 +56,7 @@
   },
   "dependencies": {
     "mindi": "^2.6.3",
-    "rx-decorators": "^1.0.2",
+    "rx-decorators": "^1.2.1",
     "snabbdom": "^0.6.3",
     "tslib": "^1.6.0"
   },

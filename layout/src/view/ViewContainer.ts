@@ -398,6 +398,15 @@ export class ViewContainer<T> {
       this._container.makeVisible();
     }
   }
+
+  /**
+   * Minimizes the view if applicable
+   */
+  minimize(): void {
+    if (this._container) {
+      this._container.minimize();
+    }
+  }
   
   /**
    * Determines whether this renderable is visible.
