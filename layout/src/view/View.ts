@@ -179,8 +179,8 @@ export class View extends Renderable {
    * Minimizes this view if applicable.
    * @emits {MinimizeCommand}
    */
-  minimize(): void {
-    this.emitUp(new MinimizeCommand(this));
+  minimize(isMinimized: boolean = true): void {
+    this.emitUp(new MinimizeCommand(this, { minimize: isMinimized }));
   }
 
   /**

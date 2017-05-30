@@ -402,9 +402,9 @@ export class ViewContainer<T> {
   /**
    * Minimizes the view if applicable
    */
-  minimize(): void {
+  minimize(isMinimized: boolean = true): void {
     if (this._container) {
-      this._container.minimize();
+      this._container.minimize(isMinimized);
     }
   }
   
