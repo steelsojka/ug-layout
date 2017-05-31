@@ -78,6 +78,11 @@ export class Angular1ComponentFactory<T> {
       this.instance['$onInit']();
     }
 
+    if (typeof this.instance['$doCheck'] === 'function') {
+      this.scope.$watch(() => this.instance['$doCheck']());
+      this.instance['$doCheck']();
+    }
+
     // Link the view to the controller.
     this._element = linkFn(this.scope)[0];
 

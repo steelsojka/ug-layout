@@ -1,6 +1,7 @@
 export interface Scope {
   $destroy(): void;
   $new(isolate?: boolean): Scope;
+  $watch(watcher: Function | string, callback?: Function): Function;
 }
 
 export interface Injector {
