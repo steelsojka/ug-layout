@@ -135,7 +135,7 @@ export class RootLayout extends Renderable {
     }
   }
 
-  load(config: ConfiguredRenderable<RootLayout>|RootLayoutConfig, options: { context?: string } = {}): void {
+  load(config: ConfiguredRenderable<RootLayout>|RootLayoutConfig, options: { context?: ContextType } = {}): void {
     const { context = ContextType.LOAD } = options;
 
     this.reset(context);
@@ -146,7 +146,7 @@ export class RootLayout extends Renderable {
     this.update();
   }
 
-  reset(context: string = ContextType.NONE): void {
+  reset(context: ContextType = ContextType.NONE): void {
     this._stateContext.setContext(context);
     this._contentItems.forEach(item => item.destroy());
     this._contentItems = [];

@@ -107,6 +107,10 @@ export function defaults<T>(dest: T, src: T|object|null): T {
   return dest;
 }
 
+export function pluck<T>(key: string, items: any[]): T[] {
+  return items.map(item => get<T>(item, key));
+}
+
 export const uid: () => number = (() => {
   let uid = 0;
   

@@ -7,11 +7,12 @@ import {
   ViewLinkerMetadata,
   ViewInsertConfig,
   ViewResolveConfig,
-  ViewQueryReadOptions
+  ViewQueryReadOptions,
+  ViewQueryInitConfig
 } from './common';
 import { ViewContainer, ViewContainerStatus } from './ViewContainer';
 import { Subscription, Observable, Observer, Subject } from '../events';
-import { get, isFunction, isObject } from '../utils';
+import { get, isFunction, isObject, pluck } from '../utils';
 import { LayoutManipulator } from '../layout';
 import { getDefaultMetadata } from './decorators';
 
@@ -61,7 +62,7 @@ export class ViewLinker {
    * @returns {Subscription} A subscription for all streams created.
    */
   autowire(instance: object): Subscription {
-    const metadata = this.readMetadata(instance);
+    const metadata = this.readInstanceMetadata(instance);
     const subscription = new Subscription();
 
     for (const insert of metadata.inserts) {
@@ -155,8 +156,8 @@ export class ViewLinker {
    * @param {object} instance 
    * @returns {ViewLinkerMetadata} 
    */
-  readMetadata(instance: object): ViewLinkerMetadata {
-    return ViewLinker.readMetadata(get(instance, 'constructor.prototype', null));
+  readInstanceMetadata(instance: object): ViewLinkerMetadata {
+    return this.getMetadata(get(instance, 'constructor.prototype', null));
   }
 
   /**
@@ -204,6 +205,41 @@ export class ViewLinker {
         }
       });
     });
+  }
+
+  /**
+   * Gets metadata for a target including merging of extension metadata.
+   * @param {(object | null)} target 
+   * @returns {ViewLinkerMetadata} 
+   */
+  getMetadata(target: object | null): ViewLinkerMetadata {
+    if (!target) {
+      return getDefaultMetadata();
+    }
+
+    const metadata = ViewLinker.readMetadata(target);
+
+    return this.mergeMetadata(
+      ...metadata.extensions.map(ext => this.getMetadata(ext)), 
+      metadata
+    );
+  }
+
+  /**
+   * Merges multiple metadata objects into one. The last item takes priority.
+   * @param {...ViewLinkerMetadata[]} metadata 
+   * @returns {ViewLinkerMetadata} 
+   */
+  mergeMetadata(...metadata: ViewLinkerMetadata[]): ViewLinkerMetadata {
+    const result = getDefaultMetadata();    
+
+    result.inits = result.inits.concat(...pluck<ViewQueryInitConfig>('inits', metadata));
+    result.inserts = result.inserts.concat(...pluck<ViewInsertConfig>('inserts', metadata));
+    result.queries = result.queries.concat(...pluck<ViewQueryConfig>('queries', metadata));
+    result.resolves = result.resolves.concat(...pluck<ViewResolveConfig>('resolves', metadata));
+    result.unlinks = result.unlinks.concat(...pluck<string>('unlinks', metadata));
+
+    return result;
   }
 
   private _insert<T>(instance: object, config: ViewInsertConfig): Observable<any> {

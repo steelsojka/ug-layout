@@ -123,8 +123,25 @@ export function ViewResolve(config: ViewResolveConfigArgs): PropertyDecorator {
   };
 }
 
+/**
+ * Indicates that this class should inherit all metadata from the given constructors.
+ * @export
+ * @param {Function[]} constructors 
+ * @returns {ClassDecorator} 
+ */
+export function ViewLinkExtends(...constructors: Function[]): ClassDecorator {
+  return (target: Function) => {
+    const metadata: ViewLinkerMetadata = Reflect.getOwnMetadata(VIEW_LINKER_METADATA, target.prototype) || getDefaultMetadata();
+
+    metadata.extensions.push(...constructors.map(ctor => ctor.prototype));
+
+    Reflect.defineMetadata(VIEW_LINKER_METADATA, metadata, target.prototype);
+  };
+}
+
 export function getDefaultMetadata(): ViewLinkerMetadata {
   return {
+    extensions: [],
     queries: [],
     inits: [],
     inserts: [],

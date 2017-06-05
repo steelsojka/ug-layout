@@ -1,11 +1,13 @@
-export class StateContext {
-  private _context: string;
+import { ContextType } from './common';
 
-  get context(): string {
+export class StateContext {
+  private _context: ContextType;
+
+  get context(): ContextType {
     return this._context;
   }
 
-  setContext(val: string): void {
+  setContext(val: ContextType): void {
     this._context = val;
   }
 }

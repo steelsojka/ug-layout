@@ -14,5 +14,6 @@ export {
   ViewLinkInit,
   ViewQuery,
   ViewResolve,
-  ViewUnlink
+  ViewUnlink,
+  ViewLinkExtends
 } from './decorators';

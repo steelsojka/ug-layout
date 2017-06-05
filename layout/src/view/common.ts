@@ -63,6 +63,7 @@ export interface ViewResolveConfig extends ViewResolveConfigArgs {
 }
 
 export interface ViewLinkerMetadata {
+  extensions: Function[];
   queries: ViewQueryConfig[];
   inits: ViewQueryInitConfig[];
   inserts: ViewInsertConfig[];

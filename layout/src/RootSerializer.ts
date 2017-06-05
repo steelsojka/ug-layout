@@ -1,8 +1,9 @@
-import { SerializerContainer, SerializerContainerConfig } from './serialization';
+import { SerializerContainer, SerializerContainerConfig, GenericSerializer } from './serialization';
 
 import { XYContainer, XYContainerSerializer, XYItemContainer, XYItemContainerSerializer } from './XYContainer';
 import { LayoutSerializer, Layout } from './layout';
 import { Stack, StackSerializer } from './stack';
+import { NoopRenderable } from './noop';
 import { RootLayout } from './RootLayout';
 import { RootLayoutSerializer, SerializedRootLayout } from './RootLayoutSerializer';
 import { View, ViewSerializer } from './view';
@@ -18,6 +19,7 @@ export class RootSerializer extends SerializerContainer {
     this.registerSerializer(RootLayout, RootLayoutSerializer);
     this.registerSerializer(View, ViewSerializer);
     this.registerSerializer(XYItemContainer, XYItemContainerSerializer);
+    this.registerSerializer(NoopRenderable, GenericSerializer.configure({ name: 'NoopRenderable', type: NoopRenderable }));
   }  
 
   deserialize(serialized: SerializedRootLayout): RenderableConstructorArg<RootLayout> {

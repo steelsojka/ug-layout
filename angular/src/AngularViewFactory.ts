@@ -116,6 +116,7 @@ export class AngularViewFactory extends ViewFactory {
       Component: token,
       config: metadata,
       $scope: this._plugin.scope || ng1Injector.get<angular.Scope>('$rootScope'),
+      angularGlobal: this._angularGlobal,
       providers: this.getNg1Providers({
         viewComponentConfig: config
       }, viewContainer)

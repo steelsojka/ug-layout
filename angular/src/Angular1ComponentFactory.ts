@@ -13,7 +13,8 @@ export class Angular1ComponentFactory<T> {
     'viewContainer',
     'Component',
     'config',
-    'providers'
+    'providers',
+    'angularGlobal'
   ];
 
   private _scope: angular.Scope;
@@ -28,7 +29,8 @@ export class Angular1ComponentFactory<T> {
     private _viewContainer: ViewContainer<T>,
     private _Component: Type<any>,
     private _config: ViewComponentConfig,
-    private _providers: { [key: string]: any }
+    private _providers: { [key: string]: any },
+    private _angularGlobal: any
   ) {}
 
   get scope(): angular.Scope {
@@ -65,7 +67,7 @@ export class Angular1ComponentFactory<T> {
     // Instaniate our controller for the component.
     this._instance = this._$injector.instantiate<T>(this._Component, {
       ...this._providers,
-      $element: this._viewContainer.element, 
+      $element: this._angularGlobal.element(this._viewContainer.element),
       $scope: this.scope,
       viewContainer: this._viewContainer
     });

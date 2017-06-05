@@ -8,10 +8,11 @@ export enum XYDirection {
   Y
 }
 
-export const ContextType: { [key: string]: string } = {
-  NONE: 'NONE',
-  LOAD: 'LOAD'
-};
+export enum ContextType {
+  NONE,
+  LOAD,
+  RESET
+}
 
 /**
  * Symbol that signifies that an XYItemContainer's ratio is unallocated.

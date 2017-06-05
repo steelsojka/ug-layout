@@ -45,3 +45,7 @@ export interface ViewOnBeforeDestroy {
 export interface ViewOnInit<T> {
   ugOnInit(container: ViewContainer<T>): void;
 }
+
+export interface ViewOnLink<T> {
+  ugOnLink(container: ViewContainer<T>): void;
+}
