@@ -8,7 +8,7 @@
   transition: opacity 200ms ease;
 }
 
-.ug-layout__splitter:hover, .ug-layout__splitter-dragging {
+.ug-layout__splitter:not(.ug-layout__splitter-disabled):hover, .ug-layout__splitter-dragging {
   opacity: 1;
 } 
 
