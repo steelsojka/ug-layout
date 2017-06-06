@@ -302,7 +302,10 @@ export class XYContainer extends Renderable {
   private _isSplitterDisabled(splitter: Splitter): boolean {
     const { before, after } = this._getSplitterItems(splitter);
 
-    return before.isMinimized || after.isMinimized;
+    return before.isMinimized 
+      || after.isMinimized 
+      || before.minSize === before.maxSize 
+      || after.minSize === after.maxSize;
   }
 
   private _dragStatusChanged(event: DragEvent<Splitter>): void {
