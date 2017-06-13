@@ -222,10 +222,6 @@ export class StackItemContainer extends Renderable implements DropTarget {
   }
 
   setContainer(container: Stack): void {
-    if (container === this._container) {
-      return;
-    }
-    
     super.setContainer(container);
 
     this._container.scope(StackItemCloseEvent)

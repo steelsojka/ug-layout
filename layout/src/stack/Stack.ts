@@ -212,7 +212,7 @@ export class Stack extends Renderable {
     } else {
       container = item;
     }
-    
+
     const tab = this._header.addTab({
       title: container.title,
       maxSize: get<number>(this._config, 'header.maxTabSize', 200),

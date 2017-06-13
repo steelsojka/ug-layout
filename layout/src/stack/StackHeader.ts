@@ -28,7 +28,7 @@ import {
   DragEvent,
   RenderableArg
 } from '../common';
-import { Subject, Observable, BeforeDestroyEvent } from '../events';
+import { Subject, Observable } from '../events';
 import { StackControl, StackControlPosition } from './controls';
 import { StackItemContainer } from './StackItemContainer';
 
