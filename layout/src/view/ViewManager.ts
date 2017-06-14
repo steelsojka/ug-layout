@@ -4,13 +4,15 @@ import { Inject, Type } from '../di';
 import { ViewFactory, ViewFactoryArgs } from './ViewFactory';
 import { ViewContainer } from './ViewContainer';
 import { Subject, Observable, Observer } from '../events';
+import { ContextType } from '../common';
 import {
   VIEW_CONFIG_KEY, 
   ViewConfig, 
   ViewComponentConfig, 
   ResolverStrategy,
   ViewQueryArgs,
-  ViewQueryResolveType
+  ViewQueryResolveType,
+  CacheStrategy
 } from './common';
 import { propEq } from '../utils';
 
@@ -314,6 +316,28 @@ export class ViewManager {
     return [];
   }
 
+  /**
+   * Purges any cached views that should be destroyed with the following context.
+   * @param {ContextType} context 
+   */
+  purgeCached(context: ContextType): void {
+    for (const container of this.entries()) {
+      if (context === ContextType.LOAD) {
+        if (container.caching !== CacheStrategy.PERSISTENT) {
+          container.destroy();
+        }
+      }  
+    }
+  }
+
+  * entries(): IterableIterator<ViewContainer<any>> {
+    for (const map of this._views.values()) {
+      for (const key of Object.keys(map)) {
+        yield map[key];
+      }
+    }
+  }
+
   private _resolve<T>(config: ViewConfig, metadata: ViewComponentConfig, options: ViewResolutionOptions): ViewContainer<T>|null {
     const resolution = this._viewFactory.resolveConfigProperty(config, 'resolution');
     let result: ViewContainer<T>|null = null;
@@ -347,7 +371,6 @@ export class ViewManager {
     
     return result;
   }
-
 
   private _resolveViewQueryStream<T>(types: ViewQueryResolveType[], initStream: Observable<ViewManagerEvent<T>>): Observable<ViewManagerEvent<T>> {
     const streams: Observable<ViewManagerEvent<T>>[] = [];

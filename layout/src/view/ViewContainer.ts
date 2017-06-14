@@ -1,15 +1,24 @@
 import { CompleteOn } from 'rx-decorators/completeOn';
 
-import { Injector, Type, Inject, Optional, PostConstruct } from '../di';
+import { Injector, Type, Inject, Optional, PostConstruct, forwardRef } from '../di';
 import { Renderable } from '../dom';
 import { ReplaySubject, Observable, Subject, BeforeDestroyEvent, BehaviorSubject } from '../events';
-import { ContainerRef, ConfigurationRef, DocumentRef } from '../common';
+import { ContainerRef, ConfigurationRef, DocumentRef, ContextType } from '../common';
+import { StateContext } from '../StateContext';
 import { View } from './View';
-import { ViewComponentRef, VIEW_COMPONENT_CONFIG, VIEW_CONFIG, ViewConfig } from './common';
+import { ViewFactory } from './ViewFactory';
+import { 
+  ViewComponentRef, 
+  VIEW_COMPONENT_CONFIG, 
+  VIEW_CONFIG, 
+  ViewConfig,
+  ResolverStrategy
+} from './common';
 import { CustomViewHookEvent } from './CustomViewHookEvent';
 import { ViewHookExecutor, ViewHookMetadata, SizeChanges } from './hooks';
 import { isFunction, get, uid, eq, isPromise, isObject, Deferred } from '../utils';
 import { ViewFailReason } from './ViewFailReason';
+import { CacheStrategy } from './common';
 
 export enum ViewContainerStatus {
   READY,
@@ -100,8 +109,10 @@ export class ViewContainer<T> {
   @Inject(DocumentRef) protected _document: Document;
   @Inject(Injector) protected _injector: Injector;
   @Inject(ViewHookExecutor) protected _viewHookExecutor: ViewHookExecutor;
+  @Inject(forwardRef(() => ViewFactory)) protected _viewFactory: ViewFactory;
   @Inject(VIEW_COMPONENT_CONFIG) protected _viewComponentConfig: any;
   @Inject(VIEW_CONFIG) protected _viewConfig: ViewConfig;
+  @Inject(StateContext) protected _stateContext: StateContext;
   
   /**
    * A unique identifier for this instance.
@@ -212,17 +223,25 @@ export class ViewContainer<T> {
     return this._component;
   }
 
+  get caching(): CacheStrategy {
+    return this.resolveConfigProperty<CacheStrategy>('caching') || CacheStrategy.NONE;
+  }
+
   /**
    * Whether the container is cacheable.
    * @readonly
    * @type {boolean}
    */
   get isCacheable(): boolean {
-    return this._container ? this._container.isCacheable : false;
-  }
+    const cacheStrategy = this.caching;
 
-  get isLazy(): boolean {
-    return this._container ? Boolean(this._container.lazy) : false;
+    if ((cacheStrategy === CacheStrategy.RELOAD 
+        && (this._stateContext.context === ContextType.NONE) || this._stateContext.context === ContextType.RESET)
+      || cacheStrategy === CacheStrategy.PERSISTENT) {
+      return true;
+    }
+
+    return false;
   }
 
   /**
@@ -486,6 +505,12 @@ export class ViewContainer<T> {
     }
   }
 
+  /**
+   * Resolves the container. Note, the component must be created or else an error will be thrown.
+   * @throws Error
+   * @param {{ fromCache?: boolean }} [options={}] 
+   * @returns {Promise<void>} 
+   */
   async resolve(options: { fromCache?: boolean } = {}): Promise<void> {
     const { fromCache = false } = options;
 
@@ -522,6 +547,26 @@ export class ViewContainer<T> {
   triggerVisibilityChange(isVisible: boolean): void {
     this._visibilityChanges.next(isVisible);
   }
+
+  /**
+   * Resolves a config property by checking the config on the currently attached container first,
+   * then the config the ViewContainer was created with, then the metadata defined for the component.
+   * @template T 
+   * @param {string} path 
+   * @returns {(T | null)} 
+   */
+  resolveConfigProperty<T>(path: string): T | null {
+    if (this._container) {
+      const value = get<T | undefined>(this._container.configuration, path, undefined);
+
+      if (value !== undefined) {
+        return value;
+      }
+    }
+
+    return this._viewFactory.resolveConfigProperty<T>(this._viewConfig, path);
+  }
+
 
   /**
    * Invoked when the view renderable is destroyed.

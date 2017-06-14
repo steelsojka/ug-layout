@@ -150,6 +150,7 @@ export class RootLayout extends Renderable {
     this._stateContext.setContext(context);
     this._contentItems.forEach(item => item.destroy());
     this._contentItems = [];
+    this._viewManager.purgeCached(context);
   }
 
   setContainingNode(node: Node): void {

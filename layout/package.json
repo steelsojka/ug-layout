@@ -55,7 +55,7 @@
     "webpack-dev-server": "^2.2.1"
   },
   "dependencies": {
-    "mindi": "^2.6.3",
+    "mindi": "^2.7.0",
     "rx-decorators": "^1.2.1",
     "snabbdom": "^0.6.3",
     "tslib": "^1.6.0"

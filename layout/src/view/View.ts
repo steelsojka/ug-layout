@@ -75,22 +75,6 @@ export class View extends Renderable {
   get lazy(): boolean|null {
     return this.resolveConfigProperty<boolean>('lazy');
   }
-  
-  /**
-   * Whether this view in configured to be cacheable.
-   * @readonly
-   * @type {(boolean|null)}
-   */
-  get isCacheable(): boolean {
-    const cacheStrategy = this.caching;
-
-    if ((cacheStrategy === CacheStrategy.RELOAD && this._stateContext.context === ContextType.NONE) 
-      || cacheStrategy === CacheStrategy.PERSISTENT) {
-      return true;
-    }
-
-    return false;
-  }
 
   get caching(): CacheStrategy|null {
     return this.resolveConfigProperty<CacheStrategy>('caching');
@@ -121,6 +105,10 @@ export class View extends Renderable {
    */
   get token(): any|null {
     return this._viewFactory.getTokenFrom(this._configuration);
+  }
+
+  get configuration(): ViewConfig {
+    return this._configuration;
   }
 
   get viewComponentConfig(): any | null {
@@ -191,6 +179,10 @@ export class View extends Renderable {
    * @returns {(T|null)} 
    */
   resolveConfigProperty<T>(path: string): T|null {
+    if (this._viewContainer) {
+      return this._viewContainer.resolveConfigProperty<T>(path);
+    }
+
     return this._viewFactory.resolveConfigProperty<T>(this._configuration, path);
   }
 
