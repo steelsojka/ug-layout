@@ -1,6 +1,6 @@
 {
   "name": "ug-layout",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "description": "An extensible and performant layout management framework.",
   "main": "dist/es5/index.js",
   "typings": "dist/es5/index.d.ts",
