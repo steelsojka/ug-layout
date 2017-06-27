@@ -35,7 +35,7 @@
   color: #FFFFFF;
 }
 
-[class^="ug-icon-"], [class*=" ug-icon-"] {
+[class^="ug-icon-"], [class*=" ug-icon-"], .ug-icon-style {
   color: #FFFFFF;
 }
 

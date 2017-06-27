@@ -200,13 +200,13 @@
   align-items: center;
 }
 
-[class^="ug-icon-"], [class*=" ug-icon-"] {
+[class^="ug-icon-"], [class*=" ug-icon-"], .ug-icon-style {
   cursor: pointer;
   opacity: 0.5;  
   transition: opacity 0.15s ease-in;
 }
 
-[class^="ug-icon-"]:hover, [class*=" ug-icon-"]:hover {
+[class^="ug-icon-"]:hover, [class*=" ug-icon-"]:hover, .ug-icon-style:hover {
   opacity: 1;  
 }
 
