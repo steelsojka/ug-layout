@@ -18,14 +18,19 @@ export class CloseStackControl extends StackControl {
   }
   
   render(): VNode {
+    const styles: { [key: string]: string } = {};
+
+    if (this.container.isHorizontal) {
+      styles.height = `${this.height}px`;
+    } else {
+      styles.width = `${this.width}px`;
+    }
+
     return h('div.ug-layout__close-stack-control', {
       attrs: {
         title: 'Close stack'  
       },
-      style: {
-        width: this.container.isHorizontal ? undefined : `${this.width}px`,
-        height: this.container.isHorizontal ? `${this.height}px` : undefined
-      }
+      style: styles 
     }, [
       h('div.ug-icon-close', {
         on: {

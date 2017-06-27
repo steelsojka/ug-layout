@@ -18,13 +18,17 @@ export class MinimizeStackControl extends StackControl {
   }
   
   render(): VNode {
+    const styles: { [key: string] : string } = {};
     const container = this.getParent(XYItemContainer);
+
+    if (this.container.isHorizontal) {
+      styles.height = `${this.height}px`;
+    } else {
+      styles.width = `${this.width}px`;
+    }
     
     return h('div.ug-layout__stack-minimize-control.ug-layout__align-center', {
-      style: {
-        width: this.container.isHorizontal ? undefined : `${this.width}px`,
-        height: this.container.isHorizontal ? `${this.height}px` : undefined
-      }
+      style: styles 
     }, [
       h('div', {
         class: {

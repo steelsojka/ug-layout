@@ -110,8 +110,8 @@ export class Splitter extends Renderable {
         'ug-layout__splitter-dragging': this._isDragging
       },
       style: {
-        height: this.height,
-        width: this.width,
+        height: `${this.height}px`,
+        width: `${this.width}px`,
         transform: `translateX(${this.x}px) translateY(${this.y}px)`
       },
       hook: {

@@ -373,6 +373,21 @@ export class Stack extends Renderable {
   }
 
   /**
+   * Gets the leaf nodes of the active item container.
+   * @override
+   * @returns {Renderable} 
+   */
+  getLeafNodes(): Renderable[] {
+    const item = this.getAtIndex(this.activeIndex);
+
+    if (item) {
+      return item.getLeafNodes();
+    }
+
+    return [ this ];
+  }
+
+  /**
    * Handles a renderable being dropped on the stack within a certain region.
    * @param {StackRegion} region The region the item was dropped in.
    * @param {Renderable} item The item being dropped.

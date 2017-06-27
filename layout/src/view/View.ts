@@ -24,6 +24,7 @@ import { SizeChanges } from './hooks';
  */
 export class View extends Renderable {
   protected _viewContainer: ViewContainer<any>;
+  protected _element: HTMLElement | null = null;
 
   @CompleteOn('destroy')
   protected _visibilityChanges: BehaviorSubject<boolean> = new BehaviorSubject(true);
@@ -115,6 +116,10 @@ export class View extends Renderable {
     return this._viewContainer ? this._viewContainer.viewComponentConfig : null;
   }
 
+  get element(): HTMLElement | null {
+    return this._element;
+  }
+
   @PostConstruct()
   initialize(): void {
     super.initialize();
@@ -202,6 +207,8 @@ export class View extends Renderable {
    * @param {HTMLElement} element 
    */
   private _onCreate(element: HTMLElement): void {
+    this._element = element;
+
     if (!this._viewContainer) {
       let container = this._viewManager.resolve<any>(this._configuration);
       let fromCache = false;

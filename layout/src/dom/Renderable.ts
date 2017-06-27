@@ -565,6 +565,23 @@ export abstract class Renderable {
   }
 
   /**
+   * Returns the active leaf nodes of the render tree from this node. Basically
+   * the node at the end of the tree.
+   * @returns {Renderable}
+   */
+  getLeafNodes(): Renderable[] {
+    const children = this.getChildren();
+
+    if (children.length) {
+      return children.reduce<Renderable[]>((result, child) => {
+        return result.concat(child.getLeafNodes());
+      }, []);
+    }
+
+    return [ this ];
+  }
+
+  /**
    * Returns a serializer, serializer class or a configured serializer specifically for this renderable.
    * @returns {(BaseSerializerArg | null)} 
    */
