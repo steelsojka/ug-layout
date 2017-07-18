@@ -35,11 +35,6 @@ export interface ViewComponentConfig extends _ViewComponentConfig {
    * @type {string}
    */
   controllerAs?: string;
-  /**
-   * The name of a hook to wait for before resolving the factory.
-   * @type {string}
-   */
-  resolveOn?: string;
 }
 
 export type ViewComponentConfigArgs = {

@@ -95,7 +95,7 @@ export class AngularViewFactory extends ViewFactory {
         return await this._ng1Factory(viewContainer, component, config);
       }
 
-      return await this._ng2Factory(viewContainer, component, config, metadata);
+      return await this._ng2Factory(viewContainer, component, config);
     };
   }
 
@@ -128,7 +128,7 @@ export class AngularViewFactory extends ViewFactory {
     return componentRef.create();
   }
 
-  private async _ng2Factory<T>(viewContainer: ViewContainer<T>, component: Type<T>, config: any, metadata: ViewComponentConfig): Promise<T> {
+  private async _ng2Factory<T>(viewContainer: ViewContainer<T>, component: Type<T>, config: any): Promise<T> {
     const token = component;
     
     const componentFactory = this._componentFactoryResolver.resolveComponentFactory<T>(token);
@@ -164,37 +164,10 @@ export class AngularViewFactory extends ViewFactory {
     viewContainer.detached
       .subscribe(() => this._onAttachChange(false, componentRef, viewContainer));
 
-    // Wait for the component hook to be invoked before letting the component be ready.
-    if (metadata.resolveOn && typeof componentRef.instance[metadata.resolveOn] === 'function') {
-      await this._waitForComponentHook(componentRef, metadata.resolveOn);
-    }
+    // This is needed for dynamic components...
+    componentRef.changeDetectorRef.markForCheck();
 
     return componentRef.instance;
-  }
-
-  /**
-   * Waits for the on init to be invoked on an NG2 component.
-   * @private
-   * @template T 
-   * @param {ComponentRef<T>} componentRef 
-   * @returns {Promise<void>} 
-   */
-  private _waitForComponentHook<T>(componentRef: ComponentRef<T>, hook: string): Promise<void> {
-    return new Promise<void>(resolve => {
-      const fn = (componentRef.instance as any)[hook] as Function;
-
-      (componentRef.instance as any)[hook] = function(...args: any[]): any {
-        let returnVal = undefined;
-
-        if (fn) {
-          returnVal = fn.apply(this, args);
-        }
-
-        resolve();
-
-        return returnVal;
-      }
-    });
   }
 
   private _onAttachChange<T>(isAttached: boolean, componentRef: ComponentRef<T>, viewContainer: ViewContainer<T>): void {
