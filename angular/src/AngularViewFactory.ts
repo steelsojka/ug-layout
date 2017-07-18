@@ -163,8 +163,36 @@ export class AngularViewFactory extends ViewFactory {
 
     viewContainer.detached
       .subscribe(() => this._onAttachChange(false, componentRef, viewContainer));
-    
+
+    // Wait for the ngOnInit hook to be invoked before letting the component be ready.
+    await this._waitForNg2ComponentInit(componentRef);
+
     return componentRef.instance;
+  }
+
+  /**
+   * Waits for the on init to be invoked on an NG2 component.
+   * @private
+   * @template T 
+   * @param {ComponentRef<T>} componentRef 
+   * @returns {Promise<void>} 
+   */
+  private _waitForNg2ComponentInit<T>(componentRef: ComponentRef<T>): Promise<void> {
+    return new Promise<void>(resolve => {
+      const initFn = (componentRef.instance as any).ngOnInit;
+
+      (componentRef.instance as any).ngOnInit = function(...args: any[]): any {
+        let returnVal = undefined;
+
+        if (initFn) {
+          returnVal = initFn.apply(this, args);
+        }
+
+        resolve();
+
+        return returnVal;
+      }
+    });
   }
 
   private _onAttachChange<T>(isAttached: boolean, componentRef: ComponentRef<T>, viewContainer: ViewContainer<T>): void {

@@ -36,7 +36,8 @@
     "style-loader": "^0.13.1",
     "ts-loader": "^2.0.0",
     "ts-node": "^2.1.2",
-    "typescript": "^2.3.0",
+    "typescript": "~2.3.4",
+    "ug-layout": "^3.2.2",
     "webpack": "^2.2.1",
     "webpack-dev-server": "^2.2.1",
     "zone.js": "^0.7.7"
