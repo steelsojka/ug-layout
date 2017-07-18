@@ -95,7 +95,7 @@ export class AngularViewFactory extends ViewFactory {
         return await this._ng1Factory(viewContainer, component, config);
       }
 
-      return await this._ng2Factory(viewContainer, component, config);
+      return await this._ng2Factory(viewContainer, component, config, metadata);
     };
   }
 
@@ -128,7 +128,7 @@ export class AngularViewFactory extends ViewFactory {
     return componentRef.create();
   }
 
-  private async _ng2Factory<T>(viewContainer: ViewContainer<T>, component: Type<T>, config: any): Promise<T> {
+  private async _ng2Factory<T>(viewContainer: ViewContainer<T>, component: Type<T>, config: any, metadata: ViewComponentConfig): Promise<T> {
     const token = component;
     
     const componentFactory = this._componentFactoryResolver.resolveComponentFactory<T>(token);
@@ -164,8 +164,10 @@ export class AngularViewFactory extends ViewFactory {
     viewContainer.detached
       .subscribe(() => this._onAttachChange(false, componentRef, viewContainer));
 
-    // Wait for the ngOnInit hook to be invoked before letting the component be ready.
-    await this._waitForNg2ComponentInit(componentRef);
+    // Wait for the component hook to be invoked before letting the component be ready.
+    if (metadata.resolveOn && typeof componentRef.instance[metadata.resolveOn] === 'function') {
+      await this._waitForComponentHook(componentRef, metadata.resolveOn);
+    }
 
     return componentRef.instance;
   }
@@ -177,15 +179,15 @@ export class AngularViewFactory extends ViewFactory {
    * @param {ComponentRef<T>} componentRef 
    * @returns {Promise<void>} 
    */
-  private _waitForNg2ComponentInit<T>(componentRef: ComponentRef<T>): Promise<void> {
+  private _waitForComponentHook<T>(componentRef: ComponentRef<T>, hook: string): Promise<void> {
     return new Promise<void>(resolve => {
-      const initFn = (componentRef.instance as any).ngOnInit;
+      const fn = (componentRef.instance as any)[hook] as Function;
 
-      (componentRef.instance as any).ngOnInit = function(...args: any[]): any {
+      (componentRef.instance as any)[hook] = function(...args: any[]): any {
         let returnVal = undefined;
 
-        if (initFn) {
-          returnVal = initFn.apply(this, args);
+        if (fn) {
+          returnVal = fn.apply(this, args);
         }
 
         resolve();
