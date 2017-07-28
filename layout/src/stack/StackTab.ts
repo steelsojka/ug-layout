@@ -115,8 +115,14 @@ export class StackTab extends Renderable {
 
   get isDraggable(): boolean {
     const { item } = this;
+    const layout = this.getParent(Layout);
 
-    if (this._lockState.get(LOCK_DRAGGING) || !item || !item.draggable) {
+    // Only exclude the header from the drop target if this is the only tab.
+    const excludes = this._container.length <= 1 ? [ this._container ] : [];
+
+    if (this._lockState.get(LOCK_DRAGGING) || !item || !item.draggable
+      || (layout && !layout.getDropTargets(item, { excludes }).length)
+    ) {
       return false;
     }
 
@@ -232,12 +238,6 @@ export class StackTab extends Renderable {
       return;  
     }
 
-    const layout = this.getParent(Layout);
-
-    if (layout && !layout.getDropTargets(this).length) {
-      return;
-    }
-    
     this._draggable.startDrag({
       host: this, 
       startX: e.pageX,

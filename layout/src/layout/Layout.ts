@@ -104,14 +104,17 @@ export class Layout extends Renderable {
       });
   }
 
-  getDropTargets(target: Renderable): DropArea[] {
+  getDropTargets(target: Renderable, options: { excludes?: Renderable[] } = {}): DropArea[] {
+    const { excludes = [] } = options;
+
     return this.getItemVisibleAreas()
       .filter(({ item }) => {
         return DragHost.isDropTarget(item) 
           && item !== target
           && item.isDroppable(target)
           && !target.contains(item)
-          && !target.isContainedWithin(item);
+          && !target.isContainedWithin(item)
+          && excludes.indexOf(item) === -1;
       }) as any; 
   }
 
