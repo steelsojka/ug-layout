@@ -92,9 +92,7 @@ export class RootLayout extends Renderable {
         width: `${this._width}px`,
         height: `${this._height}px`
       }
-    }, [
-      this._contentItems[0].render()
-    ]);
+    }, this._contentItems.map(item => item.render()));
   }
 
   resize(dimensions?: { height: number, width: number, x: number, y: number }): void {
@@ -112,7 +110,7 @@ export class RootLayout extends Renderable {
       this._offsetY = clientRec.top;
     }
     
-    this._contentItems[0].resize();
+    this._contentItems.forEach(item => item.resize());
   }
 
   update(): void {

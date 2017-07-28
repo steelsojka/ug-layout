@@ -21,6 +21,7 @@ import { DragHost } from '../DragHost';
 import { get } from '../utils';
 import { TabControl } from './tabControls';
 import { LockState, LOCK_DRAGGING } from '../LockState';
+import { Layout } from '../layout';
 
 export interface StackTabConfig extends RenderableConfig {
   maxSize: number;
@@ -229,6 +230,12 @@ export class StackTab extends Renderable {
     
     if (!this.isDraggable) {
       return;  
+    }
+
+    const layout = this.getParent(Layout);
+
+    if (layout && !layout.getDropTargets(this).length) {
+      return;
     }
     
     this._draggable.startDrag({
