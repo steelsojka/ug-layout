@@ -243,12 +243,17 @@ export class ViewLinker {
   }
 
   private _insert<T>(instance: object, config: ViewInsertConfig): Observable<any> {
-    const from = this._viewManager.query<T>(config.from)[0];
-    const view = from ? from.view : null;
     const { query, read } = config;
 
     return Observable.create((observer: Observer<any>) => {
-      if (view) {
+      const from = this._viewManager.query<T>(config.from)[0];
+      const view = from ? from.view : null;
+
+      const existing = this._viewManager.query(query);
+
+      if (existing.length) {
+        this.readQuery(this._viewManager.subscribeToQuery(query), read).subscribe(observer);
+      } else if (view) {
         this._manipulator.insert({ ...config, from: view }).subscribe(() => {
           this.readQuery(this._viewManager.subscribeToQuery(query), read).subscribe(observer);
         });  
