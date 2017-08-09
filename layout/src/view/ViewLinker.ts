@@ -258,13 +258,17 @@ export class ViewLinker {
     });
   }
 
-  private _resolve<T>(instance: object, config: ViewResolveConfig, options: ViewQueryReadOptions = {}): Observable<any> {
+  private _resolve<T>(instance: object, config: ViewResolveConfig, options: ViewQueryReadOptions = {}): Observable<any> | ViewContainer<T>[] {
     const { query, read } = config;
     const _options = {
       lazy: false,
       ...(isObject(read) ? read : { type: read }),
       ...options
     };
+
+    if (config.read === ViewQueryReadType.LIST) {
+      return this._viewManager.query<T>(config.query);
+    }
     
     return this.readQuery(this._viewManager.subscribeToQuery(query), _options);
   }

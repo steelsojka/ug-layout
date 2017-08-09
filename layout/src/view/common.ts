@@ -24,7 +24,8 @@ export enum ViewQueryReadType {
   CONTAINER,
   OBSERVABLE,
   COMPONENT,
-  EVENT
+  EVENT,
+  LIST
 }
 
 export enum CacheStrategy {
