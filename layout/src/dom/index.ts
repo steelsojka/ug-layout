@@ -5,5 +5,6 @@ export * from './Renderable';
 export * from './RenderableArea';
 export * from './decorators';
 export * from './common';
+export * from './Transferable';
 export { h, thunk } from 'snabbdom';
 export { VNode, VNodeData, vnode } from 'snabbdom/vnode';

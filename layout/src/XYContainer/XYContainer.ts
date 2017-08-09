@@ -7,7 +7,8 @@ import {
   ConfiguredRenderable,
   Renderer,
   AddChildArgs,
-  RenderableConfig
+  RenderableConfig,
+  isTransferable
 } from '../dom';
 import { Inject, Injector, Optional, PostConstruct } from '../di';
 import { 
@@ -24,7 +25,7 @@ import { XYItemContainer, XYItemContainerConfig } from './XYItemContainer';
 import { Draggable } from '../Draggable';
 import { BeforeDestroyEvent } from '../events';
 import { Splitter, SPLITTER_SIZE } from './Splitter';
-import { get, isNumber, clamp, round } from '../utils';
+import { get, isNumber, clamp, round, isFunction } from '../utils';
 import { Stack, StackItemContainer } from '../stack';
 
 export interface XYContainerConfig extends RenderableConfig {
@@ -135,6 +136,11 @@ export class XYContainer extends Renderable {
     const { distribute = true, resize = true } = options;
     const childArgs = Object.assign({}, options, { render: false, resize: false });
     let container: XYItemContainer;
+    let transferConfig: { [key: string]: any } = {};
+
+    if (isTransferable(item)) {
+      transferConfig = item.getTransferableConfig(this);
+    }
     
     // If this is an item container just add it.
     if (!(item instanceof XYItemContainer)) {
@@ -142,7 +148,7 @@ export class XYContainer extends Renderable {
         item = this._createStackWrapper(item);
       }
       
-      container = this.createChildItem({ use: item }, childArgs);
+      container = this.createChildItem({ ...transferConfig, use: item }, childArgs);
 
       item.setContainer(container);
     } else {

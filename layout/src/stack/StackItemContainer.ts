@@ -2,7 +2,7 @@ import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
 import { Inject, Injector, PostConstruct } from '../di'
-import { Renderer, Renderable, AddChildArgs, RenderableInjector, ConfiguredRenderable, RenderableArea, RenderableConfig } from '../dom';
+import { Renderer, Renderable, AddChildArgs, RenderableInjector, ConfiguredRenderable, RenderableArea, RenderableConfig, Transferable } from '../dom';
 import { BeforeDestroyEvent, Cancellable, Subject, Observable } from '../events';
 import { MakeVisibleCommand } from '../commands';
 import {
@@ -40,7 +40,7 @@ export interface StackItemContainerConfig extends RenderableConfig {
  * @extends {Renderable}
  * @implements {DropTarget}
  */
-export class StackItemContainer extends Renderable implements DropTarget {
+export class StackItemContainer extends Renderable implements DropTarget, Transferable {
   private _controls: TabControl[] = [];
 
   @Inject(ConfigurationRef) protected _config: StackItemContainerConfig;
@@ -199,6 +199,14 @@ export class StackItemContainer extends Renderable implements DropTarget {
   }
 
   onDropHighlightExit(): void {}
+
+  getTransferableConfig(to: Renderable): { [key: string]: any } {
+    if (to instanceof XYContainer) {
+      return { persist: this._config.persist };
+    }
+
+    return {};
+  }
 
   addControl(control: RenderableArg<TabControl>, options: AddChildArgs = {}): void {
     const { index = -1, render = true, resize = true } = options;
