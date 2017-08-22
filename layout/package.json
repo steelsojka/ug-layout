@@ -24,7 +24,8 @@
     "build:es2015": "tsc -p tsconfig.es2015.json",
     "build:es5": "tsc -p tsconfig.es5.json",
     "build:styles": "cp -R src/styles dist",
-    "start": "webpack-dev-server"
+    "start": "webpack-dev-server",
+    "release": "standard-version"
   },
   "author": "steelsojka@gmail.com",
   "license": "MIT",
@@ -47,6 +48,7 @@
     "reflect-metadata": "^0.1.9",
     "rxjs": "^5.0.0",
     "sinon": "^1.17.7",
+    "standard-version": "^4.2.0",
     "style-loader": "^0.13.1",
     "ts-loader": "^2.0.0",
     "ts-node": "^2.1.0",
