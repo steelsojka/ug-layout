@@ -256,6 +256,15 @@ export class ViewContainer<T> {
   get view(): View|null {
     return this._container;
   }
+
+  /**
+   * Determines whether the view is attached to a Renderable or not.
+   * @readonly
+   * @type {boolean}
+   */
+  get isAttached(): boolean {
+    return this._isAttached;
+  }
   
   @PostConstruct()
   init(): void {

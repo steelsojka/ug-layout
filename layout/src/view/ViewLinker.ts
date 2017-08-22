@@ -251,7 +251,8 @@ export class ViewLinker {
 
       const existing = this._viewManager.query(query);
 
-      if (existing.length) {
+      // If the view exists and is attached, we don't need to insert it.
+      if (existing.length && existing[0].isAttached) {
         this.readQuery(this._viewManager.subscribeToQuery(query), read).subscribe(observer);
       } else if (view) {
         this._manipulator.insert({ ...config, from: view }).subscribe(() => {
