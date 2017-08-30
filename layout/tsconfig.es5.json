@@ -4,6 +4,7 @@
     "target": "es5",
     "outDir": "dist/es5",
     "declaration": true,
+    "noUnusedLocals": false,
     "declarationDir": "dist/es5",
     "lib": [
       "ES2015",

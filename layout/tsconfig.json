@@ -2,6 +2,7 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "downlevelIteration": true,
+    "noUnusedLocals": true,
     "skipLibCheck": true,
     "types": [
       "reflect-metadata",

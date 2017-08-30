@@ -1,28 +1,32 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
-import { Type, Inject, Injector, PostConstruct } from '../di';
+import { Type, Inject, PostConstruct } from '../di';
 import { 
-  RenderableInjector, 
   Renderable, 
   RemoveChildArgs,
   AddChildArgs,
   ConfiguredRenderable,
   BaseModificationArgs
 } from '../dom';
-import { BeforeDestroyEvent, BusEvent, Subject, Observable } from '../events';
+import { BeforeDestroyEvent } from '../events';
 import { ConfigurationRef, ContainerRef, RenderableArg, XYDirection } from '../common';
-import { XYItemContainer, XYItemContainerConfig, Row, Column } from '../XYContainer';
+import { 
+  XYItemContainer, 
+  Row, 
+  Column,
+  ROW_CLASS,
+  COLUMN_CLASS
+} from '../XYContainer';
 import { StackHeader, StackHeaderConfigArgs } from './StackHeader';
 import { TabCloseEvent } from './TabCloseEvent';
 import { TabSelectionEvent } from './TabSelectionEvent';
 import { TabDragEvent } from './TabDragEvent';
 import { StackItemCloseEvent } from './StackItemCloseEvent';
 import { StackItemContainer, StackItemContainerConfig } from './StackItemContainer';
-import { RootInjector } from '../RootInjector';
 import { StackTab } from './StackTab';
 import { clamp, get, isNumber, propEq } from '../utils';
-import { StackRegion } from './common';
+import { StackRegion, STACK_HEADER_CLASS, STACK_ITEM_CONTAINER_CLASS } from './common';
 import { RenderableConfigArgs, RenderableConfig } from '../dom';
 import { StackControl, CloseStackControl } from './controls';
 
@@ -51,13 +55,16 @@ export interface StackConfigArgs extends RenderableConfigArgs {
  * @extends {Renderable}
  */
 export class Stack extends Renderable {
-  private _direction: XYDirection;
   private _header: StackHeader;
   private _activeIndex: number = 0;
   protected _contentItems: StackItemContainer[] = [];
 
   @Inject(ConfigurationRef) protected _config: StackConfig;
   @Inject(ContainerRef) protected _container: Renderable;
+  @Inject(STACK_HEADER_CLASS) protected _StackHeader: typeof StackHeader;
+  @Inject(STACK_ITEM_CONTAINER_CLASS) protected _StackItemContainer: typeof StackItemContainer;
+  @Inject(ROW_CLASS) protected _Row: typeof Row;
+  @Inject(COLUMN_CLASS) protected _Column: typeof Column;
 
   /**
    * The direction of the stack.
@@ -148,7 +155,7 @@ export class Stack extends Renderable {
 
     super.initialize();
     
-    this._header = this.createChild(new ConfiguredRenderable(StackHeader, this._config ? this._config.header : null));
+    this._header = this.createChild(new ConfiguredRenderable(this._StackHeader, this._config ? this._config.header : null));
     this._header.subscribe(TabCloseEvent, this._onTabClose.bind(this));
     this._header.subscribe(TabSelectionEvent, this._onTabSelect.bind(this));
     this._header.subscribe(TabDragEvent, this._onTabDrag.bind(this));
@@ -184,7 +191,7 @@ export class Stack extends Renderable {
    * @returns {StackItemContainer} 
    */
   createChildItem(config: StackItemContainerConfig): StackItemContainer {
-    return this.createChild(new ConfiguredRenderable(StackItemContainer, config));
+    return this.createChild(new ConfiguredRenderable(this._StackItemContainer, config));
   }
 
   /**
@@ -213,7 +220,7 @@ export class Stack extends Renderable {
       container = item;
     }
 
-    const tab = this._header.addTab({
+    this._header.addTab({
       title: container.title,
       maxSize: get<number>(this._config, 'header.maxTabSize', 200),
     }, {
@@ -431,7 +438,7 @@ export class Stack extends Renderable {
   }
 
   private _getContainerDropType(region: StackRegion): typeof Row|typeof Column {
-    return region === StackRegion.EAST || region === StackRegion.WEST ? Row : Column;
+    return region === StackRegion.EAST || region === StackRegion.WEST ? this._Row : this._Column;
   }
 
   private _onTabClose(e: TabCloseEvent): void {

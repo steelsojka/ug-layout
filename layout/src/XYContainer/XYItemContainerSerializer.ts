@@ -5,6 +5,7 @@ import { XYItemContainer } from './XYItemContainer'
 import { Row } from './Row';
 import { Column } from './Column';
 import { UNALLOCATED, XYDirection } from '../common';
+import { XY_ITEM_CONTAINER_CLASS } from './common';
 
 export interface SerializedXYItemContainer {
   name: 'XYItemContainer';
@@ -57,7 +58,7 @@ export class XYItemContainerSerializer extends Serializer<XYItemContainer, Seria
   }
 
   static register(container: SerializerContainer): void {
-    container.registerClass('XYItemContainer', XYItemContainer);
+    container.registerClass('XYItemContainer', container.resolve<typeof XYItemContainer>(XY_ITEM_CONTAINER_CLASS, true));
 
     Serializer.register.call(this, container);
   }

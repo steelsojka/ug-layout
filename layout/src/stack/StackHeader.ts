@@ -1,14 +1,12 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
-import { Inject, Injector, PostConstruct } from '../di';
+import { Inject, PostConstruct } from '../di';
 import { 
   Renderable, 
-  RenderableInjector, 
   ConfiguredRenderable, 
   RenderableArea,
   AddChildArgs,
-  RemoveChildArgs,
   RenderableConfig
 } from '../dom';
 import { Stack } from './Stack';
@@ -18,7 +16,8 @@ import { StackTab, StackTabConfigArgs } from './StackTab';
 import { TabCloseEvent } from './TabCloseEvent';
 import { TabSelectionEvent } from './TabSelectionEvent';
 import { TabDragEvent } from './TabDragEvent';
-import { get, isNumber, partition, propEq } from '../utils';
+import { get, partition, propEq } from '../utils';
+import { STACK_TAB_CLASS } from './common';
 import { 
   ConfigurationRef, 
   ContainerRef, 
@@ -28,7 +27,6 @@ import {
   DragEvent,
   RenderableArg
 } from '../common';
-import { Subject, Observable } from '../events';
 import { StackControl, StackControlPosition } from './controls';
 import { StackItemContainer } from './StackItemContainer';
 
@@ -52,6 +50,7 @@ export class StackHeader extends Renderable implements DropTarget {
   @Inject(ConfigurationRef) protected _config: StackHeaderConfig;
   @Inject(ContainerRef) protected _container: Stack;
   @Inject(DragHost) protected _dragHost: DragHost;
+  @Inject(STACK_TAB_CLASS) protected _StackTab: typeof StackTab;
 
   get width(): number {
     return this._container.isHorizontal ? this._container.width : this._config.size;
@@ -102,7 +101,7 @@ export class StackHeader extends Renderable implements DropTarget {
   }
 
   addTab(config: StackTabConfigArgs, options: AddChildArgs = {}): StackTab {
-    const tab = this.createChild(new ConfiguredRenderable(StackTab, config), [ Draggable ]);
+    const tab = this.createChild(new ConfiguredRenderable(this._StackTab, config), [ Draggable ]);
 
     tab.subscribe(TabSelectionEvent, e => this.emit(e));
     tab.subscribe(TabCloseEvent, e => this.emit(e));
@@ -168,7 +167,7 @@ export class StackHeader extends Renderable implements DropTarget {
   }
 
   getHighlightCoordinates(args: HighlightCoordinateArgs): RenderableArea {
-    let { pageX, pageY, dragArea, dropArea: { item, area: { x, x2, y, y2, height } } } = args;
+    let { pageX, pageY, dragArea, dropArea: { area: { x, y, y2 } } } = args;
     
     const highlightArea = new RenderableArea(x, dragArea.width + x, y, y2);
     let leftMostTabIndex = this._getIndexFromArea(pageX, pageY, args.dropArea.area);
@@ -221,10 +220,9 @@ export class StackHeader extends Renderable implements DropTarget {
   }
 
   private _getIndexFromArea(pageX: number, pageY: number, area: RenderableArea): number {
-    let { x, y } = area;
+    let { x } = area;
     
     const deltaX = pageX - x;
-    const deltaY = pageY - y;
 
     let result = -1;
 

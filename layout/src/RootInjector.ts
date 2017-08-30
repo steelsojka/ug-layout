@@ -12,6 +12,26 @@ import { DocumentRef, PatchRef } from './common';
 import { LayoutManipulator } from './layout';
 import { StateContext } from './StateContext';
 import { LockState } from './LockState';
+import {
+  StackTab, 
+  StackHeader,
+  StackItemContainer,
+  Stack,
+  STACK_TAB_CLASS,
+  STACK_HEADER_CLASS,
+  STACK_ITEM_CONTAINER_CLASS,
+  STACK_CLASS
+} from './stack';
+import {
+  XYItemContainer,
+  Column,
+  Row,
+  Splitter,
+  COLUMN_CLASS,
+  ROW_CLASS,
+  XY_ITEM_CONTAINER_CLASS,
+  SPLITTER_CLASS
+} from './XYContainer';
 
 const patch = snabbdom.init([
   DOMClass,
@@ -32,10 +52,18 @@ export class RootInjector extends RenderableInjector {
       StateContext,
       LockState,
       ViewHookExecutor,
+      { provide: STACK_TAB_CLASS, useValue: StackTab },
+      { provide: STACK_HEADER_CLASS, useValue: StackHeader },
+      { provide: STACK_ITEM_CONTAINER_CLASS, useValue: StackItemContainer },
+      { provide: STACK_CLASS, useValue: Stack },
+      { provide: XY_ITEM_CONTAINER_CLASS, useValue: XYItemContainer },
+      { provide: ROW_CLASS, useValue: Row },
+      { provide: COLUMN_CLASS, useValue: Column },
+      { provide: SPLITTER_CLASS, useValue: Splitter },
       { provide: PatchRef, useValue: patch },
       { provide: DocumentRef, useValue: document },
-      { provide: RootInjector, useValue: forwardRef(() => this) },
-      ...providers
+      ...providers,
+      { provide: RootInjector, useValue: forwardRef(() => this) }
     ]);
   }
 }

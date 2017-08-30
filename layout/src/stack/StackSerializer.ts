@@ -7,6 +7,9 @@ import { StackHeaderConfig } from './StackHeader';
 import { StackControl, MinimizeStackControl, CloseStackControl, StackControlSerializer } from './controls'
 import { TabControl, CloseTabControl } from './tabControls'
 import { XYDirection } from '../common';
+import {
+  STACK_CLASS
+} from './common';
 
 export interface SerializedStackItem {
   tags: string[];
@@ -30,6 +33,8 @@ export interface SerializedStack extends SerializedRenderable {
 }
 
 export class StackSerializer extends Serializer<Stack, SerializedStack> {
+  @Inject(STACK_CLASS) protected _Stack: typeof Stack;
+
   serialize(node: Stack): SerializedStack {
     return {
       name: 'Stack',
@@ -64,7 +69,7 @@ export class StackSerializer extends Serializer<Stack, SerializedStack> {
   }
 
   deserialize(node: SerializedStack): ConfiguredRenderable<Stack> {
-    return Stack.configure({
+    return this._Stack.configure({
       startIndex: node.startIndex,
       direction: node.direction,
       reverse: node.reverse,
@@ -94,7 +99,7 @@ export class StackSerializer extends Serializer<Stack, SerializedStack> {
   }
 
   static register(container: SerializerContainer): void {
-    container.registerClass('Stack', Stack);  
+    container.registerClass('Stack', container.resolve<typeof Stack>(STACK_CLASS, true));  
     container.registerSerializer(MinimizeStackControl, StackControlSerializer.configure({ name: 'MinimizeStackControl', type: MinimizeStackControl }));
     container.registerSerializer(CloseStackControl, StackControlSerializer.configure({ name: 'CloseStackControl', type: CloseStackControl }));
     container.registerSerializer(CloseTabControl, GenericSerializer.configure({ name: 'CloseTabControl', type: CloseTabControl }));

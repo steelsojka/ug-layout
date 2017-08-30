@@ -26,7 +26,8 @@ import { Draggable } from '../Draggable';
 import { BeforeDestroyEvent } from '../events';
 import { Splitter, SPLITTER_SIZE } from './Splitter';
 import { get, isNumber, clamp, round, isFunction } from '../utils';
-import { Stack, StackItemContainer } from '../stack';
+import { Stack, StackItemContainer, STACK_CLASS } from '../stack';
+import { XY_ITEM_CONTAINER_CLASS, SPLITTER_CLASS } from './common';
 
 export interface XYContainerConfig extends RenderableConfig {
   /**
@@ -70,6 +71,10 @@ export class XYContainer extends Renderable {
   @Inject(ConfigurationRef) 
   @Optional() 
   protected _config: XYContainerConfig|null;
+
+  @Inject(STACK_CLASS) protected _Stack: typeof Stack;
+  @Inject(XY_ITEM_CONTAINER_CLASS) protected _XYItemContainer: typeof XYItemContainer;
+  @Inject(SPLITTER_CLASS) protected _Splitter: typeof Splitter;
 
   get height(): number {
     return this._height;
@@ -129,7 +134,7 @@ export class XYContainer extends Renderable {
   }
 
   createChildItem(config: XYItemContainerConfig, options: { index?: number } = {}): XYItemContainer {
-    return this.createChild(new ConfiguredRenderable(XYItemContainer, config));
+    return this.createChild(new ConfiguredRenderable(this._XYItemContainer, config));
   }
 
   addChild(item: Renderable, options: ContainerAddChildArgs = {}): void {
@@ -298,7 +303,7 @@ export class XYContainer extends Renderable {
       disabler: this._isSplitterDisabled.bind(this)
     };
 
-    const splitter = this.createChild(new ConfiguredRenderable(Splitter, splitterConfig), [ Draggable ]);
+    const splitter = this.createChild(new ConfiguredRenderable(this._Splitter, splitterConfig), [ Draggable ]);
 
     splitter.dragStatus.subscribe(this._dragStatusChanged.bind(this));
 
@@ -499,7 +504,7 @@ export class XYContainer extends Renderable {
   }
 
   private _createStackWrapper(item: Renderable): Stack {
-    const stack = this.createChild(new ConfiguredRenderable(Stack, null));
+    const stack = this.createChild(new ConfiguredRenderable(this._Stack, null));
 
     stack.addChild(item, { render: false });
 

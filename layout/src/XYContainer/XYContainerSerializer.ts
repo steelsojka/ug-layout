@@ -7,6 +7,10 @@ import { Column } from './Column';
 import { UNALLOCATED, XYDirection } from '../common';
 import { XYItemContainer } from './XYItemContainer';
 import { SerializedXYItemContainer } from './XYItemContainerSerializer';
+import {
+  ROW_CLASS,
+  COLUMN_CLASS
+} from './common';
 
 export interface SerializedXYContainer extends SerializedRenderable {
   direction: XYDirection;
@@ -40,8 +44,8 @@ export class XYContainerSerializer extends Serializer<XYContainer, SerializedXYC
 
   static register(container: SerializerContainer): void {
     container.registerClass('XYContainer', XYContainer);
-    container.registerSerializer(Row, XYContainerSerializer, { skipRegister: true });
-    container.registerSerializer(Column, XYContainerSerializer, { skipRegister: true });
+    container.registerSerializer(container.resolve<typeof Row>(ROW_CLASS, true), XYContainerSerializer, { skipRegister: true });
+    container.registerSerializer(container.resolve<typeof Column>(COLUMN_CLASS, true), XYContainerSerializer, { skipRegister: true });
 
     Serializer.register.call(this, container);
   }

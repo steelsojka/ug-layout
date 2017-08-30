@@ -259,8 +259,8 @@ export class SerializerContainer {
    * @param {*} token 
    * @returns {(T|null)} 
    */
-  resolve<T>(token: any): T|null {
-    return this._injector.get(token, null);
+  resolve<T>(token: any, _throw: boolean = false): T {
+    return _throw ? this._injector.get(token) : this._injector.get(token, null);
   }
 
   private _deserialize<R extends Renderable, S extends Serialized>(serializer: Serializer<R, S>, serialized: S): RenderableConstructorArg<R> {

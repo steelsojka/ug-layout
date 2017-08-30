@@ -1,19 +1,12 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
-import { Inject, Injector, PostConstruct } from '../di'
-import { 
-  Subject, 
-  Observable, 
-  Cancellable,
-  BeforeDestroyEvent
-} from '../events';
+import { Inject, PostConstruct } from '../di'
 import { TabSelectionEvent } from './TabSelectionEvent';
-import { Renderable, ConfiguredRenderable, MemoizeFrom, RenderableConfig } from '../dom';
+import { Renderable, MemoizeFrom, RenderableConfig } from '../dom';
 import { Draggable } from '../Draggable';
-import { ContainerRef, ConfigurationRef, DocumentRef, DragEvent, DragStatus } from '../common';
+import { ConfigurationRef, DocumentRef, DragEvent } from '../common';
 import { StackHeader } from './StackHeader';
-import { TabCloseEvent } from './TabCloseEvent';
 import { TabDragEvent } from './TabDragEvent';
 import { Stack } from './Stack';
 import { StackItemContainer } from './StackItemContainer';
@@ -179,10 +172,12 @@ export class StackTab extends Renderable {
   
   render(): VNode {
     const { item } = this;
+    const title = get(item, 'title', '');
     
     return h(`div.ug-layout__stack-tab`, {
       key: this.uid,
       style: this._getStyles(),
+      attrs: { title },
       class: {
         'ug-layout__stack-tab-active': this._container.isTabActive(this),
         'ug-layout__stack-tab-distributed': this._container.isDistributed,
@@ -199,7 +194,7 @@ export class StackTab extends Renderable {
         click: () => this._onClick()
       }
     }, [
-      h('div', get(item, 'title', '')),
+      h('div', title),
       h('div.ug-layout__stack-tab-controls', this.controls.filter(c => c.isActive()).map(c => c.render()))
     ]);
   }  
@@ -232,8 +227,6 @@ export class StackTab extends Renderable {
   }
 
   private _onMouseDown(e: MouseEvent): void {
-    const { item } = this;
-    
     if (!this.isDraggable) {
       return;  
     }
