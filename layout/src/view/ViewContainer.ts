@@ -1,9 +1,9 @@
 import { CompleteOn } from 'rx-decorators/completeOn';
 
-import { Injector, Type, Inject, Optional, PostConstruct, forwardRef } from '../di';
+import { Injector, Type, Inject, PostConstruct, forwardRef } from '../di';
 import { Renderable } from '../dom';
-import { ReplaySubject, Observable, Subject, BeforeDestroyEvent, BehaviorSubject } from '../events';
-import { ContainerRef, ConfigurationRef, DocumentRef, ContextType } from '../common';
+import { Observable, Subject, BeforeDestroyEvent, BehaviorSubject } from '../events';
+import { DocumentRef, ContextType } from '../common';
 import { StateContext } from '../StateContext';
 import { View } from './View';
 import { ViewFactory } from './ViewFactory';
@@ -11,12 +11,11 @@ import {
   ViewComponentRef, 
   VIEW_COMPONENT_CONFIG, 
   VIEW_CONFIG, 
-  ViewConfig,
-  ResolverStrategy
+  ViewConfig
 } from './common';
 import { CustomViewHookEvent } from './CustomViewHookEvent';
-import { ViewHookExecutor, ViewHookMetadata, SizeChanges } from './hooks';
-import { isFunction, get, uid, eq, isPromise, isObject, Deferred } from '../utils';
+import { ViewHookExecutor, SizeChanges } from './hooks';
+import { get, uid, eq, isPromise } from '../utils';
 import { ViewFailReason } from './ViewFailReason';
 import { CacheStrategy } from './common';
 

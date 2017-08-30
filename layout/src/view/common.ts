@@ -1,7 +1,5 @@
 import { Token, Type } from '../di';
-import { View } from './View';
-import { BeforeDestroyEvent } from '../events';
-import { Renderable, RenderableConfig, ConfiguredRenderable } from '../dom';
+import { Renderable, RenderableConfig } from '../dom';
 import { ViewContainer, ViewContainerStatus } from './ViewContainer';
 import { LayoutInsertPosition } from '../layout';
 import { RenderableArg } from '../common';
@@ -11,6 +9,7 @@ export const VIEW_COMPONENT_CONFIG = new Token<any>('ViewComponentConfig');
 export const ViewComponentRef = new Token<any>('ViewComponentRef');
 export const LinkerMetatdataRef = new Token<any>('LinkerMetadataRef');
 export const VIEW_CONFIG = new Token<ViewConfig>('ViewConfig');
+export const VIEW_CONTAINER_CLASS = new Token<ViewContainer<any>>('VIEW_CONTAINER_CLASS');
 export const VIEW_CONFIG_KEY = 'ugLayout:viewConfig';
 export const VIEW_LINKER_METADATA = 'ugLayout:ViewLinkerMetadata';
 

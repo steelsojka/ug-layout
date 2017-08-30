@@ -5,7 +5,7 @@ import DOMProps from 'snabbdom/modules/props';
 import DOMEvents from 'snabbdom/modules/eventlisteners';
 import DOMAttrs from 'snabbdom/modules/attributes';
 
-import { Injector, ProviderArg, forwardRef } from './di';
+import { ProviderArg, forwardRef } from './di';
 import { Renderer, RenderableInjector } from './dom';
 import { ViewFactory, ViewManager, ViewLinker, ViewHookExecutor } from './view';
 import { DocumentRef, PatchRef } from './common';
@@ -32,6 +32,10 @@ import {
   XY_ITEM_CONTAINER_CLASS,
   SPLITTER_CLASS
 } from './XYContainer';
+import {
+  ViewContainer,
+  VIEW_CONTAINER_CLASS
+} from './view';
 
 const patch = snabbdom.init([
   DOMClass,
@@ -60,6 +64,7 @@ export class RootInjector extends RenderableInjector {
       { provide: ROW_CLASS, useValue: Row },
       { provide: COLUMN_CLASS, useValue: Column },
       { provide: SPLITTER_CLASS, useValue: Splitter },
+      { provide: VIEW_CONTAINER_CLASS, useValue: ViewContainer },
       { provide: PatchRef, useValue: patch },
       { provide: DocumentRef, useValue: document },
       ...providers,

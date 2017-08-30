@@ -6,12 +6,12 @@ import {
   VIEW_COMPONENT_CONFIG,
   VIEW_CONFIG
 } from './common';
-import { Injector, Inject, Optional, ProviderArg, Type } from '../di';
-import { View } from './View';
+import { Injector, Inject, ProviderArg } from '../di';
 import { ConfiguredItem } from '../ConfiguredItem';
 import { ViewContainer } from './ViewContainer';
-import { ElementRef, ContainerRef } from '../common';
+import { ElementRef } from '../common';
 import { get, isFunction } from '../utils';
+import { VIEW_CONTAINER_CLASS } from './common';
 
 export interface ViewFactoryArgs {
   config: ViewConfig;
@@ -25,6 +25,7 @@ export interface ViewFactoryArgs {
  */
 export class ViewFactory {
   @Inject(Injector) protected _injector: Injector;
+  @Inject(VIEW_CONTAINER_CLASS) protected _ViewContainer: typeof ViewContainer;
 
   /**
    * Creates a view container from the given configuration.
@@ -146,7 +147,7 @@ export class ViewFactory {
   destroy(): void {}
 
   protected _getViewContainerProvider(config: ViewConfig): ProviderArg {
-    let viewContainerProvider = this.resolveMetaConfigProperty<ProviderArg>(this.getTokenFrom(config), 'container') || ViewContainer;
+    let viewContainerProvider = this.resolveMetaConfigProperty<ProviderArg>(this.getTokenFrom(config), 'container') || this._ViewContainer;
 
     if (isFunction(viewContainerProvider)) {
       viewContainerProvider = { provide: ViewContainer, useClass: viewContainerProvider };
