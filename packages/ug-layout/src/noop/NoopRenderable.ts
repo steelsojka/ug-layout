@@ -1,4 +1,4 @@
-import { VNode } from 'snabbdom/VNode';
+import { VNode } from 'snabbdom/vnode';
 import { h } from 'snabbdom';
 
 import { Renderable } from '../dom';

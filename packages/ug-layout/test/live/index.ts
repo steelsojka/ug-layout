@@ -4,30 +4,23 @@ import '../../src/styles/icons.css';
 import '../../src/styles/core.css';
 import '../../src/styles/theme-gl.css';
 import './index.css';
-import { Observable } from 'rxjs/Rx';
 
 import { 
   RootLayout, 
-  Row, 
   Column, 
   Layout, 
   View, 
   Stack, 
-  XYDirection,
   Inject,
   ViewContainer,
   ElementRef,
   ViewComponent,
-  CancelAction,
   MinimizeStackControl,
   StackControlPosition,
   RootSerializer,
   ConfiguredRenderable,
   ResolverStrategy,
-  OnBeforeDestroy,
   BeforeDestroyEvent,
-  DocumentRef,
-  Injector,
   ViewConfig
 } from '../../src';
 
@@ -50,9 +43,7 @@ class MyView extends View {
   }
 }
 
-@ViewComponent({
-  cacheable: true
-})
+@ViewComponent()
 class OtherComponent {
   ugOnInit(container: ViewContainer<this>): void {
     container.mountHTML('<div>BAMFFFFFFFF</div>');
@@ -60,10 +51,9 @@ class OtherComponent {
 }
 
 @ViewComponent({
-  cacheable: true,
   resolution: ResolverStrategy.REF
 })
-class TestView implements OnBeforeDestroy {
+class TestView {
   private _color: string = colors.shift() as string;
   
   constructor(

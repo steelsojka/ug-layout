@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "workspaces": [
+    "packages/ug-layout",
+    "packages/ug-layout-angular"
+  ]
+}

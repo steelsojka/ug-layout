@@ -1,3 +1,4 @@
 .vscode/chrome
 *.log
 .nyc_output
+node_modules

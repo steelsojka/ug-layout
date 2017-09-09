@@ -1,10 +1,13 @@
 {
-  "extends": "../tsconfig.json",
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "downlevelIteration": true,
+    "noUnusedLocals": true,
     "skipLibCheck": true,
     "types": [
-      "reflect-metadata"
+      "reflect-metadata",
+      "sinon",
+      "node"
     ]
   },
   "include": [
