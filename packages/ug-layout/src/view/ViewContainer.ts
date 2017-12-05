@@ -7,10 +7,10 @@ import { DocumentRef, ContextType } from '../common';
 import { StateContext } from '../StateContext';
 import { View } from './View';
 import { ViewFactory } from './ViewFactory';
-import { 
-  ViewComponentRef, 
-  VIEW_COMPONENT_CONFIG, 
-  VIEW_CONFIG, 
+import {
+  ViewComponentRef,
+  VIEW_COMPONENT_CONFIG,
+  VIEW_CONFIG,
   ViewConfig
 } from './common';
 import { CustomViewHookEvent } from './CustomViewHookEvent';
@@ -77,9 +77,6 @@ export class ViewContainer<T> {
   private _destroyed: Subject<ViewContainer<T>> = new Subject();
 
   @CompleteOn('destroy')
-  private _beforeDestroy: Subject<BeforeDestroyEvent<Renderable>> = new Subject();
-
-  @CompleteOn('destroy')
   private _containerChange: Subject<View|null> = new Subject<View|null>();
 
   @CompleteOn('destroy')
@@ -112,19 +109,25 @@ export class ViewContainer<T> {
   @Inject(VIEW_COMPONENT_CONFIG) protected _viewComponentConfig: any;
   @Inject(VIEW_CONFIG) protected _viewConfig: ViewConfig;
   @Inject(StateContext) protected _stateContext: StateContext;
-  
+
   /**
    * A unique identifier for this instance.
    * @type {number}
    */
   readonly id: number = uid();
   /**
+   * Notifies when this container has changed the {@link View} it is associated with.
+   * @type {(Observable<View|null>)}
+   */
+  containerChange: Observable<View|null> = this._containerChange.asObservable();
+  /**
    * Notifies that the view is being destroyed. This action is cancellable or can be halted until
    * an async action is complete.
    * @see Cancellable
    * @type {Observable<BeforeDestroyEvent<Renderable>>}
    */
-  beforeDestroy: Observable<BeforeDestroyEvent<Renderable>> = this._beforeDestroy.asObservable();
+  beforeDestroy: Observable<BeforeDestroyEvent<Renderable>> = this.containerChange
+    .switchMap(container => container ? container.scope(BeforeDestroyEvent) : Observable.empty());
   /**
    * Notifies when the view is destroyed.
    * @type {Observable<ViewContainer<T>>}
@@ -134,15 +137,24 @@ export class ViewContainer<T> {
    * Notifies when the visibility of this view changes.
    * @type {Observable<boolean>}
    */
-  visibilityChanges: Observable<boolean> = this._visibilityChanges.asObservable();
+  // visibilityChanges: Observable<boolean> = this._visibilityChanges.asObservable();
+  visibilityChanges: Observable<boolean> = Observable.merge(
+    this.containerChange
+      .switchMap(container => container ? container.visibilityChanges : Observable.empty<boolean>()),
+    this._visibilityChanges.asObservable()
+  )
+    .distinctUntilChanged();
   /**
    * Notifies when the dimensions of this views container has changed.
    * @type {Observable<{ width: number, height: number }>}
    */
-  sizeChanges: Observable<{ width: number, height: number }> = this._sizeChanges
-    .asObservable()
+  sizeChanges: Observable<SizeChanges> = Observable.merge(
+    this.containerChange
+      .switchMap(container => container ? container.sizeChanges : Observable.empty<SizeChanges>()),
+    this._sizeChanges.asObservable()
+  )
     .filter(e => e.height !== -1 && e.width !== -1)
-    .distinctUntilChanged((p, c) => p.width === c.width && p.height === c.height)
+    .distinctUntilChanged((p, c) => p.width === c.width && p.height === c.height);
   /**
    * Notifies when the status of this component changes.
    * @type {Observable<ViewContainerStatus>}
@@ -153,11 +165,6 @@ export class ViewContainer<T> {
    * @type {Observable<boolean>}
    */
   initialized: Observable<boolean> = this._initialized.asObservable();
-  /**
-   * Notifies when this container has changed the {@link View} it is associated with.
-   * @type {(Observable<View|null>)}
-   */
-  containerChange: Observable<View|null> = this._containerChange.asObservable();
   /**
    * Notifies when the view has become attached.
    * @type {Observable<boolean>}
@@ -203,7 +210,7 @@ export class ViewContainer<T> {
   get width(): number {
     return get(this._container, 'width', 0);
   }
-  
+
   /**
    * Current height in pixels.
    * @readonly
@@ -234,7 +241,7 @@ export class ViewContainer<T> {
   get isCacheable(): boolean {
     const cacheStrategy = this.caching;
 
-    if ((cacheStrategy === CacheStrategy.RELOAD 
+    if ((cacheStrategy === CacheStrategy.RELOAD
         && (this._stateContext.context === ContextType.NONE) || this._stateContext.context === ContextType.RESET)
       || cacheStrategy === CacheStrategy.PERSISTENT) {
       return true;
@@ -264,7 +271,7 @@ export class ViewContainer<T> {
   get isAttached(): boolean {
     return this._isAttached;
   }
-  
+
   @PostConstruct()
   init(): void {
     this._element = this._document.createElement('div');
@@ -276,6 +283,15 @@ export class ViewContainer<T> {
     this.visibilityChanges.subscribe(isVisible => this._executeHook('ugOnVisibilityChange', isVisible));
     this.beforeDestroy.subscribe(event => this._executeHook('ugOnBeforeDestroy', event));
     this.initialized.subscribe(v => this._isInitialized = v);
+    this.containerChange.subscribe(container => this._container = container);
+    this.containerChange
+      .switchMap(container => container ? container.scope(CustomViewHookEvent) : Observable.empty<CustomViewHookEvent<any>>())
+      .subscribe(e => this._onCustomViewHook(e));
+
+    this.containerChange
+      .switchMap(container => container ? container.destroyed : Observable.empty())
+      .subscribe(() => this._onViewDestroy());
+
 
     // Reset the retry function when the component is no longer failed.
     this.status.filter(eq(ViewContainerStatus.READY)).subscribe(() => {
@@ -289,8 +305,8 @@ export class ViewContainer<T> {
    * Get's a token from this containers injector. Note, this should not be used to grab
    * parent renderables or any item that can be changed.
    * @template U The return type.
-   * @param {*} token 
-   * @returns {(U|null)} 
+   * @param {*} token
+   * @returns {(U|null)}
    */
   get<U>(token: any): U|null {
     return this._injector.get<U>(token, null);
@@ -302,25 +318,25 @@ export class ViewContainer<T> {
   destroy(): void {
     this._destroyed.next();
   }
-  
+
   /**
    * Waits for the component to be ready. If the component is not initialized
    * it will be initialized. This is important when the view is lazy and hasn't
    * been shown yet but we need to interact with the component.
    * @async
-   * @param {{ init?: boolean }} [options={}] 
-   * @returns {Promise<ViewContainer<T>>} 
+   * @param {{ init?: boolean }} [options={}]
+   * @returns {Promise<ViewContainer<T>>}
    */
   ready(options: ViewContainerReadyOptions = {}): Observable<ViewContainer<T>> {
     return Observable.create(observer => {
-      const { 
-        init = true, 
+      const {
+        init = true,
         when = [ ViewContainerStatus.READY, ViewContainerStatus.FAILED ],
         until = []
       } = options;
 
       if (!this._isInitialized && init !== false) {
-        this.initialize();  
+        this.initialize();
       }
 
       return this.status
@@ -336,7 +352,7 @@ export class ViewContainer<T> {
   }
 
   /**
-   * Initializes the component. This creates the component. 
+   * Initializes the component. This creates the component.
    */
   initialize(): void {
     if (this._isInitialized) {
@@ -344,7 +360,7 @@ export class ViewContainer<T> {
     }
 
     const component = this._injector.get(ViewComponentRef);
-    
+
     if (isPromise<T>(component)) {
       component.then(val => this._onComponentReady(val));
     } else {
@@ -356,42 +372,15 @@ export class ViewContainer<T> {
 
   /**
    * Sets the containing {@link View} for this container.
-   * @param {(View|null)} container 
-   * @returns {void} 
+   * @param {(View|null)} container
+   * @returns {void}
    */
   setView(container: View|null): void {
     if (container === this._container) {
       return;
     }
-    
-    this._container = container;
 
-    // This needs to fire before we wire up to the new container.
     this._containerChange.next(container);
-
-    if (this._container) {
-      this._container.destroyed
-        .takeUntil(this.containerChange)
-        .subscribe(() => this._onViewDestroy());
-      
-      this._container
-        .scope(BeforeDestroyEvent)
-        .takeUntil(this.containerChange)
-        .subscribe(e => this._beforeDestroy.next(e));
-      
-      this._container.visibilityChanges
-        .takeUntil(this.containerChange)
-        .subscribe(e => this._visibilityChanges.next(e));
-      
-      this._container.sizeChanges
-        .takeUntil(this.containerChange)
-        .subscribe(e => this._sizeChanges.next(e));
-
-      this._container
-        .scope(CustomViewHookEvent)
-        .takeUntil(this.containerChange)
-        .subscribe(e => this._onCustomViewHook(e));
-    }
   }
 
   /**
@@ -399,24 +388,24 @@ export class ViewContainer<T> {
    * an instance of the passed in constructor. If non is found
    * then null is returned.
    * @template T The constructor type.
-   * @param {Type<T>} [Ctor] 
-   * @returns {(T|null)} 
+   * @param {Type<T>} [Ctor]
+   * @returns {(T|null)}
    */
   getParent<U extends Renderable>(Ctor: Type<U>): U|null {
     return this._container ? this._container.getParent(Ctor) : null;
   }
-  
+
   /**
    * Gets this renderables parents or any parents that are
-   * an instance of the passed in constructor.    
+   * an instance of the passed in constructor.
    * @template T The constructor type.
-   * @param {Type<T>} [Ctor] 
-   * @returns {(T|null)} 
+   * @param {Type<T>} [Ctor]
+   * @returns {(T|null)}
    */
   getParents<U extends Renderable>(Ctor: Type<U>): U[] {
     return this._container ? this._container.getParents(Ctor) : [];
   }
-  
+
   /**
    * Signals up the tree to make this {@link View} visible.
    */
@@ -434,18 +423,18 @@ export class ViewContainer<T> {
       this._container.minimize(isMinimized);
     }
   }
-  
+
   /**
    * Determines whether this renderable is visible.
-   * @returns {boolean} 
+   * @returns {boolean}
    */
   isVisible(): boolean {
     return this._container ? this._container.isVisible() : false;
   }
-  
+
   /**
    * Closes this view.
-   * @param {{ silent?: boolean }} args 
+   * @param {{ silent?: boolean }} args
    */
   close(args: { silent?: boolean }): void {
     if (this._container) {
@@ -455,23 +444,23 @@ export class ViewContainer<T> {
 
   /**
    * Mounts this containers element to the given element.
-   * @param {HTMLElement} element 
+   * @param {HTMLElement} element
    */
   mountTo(element: HTMLElement): void {
     element.appendChild(this._element);
   }
-  
+
   /**
    * Mounts an element to this containers element.
-   * @param {HTMLElement} element 
+   * @param {HTMLElement} element
    */
   mount(element: HTMLElement): void {
     this._element.appendChild(element);
   }
-  
+
   /**
    * Sets all the content of this containers element to the given HTML string.
-   * @param {string} html 
+   * @param {string} html
    */
   mountHTML(html: string): void {
     this._element.innerHTML = html;
@@ -516,8 +505,8 @@ export class ViewContainer<T> {
   /**
    * Resolves the container. Note, the component must be created or else an error will be thrown.
    * @throws Error
-   * @param {{ fromCache?: boolean }} [options={}] 
-   * @returns {Promise<void>} 
+   * @param {{ fromCache?: boolean }} [options={}]
+   * @returns {Promise<void>}
    */
   async resolve(options: { fromCache?: boolean } = {}): Promise<void> {
     const { fromCache = false } = options;
@@ -527,7 +516,7 @@ export class ViewContainer<T> {
     }
 
     this._status.next(ViewContainerStatus.PENDING);
-    
+
     try {
       await this._executeHook('ugOnResolve', { fromCache });
       this._status.next(ViewContainerStatus.READY);
@@ -541,7 +530,7 @@ export class ViewContainer<T> {
    * Triggers a size change event. This doesn't resize the view. This is merely
    * to force a resize event to a component. This is useful for sizing a component
    * that has now view attached to it.
-   * @param {SizeChanges} event 
+   * @param {SizeChanges} event
    */
   triggerSizeChange(event: SizeChanges): void {
     this._sizeChanges.next(event);
@@ -549,8 +538,8 @@ export class ViewContainer<T> {
 
   /**
    * Triggers a visibility change event. This is merely
-   * to force a visibility event to a component. 
-   * @param {SizeChanges} event 
+   * to force a visibility event to a component.
+   * @param {SizeChanges} event
    */
   triggerVisibilityChange(isVisible: boolean): void {
     this._visibilityChanges.next(isVisible);
@@ -559,9 +548,9 @@ export class ViewContainer<T> {
   /**
    * Resolves a config property by checking the config on the currently attached container first,
    * then the config the ViewContainer was created with, then the metadata defined for the component.
-   * @template T 
-   * @param {string} path 
-   * @returns {(T | null)} 
+   * @template T
+   * @param {string} path
+   * @returns {(T | null)}
    */
   resolveConfigProperty<T>(path: string): T | null {
     if (this._container) {
@@ -592,9 +581,9 @@ export class ViewContainer<T> {
   /**
    * Executes a hook on the component.
    * @private
-   * @param {string} name 
-   * @param {...any[]} args 
-   * @returns {*} 
+   * @param {string} name
+   * @param {...any[]} args
+   * @returns {*}
    */
   private _executeHook(name: string, arg?: any): any {
     if (this._component) {
@@ -614,8 +603,8 @@ export class ViewContainer<T> {
    * Invoked when the component is resolved from the initialization.
    * @private
    * @async
-   * @param {T} component 
-   * @returns {Promise<void>} 
+   * @param {T} component
+   * @returns {Promise<void>}
    */
   private async _onComponentReady(component: T): Promise<void> {
     this._component = component;
