@@ -2,20 +2,20 @@ import h from 'snabbdom/h';
 import { VNode } from 'snabbdom/vnode';
 
 import { Injector, Inject, Optional, Injectable, PostConstruct } from '../di';
-import { 
-  Renderable, 
+import {
+  Renderable,
   RenderableInjector,
   ConfiguredRenderable,
   RenderableArea,
-  RenderableConfig
+  RenderableConfig,
+  RenderableDestroyContext
 } from '../dom';
-import { 
-  ContainerRef, 
+import {
+  ContainerRef,
   ConfigurationRef,
   RenderableArg,
   DropArea
 } from '../common';
-import { XYContainer } from '../XYContainer';
 import { DragHost, DragHostContainer } from '../DragHost';
 
 export interface LayoutConfig extends RenderableConfig {
@@ -57,7 +57,7 @@ export class Layout extends Renderable {
   @PostConstruct()
   initialize(): void {
     super.initialize();
-    
+
     if (!this._config || !this._config.child) {
       throw new Error('A layout requires a child renderable.');
     }
@@ -65,10 +65,10 @@ export class Layout extends Renderable {
     this._contentItems.push(this.createChild(this._config.child));
     this._dragHost.start.subscribe(this._onDragHostStart.bind(this));
   }
-  
+
   /**
    * Creates this renderables virtual node.
-   * @returns {VNode} 
+   * @returns {VNode}
    */
   render(): VNode {
     return h('div.ug-layout__layout', {
@@ -76,7 +76,7 @@ export class Layout extends Renderable {
         height: `${this.height}px`,
         width: `${this.width}px`
       }
-    }, 
+    },
       this._contentItems.map(i => i.render())
     );
   }
@@ -84,14 +84,14 @@ export class Layout extends Renderable {
   /**
    * Destroys this renderable.
    */
-  destroy(): void {
+  destroy(context: RenderableDestroyContext): void {
     this._dragHost.destroy();
-    super.destroy();
+    super.destroy(context);
   }
 
   /**
    * Gets the visible areas of all descendant Renderables.
-   * @returns {Array<{ item: Renderable, area: RenderableArea }>} 
+   * @returns {Array<{ item: Renderable, area: RenderableArea }>}
    */
   getItemVisibleAreas(): Array<{ item: Renderable, area: RenderableArea }> {
     return this.getDescendants()
@@ -109,19 +109,19 @@ export class Layout extends Renderable {
 
     return this.getItemVisibleAreas()
       .filter(({ item }) => {
-        return DragHost.isDropTarget(item) 
+        return DragHost.isDropTarget(item)
           && item !== target
           && item.isDroppable(target)
           && !target.contains(item)
           && !target.isContainedWithin(item)
           && excludes.indexOf(item) === -1;
-      }) as any; 
+      }) as any;
   }
 
   private _onDragHostStart(container: DragHostContainer): void {
     const { offsetX, offsetY, height, width } = this;
     const { dragArea, item } = container;
-    
+
     this._dragHost.bounds = new RenderableArea(offsetX, width + offsetX - dragArea.width, offsetY, height + offsetY - dragArea.height);
     this._dragHost.setDropAreas(this.getDropTargets(item));
   }
@@ -129,10 +129,10 @@ export class Layout extends Renderable {
   /**
    * Configures a layout renderable.
    * @static
-   * @param {LayoutConfig} config 
-   * @returns {ConfiguredRenderable<Layout>} 
+   * @param {LayoutConfig} config
+   * @returns {ConfiguredRenderable<Layout>}
    */
   static configure(config: LayoutConfig): ConfiguredRenderable<Layout> {
-    return new ConfiguredRenderable(Layout, config);    
+    return new ConfiguredRenderable(Layout, config);
   }
 }

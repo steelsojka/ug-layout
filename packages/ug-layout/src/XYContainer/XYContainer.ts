@@ -1,25 +1,27 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
-import { 
-  Renderable, 
+import {
+  Renderable,
   RenderableInjector,
   ConfiguredRenderable,
   Renderer,
   AddChildArgs,
   RenderableConfig,
-  isTransferable
+  isTransferable,
+  RemoveChildArgs
 } from '../dom';
 import { Inject, Injector, Optional, PostConstruct } from '../di';
-import { 
-  ContainerRef, 
+import {
+  ContainerRef,
   XYDirection,
   ConfigurationRef,
   RenderableArg,
   RenderableConstructorArg,
   UNALLOCATED,
   DragStatus,
-  DragEvent
+  DragEvent,
+  ContextType
 } from '../common';
 import { XYItemContainer, XYItemContainerConfig } from './XYItemContainer';
 import { Draggable } from '../Draggable';
@@ -68,8 +70,8 @@ export class XYContainer extends Renderable {
   protected _dragLimitMax: number = 0;
   protected _container: Renderable|null;
 
-  @Inject(ConfigurationRef) 
-  @Optional() 
+  @Inject(ConfigurationRef)
+  @Optional()
   protected _config: XYContainerConfig|null;
 
   @Inject(STACK_CLASS) protected _Stack: typeof Stack;
@@ -112,8 +114,8 @@ export class XYContainer extends Renderable {
     if (!this._container) {
       return 0;
     }
-    
-    return this.isRow 
+
+    return this.isRow
       ? this._container.width - this._totalSplitterSize
       : this._container.height - this._totalSplitterSize;
   }
@@ -121,12 +123,12 @@ export class XYContainer extends Renderable {
   @PostConstruct()
   initialize(): void {
     super.initialize();
-    
+
     const children = this._config && this._config.children ? this._config.children : [];
-    
+
     children.forEach(config => {
       const item = ConfiguredRenderable.isRenderableConstructor<XYItemContainer>(config)
-        ? this.createChild(config) 
+        ? this.createChild(config)
         : this.createChildItem(config as any);
 
       return this.addChild(item, { render: false, resize: false });
@@ -146,13 +148,13 @@ export class XYContainer extends Renderable {
     if (isTransferable(item)) {
       transferConfig = item.getTransferableConfig(this);
     }
-    
+
     // If this is an item container just add it.
     if (!(item instanceof XYItemContainer)) {
       if (item instanceof StackItemContainer) {
         item = this._createStackWrapper(item);
       }
-      
+
       container = this.createChildItem({ ...transferConfig, use: item }, childArgs);
 
       item.setContainer(container);
@@ -162,7 +164,7 @@ export class XYContainer extends Renderable {
 
     if (resize) {
       let newItemRatio;
-      
+
       if (container.initialSize != null) {
         newItemRatio = (container.initialSize / this._totalContainerSize) * 100;
       } else {
@@ -170,21 +172,22 @@ export class XYContainer extends Renderable {
       }
 
       container.ratio = newItemRatio;
-      
+
       for (const item of this._contentItems) {
         item.ratio = <number>item.ratio * ((100 - newItemRatio) / 100);
       }
     }
-    
+
     while (this._splitters.length < this._contentItems.length) {
       this._splitters.push(this._createSplitter());
     }
-      
+
     super.addChild(container, options);
   }
 
-  removeChild(item: XYItemContainer): void {
+  removeChild(item: XYItemContainer, options: RemoveChildArgs = {}): void {
     const index = this._contentItems.indexOf(item);
+    const { context = ContextType.NONE } = options;
 
     if (index === -1) {
       return;
@@ -195,26 +198,26 @@ export class XYContainer extends Renderable {
 
     if (splitter) {
       this._splitters.splice(splitterIndex, 1);
-      splitter.destroy();
+      splitter.destroy({ type: context });
     }
 
-    super.removeChild(item, { render: false });
+    super.removeChild(item, { render: false, context });
 
     if (this._contentItems.length === 1 && this.container && get(this._config, 'static') !== true) {
       const container = this._contentItems[0];
       const item = container.item;
-      
+
       this._contentItems = [];
-      this.container.replaceChild(this, item, { destroy: true, render: false });
-      
+      this.container.replaceChild(this, item, { destroy: true, render: false, context });
+
       container.setContainer(null);
-      container.removeChild(item, { destroy: false });
+      container.removeChild(item, { destroy: false, context });
     }
-    
+
     this.resize();
     this._renderer.render();
   }
-  
+
   render(): VNode {
     const children: VNode[] = [];
 
@@ -222,10 +225,10 @@ export class XYContainer extends Renderable {
       if (index > 0 && this._splitters[index - 1]) {
         children.push(this._splitters[index - 1].render());
       }
-      
+
       children.push(child.render());
     }
-    
+
     return h(`div.${this._className}`, {
       style: {
         height: `${this._height}px`,
@@ -248,7 +251,7 @@ export class XYContainer extends Renderable {
     const { resize = true, render = true } = options;
     const { before, after } = this.getAdjacentItems(item);
     const prevRatio = item.ratio;
-    
+
     item.ratio = (size / this._totalContainerSize) * 100;
 
     if (after && isNumber(after.ratio)) {
@@ -313,9 +316,9 @@ export class XYContainer extends Renderable {
   private _isSplitterDisabled(splitter: Splitter): boolean {
     const { before, after } = this._getSplitterItems(splitter);
 
-    return before.isMinimized 
-      || after.isMinimized 
-      || before.minSize === before.maxSize 
+    return before.isMinimized
+      || after.isMinimized
+      || before.minSize === before.maxSize
       || after.minSize === after.maxSize;
   }
 
@@ -339,14 +342,14 @@ export class XYContainer extends Renderable {
   private _dragStart(event: DragEvent<Splitter>): void {
     const { host } = event;
     const { before, after } = this._getSplitterItems(host);
-    
+
     this._dragLimitMin = Math.max((-before.size + before.minSize), -(after.maxSize - after.size));
     this._dragLimitMax = Math.min(after.size - after.minSize, before.maxSize - before.size);
   }
 
   private _dragEnd(event: DragEvent<Splitter>): void {
     let { host, x, y } = event;
-    
+
     host.dragTo(0, 0);
 
     x = clamp(x, this._dragLimitMin, this._dragLimitMax);
@@ -359,7 +362,7 @@ export class XYContainer extends Renderable {
   private _updateSplitterItems(splitter: Splitter, x: number, y: number): void {
     const { before, after } = this._getSplitterItems(splitter);
     const totalContainerSize = this._totalContainerSize;
-    
+
     if (this.isRow) {
       before.ratio = ((before.width + x) / totalContainerSize) * 100;
       after.ratio = ((after.width - x) / totalContainerSize) * 100;
@@ -370,7 +373,7 @@ export class XYContainer extends Renderable {
 
     this.resize();
   }
-  
+
   private _dragMove(event: DragEvent<Splitter>): void {
     if (this.isRow) {
       event.host.dragTo(clamp(event.x, this._dragLimitMin, this._dragLimitMax), event.host.y);
@@ -446,8 +449,8 @@ export class XYContainer extends Renderable {
             child.ratio = 50;
             total += 50;
           }
-        } 
-        
+        }
+
         for (const child of this._contentItems) {
           child.ratio = (<number>child.ratio / total) * 100;
         }
@@ -460,7 +463,7 @@ export class XYContainer extends Renderable {
 
     this._distributeRatios();
   }
-  
+
   private _distributeRatios(_iterationCount: number = 0): void {
     // Recursion alert. Check for inifinite loop here.
     const growable: XYItemContainer[] = [];
@@ -471,10 +474,10 @@ export class XYContainer extends Renderable {
     for (const child of this._contentItems) {
       const minRatio = !child.isMinimized ? (child.minSize / containerSize) * 100 : 0;
       const maxRatio = (child.maxSize / containerSize) * 100;
-      
+
       child.ratio = clamp(child.ratio, minRatio, maxRatio);
       totalRatio += child.ratio;
-      
+
       const size = containerSize * (<number>child.ratio / 100);
 
       if (size < child.maxSize) {
@@ -497,7 +500,7 @@ export class XYContainer extends Renderable {
     }
 
     totalRatio = this._contentItems.reduce((r, i) => r + <number>i.ratio, 0);
-    
+
     for (const child of this._contentItems) {
       child.ratio = (<number>child.ratio / totalRatio) * 100;
     }

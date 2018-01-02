@@ -10,10 +10,9 @@ import { Renderer, RenderableInjector } from './dom';
 import { ViewFactory, ViewManager, ViewLinker, ViewHookExecutor } from './view';
 import { DocumentRef, PatchRef } from './common';
 import { LayoutManipulator } from './layout';
-import { StateContext } from './StateContext';
 import { LockState } from './LockState';
 import {
-  StackTab, 
+  StackTab,
   StackHeader,
   StackItemContainer,
   Stack,
@@ -53,7 +52,6 @@ export class RootInjector extends RenderableInjector {
       ViewManager,
       ViewLinker,
       LayoutManipulator,
-      StateContext,
       LockState,
       ViewHookExecutor,
       { provide: STACK_TAB_CLASS, useValue: StackTab },

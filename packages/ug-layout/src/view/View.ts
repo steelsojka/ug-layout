@@ -12,8 +12,6 @@ import { Subject, Observable, BeforeDestroyEvent, BehaviorSubject } from '../eve
 import { MakeVisibleCommand, MinimizeCommand } from '../commands';
 import { ViewManager } from './ViewManager';
 import { ViewFactory } from './ViewFactory';
-import { CustomViewHookEvent } from './CustomViewHookEvent';
-import { StateContext } from '../StateContext';
 import { SizeChanges } from './hooks';
 
 /**
@@ -41,8 +39,7 @@ export class View extends Renderable {
   @Inject(ViewManager) protected _viewManager: ViewManager;
   @Inject(ViewFactory) protected _viewFactory: ViewFactory;
   @Inject(DocumentRef) protected _document: Document;
-  @Inject(StateContext) protected _stateContext: StateContext;
-  
+
   /**
    * Notifies when the visibility of this view changes.
    * @type {Observable<boolean>}
@@ -80,7 +77,7 @@ export class View extends Renderable {
   get caching(): CacheStrategy|null {
     return this.resolveConfigProperty<CacheStrategy>('caching');
   }
-  
+
   /**
    * The 'ref' string this view is configured with.
    * @readonly
@@ -89,7 +86,7 @@ export class View extends Renderable {
   get ref(): string|null {
     return this.resolveConfigProperty<string>('ref');
   }
-  
+
   /**
    * The resolution strategy this view is configured with.
    * @readonly
@@ -98,7 +95,7 @@ export class View extends Renderable {
   get resolution(): ResolverStrategy|null {
     return this.resolveConfigProperty<ResolverStrategy>('resolution');
   }
-  
+
   /**
    * The token this view is using for registration.
    * @readonly
@@ -123,7 +120,7 @@ export class View extends Renderable {
   @PostConstruct()
   initialize(): void {
     super.initialize();
-    
+
     this._renderer.rendered
       .takeUntil(this.destroyed)
       .subscribe(this._postRender.bind(this));
@@ -145,18 +142,18 @@ export class View extends Renderable {
   /**
    * Closes this view.
    * @emits {BeforeDestroyEvent} Fired when not silent.
-   * @param {{ silent?: boolean }} [args={}] 
+   * @param {{ silent?: boolean }} [args={}]
    */
   close(args: { silent?: boolean } = {}): void {
     const { silent = false } = args;
-    
+
     if (!silent) {
       const event = new BeforeDestroyEvent(this);
-      
+
       this._eventBus.next(event);
       event.results().subscribe(() => this.remove());
     } else {
-      this.destroy();
+      this.destroy({ type: ContextType.NONE });
     }
   }
 
@@ -180,8 +177,8 @@ export class View extends Renderable {
    * Resolves a views config property. Checks the configuration given to the
    * view renderable first then checks the component metadata.
    * @template T The return type.
-   * @param {string} path 
-   * @returns {(T|null)} 
+   * @param {string} path
+   * @returns {(T|null)}
    */
   resolveConfigProperty<T>(path: string): T|null {
     if (this._viewContainer) {
@@ -204,7 +201,7 @@ export class View extends Renderable {
   /**
    * Invoked when snabbdom has created the HTML element for this view.
    * @private
-   * @param {HTMLElement} element 
+   * @param {HTMLElement} element
    */
   private _onCreate(element: HTMLElement): void {
     this._element = element;
@@ -238,8 +235,8 @@ export class View extends Renderable {
   /**
    * Configures a view.
    * @static
-   * @param {ViewConfig} config 
-   * @returns {ConfiguredRenderable<View>} 
+   * @param {ViewConfig} config
+   * @returns {ConfiguredRenderable<View>}
    */
   static configure(config: ViewConfig): ConfiguredRenderable<View> {
     return new ConfiguredRenderable(View, config);

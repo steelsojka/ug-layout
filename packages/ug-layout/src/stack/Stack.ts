@@ -2,18 +2,25 @@ import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
 import { Type, Inject, PostConstruct } from '../di';
-import { 
-  Renderable, 
+import {
+  Renderable,
   RemoveChildArgs,
   AddChildArgs,
   ConfiguredRenderable,
-  BaseModificationArgs
+  BaseModificationArgs,
+  RenderableDestroyContext
 } from '../dom';
 import { BeforeDestroyEvent } from '../events';
-import { ConfigurationRef, ContainerRef, RenderableArg, XYDirection } from '../common';
-import { 
-  XYItemContainer, 
-  Row, 
+import {
+  ConfigurationRef,
+  ContainerRef,
+  RenderableArg,
+  XYDirection,
+  ContextType
+} from '../common';
+import {
+  XYItemContainer,
+  Row,
   Column,
   ROW_CLASS,
   COLUMN_CLASS
@@ -154,12 +161,12 @@ export class Stack extends Renderable {
     }, this._config);
 
     super.initialize();
-    
+
     this._header = this.createChild(new ConfiguredRenderable(this._StackHeader, this._config ? this._config.header : null));
     this._header.subscribe(TabCloseEvent, this._onTabClose.bind(this));
     this._header.subscribe(TabSelectionEvent, this._onTabSelect.bind(this));
     this._header.subscribe(TabDragEvent, this._onTabDrag.bind(this));
-    
+
     this._config.children.forEach(child => {
       this.addChild(this.createChildItem(child), { render: false, resize: false });
     });
@@ -181,14 +188,14 @@ export class Stack extends Renderable {
       }
     }, [
       this._header.render(),
-      ...this._contentItems.map(item => item.render())  
+      ...this._contentItems.map(item => item.render())
     ]);
   }
 
   /**
    * Creates a child {@link StackItemContainer}.
-   * @param {StackItemContainerConfig} config 
-   * @returns {StackItemContainer} 
+   * @param {StackItemContainerConfig} config
+   * @returns {StackItemContainer}
    */
   createChildItem(config: StackItemContainerConfig): StackItemContainer {
     return this.createChild(new ConfiguredRenderable(this._StackItemContainer, config));
@@ -196,7 +203,7 @@ export class Stack extends Renderable {
 
   /**
    * Adds a header control to this stack.
-   * @param {RenderableArg<StackControl>} control 
+   * @param {RenderableArg<StackControl>} control
    */
   addControl(control: RenderableArg<StackControl>): void {
     if (this._header) {
@@ -207,8 +214,8 @@ export class Stack extends Renderable {
   /**
    * Adds a child renderable. If the renderable being added is not a StackItemContainer
    * then one is created and the item is wrapped in it.
-   * @param {Renderable} item 
-   * @param {AddChildArgs} [options={}] 
+   * @param {Renderable} item
+   * @param {AddChildArgs} [options={}]
    */
   addChild(item: Renderable, options: AddChildArgs = {}): void {
     const { index } = options;
@@ -224,22 +231,22 @@ export class Stack extends Renderable {
       title: container.title,
       maxSize: get<number>(this._config, 'header.maxTabSize', 200),
     }, {
-      index, 
+      index,
       render: false,
       resize: false
     });
-    
+
     super.addChild(item, options);
   }
 
   /**
    * Removes a child item along with the tab associated with.
-   * @param {StackItemContainer} item 
-   * @param {RemoveChildArgs} [options={}] 
-   * @returns {void} 
+   * @param {StackItemContainer} item
+   * @param {RemoveChildArgs} [options={}]
+   * @returns {void}
    */
   removeChild(item: StackItemContainer, options: RemoveChildArgs = {}): void {
-    const { render = true } = options;
+    const { render = true, context = ContextType.NONE } = options;
     const index = this._contentItems.indexOf(item);
 
     if (index === -1) {
@@ -247,12 +254,12 @@ export class Stack extends Renderable {
     }
 
     const tab = this._header.getAtIndex(index);
-    
+
     if (tab) {
-      this._header.removeChild(tab, Object.assign({}, options, { render: false }));
+      this._header.removeChild(tab, Object.assign({}, options, { render: false, context }));
     }
-    
-    super.removeChild(item, Object.assign({}, options, { render: false }));
+
+    super.removeChild(item, Object.assign({}, options, { render: false, context }));
 
     this._setActiveIndex(this._activeIndex);
 
@@ -263,12 +270,12 @@ export class Stack extends Renderable {
 
   /**
    * Sets the active item at a specific index.
-   * @param {number} [index] 
-   * @param {BaseModificationArgs} [args={}] 
+   * @param {number} [index]
+   * @param {BaseModificationArgs} [args={}]
    */
   setActiveIndex(index?: number, args: BaseModificationArgs = {}): void {
     const { render = true } = args;
-    
+
     this._setActiveIndex(index);
 
     if (render) {
@@ -278,12 +285,12 @@ export class Stack extends Renderable {
 
   /**
    * Removes an item a specified index.
-   * @param {number} index 
-   * @param {RemoveChildArgs} [options={}] 
+   * @param {number} index
+   * @param {RemoveChildArgs} [options={}]
    */
   removeAtIndex(index: number, options: RemoveChildArgs = {}): void {
-    const item = this.getAtIndex(index); 
-    
+    const item = this.getAtIndex(index);
+
     if (item) {
       this.removeChild(item as StackItemContainer, options);
     }
@@ -292,28 +299,28 @@ export class Stack extends Renderable {
   /**
    * Closes the stack if all items are closeable.
    * @emits {BeforeDestroyEvent} Event that can prevent this action.
-   * @returns {void} 
+   * @returns {void}
    */
-  close(): void {
+  close(context: ContextType = ContextType.NONE): void {
     if (!this.isCloseable) {
       return;
     }
 
     const event = new BeforeDestroyEvent(this);
-    
+
     this.emitDown(event);
     event.results().subscribe(() => {
       if (this._container) {
-        this._container.removeChild(this);
+        this._container.removeChild(this, { context });
       } else {
-        this.destroy();
+        this.destroy({ type: context });
       }
     });
   }
 
-  destroy(): void {
-    this._header.destroy();
-    super.destroy();
+  destroy(context: RenderableDestroyContext): void {
+    this._header.destroy(context);
+    super.destroy(context);
   }
 
   getChildren(): Renderable[] {
@@ -322,54 +329,54 @@ export class Stack extends Renderable {
       this._header
     ];
   }
-  
+
   /**
    * Gets the index of a tab.
-   * @param {StackTab} tab 
-   * @returns {number} 
+   * @param {StackTab} tab
+   * @returns {number}
    */
   getIndexOfTab(tab: StackTab): number {
     return this._header.getIndexOf(tab);
   }
-  
+
   /**
    * Determines whether an item is the action item container.
-   * @param {StackItemContainer} container 
-   * @returns {boolean} 
+   * @param {StackItemContainer} container
+   * @returns {boolean}
    */
   isActiveContainer(container: StackItemContainer): boolean {
     return this.getIndexOf(container) === this.activeIndex;
-  } 
-  
+  }
+
   /**
    * Determines whether a tab is the active tab.
-   * @param {StackTab} tab 
-   * @returns {boolean} 
+   * @param {StackTab} tab
+   * @returns {boolean}
    */
   isActiveTab(tab: StackTab): boolean {
     return this._header.getIndexOf(tab) === this.activeIndex;
   }
-  
+
   /**
    * Gets a tab at a specified index.
-   * @param {number} index 
-   * @returns {(StackTab|null)} 
+   * @param {number} index
+   * @returns {(StackTab|null)}
    */
   getTabAtIndex(index: number): StackTab|null {
     return this._header.getAtIndex(index) as StackTab|null;
   }
-  
+
   /**
    * Sets the given container as the active item.
-   * @param {StackItemContainer} container 
+   * @param {StackItemContainer} container
    */
   setActiveContainer(container: StackItemContainer): void {
     this.setActiveIndex(this.getIndexOf(container));
   }
-  
+
   /**
    * Sets the active item from the given tab.
-   * @param {StackTab} tab 
+   * @param {StackTab} tab
    */
   setActiveTab(tab: StackTab): void {
     this.setActiveIndex(this.getIndexOfTab(tab));
@@ -382,7 +389,7 @@ export class Stack extends Renderable {
   /**
    * Gets the leaf nodes of the active item container.
    * @override
-   * @returns {Renderable} 
+   * @returns {Renderable}
    */
   getLeafNodes(): Renderable[] {
     const item = this.getAtIndex(this.activeIndex);
@@ -408,10 +415,10 @@ export class Stack extends Renderable {
       // If this stack belongs to a Row/Column and the item is being dropped in a region that flows with that container
       // then it can be dropped in without creating the XYItemContainer.
       const containerIndex = this._container.container.getIndexOf(this._container);
-      const index = region === StackRegion.NORTH || region === StackRegion.WEST 
+      const index = region === StackRegion.NORTH || region === StackRegion.WEST
         ? containerIndex
         : containerIndex + 1;
-      
+
       this._container.addChild(item, { index, render: false, resize: false });
       this._container.ratio = <number>this._container.ratio * 0.5;
       this._container.container.resize();
@@ -419,13 +426,13 @@ export class Stack extends Renderable {
       // Create a Row/Column and replace this stack with it, while adding the stack as an item.
       const container = this._createContainerFromRegion(region);
       const index = region === StackRegion.NORTH || region === StackRegion.WEST ? 0 : -1;
-      
+
       this._container.replaceChild(this, container, { destroy: false, render: false });
-      
+
       container.addChild(this, { render: false });
       container.addChild(item, { render: false, index });
     }
-        
+
     this._renderer.render();
   }
 
@@ -446,9 +453,9 @@ export class Stack extends Renderable {
 
     if (container) {
       const event = e.delegate(StackItemCloseEvent, container);
-      
+
       this._eventBus.next(event);
-      
+
       event.results().subscribe(() => {
         this.removeChild(container);
       });
@@ -458,10 +465,10 @@ export class Stack extends Renderable {
   private _onTabSelect(e: TabSelectionEvent): void {
     this.setActiveTab(e.target);
   }
-  
+
   private _onTabDrag(e: TabDragEvent): void {
     const item = this.getAtIndex(this.getIndexOfTab(e.target)) as StackItemContainer|null;
-    
+
     if (item) {
       this.removeChild(item, { destroy: false });
     }
@@ -471,7 +478,7 @@ export class Stack extends Renderable {
     if (!isNumber(index)) {
       return;
     }
-    
+
     this._activeIndex = clamp(index, 0, Math.max(this._contentItems.length - 1, 0));
   }
 

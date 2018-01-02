@@ -3,9 +3,9 @@ import h from 'snabbdom/h';
 
 import { Inject, PostConstruct } from '../di'
 import { TabSelectionEvent } from './TabSelectionEvent';
-import { Renderable, MemoizeFrom, RenderableConfig } from '../dom';
+import { Renderable, MemoizeFrom, RenderableConfig, RenderableDestroyContext } from '../dom';
 import { Draggable } from '../Draggable';
-import { ConfigurationRef, DocumentRef, DragEvent } from '../common';
+import { ConfigurationRef, DocumentRef, DragEvent, ContextType } from '../common';
 import { StackHeader } from './StackHeader';
 import { TabDragEvent } from './TabDragEvent';
 import { Stack } from './Stack';
@@ -41,7 +41,7 @@ export class StackTab extends Renderable {
   @Inject(DocumentRef) private _document: Document;
   @Inject(LockState) private _lockState: LockState;
   @Inject(ConfigurationRef) protected _config: StackTabConfig;
-  
+
   get width(): number {
     return this._container.isHorizontal ? this._width : this._container.width;
   }
@@ -72,7 +72,7 @@ export class StackTab extends Renderable {
   get offsetX(): number {
     return this._container.getOffsetXForTab(this);
   }
-  
+
   get offsetY(): number {
     return this._container.getOffsetYForTab(this);
   }
@@ -102,7 +102,7 @@ export class StackTab extends Renderable {
    */
   get controls(): TabControl[] {
     const { item } = this;
-    
+
     return item ? item.controls : [];
   }
 
@@ -134,19 +134,19 @@ export class StackTab extends Renderable {
   initialize(): void {
     this._config = Object.assign({
       maxSize: 150,
-      title: ''   
+      title: ''
     }, this._config || {});
 
     super.initialize();
-    
+
     this._draggable.drag
       .filter(Draggable.isDraggingEvent)
       .subscribe(this._onDragMove.bind(this));
-    
+
     this._draggable.drag
       .filter(Draggable.isDragStopEvent)
       .subscribe(this._onDragStop.bind(this));
-      
+
     this._draggable.drag
       .filter(Draggable.isDragStartEvent)
       .subscribe(this._onDragStart.bind(this));
@@ -154,7 +154,7 @@ export class StackTab extends Renderable {
     this._dragHost.start
       .takeUntil(this.destroyed)
       .subscribe(this._onDragHostStart.bind(this));
-    
+
     this._dragHost.dropped
       .takeUntil(this.destroyed)
       .subscribe(this._onDragHostDropped.bind(this));
@@ -169,11 +169,11 @@ export class StackTab extends Renderable {
       this._height = rect.height;
     }
   }
-  
+
   render(): VNode {
     const { item } = this;
     const title = get(item, 'title', '');
-    
+
     return h(`div.ug-layout__stack-tab`, {
       key: this.uid,
       style: this._getStyles(),
@@ -197,11 +197,11 @@ export class StackTab extends Renderable {
       h('div', title),
       h('div.ug-layout__stack-tab-controls', this.controls.filter(c => c.isActive()).map(c => c.render()))
     ]);
-  }  
+  }
 
-  destroy(): void {
+  destroy(context: RenderableDestroyContext): void {
     this._draggable.destroy();
-    super.destroy();
+    super.destroy(context);
   }
 
   private _getStyles(): { [key: string]: string } {
@@ -211,28 +211,28 @@ export class StackTab extends Renderable {
       if (!this._container.isDistributed) {
         result['max-width'] = `${this._config.maxSize}px`;
       }
-      
+
       result['max-height'] = `${this._container.height}px`;
       result['height'] = `${this.height}px`;
     } else {
       if (!this._container.isDistributed) {
         result['max-height'] = `${this._config.maxSize}px`;
       }
-      
+
       result['max-width'] = `${this._container.width}px`;
       result['width'] = `${this.width}px`;
     }
-    
+
     return result;
   }
 
   private _onMouseDown(e: MouseEvent): void {
     if (!this.isDraggable) {
-      return;  
+      return;
     }
 
     this._draggable.startDrag({
-      host: this, 
+      host: this,
       startX: e.pageX,
       startY: e.pageY
     });
@@ -242,19 +242,19 @@ export class StackTab extends Renderable {
     const item = this._container.getItemFromTab(this);
     const originStack = this.stack;
     const originIndex = this._container.getIndexOf(this);
-    
+
     this._isDragging = true;
     this.emit(new TabDragEvent(this));
     this._element.classList.add('ug-layout__tab-dragging');
     this._document.body.appendChild(this._element);
-    
+
     if (item) {
       this._dragHost.initialize({
-        item: <Renderable>item, 
-        draggable: this._draggable, 
+        item: <Renderable>item,
+        draggable: this._draggable,
         dragArea: this.getArea()
       });
-      
+
       this._dragHost.fail
         .takeUntil(this._dragHost.dropped)
         .subscribe(() => {
@@ -262,11 +262,11 @@ export class StackTab extends Renderable {
             originStack.addChild(item, { index: originIndex });
           }
         });
-        
+
       this._dragHost.dropped
         .first()
-        .subscribe(() => this.destroy());
-    } 
+        .subscribe(() => this.destroy({ type: ContextType.NONE }));
+    }
   }
 
   private _onDragMove(e: DragEvent<StackTab>): void {
@@ -279,10 +279,10 @@ export class StackTab extends Renderable {
       x = bounds.clampX(x);
       y = bounds.clampY(y);
     }
-    
+
     this._element.style.transform = `translateX(${x}px) translateY(${y}px)`;
   }
-  
+
   private _onDragStop(e: DragEvent<StackTab>): void {
     this._isDragging = false;
     this._element.style.transform = `translateX(0px) translateY(0px)`;
@@ -293,7 +293,7 @@ export class StackTab extends Renderable {
   private _onDragHostStart(): void {
     this._element.classList.add('ug-layout__tab-drag-enabled');
   }
-  
+
   private _onDragHostDropped(): void {
     this._element.classList.remove('ug-layout__tab-drag-enabled');
   }

@@ -1,11 +1,11 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
-import { Inject, Injector, PostConstruct } from '../di';
-import { Renderable, Renderer } from '../dom';
-import { DocumentRef, ContainerRef, XYDirection, ConfigurationRef, DragEvent } from '../common';
+import { Inject, PostConstruct } from '../di';
+import { Renderable, RenderableDestroyContext } from '../dom';
+import { DocumentRef, ContainerRef, ConfigurationRef, DragEvent } from '../common';
 import { XYContainer } from './XYContainer';
-import { Observable, ReplaySubject } from '../events';
+import { Observable } from '../events';
 import { Draggable } from '../Draggable';
 import { LockState, LOCK_RESIZING } from '../LockState';
 
@@ -20,19 +20,16 @@ export class Splitter extends Renderable {
   dragStatus: Observable<DragEvent<Splitter>>;
   x: number = 0;
   y: number = 0;
-  
-  private _startX: number = 0;
-  private _startY: number = 0;
+
   private _isDragging: boolean = false;
   private _element: HTMLElement;
   private _isDisabled: boolean = false;
 
   @Inject(ConfigurationRef) protected _config: SplitterConfig;
-  @Inject(DocumentRef) private _document: Document;
   @Inject(ContainerRef) protected _container: XYContainer;
   @Inject(Draggable) protected _draggable: Draggable<Splitter>;
   @Inject(LockState) protected _lockState: LockState;
-  
+
   get height(): number {
     return this._isRow ? this._container.height : this._config.size;
   }
@@ -62,7 +59,7 @@ export class Splitter extends Renderable {
         top: 0
       };
     }
-    
+
     return {
       height: `${this.height + 10}px`,
       width: `${this.width}px`,
@@ -78,13 +75,13 @@ export class Splitter extends Renderable {
   @PostConstruct()
   initialize(): void {
     super.initialize();
-    
+
     this.dragStatus = this._draggable.drag;
 
     this._draggable.drag
       .filter(Draggable.isDragStopEvent)
       .subscribe(() => this._isDragging = false);
-    
+
     this._draggable.drag
       .filter(Draggable.isDragStartEvent)
       .subscribe(this._onDragStart.bind(this));
@@ -127,9 +124,9 @@ export class Splitter extends Renderable {
     ]);
   }
 
-  destroy(): void {
+  destroy(context: RenderableDestroyContext): void {
     this._draggable.destroy();
-    super.destroy();
+    super.destroy(context);
   }
 
   disable(): void {
@@ -142,11 +139,11 @@ export class Splitter extends Renderable {
 
   private _onMouseDown(e: MouseEvent): void {
     e.preventDefault();
-    
+
     if (!this.isDisabled) {
       this._draggable.startDrag({
-        host: this, 
-        startX: e.pageX, 
+        host: this,
+        startX: e.pageX,
         startY: e.pageY,
         threshold: 1
       });

@@ -8,16 +8,15 @@ import { Serialized } from './serialization';
 import { ViewManager } from './view';
 import { defaults } from './utils';
 import { Renderer, Renderable, ConfiguredRenderable, RenderableInjector } from './dom';
-import { 
+import {
   ConfigurationRef,
-  ContainerRef, 
+  ContainerRef,
   RootConfigRef,
   RenderableArg,
   ElementRef,
   ContextType
 } from './common';
 import { UgPlugin } from './UgPlugin';
-import { StateContext } from './StateContext';
 import { LockState, LOCK_DRAGGING, LOCK_RESIZING } from './LockState';
 
 export interface RootLayoutConfig {
@@ -51,7 +50,6 @@ export class RootLayout extends Renderable {
   @Inject(ElementRef) protected _containerEl: HTMLElement;
   @Inject(ViewManager) protected _viewManager: ViewManager;
   @Inject(RootConfigRef) protected _rootConfig: RootLayoutCreationConfig;
-  @Inject(StateContext) protected _stateContext: StateContext;
   @Inject(LockState) protected _lockState: LockState;
 
   get height(): number {
@@ -61,11 +59,11 @@ export class RootLayout extends Renderable {
   get width(): number {
     return this._width;
   }
-  
+
   get isInitialized(): boolean {
     return this._isInitialized;
   }
-  
+
   get containerEl(): Node|null {
     return this._containerEl;
   }
@@ -73,7 +71,7 @@ export class RootLayout extends Renderable {
   get offsetX(): number {
     return this._offsetX;
   }
-  
+
   get offsetY(): number {
     return this._offsetY;
   }
@@ -103,13 +101,13 @@ export class RootLayout extends Renderable {
       this._offsetY = dimensions.y;
     } else {
       const clientRec = this._containerEl.getBoundingClientRect();
-      
+
       this._width = clientRec.width;
       this._height = clientRec.height;
       this._offsetX = clientRec.left;
       this._offsetY = clientRec.top;
     }
-    
+
     this._contentItems.forEach(item => item.resize());
   }
 
@@ -139,14 +137,13 @@ export class RootLayout extends Renderable {
     this.reset(context);
     this._config = ConfiguredRenderable.resolveConfiguration(config);
     this._contentItems = [ this.createChild(this._config.use) ];
-    
+
     this.resize();
     this.update();
   }
 
   reset(context: ContextType = ContextType.NONE): void {
-    this._stateContext.setContext(context);
-    this._contentItems.forEach(item => item.destroy());
+    this._contentItems.forEach(item => item.destroy({ type: context }));
     this._contentItems = [];
     this._viewManager.purgeCached(context);
   }
@@ -161,8 +158,8 @@ export class RootLayout extends Renderable {
   }
 
   destroy(): void {
-    super.destroy();
-    
+    super.destroy({ type: ContextType.NONE });
+
     this._viewManager.destroy();
     this._renderer.destroy();
   }
@@ -180,7 +177,7 @@ export class RootLayout extends Renderable {
   static create<T extends RootLayout>(config: RootLayoutCreationConfigArgs = {}): T {
     const _config = defaults(config, {
       plugins: [],
-      providers: [] 
+      providers: []
     }) as RootLayoutCreationConfig;
 
     const providers = _config.plugins.reduce((result, plugin) => {
@@ -194,14 +191,14 @@ export class RootLayout extends Renderable {
       { provide: RootConfigRef, useValue: config },
       ..._config.providers
     ]);
-    
+
     const rootInjector = new RootInjector(providers);
 
     return RenderableInjector.fromRenderable(
-      RootLayout, 
+      RootLayout,
       [
         { provide: RootLayout, useExisting: ConfiguredRenderable }
-      ], 
+      ],
       rootInjector
     )
       .get<T>(ConfiguredRenderable as any);

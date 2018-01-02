@@ -1,10 +1,9 @@
 import { CompleteOn } from 'rx-decorators/completeOn';
 
 import { Injector, Type, Inject, PostConstruct, forwardRef } from '../di';
-import { Renderable } from '../dom';
+import { Renderable, RenderableDestroyedContext } from '../dom';
 import { Observable, Subject, BeforeDestroyEvent, BehaviorSubject } from '../events';
 import { DocumentRef, ContextType } from '../common';
-import { StateContext } from '../StateContext';
 import { View } from './View';
 import { ViewFactory } from './ViewFactory';
 import {
@@ -108,7 +107,6 @@ export class ViewContainer<T> {
   @Inject(forwardRef(() => ViewFactory)) protected _viewFactory: ViewFactory;
   @Inject(VIEW_COMPONENT_CONFIG) protected _viewComponentConfig: any;
   @Inject(VIEW_CONFIG) protected _viewConfig: ViewConfig;
-  @Inject(StateContext) protected _stateContext: StateContext;
 
   /**
    * A unique identifier for this instance.
@@ -234,23 +232,6 @@ export class ViewContainer<T> {
   }
 
   /**
-   * Whether the container is cacheable.
-   * @readonly
-   * @type {boolean}
-   */
-  get isCacheable(): boolean {
-    const cacheStrategy = this.caching;
-
-    if ((cacheStrategy === CacheStrategy.RELOAD
-        && (this._stateContext.context === ContextType.NONE) || this._stateContext.context === ContextType.RESET)
-      || cacheStrategy === CacheStrategy.PERSISTENT) {
-      return true;
-    }
-
-    return false;
-  }
-
-  /**
    * The HTML element for this container.
    * @readonly
    * @type {HTMLElement}
@@ -289,9 +270,8 @@ export class ViewContainer<T> {
       .subscribe(e => this._onCustomViewHook(e));
 
     this.containerChange
-      .switchMap(container => container ? container.destroyed : Observable.empty())
-      .subscribe(() => this._onViewDestroy());
-
+      .switchMap(container => container ? container.destroyed : Observable.empty<RenderableDestroyedContext<View>>())
+      .subscribe(context => this._onViewDestroy(context));
 
     // Reset the retry function when the component is no longer failed.
     this.status.filter(eq(ViewContainerStatus.READY)).subscribe(() => {
@@ -318,6 +298,24 @@ export class ViewContainer<T> {
   destroy(): void {
     this._destroyed.next();
   }
+
+  /**
+   * Whether the container is cacheable.
+   * @param {ContextType} context The current context
+   * @returns {boolean}
+   */
+  isCacheable(context: ContextType = ContextType.NONE): boolean {
+    const cacheStrategy = this.caching;
+
+    if ((cacheStrategy === CacheStrategy.RELOAD
+        && (context === ContextType.NONE) || context === ContextType.RESET)
+      || cacheStrategy === CacheStrategy.PERSISTENT) {
+      return true;
+    }
+
+    return false;
+  }
+
 
   /**
    * Waits for the component to be ready. If the component is not initialized
@@ -569,9 +567,9 @@ export class ViewContainer<T> {
    * Invoked when the view renderable is destroyed.
    * @private
    */
-  private _onViewDestroy(): void {
+  private _onViewDestroy(context: RenderableDestroyedContext<View>): void {
     // If this view is cacheable, we don't destroy it.
-    if (this.isCacheable) {
+    if (this.isCacheable(context.context)) {
       this.detach();
     } else {
       this.destroy();
