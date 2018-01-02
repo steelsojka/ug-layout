@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.0.0"></a>
+# [4.0.0](https://github.com/steelsojka/ug-layout/compare/v3.2.8...v4.0.0) (2018-01-02)
+
+
+### Features
+
+* **injector:** add overridable ViewContainer in injector ([5489767](https://github.com/steelsojka/ug-layout/commit/5489767))
+* **injector:** allow overriding of builtin classes ([7663ca9](https://github.com/steelsojka/ug-layout/commit/7663ca9))
+
+
+
 <a name="3.2.8"></a>
 ## [3.2.8](https://github.com/steelsojka/ug-layout/compare/v2.0.1...v3.2.8) (2017-08-22)
 
