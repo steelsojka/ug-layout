@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.0.1"></a>
+## [4.0.1](https://github.com/steelsojka/ug-layout/compare/v4.0.0...v4.0.1) (2018-01-02)
+
+
+
 <a name="4.0.0"></a>
 # [4.0.0](https://github.com/steelsojka/ug-layout/compare/v3.2.8...v4.0.0) (2018-01-02)
 
