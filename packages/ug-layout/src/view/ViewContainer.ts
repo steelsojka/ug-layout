@@ -76,6 +76,9 @@ export class ViewContainer<T> {
   private _destroyed: Subject<ViewContainer<T>> = new Subject();
 
   @CompleteOn('destroy')
+  private _beforeDestroy: Subject<BeforeDestroyEvent<Renderable>> = new Subject();
+
+  @CompleteOn('destroy')
   private _containerChange: Subject<View|null> = new Subject<View|null>();
 
   @CompleteOn('destroy')
@@ -114,18 +117,12 @@ export class ViewContainer<T> {
    */
   readonly id: number = uid();
   /**
-   * Notifies when this container has changed the {@link View} it is associated with.
-   * @type {(Observable<View|null>)}
-   */
-  containerChange: Observable<View|null> = this._containerChange.asObservable();
-  /**
    * Notifies that the view is being destroyed. This action is cancellable or can be halted until
    * an async action is complete.
    * @see Cancellable
    * @type {Observable<BeforeDestroyEvent<Renderable>>}
    */
-  beforeDestroy: Observable<BeforeDestroyEvent<Renderable>> = this.containerChange
-    .switchMap(container => container ? container.scope(BeforeDestroyEvent) : Observable.empty());
+  beforeDestroy: Observable<BeforeDestroyEvent<Renderable>> = this._beforeDestroy.asObservable();
   /**
    * Notifies when the view is destroyed.
    * @type {Observable<ViewContainer<T>>}
@@ -135,24 +132,15 @@ export class ViewContainer<T> {
    * Notifies when the visibility of this view changes.
    * @type {Observable<boolean>}
    */
-  // visibilityChanges: Observable<boolean> = this._visibilityChanges.asObservable();
-  visibilityChanges: Observable<boolean> = Observable.merge(
-    this.containerChange
-      .switchMap(container => container ? container.visibilityChanges : Observable.empty<boolean>()),
-    this._visibilityChanges.asObservable()
-  )
-    .distinctUntilChanged();
+  visibilityChanges: Observable<boolean> = this._visibilityChanges.asObservable();
   /**
    * Notifies when the dimensions of this views container has changed.
    * @type {Observable<{ width: number, height: number }>}
    */
-  sizeChanges: Observable<SizeChanges> = Observable.merge(
-    this.containerChange
-      .switchMap(container => container ? container.sizeChanges : Observable.empty<SizeChanges>()),
-    this._sizeChanges.asObservable()
-  )
+  sizeChanges: Observable<{ width: number, height: number }> = this._sizeChanges
+    .asObservable()
     .filter(e => e.height !== -1 && e.width !== -1)
-    .distinctUntilChanged((p, c) => p.width === c.width && p.height === c.height);
+    .distinctUntilChanged((p, c) => p.width === c.width && p.height === c.height)
   /**
    * Notifies when the status of this component changes.
    * @type {Observable<ViewContainerStatus>}
@@ -163,6 +151,11 @@ export class ViewContainer<T> {
    * @type {Observable<boolean>}
    */
   initialized: Observable<boolean> = this._initialized.asObservable();
+  /**
+   * Notifies when this container has changed the {@link View} it is associated with.
+   * @type {(Observable<View|null>)}
+   */
+  containerChange: Observable<View|null> = this._containerChange.asObservable();
   /**
    * Notifies when the view has become attached.
    * @type {Observable<boolean>}
@@ -264,14 +257,6 @@ export class ViewContainer<T> {
     this.visibilityChanges.subscribe(isVisible => this._executeHook('ugOnVisibilityChange', isVisible));
     this.beforeDestroy.subscribe(event => this._executeHook('ugOnBeforeDestroy', event));
     this.initialized.subscribe(v => this._isInitialized = v);
-    this.containerChange.subscribe(container => this._container = container);
-    this.containerChange
-      .switchMap(container => container ? container.scope(CustomViewHookEvent) : Observable.empty<CustomViewHookEvent<any>>())
-      .subscribe(e => this._onCustomViewHook(e));
-
-    this.containerChange
-      .switchMap(container => container ? container.destroyed : Observable.empty<RenderableDestroyedContext<View>>())
-      .subscribe(context => this._onViewDestroy(context));
 
     // Reset the retry function when the component is no longer failed.
     this.status.filter(eq(ViewContainerStatus.READY)).subscribe(() => {
@@ -378,7 +363,34 @@ export class ViewContainer<T> {
       return;
     }
 
+    this._container = container;
+
+    // This needs to fire before we wire up to the new container.
     this._containerChange.next(container);
+
+    if (this._container) {
+      this._container.destroyed
+        .takeUntil(this.containerChange)
+        .subscribe(context => this._onViewDestroy(context));
+
+      this._container
+        .scope(BeforeDestroyEvent)
+        .takeUntil(this.containerChange)
+        .subscribe(e => this._beforeDestroy.next(e));
+
+      this._container.visibilityChanges
+        .takeUntil(this.containerChange)
+        .subscribe(e => this._visibilityChanges.next(e));
+
+      this._container.sizeChanges
+        .takeUntil(this.containerChange)
+        .subscribe(e => this._sizeChanges.next(e));
+
+      this._container
+        .scope(CustomViewHookEvent)
+        .takeUntil(this.containerChange)
+        .subscribe(e => this._onCustomViewHook(e));
+    }
   }
 
   /**
