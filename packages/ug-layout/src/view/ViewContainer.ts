@@ -88,7 +88,7 @@ export class ViewContainer<T> {
   private _sizeChanges: BehaviorSubject<SizeChanges> = new BehaviorSubject({ width: -1, height: -1 });
 
   @CompleteOn('destroy')
-  private _attached: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  private _attached: Subject<boolean> = new Subject();
 
   @CompleteOn('destroy')
   private _initialized: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);

@@ -9,6 +9,7 @@ import {
 } from 'ug-layout';
 
 import 'rxjs/add/observable/combineLatest';
+import 'rxjs/add/observable/merge';
 import 'rxjs/add/operator/takeUntil';
 import 'rxjs/add/operator/first';
 import 'rxjs/add/operator/distinctUntilChanged';
@@ -101,16 +102,17 @@ export class AngularViewTestability {
     Observable.combineLatest(
       container.visibilityChanges.distinctUntilChanged(),
       container.componentInitialized.distinctUntilChanged(),
-      container.attached.distinctUntilChanged()
+      // Emit initially so combine latest doesn't wait for attach events.
+      Observable.merge(container.attached, container.detached, Observable.of(true))
+        .distinctUntilChanged()
     )
       .takeUntil(this._destroyed)
-      .subscribe(([ isVisible, isInitialized, isAttached ]) => {
-        if (isVisible && isInitialized && isAttached) {
+      .subscribe(([ isVisible, isInitialized ]) => {
+        if (isVisible && isInitialized && container.isAttached) {
           this.add(container);
         } else {
           this.remove(container);
         }
       });
   }
-
 }
