@@ -6,9 +6,9 @@ import { ViewContainer } from './ViewContainer';
 import { Subject, Observable, Observer } from '../events';
 import { ContextType } from '../common';
 import {
-  VIEW_CONFIG_KEY, 
-  ViewConfig, 
-  ViewComponentConfig, 
+  VIEW_CONFIG_KEY,
+  ViewConfig,
+  ViewComponentConfig,
   ResolverStrategy,
   ViewQueryArgs,
   ViewQueryResolveType,
@@ -41,26 +41,34 @@ export class ViewManager {
   private _views: Map<any, { [key: string]: ViewContainer<any> }> = new Map();
   private _refs: Map<string, ViewContainer<any>> = new Map();
 
-  @CompleteOn('destroy') 
+  @CompleteOn('destroy')
   private _resolved: Subject<ViewManagerEvent<any>> = new Subject();
 
-  @CompleteOn('destroy') 
+  @CompleteOn('destroy')
   private _created: Subject<ViewManagerEvent<any>> = new Subject();
 
-  @CompleteOn('destroy') 
+  @CompleteOn('destroy')
   private _destroyed: Subject<void> = new Subject<void>();
 
-  @CompleteOn('destroy') 
+  @CompleteOn('destroy')
   private _refChanges: Subject<RefChangeEvent<any>> = new Subject();
+
+  @CompleteOn('destroy')
+  private _registered: Subject<ViewManagerEvent<any>> = new Subject();
+
+  @CompleteOn('destroy')
+  private _unregistered: Subject<ViewManagerEvent<any>> = new Subject();
 
   resolved: Observable<ViewManagerEvent<any>> = this._resolved.asObservable();
   created: Observable<ViewManagerEvent<any>> = this._created.asObservable();
   destroyed: Observable<void> = this._destroyed.asObservable();
   refChanges: Observable<RefChangeEvent<any>> = this._refChanges.asObservable();
+  registered: Observable<ViewManagerEvent<any>> = this._registered.asObservable();
+  unregistered: Observable<ViewManagerEvent<any>> = this._unregistered.asObservable();
 
   has(token: any, id?: number): boolean {
     const map = this.getAll(token);
-    
+
     if (!map) {
       return false;
     }
@@ -92,10 +100,10 @@ export class ViewManager {
         const view = views[key] as ViewContainer<any>|null;
 
         if (view) {
-          view.destroy();  
+          view.destroy();
         }
       }
-    }      
+    }
 
     this._destroyed.next();
   }
@@ -110,13 +118,13 @@ export class ViewManager {
 
     return this._resolve<T>(config, metadata, options);
   }
-  
+
   resolveOrCreate<T>(args: ViewFactoryArgs, options: ViewResolutionOptions = {}): ViewContainer<T> {
     return this.resolveOrCreateWith<T>(args.config, (): ViewContainer<T> => {
       return this._viewFactory.create<T>(args);
     }, options);
   }
-  
+
   resolveOrCreateWith<T>(config: ViewConfig, factory: (viewFactory: ViewFactory) => ViewContainer<T>, options: ViewResolutionOptions = {}): ViewContainer<T> {
     const token = this._viewFactory.getTokenFrom(config);
     const metadata = this._assertAndReadComponent(token);
@@ -135,12 +143,12 @@ export class ViewManager {
       return this._viewFactory.create<T>(args);
     }, options);
   }
-  
+
   createWith<T>(config: ViewConfig, factory: (viewFactory: ViewFactory) => ViewContainer<T>, options: ViewResolutionOptions = {}): ViewContainer<T> {
     const token = this._viewFactory.getTokenFrom(config);
-    
+
     this._assertAndReadComponent(token);
-    
+
     const container = factory(this._viewFactory);
 
     this._created.next({
@@ -148,15 +156,15 @@ export class ViewManager {
       token,
       ref: config.ref
     });
-    
+
     this.register(token, container, { ref: config.ref });
-    
+
     return container;
   }
 
   register(token: any, container: ViewContainer<any>, options: { ref?: string|null } = {}): void {
     const { ref } = options;
-    
+
     if (!this._views.has(token)) {
       this._views.set(token, {});
     }
@@ -172,20 +180,22 @@ export class ViewManager {
     this._views.set(token, map);
 
     container.destroyed.subscribe(() => this.unregister(token, container, { ref }));
-    
+
     if (ref) {
       if (this._refs.has(ref)) {
         throw new Error(`Ref '${ref}' already exists.`);
       }
-      
+
       this._refs.set(ref, container);
-      this._refChanges.next({ 
-        ref, container, token, 
+      this._refChanges.next({
+        ref, container, token,
         type: 'add',
       });
     }
+
+    this._registered.next({ container, token, ref });
   }
-  
+
   unregister(token: any, container: ViewContainer<any>, options: { ref?: string|null } = {}): void {
     const { ref } = options;
     const map = this._views.get(token) as { [key:number]: ViewContainer<any> };
@@ -206,22 +216,24 @@ export class ViewManager {
 
     if (ref && this._refs.has(ref)) {
       this._refs.delete(ref);
-      this._refChanges.next({ 
-        ref, container, token, 
+      this._refChanges.next({
+        ref, container, token,
         type: 'remove'
       });
     }
+
+    this._unregistered.next({ container, token, ref });
   }
 
   /**
    * Notifies when the a view is registered matching the given query.
-   * @template T 
-   * @param {{ token?: any, ref?: string }} [query={}] 
-   * @returns {Observable<ViewContainer<T>>} 
+   * @template T
+   * @param {{ token?: any, ref?: string }} [query={}]
+   * @returns {Observable<ViewContainer<T>>}
    */
   subscribeToQuery<T>(query: ViewQueryArgs = {}): Observable<ViewManagerQueryEvent<T>> {
     const { ref, token, id } = query;
-  
+
     if (ref) {
       return this.queryRef(ref, query);
     } else if (token) {
@@ -252,7 +264,7 @@ export class ViewManager {
       return Observable.merge(
         this.created.map(event => ({ ...event, initial: true })),
         this.resolved.map(event => ({ ...event, initial: false }))
-      ) 
+      )
         .filter(propEq('token', token))
         .filter(e => id ? id === e.container.id : true)
         .subscribe(observer);
@@ -264,13 +276,13 @@ export class ViewManager {
 
     return Observable.create((observer: Observer<ViewManagerQueryEvent<T>>) => {
       const result = this.query<T>({ ref });
-      
+
       if (result.length) {
         observer.next({
           ref,
           token: this._viewFactory.getTokenFrom(result[0].config),
           initial: true,
-          container: result[0]  
+          container: result[0]
         });
       }
 
@@ -294,7 +306,7 @@ export class ViewManager {
 
   query<T>(query: ViewQueryArgs): ViewContainer<T>[] {
     const { ref, id, token } = query;
-    
+
     if (ref && this._refs.has(ref)) {
       return [ this._refs.get(ref) as ViewContainer<T> ];
     } else if (token) {
@@ -304,7 +316,7 @@ export class ViewManager {
         if (!id) {
           return Object.keys(containers).map(id => containers[id]);
         }
-        
+
         for (const containerId of Object.keys(containers)) {
           if (id && containerId === id.toString()) {
             return [ containers[containerId] ];
@@ -318,7 +330,7 @@ export class ViewManager {
 
   /**
    * Purges any cached views that should be destroyed with the following context.
-   * @param {ContextType} context 
+   * @param {ContextType} context
    */
   purgeCached(context: ContextType): void {
     for (const container of this.entries()) {
@@ -326,7 +338,7 @@ export class ViewManager {
         if (container.caching !== CacheStrategy.PERSISTENT) {
           container.destroy();
         }
-      }  
+      }
     }
   }
 
@@ -341,7 +353,7 @@ export class ViewManager {
   private _resolve<T>(config: ViewConfig, metadata: ViewComponentConfig, options: ViewResolutionOptions): ViewContainer<T>|null {
     const resolution = this._viewFactory.resolveConfigProperty(config, 'resolution');
     let result: ViewContainer<T>|null = null;
-      
+
     // REF
     if (resolution === ResolverStrategy.REF) {
       if (config.ref && this._refs.has(config.ref)) {
@@ -368,7 +380,7 @@ export class ViewManager {
         token: this._viewFactory.getTokenFrom(config)
       });
     }
-    
+
     return result;
   }
 
