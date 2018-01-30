@@ -45,8 +45,8 @@
   "peerDependencies": {
     "@angular/core": "^4.0.1",
     "rxjs": "^5.3.0",
-    "zone.js": "^0.8.4",
-    "ug-layout": "^3.0.0"
+    "ug-layout": "^3.0.0",
+    "zone.js": "^0.8.4"
   },
   "dependencies": {
     "tslib": "^1.6.0"

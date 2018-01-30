@@ -1,8 +1,4 @@
-import {
-  NgModule,
-  Injector,
-  ApplicationRef
-} from '@angular/core';
+import { NgModule } from '@angular/core';
 
 import { UgLayoutOutletComponent } from './UgLayoutOutlet.component';
 import { UgLayoutDirective } from './UgLayout.directive';

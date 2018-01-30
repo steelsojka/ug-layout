@@ -1,20 +1,23 @@
-import { 
-  Injector, 
-  ViewContainerRef, 
-  Inject, 
-  Component, 
-  Input, 
+import {
+  Injector,
+  ViewContainerRef,
+  Inject,
+  Component,
+  Input,
   Output,
   OnChanges,
   SimpleChanges,
   ViewChild,
   EventEmitter,
   OnDestroy,
-  Type
+  Type,
+  ElementRef,
+  TestabilityRegistry
 } from '@angular/core';
 import { RootLayout, ProviderArg, Renderable, ConfiguredRenderable, Layout } from 'ug-layout';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
+import { AngularViewTestability } from './AngularViewTestability';
 
 import { AngularPlugin, AngularPluginConfig } from './AngularPlugin';
 import { DestroyNotifyEvent } from './DestroyNotifyEvent';
@@ -35,6 +38,7 @@ export class UgLayoutOutletComponent implements OnChanges, OnDestroy {
   @Input() root?: RootLayout;
   @Input() destroyNotifier?: Observable<void>;
   @Input() pluginFactory?: (config: AngularPluginConfig) => AngularPlugin;
+  @Input() testable: boolean = true;
   @Output() initialized: EventEmitter<RootLayout> = new EventEmitter();
 
   @ViewChild('container', { read: ViewContainerRef })
@@ -42,9 +46,12 @@ export class UgLayoutOutletComponent implements OnChanges, OnDestroy {
   private _isInitialized: boolean = false;
   private _rootLayout: RootLayout;
   private _destroyed: Subject<void> = new Subject<void>();
+  private _testability: AngularViewTestability = new AngularViewTestability();
 
   constructor(
-    @Inject(Injector) private _injector: Injector
+    @Inject(Injector) private _injector: Injector,
+    @Inject(ElementRef) private _elementRef: ElementRef,
+    @Inject(TestabilityRegistry) private _testabilityRegistry: TestabilityRegistry
   ) {}
 
   ngOnInit(): void {
@@ -77,6 +84,11 @@ export class UgLayoutOutletComponent implements OnChanges, OnDestroy {
       this._rootLayout.initialize();
     }
 
+    if (this.testable) {
+      this._testability.setLayout(this._rootLayout);
+      this._testabilityRegistry.registerApplication(this._elementRef.nativeElement, this._testability as any)
+    }
+
     if (this.destroyNotifier) {
       this.destroyNotifier
         .takeUntil(this._destroyed)
@@ -86,12 +98,12 @@ export class UgLayoutOutletComponent implements OnChanges, OnDestroy {
     if (this.config) {
       this._construct(this.config);
     }
-    
+
     this.initialized.emit(this._rootLayout);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.config 
+    if (changes.config
       && changes.config.currentValue instanceof ConfiguredRenderable
       && !changes.config.isFirstChange()) {
       this._construct(changes.config.currentValue);
@@ -103,6 +115,7 @@ export class UgLayoutOutletComponent implements OnChanges, OnDestroy {
       this._rootLayout.destroy();
     }
 
+    this._testability.destroy();
     this._destroyed.next();
     this._destroyed.complete();
   }
