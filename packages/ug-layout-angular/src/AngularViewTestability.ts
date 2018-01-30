@@ -109,7 +109,7 @@ export class AngularViewTestability {
     )
       .takeUntil(this._destroyed)
       .subscribe(([ isVisible, isInitialized ]) => {
-        if (isVisible && isInitialized && container.isAttached) {
+        if (isVisible && !isInitialized && container.isAttached) {
           this.add(container);
         } else {
           this.remove(container);
