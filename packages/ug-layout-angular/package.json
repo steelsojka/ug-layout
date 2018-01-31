@@ -1,6 +1,6 @@
 {
   "name": "ug-layout-angular",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "description": "",
   "main": "dist/es5/index.js",
   "typings": "dist/es5/index.d.ts",
