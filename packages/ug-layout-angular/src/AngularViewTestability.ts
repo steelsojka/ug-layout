@@ -10,10 +10,10 @@ import {
 
 import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/observable/merge';
-import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/takeUntil';
 import 'rxjs/add/operator/first';
 import 'rxjs/add/operator/distinctUntilChanged';
+import 'rxjs/add/operator/startWith';
 
 /**
  * Class used for protractor testing.
@@ -104,7 +104,8 @@ export class AngularViewTestability {
       container.visibilityChanges.distinctUntilChanged(),
       container.componentInitialized.distinctUntilChanged(),
       // Emit initially so combine latest doesn't wait for attach events.
-      Observable.merge(container.attached, container.detached, Observable.of(true))
+      Observable.merge(container.attached, container.detached)
+        .startWith(true)
         .distinctUntilChanged()
     )
       .takeUntil(this._destroyed)
