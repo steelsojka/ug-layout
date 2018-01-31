@@ -27,6 +27,9 @@ export class AngularViewTestability {
   private _pendingUpdate = new Subject<ViewContainer<any>[]>();
   private _destroyed = new Subject();
   private _pending: ViewContainer<any>[] = [];
+  private _clearSubscriptions = Observable.merge(
+    this._destroyed.asObservable(),
+    this._layoutSource.asObservable());
 
   constructor(layout?: RootLayout | null) {
     this._layoutSource.subscribe(layoutOrNull => this.layoutChanged(layoutOrNull));
@@ -60,6 +63,8 @@ export class AngularViewTestability {
 
   destroy(): void {
     this._destroyed.next();
+    this._layoutSource.complete();
+    this._pendingUpdate.complete();
     this._destroyed.complete();
   }
 
@@ -79,10 +84,18 @@ export class AngularViewTestability {
     }
   }
 
+  private clear(): void {
+    this._pending = [];
+    this._pendingUpdate.next(this._pending);
+  }
+
   private layoutChanged(layoutOrNull: RootLayout | null): void {
+    this.clear();
+
     if (!layoutOrNull) {
       return;
     }
+
 
     const viewManager = layoutOrNull.injector.get(ViewManager);
 
@@ -91,11 +104,11 @@ export class AngularViewTestability {
     }
 
     viewManager.registered
-      .takeUntil(this._layoutSource.asObservable())
+      .takeUntil(this._clearSubscriptions)
       .subscribe(({ container }) => this.subscribeToContainerEvents(container));
 
     viewManager.unregistered
-      .takeUntil(this._layoutSource.asObservable())
+      .takeUntil(this._clearSubscriptions)
       .subscribe(({ container }) => this.remove(container));
   }
 
@@ -108,7 +121,7 @@ export class AngularViewTestability {
         .startWith(true)
         .distinctUntilChanged()
     )
-      .takeUntil(this._destroyed)
+      .takeUntil(this._clearSubscriptions)
       .subscribe(([ isVisible, isInitialized ]) => {
         if (isVisible && !isInitialized && container.isAttached) {
           this.add(container);
