@@ -1,12 +1,11 @@
 import { ConfiguredRenderable } from './dom';
-import { Inject } from './di';
 import { SerializerContainer, Serializer, Serialized } from './serialization';
 import { RootLayout } from './RootLayout';
 import { RenderableArg } from './common';
 import { Layout } from './layout';
 
 export interface SerializedRootLayout extends Serialized {
-  use: Serialized; 
+  use: Serialized;
 }
 
 export class RootLayoutSerializer extends Serializer<RootLayout, SerializedRootLayout> {

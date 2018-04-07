@@ -28,12 +28,12 @@ export class XYContainerSerializer extends Serializer<XYContainer, SerializedXYC
       direction: node.direction,
       splitterSize: node.splitterSize,
       children: this.container.serializeList<XYItemContainer, SerializedXYItemContainer>(node.getChildren())
-    };    
+    };
   }
 
   deserialize(node: SerializedXYContainer): ConfiguredRenderable<XYContainer> {
     const Ctor = node.direction === XYDirection.X ? Row : Column;
-    
+
     return Ctor.configure({
       splitterSize: node.splitterSize,
       static: node.static,
@@ -44,8 +44,8 @@ export class XYContainerSerializer extends Serializer<XYContainer, SerializedXYC
 
   static register(container: SerializerContainer): void {
     container.registerClass('XYContainer', XYContainer);
-    container.registerSerializer(container.resolve<typeof Row>(ROW_CLASS, true), XYContainerSerializer, { skipRegister: true });
-    container.registerSerializer(container.resolve<typeof Column>(COLUMN_CLASS, true), XYContainerSerializer, { skipRegister: true });
+    container.registerSerializer(container.resolve<typeof XYContainer>(ROW_CLASS, true), XYContainerSerializer, { skipRegister: true });
+    container.registerSerializer(container.resolve<typeof XYContainer>(COLUMN_CLASS, true), XYContainerSerializer, { skipRegister: true });
 
     Serializer.register.call(this, container);
   }

@@ -1,5 +1,4 @@
 import { Observer } from 'rxjs/Observer';
-import { Observable } from 'rxjs/Observable';
 
 import { Type } from '../di';
 
@@ -14,15 +13,15 @@ export interface BusEventOptions {}
 export class BusEvent<T> {
   private _promise: Promise<this>;
   private _isPropagationStopped: boolean = false;
-  
+
   /**
    * Creates an instance of BusEvent.
-   * @param {T} _target 
-   * @param {BusEventOptions} [_options={}] 
-   * @param {(BusEvent<any>|null)} [_parent=null] 
+   * @param {T} _target
+   * @param {BusEventOptions} [_options={}]
+   * @param {(BusEvent<any>|null)} [_parent=null]
    */
   constructor(
-    protected _target: T, 
+    protected _target: T,
     protected _options: BusEventOptions = {},
     protected _parent: BusEvent<any>|null = null
   ) {
@@ -74,19 +73,19 @@ export class BusEvent<T> {
    * @readonly
    * @type {Promise<this>}
    */
-  get done(): Promise<this> {
+  get done(): Promise<BusEvent<any>> {
     if (this._parent) {
       return this._parent.done;
     }
-    
+
     return this._promise;
   }
 
   /**
    * Adds a function that will execute and hold up the finishing of this event
    * until the given promise resolves. These are executed in the order the are received.
-   * @param {function(): *} fn 
-   * @returns {void} 
+   * @param {function(): *} fn
+   * @returns {void}
    */
   wait(fn: () => any): void {
     if (this._parent) {
@@ -94,7 +93,7 @@ export class BusEvent<T> {
 
       return;
     }
-    
+
     this._promise = this._promise.then(value => {
       return Promise.resolve(fn()).then(() => value);
     });
@@ -103,11 +102,11 @@ export class BusEvent<T> {
   /**
    * Creates a new event with a new target and setting this event as the _parent
    * of the new event. This will merge options with the previou event.
-   * @template U 
-   * @param {Type<U>} Ctor 
-   * @param {*} [target=this.target] 
-   * @param {BusEventOptions} [options={}] 
-   * @returns {U} 
+   * @template U
+   * @param {Type<U>} Ctor
+   * @param {*} [target=this.target]
+   * @param {BusEventOptions} [options={}]
+   * @returns {U}
    */
   delegate<U extends BusEvent<any>>(Ctor: Type<U>, target: any = this.target, options: BusEventOptions = {}): U {
     return new Ctor(target, { ...this.options, ...options }, this);
@@ -122,7 +121,7 @@ export class BusEvent<T> {
 
   /**
    * Implements how this event is dispatched on the given event bus.
-   * @param {Observer<this>} subscriber 
+   * @param {Observer<this>} subscriber
    */
   dispatch(subscriber: Observer<this>): void {
     subscriber.next(this);

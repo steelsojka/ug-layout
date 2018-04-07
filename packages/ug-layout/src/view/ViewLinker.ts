@@ -1,9 +1,9 @@
 import { Inject, Injector } from '../di';
 import { ViewManager, ViewManagerQueryEvent } from './ViewManager';
-import { 
-  VIEW_LINKER_METADATA, 
-  ViewQueryConfig, 
-  ViewQueryReadType, 
+import {
+  VIEW_LINKER_METADATA,
+  ViewQueryConfig,
+  ViewQueryReadType,
   ViewLinkerMetadata,
   ViewInsertConfig,
   ViewResolveConfig,
@@ -21,18 +21,18 @@ import { getDefaultMetadata } from './decorators';
  * between multiple views. The instance is usually decorated with decorators that describe the
  * actions needing to be performed. Such actions are resolving a view, inserting {@link Renderable}s into
  * the current layout, or querying for specific views and interacting with them.
- * 
+ *
  * Due to the async nature of component resolution, it is important to never store the component instances
  * as they could change over the course of the layouts lifecycle. This is why we set up a `ViewResolve` to
  * get the component we want.
  * @export
  * @class ViewLinker
- * @example 
- * 
+ * @example
+ *
  * class MyController {
- *   @ViewResolve({ token: SomeOtherComponent }) 
+ *   @ViewResolve({ token: SomeOtherComponent })
  *   getSomeOtherComponent: Observable<SomeOtherComponent>;
- * 
+ *
  *   @ViewQuery({ token: MyComponent })
  *   onMyViewResolved(component: MyComponent): void {
  *     // MyComponent has stream for selecting something.
@@ -44,21 +44,21 @@ import { getDefaultMetadata } from './decorators';
  *     });
  *   }
  * }
- * 
+ *
  * // Lets assume I have the viewLinker instance from the root layout I'm working with.
- * 
+ *
  * const myController = new MyController();
- * 
+ *
  * viewLinker.autowire(myController);
  */
 export class ViewLinker {
   @Inject(ViewManager) private _viewManager: ViewManager;
   @Inject(Injector) private _injector: Injector;
   @Inject(LayoutManipulator) private _manipulator: LayoutManipulator;
-  
+
   /**
    * Wires all types of custom behavior for linker
-   * @param {object} instance 
+   * @param {object} instance
    * @returns {Subscription} A subscription for all streams created.
    */
   autowire(instance: object): Subscription {
@@ -72,7 +72,7 @@ export class ViewLinker {
     for (const resolve of metadata.resolves) {
       this.wireResolve(instance, resolve);
     }
-    
+
     for (const query of metadata.queries) {
       subscription.add(this.wireQuery(instance, query));
     }
@@ -95,9 +95,9 @@ export class ViewLinker {
 
   /**
    * Wires a query on the instance using the provided config.
-   * @param {object} instance 
-   * @param {ViewQueryConfig} config 
-   * @returns {Subscription} 
+   * @param {object} instance
+   * @param {ViewQueryConfig} config
+   * @returns {Subscription}
    */
   wireQuery(instance: object, config: ViewQueryConfig): Subscription {
     const { read, method } = config;
@@ -109,7 +109,7 @@ export class ViewLinker {
       _unsubscribed.next();
       _unsubscribed.complete();
     });
-    
+
     if (!isFunction(instance[method])) {
       throw new Error(`Can not wire method '${method}'. Method does not exist.`);
     }
@@ -124,8 +124,8 @@ export class ViewLinker {
 
   /**
    * Wires a view insert on the instance using the provided config.
-   * @param {object} instance 
-   * @param {ViewInsertConfig} config 
+   * @param {object} instance
+   * @param {ViewInsertConfig} config
    */
   wireInsert(instance: object, config: ViewInsertConfig): void {
     Object.defineProperty(instance, config.method, {
@@ -135,12 +135,12 @@ export class ViewLinker {
       value: this._insert.bind(this, instance, config)
     })
   }
-  
+
 
   /**
    * Wires a resolve method with the given config.
-   * @param {object} instance 
-   * @param {ViewResolveConfig} config 
+   * @param {object} instance
+   * @param {ViewResolveConfig} config
    */
   wireResolve(instance: object, config: ViewResolveConfig): void {
     Object.defineProperty(instance, config.method, {
@@ -153,8 +153,8 @@ export class ViewLinker {
 
   /**
    * Reads metadata from a class instance.
-   * @param {object} instance 
-   * @returns {ViewLinkerMetadata} 
+   * @param {object} instance
+   * @returns {ViewLinkerMetadata}
    */
   readInstanceMetadata(instance: object): ViewLinkerMetadata {
     return this.getMetadata(get(instance, 'constructor.prototype', null));
@@ -162,32 +162,32 @@ export class ViewLinker {
 
   /**
    * Reads a query observable from the view manager. A `ViewQuery` decorated method can be given a different
-   * argument depending on how you need to interact with the view. If we need the component then the 
-   * query will wait until the component is in a ready state. If we need the {@link ViewContainer} then it 
+   * argument depending on how you need to interact with the view. If we need the component then the
+   * query will wait until the component is in a ready state. If we need the {@link ViewContainer} then it
    * will be given to us regardless of whether the component is ready or not. We can also request the query
    * observable instead if we want some custom resolution logic.
-   * @template T 
-   * @param {Observable<ViewContainer<T>>} query 
-   * @param {(ViewQueryReadType|ViewQueryReadOptions)} [options] 
-   * @returns {Observable<any>} 
+   * @template T
+   * @param {Observable<ViewContainer<T>>} query
+   * @param {(ViewQueryReadType|ViewQueryReadOptions)} [options]
+   * @returns {Observable<any>}
    */
   readQuery<T>(query: Observable<ViewManagerQueryEvent<T>>, options?: ViewQueryReadType|ViewQueryReadOptions): Observable<any> {
     const _options = (isObject(options) ? options : { type: options }) as ViewQueryReadOptions;
     const {
-      type = ViewQueryReadType.COMPONENT, 
-      when = [ ViewContainerStatus.READY ], 
+      type = ViewQueryReadType.COMPONENT,
+      when = [ ViewContainerStatus.READY ],
       until = [ ViewContainerStatus.FAILED ],
       lazy = true
     } = _options;
-    
+
     return Observable.create((observer: Observer<any>) => {
       if (type === ViewQueryReadType.OBSERVABLE) {
         observer.next(query);
         observer.complete();
-        
+
         return;
-      } 
-      
+      }
+
       return query.subscribe(event => {
         const { container } = event;
 
@@ -209,8 +209,8 @@ export class ViewLinker {
 
   /**
    * Gets metadata for a target including merging of extension metadata.
-   * @param {(object | null)} target 
-   * @returns {ViewLinkerMetadata} 
+   * @param {(object | null)} target
+   * @returns {ViewLinkerMetadata}
    */
   getMetadata(target: object | null): ViewLinkerMetadata {
     if (!target) {
@@ -220,18 +220,18 @@ export class ViewLinker {
     const metadata = ViewLinker.readMetadata(target);
 
     return this.mergeMetadata(
-      ...metadata.extensions.map(ext => this.getMetadata(ext)), 
+      ...metadata.extensions.map(ext => this.getMetadata(ext)),
       metadata
     );
   }
 
   /**
    * Merges multiple metadata objects into one. The last item takes priority.
-   * @param {...ViewLinkerMetadata[]} metadata 
-   * @returns {ViewLinkerMetadata} 
+   * @param {...ViewLinkerMetadata[]} metadata
+   * @returns {ViewLinkerMetadata}
    */
   mergeMetadata(...metadata: ViewLinkerMetadata[]): ViewLinkerMetadata {
-    const result = getDefaultMetadata();    
+    const result = getDefaultMetadata();
 
     result.inits = result.inits.concat(...pluck<ViewQueryInitConfig>('inits', metadata));
     result.inserts = result.inserts.concat(...pluck<ViewInsertConfig>('inserts', metadata));
@@ -255,9 +255,9 @@ export class ViewLinker {
       if (existing.length && existing[0].isAttached) {
         this.readQuery(this._viewManager.subscribeToQuery(query), read).subscribe(observer);
       } else if (view) {
-        this._manipulator.insert({ ...config, from: view }).subscribe(() => {
+        this._manipulator.insert({ ...(config as any), from: view }).subscribe(() => {
           this.readQuery(this._viewManager.subscribeToQuery(query), read).subscribe(observer);
-        });  
+        });
       } else {
         observer.complete();
       }
@@ -275,7 +275,7 @@ export class ViewLinker {
     if (config.read === ViewQueryReadType.LIST) {
       return this._viewManager.query<T>(config.query);
     }
-    
+
     return this.readQuery(this._viewManager.subscribeToQuery(query), _options);
   }
 

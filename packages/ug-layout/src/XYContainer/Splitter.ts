@@ -2,7 +2,7 @@ import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
 import { Inject, PostConstruct } from '../di';
-import { Renderable, RenderableDestroyContext } from '../dom';
+import { Renderable, RenderableDestroyContext, RenderableConfig } from '../dom';
 import { DocumentRef, ContainerRef, ConfigurationRef, DragEvent } from '../common';
 import { XYContainer } from './XYContainer';
 import { Observable } from '../events';
@@ -11,12 +11,12 @@ import { LockState, LOCK_RESIZING } from '../LockState';
 
 export const SPLITTER_SIZE = 5;
 
-export interface SplitterConfig {
+export interface SplitterConfig extends RenderableConfig {
   size: number;
   disabler?: (splitter: Splitter) => boolean;
 }
 
-export class Splitter extends Renderable {
+export class Splitter extends Renderable<SplitterConfig> {
   dragStatus: Observable<DragEvent<Splitter>>;
   x: number = 0;
   y: number = 0;

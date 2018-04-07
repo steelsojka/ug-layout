@@ -1,14 +1,8 @@
-import { ConfiguredRenderable, Renderable } from '../../dom';
-import { Inject, Type } from '../../di';
-import { 
-  GenericSerializer, 
-  SerializerContainer, 
-  Serializer, 
-  Serialized, 
-  GenericSerializerConfig,
-  ConfiguredSerializer
+import {
+  GenericSerializer,
+  Serialized
 } from '../../serialization';
-import { XYDirection, RenderableConstructorArg, ConfigureableType } from '../../common';
+import { RenderableConstructorArg } from '../../common';
 import { StackControlPosition, StackControl } from './StackControl';
 
 export interface SerializedStackControl extends Serialized {

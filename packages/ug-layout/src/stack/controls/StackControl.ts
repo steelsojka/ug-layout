@@ -2,7 +2,7 @@ import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
 import { Type, Injector, PostConstruct, Inject } from '../../di';
-import { Renderable, ConfiguredRenderable } from '../../dom';
+import { Renderable, ConfiguredRenderable, RenderableConfig } from '../../dom';
 import { RenderableArg, ConfigurationRef } from '../../common';
 import { defaults } from '../../utils';
 import { StackHeader } from '../StackHeader';
@@ -12,7 +12,7 @@ export enum StackControlPosition {
   POST_TAB
 }
 
-export interface StackControlConfig {
+export interface StackControlConfig extends RenderableConfig {
   position: StackControlPosition;
 }
 
@@ -26,25 +26,25 @@ export type StackControlConfigArgs = {
  * @class StackControl
  * @extends {Renderable}
  */
-export class StackControl extends Renderable {
+export class StackControl extends Renderable<StackControlConfig> {
   container: StackHeader;
-  
+
   @Inject(ConfigurationRef)
   protected _config: StackControlConfig;
 
   get position(): StackControlPosition {
     return this._config.position;
   }
-  
+
   @PostConstruct()
   initialize(): void {
     super.initialize();
-    
+
     this._config = defaults(this._config, {
-      position: StackControlPosition.POST_TAB  
+      position: StackControlPosition.POST_TAB
     });
   }
-  
+
   isActive(): boolean {
     return true;
   }

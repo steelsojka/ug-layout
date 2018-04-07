@@ -1,8 +1,7 @@
-import { Token, Inject, Optional, Type } from '../di';
+import { Token, Inject, Optional } from '../di';
 import { Renderable, RenderableConfig, ConfiguredRenderable } from '../dom';
 import { RenderableConstructorArg } from '../common';
-import { isObject, isFunction, get } from '../utils';
-import { SerializerContainer, BaseSerializerArg, BaseSerializer } from './SerializerContainer';
+import { SerializerContainer, BaseSerializerArg, SerializerConstructor } from './SerializerContainer';
 import { ConfiguredSerializer } from './ConfiguredSerializer';
 
 export const SERIALIZER_CONFIG = new Token<any>('SERIALIZER_CONFIG');
@@ -23,10 +22,10 @@ export abstract class Serializer<R extends Renderable, S extends Serialized> {
   @Inject(SerializerContainer) protected container: SerializerContainer;
 
   @Inject(SERIALIZER_CONFIG)
-  @Optional() 
+  @Optional()
   protected config: SerializerConfig | null;
 
-  abstract serialize(node: R): S; 
+  abstract serialize(node: R): S;
   abstract deserialize(serialized: S): RenderableConstructorArg<R>;
 
   postDeserialized(serialized: S, node: RenderableConstructorArg<R>): RenderableConstructorArg<R> {
@@ -108,8 +107,8 @@ export abstract class Serializer<R extends Renderable, S extends Serialized> {
     };
   }
 
-  static configure<T extends typeof Serializer>(config: SerializerConfig): ConfiguredSerializer<T, SerializerConfig> {
-    return new ConfiguredSerializer(this as T, config, container => this.register(container));
+  static configure(config: any): ConfiguredSerializer<any, any> {
+    return new ConfiguredSerializer(this as any, config, container => this.register(container));
   }
 
   static register(container: SerializerContainer): void {

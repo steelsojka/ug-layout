@@ -1,23 +1,20 @@
 import {
-  VIEW_CONFIG_KEY, 
+  VIEW_CONFIG_KEY,
   ViewComponentConfigArgs,
   ResolverStrategy,
   VIEW_LINKER_METADATA,
-  ViewQueryConfig,
   ViewQueryConfigArgs,
   ViewQueryReadType,
-  ViewQueryInitConfig,
   ViewLinkerMetadata,
   ViewInsertConfigArgs,
-  ViewResolveConfigArgs,
-  CacheStrategy
+  ViewResolveConfigArgs
 } from './common';
 
 /**
  * Registers view metadata with a component class.
  * @export
- * @param {ViewComponentConfigArgs} [config={}] 
- * @returns {ClassDecorator} 
+ * @param {ViewComponentConfigArgs} [config={}]
+ * @returns {ClassDecorator}
  */
 export function ViewComponent(config: ViewComponentConfigArgs = {}): ClassDecorator {
   return (target: Function): void => {
@@ -28,16 +25,16 @@ export function ViewComponent(config: ViewComponentConfigArgs = {}): ClassDecora
       name: null,
       container: null
     }, config);
-    
+
     Reflect.defineMetadata(VIEW_CONFIG_KEY, config, target);
   };
 }
 
 /**
- * Sets up a view query with the decorated method as the callback to receive the query results. 
+ * Sets up a view query with the decorated method as the callback to receive the query results.
  * @export
- * @param {ViewQueryConfigArgs} [config={}] 
- * @returns {MethodDecorator} 
+ * @param {ViewQueryConfigArgs} [config={}]
+ * @returns {MethodDecorator}
  */
 export function ViewQuery(config: ViewQueryConfigArgs = {}): MethodDecorator {
   return (target: Object, key: string) => {
@@ -58,7 +55,7 @@ export function ViewQuery(config: ViewQueryConfigArgs = {}): MethodDecorator {
  * from the Layouts DI can be injected.
  * @export
  * @param {...any[]} injections Injection tokens for services needing to be injected into the controller.
- * @returns {MethodDecorator} 
+ * @returns {MethodDecorator}
  */
 export function ViewLinkInit(...injections: any[]): MethodDecorator {
   return (target: Object, key: string) => {
@@ -87,8 +84,8 @@ export function ViewUnlink(): PropertyDecorator {
  * Sets up a view insert method.
  * @export
  * @see {@link ViewLinker#wireInsert}
- * @param {ViewInsertConfigArgs} config 
- * @returns {PropertyDecorator} 
+ * @param {ViewInsertConfigArgs} config
+ * @returns {PropertyDecorator}
  */
 export function ViewInsert(config: ViewInsertConfigArgs): PropertyDecorator {
   return (target: Object, key: string) => {
@@ -107,8 +104,8 @@ export function ViewInsert(config: ViewInsertConfigArgs): PropertyDecorator {
  * Sets up a view resolve method.
  * @export
  * @see {@link ViewLinker#wireResolve}
- * @param {ViewResolveConfigArgs} config 
- * @returns {PropertyDecorator} 
+ * @param {ViewResolveConfigArgs} config
+ * @returns {PropertyDecorator}
  */
 export function ViewResolve(config: ViewResolveConfigArgs): PropertyDecorator {
   return (target: Object, key: string) => {
@@ -126,8 +123,8 @@ export function ViewResolve(config: ViewResolveConfigArgs): PropertyDecorator {
 /**
  * Indicates that this class should inherit all metadata from the given constructors.
  * @export
- * @param {Function[]} constructors 
- * @returns {ClassDecorator} 
+ * @param {Function[]} constructors
+ * @returns {ClassDecorator}
  */
 export function ViewLinkExtends(...constructors: Function[]): ClassDecorator {
   return (target: Function) => {

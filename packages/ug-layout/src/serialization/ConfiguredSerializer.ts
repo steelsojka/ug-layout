@@ -1,10 +1,10 @@
 import { ConfiguredItem } from '../ConfiguredItem';
 import { SerializerConfig, Serializer } from './Serializer';
-import { SerializerContainer } from './SerializerContainer';
+import { SerializerContainer, SerializerConstructor, BaseSerializer } from './SerializerContainer';
 
-export class ConfiguredSerializer<T extends typeof Serializer, C extends SerializerConfig> extends ConfiguredItem<T, C> {
+export class ConfiguredSerializer<T extends SerializerConstructor<BaseSerializer>, C extends SerializerConfig> extends ConfiguredItem<T, C> {
   constructor(
-    item: T, 
+    item: T,
     config: C,
     private _register?: (container: SerializerContainer) => void
   ) {

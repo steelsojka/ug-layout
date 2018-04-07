@@ -1,16 +1,14 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
-import { Type, Injector, Inject, Optional, forwardRef, ProviderArg, PostConstruct } from './di';
+import { Type, Inject, ProviderArg, PostConstruct } from './di';
 import { RootInjector } from './RootInjector';
 import { Layout } from './layout';
-import { Serialized } from './serialization';
 import { ViewManager } from './view';
 import { defaults } from './utils';
-import { Renderer, Renderable, ConfiguredRenderable, RenderableInjector } from './dom';
+import { Renderer, Renderable, ConfiguredRenderable, RenderableInjector, RenderableConfig } from './dom';
 import {
   ConfigurationRef,
-  ContainerRef,
   RootConfigRef,
   RenderableArg,
   ElementRef,
@@ -19,7 +17,7 @@ import {
 import { UgPlugin } from './UgPlugin';
 import { LockState, LOCK_DRAGGING, LOCK_RESIZING } from './LockState';
 
-export interface RootLayoutConfig {
+export interface RootLayoutConfig extends RenderableConfig {
   use: RenderableArg<Layout>;
 }
 
@@ -36,7 +34,7 @@ export interface RootLayoutCreationConfigArgs {
   interceptors?: ProviderArg[];
 }
 
-export class RootLayout extends Renderable {
+export class RootLayout extends Renderable<RootLayoutConfig> {
   protected _height: number = 0;
   protected _width: number = 0;
   protected _vnode: VNode;

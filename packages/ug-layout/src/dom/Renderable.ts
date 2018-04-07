@@ -99,7 +99,7 @@ export interface RenderableDestroyedContext<T extends Renderable> {
  * @abstract
  * @class Renderable
  */
-export abstract class Renderable {
+export abstract class Renderable<C extends RenderableConfig = RenderableConfig> {
   /**
    * Notifies when this renderable is destroyed.
    * @type {Observable<this>}
@@ -129,7 +129,7 @@ export abstract class Renderable {
 
   @Inject(Renderer) protected _renderer: Renderer;
   @Inject(Injector) protected _injector: Injector;
-  @Inject(ConfigurationRef) protected _config: RenderableConfig | null;
+  @Inject(ConfigurationRef) protected _config: C | null;
 
   constructor() {
     this.destroyed = this._destroyed.asObservable();
@@ -239,7 +239,7 @@ export abstract class Renderable {
   initialize(): void {
     this.setContainer(this.injector.get<Renderable|null>(ContainerRef, null));
 
-    const config = this.injector.get(ConfigurationRef, null) as RenderableConfig|null;
+    const config = this.injector.get(ConfigurationRef, null) as C | null;
 
     if (config && Array.isArray(config.tags)) {
       config.tags.forEach(tag => this.tags.add(tag));

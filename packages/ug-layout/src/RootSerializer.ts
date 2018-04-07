@@ -1,24 +1,23 @@
 import { SerializerContainer, GenericSerializer } from './serialization';
 
 import { Inject, Injector, PostConstruct } from './di';
-import { 
-  XYContainer, 
-  XYContainerSerializer, 
-  XYItemContainer, 
+import {
+  XYContainer,
+  XYContainerSerializer,
+  XYItemContainer,
   XYItemContainerSerializer,
   XY_ITEM_CONTAINER_CLASS
 } from './XYContainer';
 import { LayoutSerializer, Layout } from './layout';
-import { 
-  Stack, 
+import {
+  Stack,
   StackSerializer,
   STACK_CLASS
 } from './stack';
 import { NoopRenderable } from './noop';
 import { RootLayout } from './RootLayout';
-import { RootLayoutSerializer, SerializedRootLayout } from './RootLayoutSerializer';
+import { RootLayoutSerializer } from './RootLayoutSerializer';
 import { View, ViewSerializer } from './view';
-import { RenderableConstructorArg } from './common';
 
 export class RootSerializer extends SerializerContainer {
   @Inject(STACK_CLASS) private _Stack: typeof Stack;
@@ -26,7 +25,7 @@ export class RootSerializer extends SerializerContainer {
 
   constructor(@Inject(Injector) injector: Injector) {
     super({ injector });
-  }  
+  }
 
   @PostConstruct()
   initialize(): void {
@@ -36,15 +35,7 @@ export class RootSerializer extends SerializerContainer {
     this.registerSerializer(RootLayout, RootLayoutSerializer);
     this.registerSerializer(View, ViewSerializer);
     this.registerSerializer(this._XYItemContainer, XYItemContainerSerializer);
-    this.registerSerializer(NoopRenderable, GenericSerializer.configure({ name: 'NoopRenderable', type: NoopRenderable }));
-  }
-
-  deserialize(serialized: SerializedRootLayout): RenderableConstructorArg<RootLayout> {
-    return super.deserialize<RootLayout, SerializedRootLayout>(serialized);
-  }
-
-  serialize(root: RootLayout): SerializedRootLayout {
-    return super.serialize<RootLayout, SerializedRootLayout>(root);
+    this.registerSerializer(NoopRenderable, GenericSerializer.configure<NoopRenderable>({ name: 'NoopRenderable', type: NoopRenderable }));
   }
 
   static fromRoot(rootLayout: RootLayout): RootSerializer {

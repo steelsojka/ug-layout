@@ -1,7 +1,7 @@
 import {
-  ViewComponentConfig, 
-  ViewConfig, 
-  ViewComponentRef, 
+  ViewComponentConfig,
+  ViewConfig,
+  ViewComponentRef,
   VIEW_CONFIG_KEY,
   VIEW_COMPONENT_CONFIG,
   VIEW_CONFIG
@@ -30,8 +30,8 @@ export class ViewFactory {
   /**
    * Creates a view container from the given configuration.
    * @template T The component type.
-   * @param {ViewFactoryArgs} args 
-   * @returns {ViewContainer<T>} 
+   * @param {ViewFactoryArgs} args
+   * @returns {ViewContainer<T>}
    */
   create<T>(args: ViewFactoryArgs): ViewContainer<T> {
     let { config } = args;
@@ -47,7 +47,7 @@ export class ViewFactory {
       viewConfig = ConfiguredItem.resolveConfig<any>(config.useFactory, null);
 
       providers.push({
-        provide: ViewComponentRef, 
+        provide: ViewComponentRef,
         useFactory: ConfiguredItem.resolveItem(config.useFactory),
         deps: config.deps
       });
@@ -67,8 +67,8 @@ export class ViewFactory {
     });
 
     const viewInjector = Injector.fromInjectable(ViewContainer, providers, injector);
-    const viewContainer = viewInjector.get(ViewContainer);
-    
+    const viewContainer = viewInjector.get<ViewContainer<T>>(ViewContainer);
+
     viewInjector.registerProvider({ provide: ElementRef, useValue: viewContainer.element });
 
     // If this view is lazy and it is not already visible wait for the
@@ -82,21 +82,21 @@ export class ViewFactory {
     } else {
       viewContainer.initialize();
     }
-     
+
     return viewContainer;
-  }  
+  }
 
   /**
    * Gets the token from a view config. If using `useClass` the class will be used as the token.
    * Any other type will require token to be provided.
-   * @param {ViewConfig} config 
-   * @returns {*} 
+   * @param {ViewConfig} config
+   * @returns {*}
    */
   getTokenFrom(config: ViewConfig): any {
     if (config.token) {
       return config.token;
     }
-    
+
     if (config.useClass) {
       return ConfiguredItem.resolveItem(config.useClass);
     } else if (config.useFactory) {
@@ -111,9 +111,9 @@ export class ViewFactory {
   /**
    * Resolves a config property by looking at the view config then the components metadata config.
    * @template T The type of the value expected.
-   * @param {ViewConfig} config 
-   * @param {string} path 
-   * @returns {(T|null)} 
+   * @param {ViewConfig} config
+   * @param {string} path
+   * @returns {(T|null)}
    */
   resolveConfigProperty<T>(config: ViewConfig, path: string): T|null {
     const token = this.getTokenFrom(config);
@@ -129,9 +129,9 @@ export class ViewFactory {
   /**
    * Resolves a config property from the tokens metadata.
    * @template T The return type.
-   * @param {*} token 
-   * @param {string} path 
-   * @returns {(T|null)} 
+   * @param {*} token
+   * @param {string} path
+   * @returns {(T|null)}
    */
   resolveMetaConfigProperty<T>(token: any, path: string): T|null {
     const metadata = Reflect.getOwnMetadata(VIEW_CONFIG_KEY, token) as ViewComponentConfig|undefined;

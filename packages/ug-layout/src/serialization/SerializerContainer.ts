@@ -1,7 +1,7 @@
 import { Injector, Type } from '../di';
-import { Renderable, RenderableConfig } from '../dom';
+import { Renderable } from '../dom';
 import { Serializer, Serialized, SERIALIZER_CONFIG } from './Serializer';
-import { isFunction, isString, ReversibleMap } from '../utils';
+import { isFunction, ReversibleMap } from '../utils';
 import { ConfiguredSerializer } from './ConfiguredSerializer';
 import { RenderableConstructorArg } from '../common';
 
@@ -10,7 +10,8 @@ export interface Constructable<T> {
 }
 
 export type BaseSerializer = Serializer<Renderable, Serialized>;
-export type BaseSerializerArg = BaseSerializer | typeof Serializer | ConfiguredSerializer<typeof Serializer, any>;
+export type SerializerConstructor<T extends BaseSerializer> = new (...args: any[]) => T;
+export type BaseSerializerArg<T extends BaseSerializer = any> = T | SerializerConstructor<T> | ConfiguredSerializer<SerializerConstructor<T>, any>;
 
 export interface SerializerContainerConfig {
   /**
@@ -25,26 +26,26 @@ export interface SerializerContainerConfig {
  * @export
  * @class SerializerContainer
  * @example
- * 
+ *
  * const container = new SerializerContainer();
- * 
+ *
  * class MyClass {}
- * 
+ *
  * const mySerializer = new GenericSerializer('MyClass', MyClass);
- * 
+ *
  * container.registerSerializer(MyClass, mySerializer);
  * container.serialize(new MyClass()); // => { name: 'MyClass' }
  * container.deserialize({ name: 'MyClass' }); // => MyClass
  */
 export class SerializerContainer {
   protected _injector;
-  protected _serializers: Map<Type<any>, BaseSerializerArg> = new Map();
+  protected _serializers: Map<Type<any>, BaseSerializerArg<any>> = new Map();
   protected _classMap: ReversibleMap<Type<any>, string> = new ReversibleMap<Type<any>, string>();
   protected _instanceCache: WeakMap<any, Serializer<any, any>> = new WeakMap();
 
   /**
    * Creates an instance of SerializerContainer.
-   * @param {SerializerContainerConfig} [config={}] 
+   * @param {SerializerContainerConfig} [config={}]
    */
   constructor(config: SerializerContainerConfig = {}) {
     this._injector = new Injector([ { provide: SerializerContainer, useValue: this } ], config.injector || null);
@@ -52,17 +53,24 @@ export class SerializerContainer {
 
   /**
    * Registers a serializer with the container.
-   * @param {Type<any>} _Class 
-   * @param {(BaseSerializer|Type<BaseSerializer>)} serializer 
-   * @param {{ skipRegister?: boolean }} [options={}] 
+   * @param {Type<any>} _Class
+   * @param {(BaseSerializer|Type<BaseSerializer>)} serializer
+   * @param {{ skipRegister?: boolean }} [options={}]
    */
-  registerSerializer(_Class: Type<any>, serializer: BaseSerializerArg, options: { skipRegister?: boolean } = {}): void {
+  registerSerializer<
+    R extends Renderable,
+    T extends Serializer<R, any>
+  >(
+    _Class: new (...args: any[]) => R,
+    serializer: BaseSerializerArg<T>,
+    options: { skipRegister?: boolean } = {}
+  ): void {
     const { skipRegister = false } = options;
 
     this._serializers.set(_Class, serializer);
 
     this._injector.registerProvider({
-      provide: serializer, 
+      provide: serializer,
       useFactory: () => this.constructSerializer(serializer)
     });
 
@@ -71,12 +79,12 @@ export class SerializerContainer {
     }
   }
 
-  constructSerializer(serializer: BaseSerializerArg): Serializer<any, any> {
-    let token: typeof Serializer | BaseSerializer;   
+  constructSerializer<T extends BaseSerializer>(serializer: BaseSerializerArg<T>): T {
+    let token: SerializerConstructor<T> | T;
     let config: any = null;
 
     if (serializer instanceof ConfiguredSerializer) {
-      token = ConfiguredSerializer.resolveItem<typeof Serializer>(serializer);
+      token = ConfiguredSerializer.resolveItem<SerializerConstructor<T>>(serializer);
       config = ConfiguredSerializer.resolveConfig(serializer);
     } else {
       token = serializer;
@@ -93,21 +101,21 @@ export class SerializerContainer {
       return this._injector.resolveAndInstantiate(token);
     }
 
-    return serializer as Serializer<any, any>;
+    return serializer as T;
   }
 
   /**
    * Registers a class that can be identified by a string representation.
-   * @param {string} name 
-   * @param {Type<any>} _Class 
+   * @param {string} name
+   * @param {Type<any>} _Class
    */
   registerClass(name: string, _Class: Type<any>): void {
     this._classMap.set(_Class, name);
   }
-  
+
   /**
    * Registers multiple classes that can be identified by a string representation.
-   * @param {{ [key:string]: Type<any> }} [classes={}] 
+   * @param {{ [key:string]: Type<any> }} [classes={}]
    */
   registerClasses(classes: { [key:string]: Type<any> } = {}): void {
     for (const key of Object.keys(classes)) {
@@ -117,8 +125,8 @@ export class SerializerContainer {
 
   /**
    * Resolves a class to it's registered string representation.
-   * @param {Type<any>} _Class 
-   * @returns {(string|null)} 
+   * @param {Type<any>} _Class
+   * @returns {(string|null)}
    */
   resolveClassString(_Class: Type<any>): string|null {
     return this._classMap.has(_Class) ? this._classMap.get(_Class) as string : null;
@@ -126,8 +134,8 @@ export class SerializerContainer {
 
   /**
    * Resolves a serializer from a serialized node.
-   * @param {Serialized} node 
-   * @returns {(BaseSerializer|null)} 
+   * @param {Serialized} node
+   * @returns {(BaseSerializer|null)}
    */
   resolveFromSerialized(node: Serialized): Serializer<any, any>|null {
     const _Class = this.resolveClass(node.name);
@@ -140,11 +148,11 @@ export class SerializerContainer {
 
     return null;
   }
-  
+
   /**
    * Resolves a serializer from a class.
-   * @param {Type<any>} _Class 
-   * @returns {(BaseSerializer|null)} 
+   * @param {Type<any>} _Class
+   * @returns {(BaseSerializer|null)}
    */
   resolveFromClass(_Class: Type<any>): Serializer<any, any>|null {
     if (this._serializers.has(_Class)) {
@@ -156,8 +164,8 @@ export class SerializerContainer {
 
   /**
    * Resolves a serializer from an instance of a registered class.
-   * @param {(Renderable & Constructable<any>)} instance 
-   * @returns {(BaseSerializer|null)} 
+   * @param {(Renderable & Constructable<any>)} instance
+   * @returns {(BaseSerializer|null)}
    */
   resolveFromInstance(instance: Renderable & Constructable<any>): BaseSerializer|null {
     if (this._instanceCache.has(instance)) {
@@ -177,8 +185,8 @@ export class SerializerContainer {
 
   /**
    * Resolves a string to a registered class.
-   * @param {string} name 
-   * @returns {(Type<any>|null)} 
+   * @param {string} name
+   * @returns {(Type<any>|null)}
    */
   resolveClass<T>(name: string): Type<T>|null {
     return this._classMap.has(name) ? this._classMap.get(name) as Type<T> : null;
@@ -188,7 +196,7 @@ export class SerializerContainer {
    * Serializes a class instance using the registered serializer for that class.
    * @template R The class type.
    * @template S The serialized type.
-   * @param {R} instance 
+   * @param {R} instance
    * @returns {S} The serialized node.
    */
   serialize<R extends Renderable & Constructable<any>, S extends Serialized>(instance: R): S {
@@ -200,12 +208,12 @@ export class SerializerContainer {
 
     return this._serialize(serializer, instance);
   }
-  
+
   /**
    * Deserializes a serialized node using the registered serializer for that node type.
    * @template R The class type.
    * @template S The serialized type.
-   * @param {S} serialized 
+   * @param {S} serialized
    * @returns {R} The renderable argument.
    */
   deserialize<R extends Renderable, S extends Serialized>(serialized: S): RenderableConstructorArg<R> {
@@ -256,8 +264,8 @@ export class SerializerContainer {
   /**
    * Resolves a token with this containers injector.
    * @template T The return type.
-   * @param {*} token 
-   * @returns {(T|null)} 
+   * @param {*} token
+   * @returns {(T|null)}
    */
   resolve<T>(token: any, _throw: boolean = false): T {
     return _throw ? this._injector.get(token) : this._injector.get(token, null);

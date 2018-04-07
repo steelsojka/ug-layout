@@ -1,11 +1,11 @@
 import { PostConstruct } from '../di';
-import { Serializer, Serialized } from './Serializer';
-import { SerializerContainer } from './SerializerContainer';
-import { Renderable, RenderableConfig } from '../dom';
-import { RenderableConstructorArg, ConfigureableType } from '../common';
+import { Serializer, Serialized, SerializerConfig } from './Serializer';
+import { SerializerConstructor } from './SerializerContainer';
+import { Renderable } from '../dom';
+import { ConfigureableType } from '../common';
 import { ConfiguredSerializer } from './ConfiguredSerializer';
 
-export interface GenericSerializerConfig<R extends Renderable> {
+export interface GenericSerializerConfig<R extends Renderable> extends SerializerConfig {
   name: string;
   type: ConfigureableType<R>;
 }
@@ -29,8 +29,8 @@ export class GenericSerializer<R extends Renderable> extends Serializer<R, Seria
   }
   /**
    * Serializes the renderable.
-   * @param {R} node 
-   * @returns {Serialized} 
+   * @param {R} node
+   * @returns {Serialized}
    */
   serialize(node: R): Serialized {
     return { name: this.config.name } ;
@@ -38,14 +38,16 @@ export class GenericSerializer<R extends Renderable> extends Serializer<R, Seria
 
   /**
    * Deserializes the node.
-   * @param {Serialized} node 
-   * @returns {RenderableArg<R>} 
+   * @param {Serialized} node
+   * @returns {RenderableArg<R>}
    */
   deserialize(node: Serialized): any {
     return this.config.type;
   }
 
-  static configure<R extends Renderable>(config: GenericSerializerConfig<R>): ConfiguredSerializer<typeof GenericSerializer, GenericSerializerConfig<R>> {
+  static configure<R extends Renderable>(
+    config: GenericSerializerConfig<R>
+  ): ConfiguredSerializer<SerializerConstructor<GenericSerializer<R>>, GenericSerializerConfig<R>> {
     return new ConfiguredSerializer(this, config, container => {
       container.registerClass(config.name, config.type);
     });

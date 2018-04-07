@@ -30,7 +30,7 @@ export enum ViewQueryReadType {
 export enum CacheStrategy {
   NONE,
   PERSISTENT,
-  RELOAD 
+  RELOAD
 }
 
 export enum ViewQueryResolveType {
@@ -95,10 +95,7 @@ export interface ViewInsertConfig extends ViewInsertConfigArgs {
   method: string;
 }
 
-export interface ViewQueryConfig {
-  ref?: string;
-  token?: any;
-  id?: number;
+export interface ViewQueryConfig extends ViewQueryConfigArgs {
   read: ViewQueryReadType|ViewQueryReadOptions;
   method: string;
 }
