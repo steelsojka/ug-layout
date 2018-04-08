@@ -65,7 +65,7 @@ export class StackSerializer extends Serializer<Stack, SerializedStack> {
             })
           };
         })
-    }  
+    }
   }
 
   deserialize(node: SerializedStack): ConfiguredRenderable<Stack> {
@@ -99,9 +99,9 @@ export class StackSerializer extends Serializer<Stack, SerializedStack> {
   }
 
   static register(container: SerializerContainer): void {
-    container.registerClass('Stack', container.resolve<typeof Stack>(STACK_CLASS, true));  
-    container.registerSerializer(MinimizeStackControl, StackControlSerializer.configure({ name: 'MinimizeStackControl', type: MinimizeStackControl }));
-    container.registerSerializer(CloseStackControl, StackControlSerializer.configure({ name: 'CloseStackControl', type: CloseStackControl }));
+    container.registerClass('Stack', container.resolve<typeof Stack>(STACK_CLASS, true));
+    container.registerSerializer(MinimizeStackControl, StackControlSerializer.configure<MinimizeStackControl>({ name: 'MinimizeStackControl', type: MinimizeStackControl }));
+    container.registerSerializer(CloseStackControl, StackControlSerializer.configure<CloseStackControl>({ name: 'CloseStackControl', type: CloseStackControl }));
     container.registerSerializer(CloseTabControl, GenericSerializer.configure({ name: 'CloseTabControl', type: CloseTabControl }));
 
     Serializer.register.call(this, container);

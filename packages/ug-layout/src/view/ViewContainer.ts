@@ -374,7 +374,7 @@ export class ViewContainer<T> {
         .subscribe(context => this._onViewDestroy(context));
 
       this._container
-        .scope(BeforeDestroyEvent)
+        .scope<BeforeDestroyEvent<Renderable>>(BeforeDestroyEvent)
         .takeUntil(this.containerChange)
         .subscribe(e => this._beforeDestroy.next(e));
 

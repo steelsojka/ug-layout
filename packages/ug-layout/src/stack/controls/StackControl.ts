@@ -53,7 +53,7 @@ export class StackControl extends Renderable<StackControlConfig> {
     return h('div');
   }
 
-  static configure(config: StackControlConfigArgs): ConfiguredRenderable<StackControl> {
-    return new ConfiguredRenderable(this, config);
+  static configure<C extends StackControl>(config: StackControlConfigArgs): ConfiguredRenderable<C> {
+    return new ConfiguredRenderable(this, config) as ConfiguredRenderable<C>;
   }
 }
