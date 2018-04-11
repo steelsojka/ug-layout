@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.2.0"></a>
+# [4.2.0](https://github.com/steelsojka/ug-layout/compare/v4.0.2...v4.2.0) (2018-04-11)
+
+
+### Bug Fixes
+
+* **testability:** clear pending when layout switches ([a6ff9f6](https://github.com/steelsojka/ug-layout/commit/a6ff9f6))
+* **testability:** don't use testability by default ([596644e](https://github.com/steelsojka/ug-layout/commit/596644e))
+* **Testability:** fix condition ([6eb2c18](https://github.com/steelsojka/ug-layout/commit/6eb2c18))
+* **ViewContainer:** revert attached subject change ([57fef8b](https://github.com/steelsojka/ug-layout/commit/57fef8b))
+
+
+### Features
+
+* **Renderable:** allow for querying a parent ([f95735f](https://github.com/steelsojka/ug-layout/commit/f95735f))
+* **ViewManager:** add register apis ([814fafa](https://github.com/steelsojka/ug-layout/commit/814fafa))
+
+
+
 <a name="4.0.2"></a>
 ## [4.0.2](https://github.com/steelsojka/ug-layout/compare/v4.0.1...v4.0.2) (2018-01-05)
 
