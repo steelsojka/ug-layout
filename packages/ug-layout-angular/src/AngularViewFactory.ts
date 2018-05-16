@@ -30,10 +30,10 @@ import * as angular from './angular';
 import { AngularPlugin } from './AngularPlugin';
 import { DestroyNotifyEvent } from './DestroyNotifyEvent';
 import { Angular1ComponentFactory } from './Angular1ComponentFactory';
-import { 
-  ANGULAR_TAG, 
-  ViewComponentConfig, 
-  COMPONENT_REF_KEY, 
+import {
+  ANGULAR_TAG,
+  ViewComponentConfig,
+  COMPONENT_REF_KEY,
   ANGULAR_PLUGIN,
   ANGULAR_GLOBAL
 } from './common';
@@ -104,7 +104,7 @@ export class AngularViewFactory extends ViewFactory {
       if (!this._isCheckingForNg1) {
         this._checkForNg1Init();
       }
-      
+
       await this._ng1Bootstrapped.toPromise();
     }
 
@@ -130,7 +130,7 @@ export class AngularViewFactory extends ViewFactory {
 
   private async _ng2Factory<T>(viewContainer: ViewContainer<T>, component: Type<T>, config: any): Promise<T> {
     const token = component;
-    
+
     const componentFactory = this._componentFactoryResolver.resolveComponentFactory<T>(token);
     const injector = ReflectiveInjector.resolveAndCreate(
       this.getNg2Providers(
@@ -140,10 +140,10 @@ export class AngularViewFactory extends ViewFactory {
           { provide: VIEW_COMPONENT_CONFIG, useValue: config }
         ],
         viewContainer
-      ), 
+      ),
       this._ng2Injector
     );
-    
+
     const componentRef = this._viewContainerRef.createComponent(
       componentFactory,
       undefined,
@@ -151,12 +151,12 @@ export class AngularViewFactory extends ViewFactory {
     );
 
     this._setupInputs<T>(componentFactory, componentRef);
-    
+
     componentRef.instance[COMPONENT_REF_KEY] = componentRef;
     viewContainer.mount(componentRef.location.nativeElement);
 
     viewContainer.destroyed
-      .subscribe(() => this._onComponentDestroy(componentRef));
+      .subscribe(() => this._onComponentDestroy(componentRef, componentFactory));
 
     viewContainer.attached
       .subscribe(() => this._onAttachChange(true, componentRef, viewContainer));
@@ -198,7 +198,7 @@ export class AngularViewFactory extends ViewFactory {
    */
   protected _checkForNg1Init(): void {
     this._isCheckingForNg1 = true;
-    
+
     if (this._ng2Injector.get('$injector', null)) {
       this._isNg1Bootstrapped = true;
       this._ng1Bootstrapped.next();
@@ -210,7 +210,7 @@ export class AngularViewFactory extends ViewFactory {
 
   private _setupInputs<T>(factory: ComponentFactory<T>, componentRef: ComponentRef<T>): void {
     for (const input of factory.inputs) {
-      const descriptor = Object.getOwnPropertyDescriptor(componentRef.instance, input.propName) 
+      const descriptor = Object.getOwnPropertyDescriptor(componentRef.instance, input.propName)
         // Account for getter/setters
         || Object.getOwnPropertyDescriptor(componentRef.componentType.prototype, input.propName);
 
@@ -264,20 +264,28 @@ export class AngularViewFactory extends ViewFactory {
     }
   }
 
-  private _onComponentDestroy<T>(componentRef: ComponentRef<T>): void {
+  private _onComponentDestroy<T>(componentRef: ComponentRef<T>, componentFactory: ComponentFactory<T>): void {
     const index = this._viewContainerRef.indexOf(componentRef.hostView);
-    
+
     if (index !== -1) {
       this._viewContainerRef.remove(index);
     }
 
     componentRef.destroy();
+
+    for (const output of componentFactory.outputs) {
+      if (typeof componentRef.instance === 'object'
+        && typeof componentRef.instance[output.propName] === 'object'
+        && typeof componentRef.instance[output.propName].complete === 'function') {
+        componentRef.instance[output.propName].complete();
+      }
+    }
   }
 
   protected getNg1Providers(providers: { [key: string]: any }, viewContainer: ViewContainer<any>): { [key: string]: any } {
     return providers;
   }
-  
+
   protected getNg2Providers(providers: Provider[], viewContainer: ViewContainer<any>): Provider[] {
     return providers;
   }
