@@ -2,7 +2,6 @@ import { ProviderArg, Injector, Type } from '../di';
 import { ConfiguredRenderable } from './ConfiguredRenderable';
 import { ConfigurationRef } from '../common';
 import { Renderable } from './Renderable';
-import { isFunction } from '../utils';
 
 /**
  * Key used to assign the injector to on Renderables.
@@ -23,14 +22,14 @@ export class RenderableInjector extends Injector {
    * The renderable is registered under the `ConfiguredRenderable` token and the configuration is under the
    * `ConfigurationRef` token.
    * @static
-   * @param {(Type<Renderable>|ConfiguredRenderable<Renderable>|Renderable)} renderable 
-   * @param {Provider[]} [providers=[]] 
-   * @param {Injector} [parent] 
+   * @param {(Type<Renderable>|ConfiguredRenderable<Renderable>|Renderable)} renderable
+   * @param {Provider[]} [providers=[]]
+   * @param {Injector} [parent]
    * @param {{skipInit: ?boolean}} [options={}]
-   * @returns {RenderableInjector} 
+   * @returns {RenderableInjector}
    */
   static fromRenderable(
-    renderable: Type<Renderable>|ConfiguredRenderable<Renderable>|Renderable, 
+    renderable: Type<Renderable>|ConfiguredRenderable<Renderable>|Renderable,
     providers: ProviderArg[] = [],
     parent?: Injector,
     options: { skipInit?: boolean } = {}
@@ -39,7 +38,7 @@ export class RenderableInjector extends Injector {
     let Ctor = renderable;
     let config: any = null;
     let factory = (injector: Injector) => injector.resolveAndInstantiate<Renderable>(Ctor, { skipInit });
-    
+
     if (renderable instanceof ConfiguredRenderable) {
       Ctor = renderable.renderable;
       config = renderable.config;

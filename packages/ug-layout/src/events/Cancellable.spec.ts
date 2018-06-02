@@ -1,6 +1,5 @@
 import test from 'ava';
 import { spy } from 'sinon';
-import 'rxjs/Rx';
 
 import { Cancellable } from './Cancellable';
 
@@ -10,7 +9,7 @@ test('waiting for complete results', async t => {
   const _complete = spy();
 
   const done = event.results()
-  
+
   done.subscribe({ next: _spy, complete: _complete });
 
   await done.toPromise();

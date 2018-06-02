@@ -1,10 +1,9 @@
 import { ConfiguredRenderable, SerializedRenderable } from '../dom';
-import { Inject } from '../di';
-import { SerializerContainer, Serializer, Serialized } from '../serialization';
+import { SerializerContainer, Serializer } from '../serialization';
 import { XYContainer } from './XYContainer';
 import { Row } from './Row';
 import { Column } from './Column';
-import { UNALLOCATED, XYDirection } from '../common';
+import { XYDirection } from '../common';
 import { XYItemContainer } from './XYItemContainer';
 import { SerializedXYItemContainer } from './XYItemContainerSerializer';
 import {

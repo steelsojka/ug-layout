@@ -1,5 +1,4 @@
-import { Observable } from 'rxjs/Observable';
-import { Subscriber } from 'rxjs/Subscriber';
+import { Observable, Subscriber } from 'rxjs';
 
 import { BusEvent } from './BusEvent';
 import { CancelAction } from './CancelAction';
@@ -17,17 +16,17 @@ export class Cancellable<T> extends BusEvent<T> {
    * @see {@link BusEvent#wait}
    */
   cancel(): void {
-    throw new CancelAction();  
+    throw new CancelAction();
   }
 
   /**
    * Creates an observable that waits for the results of the event.
-   * @returns {Observable<this>} 
+   * @returns {Observable<this>}
    * @example
    * const event = new Cancellable(null);
-   * 
+   *
    * bus.emit(event);
-   * 
+   *
    * event.results().subscribe(() => {
    *   // The event was successful and NOT cancelled.
    * });

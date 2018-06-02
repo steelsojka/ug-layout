@@ -1,8 +1,8 @@
 import { VNode } from 'snabbdom/vnode';
 import { CompleteOn } from 'rx-decorators/completeOn';
+import { Subject, Observable } from 'rxjs';
 
 import { Inject, PostConstruct } from '../di';
-import { Subject, Observable } from '../events';
 import { DocumentRef, PatchRef, Patch } from '../common';
 
 /**
@@ -29,14 +29,14 @@ export class Renderer {
 
   /**
    * Initializes the renderer with the containing DOM element to mount to.
-   * @param {Node} containerEl 
+   * @param {Node} containerEl
    */
   @PostConstruct()
   initialize(): void {
     this._mountPoint = this._document.createElement('div');
   }
 
-  setContainer(containerEl: Node): void { 
+  setContainer(containerEl: Node): void {
     if (this._containerEl === containerEl) {
       return;
     }
@@ -48,7 +48,7 @@ export class Renderer {
 
   /**
    * Sets a the function that generates the virtual DOM tree.
-   * @param {function(): VNode} fn 
+   * @param {function(): VNode} fn
    */
   useNodeGenerator(fn: () => VNode): void {
     this._nodeGenerator = fn;
@@ -56,13 +56,13 @@ export class Renderer {
 
   /**
    * Updates the DOM with the current state of the renderable tree.
-   * @returns {void} 
+   * @returns {void}
    */
   render(): void {
     if (!this._nodeGenerator) {
       return;
     }
-    
+
     if (this._lastVNode) {
       this._lastVNode = this._patch(this._lastVNode, this._nodeGenerator());
     } else {

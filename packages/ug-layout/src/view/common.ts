@@ -7,7 +7,7 @@ import { ConfiguredItem } from '../ConfiguredItem';
 
 export const VIEW_COMPONENT_CONFIG = new Token<any>('ViewComponentConfig');
 export const ViewComponentRef = new Token<any>('ViewComponentRef');
-export const LinkerMetatdataRef = new Token<any>('LinkerMetadataRef');
+export const LinkerMetadataRef = new Token<any>('LinkerMetadataRef');
 export const VIEW_CONFIG = new Token<ViewConfig>('ViewConfig');
 export const VIEW_CONTAINER_CLASS = new Token<ViewContainer<any>>('VIEW_CONTAINER_CLASS');
 export const VIEW_CONFIG_KEY = 'ugLayout:viewConfig';

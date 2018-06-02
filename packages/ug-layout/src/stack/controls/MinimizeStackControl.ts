@@ -1,10 +1,7 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
-import { Inject, Injector } from '../../di';
-import { ContainerRef } from '../../common';
 import { StackControl } from './StackControl';
-import { StackHeader } from '../StackHeader';
 import { MinimizeCommand } from '../../commands';
 import { XYItemContainer } from '../../XYContainer';
 
@@ -16,7 +13,7 @@ export class MinimizeStackControl extends StackControl {
   get height(): number {
     return this.container.height;
   }
-  
+
   render(): VNode {
     const styles: { [key: string] : string } = {};
     const container = this.getParent(XYItemContainer);
@@ -26,9 +23,9 @@ export class MinimizeStackControl extends StackControl {
     } else {
       styles.width = `${this.width}px`;
     }
-    
+
     return h('div.ug-layout__stack-minimize-control.ug-layout__align-center', {
-      style: styles 
+      style: styles
     }, [
       h('div', {
         class: {
@@ -40,7 +37,7 @@ export class MinimizeStackControl extends StackControl {
         },
         on: {
           click: e => this._onClick(e)
-        }  
+        }
       })
     ]);
   }
@@ -48,7 +45,7 @@ export class MinimizeStackControl extends StackControl {
   private _onClick(e: MouseEvent): void {
     e.stopPropagation();
     e.preventDefault();
-    
+
     this.emitUp(new MinimizeCommand(this, { size: this.height }))
   }
 }

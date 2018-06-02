@@ -32,7 +32,7 @@
     "css-loader": "^0.26.1",
     "del-cli": "^0.2.1",
     "reflect-metadata": "^0.1.9",
-    "rxjs": "^5.1.1",
+    "rxjs": "^6.0.0",
     "style-loader": "^0.13.1",
     "ts-loader": "^2.0.0",
     "ts-node": "^2.1.2",
@@ -43,10 +43,10 @@
     "zone.js": "^0.7.7"
   },
   "peerDependencies": {
-    "@angular/core": "^4.0.1",
-    "rxjs": "^5.3.0",
-    "zone.js": "^0.8.4",
-    "ug-layout": "^3.0.0"
+    "@angular/core": "^6.0.0",
+    "rxjs": "^6.0.0",
+    "ug-layout": "^3.0.0",
+    "zone.js": "^0.8.4"
   },
   "dependencies": {
     "tslib": "^1.6.0"

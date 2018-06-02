@@ -1,11 +1,9 @@
 import test from 'ava';
 import { spy } from 'sinon';
 
-import { Injector } from '../di';
 import { ConfiguredRenderable } from './ConfiguredRenderable';
 import { RenderableInjector } from './RenderableInjector';
 import { Renderable } from './Renderable';
-import { Renderer } from './Renderer';
 import { ConfigurationRef } from '../common';
 
 test('creating from a configured renderable', t => {
@@ -14,7 +12,7 @@ test('creating from a configured renderable', t => {
     render(): any {}
     initialize(): any { initSpy() }
   };
-  
+
   const config = {};
   const configured = new ConfiguredRenderable(MyClass, config);
   const injector = RenderableInjector.fromRenderable(configured);

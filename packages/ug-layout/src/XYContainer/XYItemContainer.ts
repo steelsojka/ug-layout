@@ -1,28 +1,24 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
-import { Inject, Injector, PostConstruct } from '../di'
-import { 
-  Renderer, 
-  Renderable, 
-  RenderableInjector, 
+import { Inject, PostConstruct } from '../di'
+import {
+  Renderable,
+  RenderableInjector,
   ConfiguredRenderable,
   AddChildArgs,
   RenderableConfigArgs
 } from '../dom';
-import { 
-  ConfigurationRef, 
-  ContainerRef, 
-  XYDirection, 
+import {
+  ConfigurationRef,
+  ContainerRef,
   UNALLOCATED,
   RenderableArg
 } from '../common';
 import { MakeVisibleCommand } from '../commands';
-import { isNumber, isFunction } from '../utils';
-import { BeforeDestroyEvent } from '../events';
+import { isNumber } from '../utils';
 import { XYContainer } from './XYContainer';
 import { MinimizeCommand } from '../commands';
-import { Splitter } from './Splitter';
 
 export interface XYItemContainerConfig extends RenderableConfigArgs {
   use: RenderableArg<Renderable>;
@@ -41,11 +37,11 @@ export class XYItemContainer extends Renderable {
   ratio: number|typeof UNALLOCATED = UNALLOCATED;
 
   @Inject(ConfigurationRef) protected _config: XYItemContainerConfig
-  
+
   protected _height: number = 0;
   protected _width: number = 0;
   protected _container: XYContainer;
-  
+
   private _lastSize: number|null = null;
   private _isMinimized: boolean = false;
 
@@ -56,7 +52,7 @@ export class XYItemContainer extends Renderable {
   get minSize(): number {
     return this._container.isRow ? this.minSizeX : this.minSizeY;
   }
-  
+
   get maxSize(): number {
     return this._container.isRow ? this.maxSizeX : this.maxSizeY;
   }
@@ -76,7 +72,7 @@ export class XYItemContainer extends Renderable {
   get maxSizeX(): number {
     return isNumber(this._config.maxSizeX) ? this._config.maxSizeX : Number.MAX_SAFE_INTEGER;
   }
-  
+
   get minSizeY(): number {
     return isNumber(this._config.minSizeY) ? this._config.minSizeY : 50;
   }
@@ -115,7 +111,7 @@ export class XYItemContainer extends Renderable {
 
   get offsetX(): number {
     let offset = this._container ? this._container.offsetX : 0;
-    
+
     if (this._container.isRow) {
       const children = this._container.getChildren();
       const index = children.indexOf(this);
@@ -130,7 +126,7 @@ export class XYItemContainer extends Renderable {
 
   get offsetY(): number {
     let offset = this._container ? this._container.offsetY : 0;
-    
+
     if (!this._container.isRow) {
       const children = this._container.getChildren();
       const index = children.indexOf(this);
@@ -154,18 +150,18 @@ export class XYItemContainer extends Renderable {
   @PostConstruct()
   initialize(): void {
     super.initialize();
-    
+
     if (this._config) {
       this.ratio = isNumber(this._config.ratio) ? this._config.ratio : UNALLOCATED;
     }
 
     this._contentItems = [
       RenderableInjector.fromRenderable(
-        this._config.use, 
+        this._config.use,
         [
           { provide: XYItemContainer, useValue: this },
           { provide: ContainerRef, useValue: this }
-        ], 
+        ],
         this.injector
       )
         .get<Renderable>(ConfiguredRenderable as any)
@@ -222,9 +218,9 @@ export class XYItemContainer extends Renderable {
     const minimize = e.minimize == null ? !this._isMinimized : e.minimize;
     let size: number|null = null;
     const lastSize = (this._lastSize != null ? this._lastSize : this._config.initialSize) || null;
-    
+
     e.stopPropagation();
-    
+
     if (minimize && !this._isMinimized) {
       size = e.size;
       this._lastSize = this.size;

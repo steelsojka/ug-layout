@@ -1,11 +1,7 @@
-import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
-import { Subscription } from 'rxjs/Subscription';
-import { Observer, PartialObserver } from 'rxjs/Observer';
-import 'rxjs/add/operator/filter';
+import { Observable, Subject, Subscription, PartialObserver } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 import { Type } from '../di';
-import { isFunction } from '../utils';
 import { BusEvent } from './BusEvent';
 
 /**
@@ -20,9 +16,9 @@ export class EventBus {
   /**
    * Subscribes to a specific event type.
    * @template T The bus event type.
-   * @param {Type<T>} Event 
-   * @param {(PartialObserver<T>|((event: T) => void))} observer 
-   * @returns {Subscription} 
+   * @param {Type<T>} Event
+   * @param {(PartialObserver<T>|((event: T) => void))} observer
+   * @returns {Subscription}
    */
   subscribe<T extends BusEvent<any>>(Event: Type<T>, observer: PartialObserver<T>|((event: T) => void)): Subscription {
     return this.scope(Event).subscribe(observer as PartialObserver<T>);
@@ -31,17 +27,18 @@ export class EventBus {
   /**
    * Creates an observable scoped to a specific event type.
    * @template T The bus event type.
-   * @param {Type<T>} Event 
-   * @returns {Observable<T>} 
+   * @param {Type<T>} Event
+   * @returns {Observable<T>}
    */
   scope<T extends BusEvent<any>>(Event: Type<T>): Observable<T> {
-    return this._observable.filter(e => e instanceof Event);
+    return this._observable.pipe(
+      filter(e => e instanceof Event));
   }
 
   /**
    * Dispatches an event.
    * @template T The bus event type.
-   * @param {T} event 
+   * @param {T} event
    */
   next<T extends BusEvent<any>>(event: T): void {
     event.dispatch(this._bus);

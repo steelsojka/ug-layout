@@ -1,9 +1,9 @@
-import { 
-  Injector, 
-  ViewContainerRef, 
-  Inject, 
-  Component, 
-  Input, 
+import {
+  Injector,
+  ViewContainerRef,
+  Inject,
+  Component,
+  Input,
   Output,
   OnChanges,
   SimpleChanges,
@@ -12,9 +12,9 @@ import {
   OnDestroy,
   Type
 } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
 import { RootLayout, ProviderArg, Renderable, ConfiguredRenderable, Layout } from 'ug-layout';
-import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
+import { takeUntil } from 'rxjs/operators';
 
 import { AngularPlugin, AngularPluginConfig } from './AngularPlugin';
 import { DestroyNotifyEvent } from './DestroyNotifyEvent';
@@ -79,19 +79,19 @@ export class UgLayoutOutletComponent implements OnChanges, OnDestroy {
 
     if (this.destroyNotifier) {
       this.destroyNotifier
-        .takeUntil(this._destroyed)
+        .pipe(takeUntil(this._destroyed))
         .subscribe(() => this._notifyDestroy());
     }
 
     if (this.config) {
       this._construct(this.config);
     }
-    
+
     this.initialized.emit(this._rootLayout);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.config 
+    if (changes.config
       && changes.config.currentValue instanceof ConfiguredRenderable
       && !changes.config.isFirstChange()) {
       this._construct(changes.config.currentValue);

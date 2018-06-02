@@ -1,11 +1,12 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
+import { Observable } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 import { Inject, PostConstruct } from '../di';
 import { Renderable, RenderableDestroyContext, RenderableConfig } from '../dom';
-import { DocumentRef, ContainerRef, ConfigurationRef, DragEvent } from '../common';
+import { ContainerRef, ConfigurationRef, DragEvent } from '../common';
 import { XYContainer } from './XYContainer';
-import { Observable } from '../events';
 import { Draggable } from '../Draggable';
 import { LockState, LOCK_RESIZING } from '../LockState';
 
@@ -79,11 +80,11 @@ export class Splitter extends Renderable<SplitterConfig> {
     this.dragStatus = this._draggable.drag;
 
     this._draggable.drag
-      .filter(Draggable.isDragStopEvent)
+      .pipe(filter(Draggable.isDragStopEvent))
       .subscribe(() => this._isDragging = false);
 
     this._draggable.drag
-      .filter(Draggable.isDragStartEvent)
+      .pipe(filter(Draggable.isDragStartEvent))
       .subscribe(this._onDragStart.bind(this));
 
     this._lockState

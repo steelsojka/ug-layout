@@ -1,6 +1,5 @@
 import { ConfiguredRenderable, SerializedRenderable } from '../dom';
-import { Inject } from '../di';
-import { GenericSerializer, SerializerContainer, Serializer, Serialized } from '../serialization';
+import { SerializerContainer, Serializer } from '../serialization';
 import { View } from './View';
 import { isBoolean, isNumber } from '../utils';
 import { ResolverStrategy, CacheStrategy } from './common';
@@ -23,7 +22,7 @@ export class ViewSerializer extends Serializer<View, SerializedView> {
     if (!token) {
       throw new Error('Can not serialize view with no registered token.');
     }
-    
+
     return {
       token,
       name: 'View',
@@ -44,9 +43,9 @@ export class ViewSerializer extends Serializer<View, SerializedView> {
     if (!token || !useClass) {
       throw new Error('Could not resolve view classes.');
     }
-    
+
     return View.configure({
-      token, 
+      token,
       useClass: new ConfiguredItem(useClass, node.viewComponentConfig),
       caching: node.caching != null ? node.caching : undefined,
       lazy: isBoolean(node.lazy) ? node.lazy : undefined,

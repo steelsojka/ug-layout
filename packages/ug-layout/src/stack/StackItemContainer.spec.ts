@@ -1,5 +1,5 @@
 import test from 'ava';
-import { stub, spy } from 'sinon';
+import { stub } from 'sinon';
 
 import { ConfigurationRef, ContainerRef } from '../common';
 import { StackItemContainer } from './StackItemContainer';
@@ -11,7 +11,7 @@ import { getRenderable } from '../../test/unit/helpers';
 function getItem(container = {}): StackItemContainer {
   return getRenderable(StackItemContainer, [
     { provide: ConfigurationRef, useValue: {} },
-    { provide: ContainerRef, useValue: container }  
+    { provide: ContainerRef, useValue: container }
   ]);
 }
 
@@ -24,7 +24,7 @@ test('get tab', t => {
   const item = getItem({
     getTabAtIndex: _stub,
     getIndexOf: indexStub
-  });    
+  });
 
   const result = item.tab;
 
@@ -39,7 +39,7 @@ function getSizeTest(t, { horz, size, prop }, expected) {
     isHorizontal: horz,
     header: {
       [prop]: 10
-    }  
+    }
   });
 
   t.is(item[prop], expected);
@@ -61,7 +61,7 @@ test('isActiveContainer', t => {
   _stub.returns(true);
   t.true(item.isActive);
   t.is(_stub.args[0][0], item);
-  
+
   _stub.returns(false);
   t.false(item.isActive);
 });
@@ -75,7 +75,7 @@ function offsetTest(t, { horz, rev, prop }, expected) {
     header: {
       height: 5,
       width: 10
-    }  
+    }
   });
 
   t.is(item[prop], expected);

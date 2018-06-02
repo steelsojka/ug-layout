@@ -1,13 +1,13 @@
 import test from 'ava';
 import { stub, spy } from 'sinon';
-import { Subject } from '../events';
+import { Subject } from 'rxjs';
 
 import { TabDragEvent } from './TabDragEvent';
 import { TabSelectionEvent } from './TabSelectionEvent';
 import { StackTab } from './StackTab';
 import { Draggable } from '../Draggable';
 import { DragHost } from '../DragHost';
-import { DocumentRef } from '../common';
+import { DocumentRef, ContextType } from '../common';
 import { Renderable, RenderableArea } from '../dom';
 import { getRenderable } from '../../test/unit/helpers';
 
@@ -40,14 +40,14 @@ test('getting width', t => {
   });
 
   t.is(tab.width, 50);
-  
+
   Object.assign(tab, {
     _container: {
       isHorizontal: false,
       width: 100
     }
   });
-  
+
   t.is(tab.width, 100);
 });
 
@@ -62,25 +62,25 @@ test('getting height', t => {
   });
 
   t.is(tab.height, 50);
-  
+
   Object.assign(tab, {
     _container: {
       isHorizontal: true,
       height: 100
     }
   });
-  
+
   t.is(tab.height, 100);
 });
 
 test('getting the stack item', t => {
   const tab = getTab();
   const item = {};
-  
+
   Object.assign(tab, {
     _container: {
       getItemFromTab: () => item
-    }  
+    }
   });
 
   t.is<any>(tab.item, item);
@@ -89,11 +89,11 @@ test('getting the stack item', t => {
 test('getting the offsetX', t => {
   const tab = getTab();
   const offset = 100;
-  
+
   Object.assign(tab, {
     _container: {
       getOffsetXForTab: () => offset
-    }  
+    }
   });
 
   t.is<any>(tab.offsetX, 100);
@@ -102,11 +102,11 @@ test('getting the offsetX', t => {
 test('getting the offsetY', t => {
   const tab = getTab();
   const offset = 100;
-  
+
   Object.assign(tab, {
     _container: {
       getOffsetYForTab: () => offset
-    }  
+    }
   });
 
   t.is<any>(tab.offsetY, 100);
@@ -115,15 +115,15 @@ test('getting the offsetY', t => {
 test('getting the stack', t => {
   const tab = getTab();
   const stack = {};
-  
+
   Object.assign(tab, {
     _container: {
       container: stack
-    }  
+    }
   });
 
   t.is<any>(tab.stack, stack);
-  
+
   Object.assign(tab, {
     _container: undefined
   });
@@ -135,12 +135,12 @@ test('getting controls', t => {
   const tab = getTab();
   const item = {
     controls: []
-  }; 
-  
+  };
+
   Object.assign(tab, {
     _container: {
       getItemFromTab: () => item
-    }  
+    }
   });
 
   t.is(tab.controls, item.controls);
@@ -150,7 +150,7 @@ test('initializing', t => {
   const drag = new Subject();
   const dragHostStart = new Subject();
   const dragHostDrop = new Subject();
-  
+
   Object.assign(stubs.draggable, { drag });
   Object.assign(stubs.dragHost, {
     start: dragHostStart,
@@ -167,7 +167,7 @@ test('initializing', t => {
   Object.assign(Draggable, {
     isDraggingEvent: n => n === 0,
     isDragStopEvent: n => n === 1,
-    isDragStartEvent: n => n === 2 
+    isDragStartEvent: n => n === 2
   });
 
   stub(Renderable.prototype, 'initialize');
@@ -208,12 +208,12 @@ test('destroy', t => {
   const tab = getTab();
   const destroyStub = stub();
   const superStub = stub(Renderable.prototype, 'destroy');
-  
+
   Object.assign(tab, {
     _draggable: { destroy: destroyStub }
   });
 
-  tab.destroy();
+  tab.destroy({ type: ContextType.NONE });
 
   t.true(destroyStub.called);
   t.true(superStub.called);
@@ -225,7 +225,7 @@ function testGetStyles(t, config, expected): void {
 
   stub(tab, 'width', { get: () => 15 });
   stub(tab, 'height', { get: () => 5 });
-  
+
   Object.assign(tab, {
     _config: {
       maxSize: 10
@@ -239,7 +239,7 @@ function testGetStyles(t, config, expected): void {
   });
 
   const result = (<any>tab)._getStyles();
-  
+
   t.deepEqual(result, expected);
 }
 
@@ -295,7 +295,7 @@ test('dragging on mouse down', t => {
 
   item.draggable = true;
   (<any>tab)._onMouseDown({ pageX: 15, pageY: 20 });
-  
+
   t.true(startDragSpy.called);
   t.deepEqual(startDragSpy.args[0][0], {
     host: tab,
@@ -312,7 +312,7 @@ test('on drag start', t => {
   const area = {};
   const fail = new Subject();
   const dropped = new Subject();
-  
+
   const dragEventSpy = spy();
   const dragHostInitSpy = spy();
   const addChildSpy = spy();
@@ -322,9 +322,9 @@ test('on drag start', t => {
   stack.addChild = addChildSpy;
   stub(tab, 'stack', { get: () => stack });
   stub(tab, 'getArea').returns(area);
-  
+
   const destroyStub = stub(tab, 'destroy');
-  
+
   Object.assign(tab, {
     _draggable: {},
     _document: {
@@ -370,7 +370,7 @@ test('on drag start', t => {
   t.false(destroyStub.called);
 
   dropped.next();
-  
+
   t.true(destroyStub.called);
 });
 
@@ -402,7 +402,7 @@ test('on drag stop', t => {
 
   Object.assign(tab, {
     _isDragging: true,
-    _element: { 
+    _element: {
       style: {},
       classList: {
         remove: removeSpy
@@ -433,7 +433,7 @@ test('on drag host start', t => {
     _element: {
       classList: { add: addSpy }
     }
-  });  
+  });
 
   (<any>tab)._onDragHostStart();
 
@@ -449,7 +449,7 @@ test('on drag host dropped', t => {
     _element: {
       classList: { remove: removeSpy }
     }
-  });  
+  });
 
   (<any>tab)._onDragHostDropped();
 

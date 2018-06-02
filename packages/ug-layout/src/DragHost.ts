@@ -1,16 +1,16 @@
+import { Observable, Subject } from 'rxjs';
+import { filter, takeUntil } from 'rxjs/operators';
+
 import { Inject, PostConstruct } from './di';
-import { 
-  DocumentRef, 
-  DropTarget, 
-  DropArea, 
+import {
+  DocumentRef,
+  DropArea,
   RenderableDropTarget,
-  DragStatus,
   DragEvent
 } from './common';
 import { Renderable, RenderableArea } from './dom';
-import { Observable, Subject } from './events';
 import { Draggable } from './Draggable';
-import { isObject, isFunction, clamp } from './utils';
+import { isObject, isFunction } from './utils';
 
 export class DragHostContainer {
   item: Renderable;
@@ -60,24 +60,26 @@ export class DragHost {
 
   initialize(container: DragHostContainer): void {
     const { item, dragArea, draggable } = container;
-    
+
     this._item = item;
     this._dragArea = dragArea;
     this._start.next(container);
 
     draggable.drag
-      .filter(Draggable.isDraggingEvent)
-      .takeUntil(draggable.drag.filter(Draggable.isDragStopEvent))
+      .pipe(
+        filter(Draggable.isDraggingEvent),
+        takeUntil(draggable.drag.pipe(filter(Draggable.isDragStopEvent))))
       .subscribe(this._onDrag.bind(this));
-    
+
     draggable.drag
-      .filter(Draggable.isDragStopEvent)
-      .takeUntil(this._dropped)
+      .pipe(
+        filter(Draggable.isDragStopEvent),
+        takeUntil(this._dropped))
       .subscribe(this._onDragStop.bind(this));
 
     this._element.hidden = false;
-  } 
-  
+  }
+
   setDropAreas(areas: DropArea[]): void {
     this._areas = areas;
   }
@@ -89,7 +91,7 @@ export class DragHost {
 
     const pageX = this._bounds ? this._bounds.clampX(e.pageX) : e.pageX;
     const pageY = this._bounds ? this._bounds.clampY(e.pageY) : e.pageY;
-    
+
     let minSurface = Infinity;
     let result: DropArea|null = null;
 
@@ -102,7 +104,7 @@ export class DragHost {
         minSurface > entry.area.surface
       ) {
         minSurface = entry.area.surface;
-        result = entry;  
+        result = entry;
       }
     }
 
@@ -110,7 +112,7 @@ export class DragHost {
       if (this._dropArea) {
         this._dropArea.item.onDropHighlightExit();
       }
-      
+
       this._dropArea = result;
 
       const area = this._dropArea.item.getHighlightCoordinates({
@@ -118,7 +120,7 @@ export class DragHost {
         dropArea: result,
         dragArea: this._dragArea
       });
-      
+
       this._element.style.transform = `translate(${area.x}px, ${area.y}px)`;
       this._element.style.height = `${area.height}px`;
       this._element.style.width = `${area.width}px`;
@@ -135,12 +137,12 @@ export class DragHost {
       this._dropArea.item.handleDrop(this._item, this._dropArea, e);
       this._success.next(e.host);
     }
-    
+
     this._dropped.next();
   }
 
   static isDropTarget(item: any): item is RenderableDropTarget {
-    return isObject(item) 
+    return isObject(item)
       && item instanceof Renderable
       && isFunction(item['getHighlightCoordinates'])
       && isFunction(item['handleDrop']);

@@ -8,7 +8,11 @@ class MyClass {};
 let serializer: GenericSerializer<any>;
 
 test.beforeEach(() => {
-  serializer = new GenericSerializer('Test', MyClass as any);
+  serializer = new GenericSerializer();
+  (serializer as any).config = {
+    name: 'Test',
+    type: MyClass
+  }
 });
 
 test('serialize', t => {
@@ -21,13 +25,4 @@ test('deserialize', t => {
   const results = serializer.deserialize({} as any);
 
   t.is(results, MyClass);
-});
-
-test('registration', t => {
-  const _spy = spy();
-  serializer.register({ registerClass: _spy } as any);
-
-  t.is(_spy.callCount, 1);
-  t.is(_spy.args[0][0], 'Test');
-  t.is(_spy.args[0][1], MyClass);
 });

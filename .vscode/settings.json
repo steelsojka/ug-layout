@@ -1,3 +1,20 @@
 {
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "cSpell.words": [
+    "configureable",
+    "constructable",
+    "deserialize",
+    "deserialized",
+    "deserializes",
+    "droppable",
+    "injectable",
+    "renderable",
+    "renderables",
+    "serializers",
+    "snabbdom",
+    "taggable",
+    "unallocated",
+    "unminimize",
+    "vnode"
+  ]
 }

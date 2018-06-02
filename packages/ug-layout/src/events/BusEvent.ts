@@ -1,4 +1,4 @@
-import { Observer } from 'rxjs/Observer';
+import { Observer } from 'rxjs';
 
 import { Type } from '../di';
 

@@ -1,5 +1,6 @@
+import { Subject, Observable } from 'rxjs';
+
 import { Inject } from './di';
-import { Subject, Observable } from './events';
 import { DocumentRef, DragEvent, DragStatus, DragOptions } from './common';
 import { propEq } from './utils';
 
@@ -76,7 +77,7 @@ export class Draggable<T> {
     const deltaY = e.pageY - this._startY;
 
     if (!this._pastThreshold && (Math.abs(deltaX) >= this._threshold || Math.abs(deltaY) >= this._threshold)) {
-      this._pastThreshold = true;  
+      this._pastThreshold = true;
       this._drag.next({
         host: this._host,
         status: DragStatus.START,
@@ -86,7 +87,7 @@ export class Draggable<T> {
         pageY: e.pageY
       });
     }
-    
+
     if (this._pastThreshold) {
       this._drag.next({
         status: DragStatus.DRAGGING,

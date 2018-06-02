@@ -1,10 +1,7 @@
-import { ConfiguredRenderable, SerializedRenderable } from '../dom';
-import { Inject } from '../di';
+import { ConfiguredRenderable } from '../dom';
 import { SerializerContainer, Serializer, Serialized } from '../serialization';
 import { XYItemContainer } from './XYItemContainer'
-import { Row } from './Row';
-import { Column } from './Column';
-import { UNALLOCATED, XYDirection } from '../common';
+import { UNALLOCATED } from '../common';
 import { XY_ITEM_CONTAINER_CLASS } from './common';
 
 export interface SerializedXYItemContainer {
@@ -35,7 +32,7 @@ export class XYItemContainerSerializer extends Serializer<XYItemContainer, Seria
       minSizeY: node.minSizeY,
       maxSizeY: node.maxSizeY === Number.MAX_SAFE_INTEGER ? undefined : node.maxSizeY,
       fixed: node.fixed
-    };    
+    };
   }
 
   deserialize(node: SerializedXYItemContainer): ConfiguredRenderable<XYItemContainer> {

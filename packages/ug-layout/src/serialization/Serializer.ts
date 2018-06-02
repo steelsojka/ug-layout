@@ -1,7 +1,7 @@
 import { Token, Inject, Optional } from '../di';
 import { Renderable, RenderableConfig, ConfiguredRenderable } from '../dom';
 import { RenderableConstructorArg } from '../common';
-import { SerializerContainer, BaseSerializerArg, SerializerConstructor } from './SerializerContainer';
+import { SerializerContainer, BaseSerializerArg } from './SerializerContainer';
 import { ConfiguredSerializer } from './ConfiguredSerializer';
 
 export const SERIALIZER_CONFIG = new Token<any>('SERIALIZER_CONFIG');

@@ -3,20 +3,16 @@ import h from 'snabbdom/h';
 
 import {
   Renderable,
-  RenderableInjector,
   ConfiguredRenderable,
-  Renderer,
   AddChildArgs,
   RenderableConfig,
   isTransferable,
   RemoveChildArgs
 } from '../dom';
-import { Inject, Injector, Optional, PostConstruct } from '../di';
+import { Inject, Optional, PostConstruct } from '../di';
 import {
-  ContainerRef,
   XYDirection,
   ConfigurationRef,
-  RenderableArg,
   RenderableConstructorArg,
   UNALLOCATED,
   DragStatus,
@@ -25,9 +21,8 @@ import {
 } from '../common';
 import { XYItemContainer, XYItemContainerConfig } from './XYItemContainer';
 import { Draggable } from '../Draggable';
-import { BeforeDestroyEvent } from '../events';
 import { Splitter, SPLITTER_SIZE } from './Splitter';
-import { get, isNumber, clamp, round, isFunction } from '../utils';
+import { get, isNumber, clamp, round } from '../utils';
 import { Stack, StackItemContainer, STACK_CLASS } from '../stack';
 import { XY_ITEM_CONTAINER_CLASS, SPLITTER_CLASS } from './common';
 

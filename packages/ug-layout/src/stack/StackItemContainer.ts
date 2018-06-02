@@ -1,9 +1,10 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
+import { filter, takeUntil } from 'rxjs/operators';
 
-import { Inject, Injector, PostConstruct } from '../di'
-import { Renderer, Renderable, AddChildArgs, RenderableInjector, ConfiguredRenderable, RenderableArea, RenderableConfig, Transferable } from '../dom';
-import { BeforeDestroyEvent, Cancellable, Subject, Observable } from '../events';
+import { Inject, PostConstruct } from '../di'
+import { Renderable, AddChildArgs, ConfiguredRenderable, RenderableArea, RenderableConfig, Transferable } from '../dom';
+import { BeforeDestroyEvent } from '../events';
 import { MakeVisibleCommand } from '../commands';
 import {
   ConfigurationRef,
@@ -21,7 +22,6 @@ import { XYContainer } from '../XYContainer';
 import { StackRegion } from './common';
 import { get } from '../utils'
 import { TabControl, CloseTabControl } from './tabControls';
-import { StackControlConfig } from './controls';
 
 export interface StackItemContainerConfig extends RenderableConfig {
   use: RenderableArg<Renderable>;
@@ -45,7 +45,7 @@ export class StackItemContainer extends Renderable implements DropTarget, Transf
 
   @Inject(ConfigurationRef) protected _config: StackItemContainerConfig;
   @Inject(ContainerRef) protected _container: Stack;
-  
+
   get container(): Stack {
     return this._container as Stack;
   }
@@ -80,18 +80,18 @@ export class StackItemContainer extends Renderable implements DropTarget, Transf
         return this.container.offsetY + this.container.header.height
       }
     }
-    
+
     return this.container.offsetY;
   }
 
   get draggable(): boolean {
     return Boolean(get(this._config, 'draggable', true));
   }
-  
+
   get droppable(): boolean {
     return Boolean(get(this._config, 'droppable', true));
   }
-  
+
   get closeable(): boolean {
     return Boolean(get(this._config, 'closeable', false));
   }
@@ -106,7 +106,7 @@ export class StackItemContainer extends Renderable implements DropTarget, Transf
         return this.container.offsetX + this.container.header.width
       }
     }
-    
+
     return this.container.offsetX;
   }
 
@@ -121,7 +121,7 @@ export class StackItemContainer extends Renderable implements DropTarget, Transf
   @PostConstruct()
   initialize(): void {
     super.initialize();
-    
+
     this._contentItems = [
       this.createChild(this._config.use)
     ];
@@ -211,7 +211,7 @@ export class StackItemContainer extends Renderable implements DropTarget, Transf
   addControl(control: RenderableArg<TabControl>, options: AddChildArgs = {}): void {
     const { index = -1, render = true, resize = true } = options;
     const { tab } = this;
-    
+
     const newControl = this.createChild(control);
 
     if (index !== -1) {
@@ -232,9 +232,11 @@ export class StackItemContainer extends Renderable implements DropTarget, Transf
   setContainer(container: Stack): void {
     super.setContainer(container);
 
-    this._container.scope(StackItemCloseEvent)
-      .filter(e => e.target === this)
-      .takeUntil(this.containerChange)
+    this._container
+      .scope(StackItemCloseEvent)
+      .pipe(
+        filter(e => e.target === this),
+        takeUntil(this.containerChange))
       .subscribe(this._onTabClose.bind(this));
   }
 
@@ -242,7 +244,7 @@ export class StackItemContainer extends Renderable implements DropTarget, Transf
     const { x, x2, y, y2 } = area;
     const deltaX = pageX - x;
     const deltaY = pageY - y;
-    
+
     if (deltaX < this.width / 3) {
       return StackRegion.WEST;
     } else if (deltaX > (this.width / 3) * 2) {

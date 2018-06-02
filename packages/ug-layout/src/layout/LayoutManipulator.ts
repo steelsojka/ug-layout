@@ -1,7 +1,8 @@
+import { Observable, Observer } from 'rxjs';
+
 import { Type } from '../di';
 import { Renderable } from '../dom';
 import { RenderableArg } from '../common';
-import { Observable, Observer } from '../events';
 import { TagUtil } from '../TagUtil';
 
 export enum LayoutInsertPosition {

@@ -1,7 +1,8 @@
-import { VIEW_HOOK_METADATA, ViewHookMetadata } from './common';
-import { isFunction, get } from '../../utils';
+import { Subject } from 'rxjs';
+
+import { VIEW_HOOK_METADATA } from './common';
+import { isFunction } from '../../utils';
 import { ViewContainer } from '../ViewContainer';
-import { Subject } from '../../events';
 import { getDefaultMetadata } from './decorators';
 
 /**
@@ -16,11 +17,11 @@ export class ViewHookExecutor {
    * Invokes the view hook on the instance with the given argument.
    * This will also invoke any interceptors for the hook as well after the hook
    * on the component has been invoked.
-   * @template T 
-   * @param {T} instance 
-   * @param {string} method 
-   * @param {*} [arg] 
-   * @returns {*} 
+   * @template T
+   * @param {T} instance
+   * @param {string} method
+   * @param {*} [arg]
+   * @returns {*}
    */
   execute<T>(instance: T, method: string, arg?: any): any {
     const target = instance[method];
@@ -42,9 +43,9 @@ export class ViewHookExecutor {
 
   /**
    * Registers an interceptor for a hook on a given instance.
-   * @param {*} instance 
-   * @param {string} hook 
-   * @param {Function} fn 
+   * @param {*} instance
+   * @param {string} hook
+   * @param {Function} fn
    */
   registerInterceptor(instance: any, hook: string, fn: Function): void {
     const map = this._interceptors.get(instance) || {};
@@ -58,8 +59,8 @@ export class ViewHookExecutor {
   /**
    * Links a resolved view container to any hook observables. Metadata is read from the given target.
    * @template T The component type for the view container.
-   * @param {ViewContainer<T>} viewContainer 
-   * @param {Object} target 
+   * @param {ViewContainer<T>} viewContainer
+   * @param {Object} target
    */
   link<T>(viewContainer: ViewContainer<T>, target: Object): void {
     const metadata = Reflect.getOwnMetadata(VIEW_HOOK_METADATA, target) || getDefaultMetadata();

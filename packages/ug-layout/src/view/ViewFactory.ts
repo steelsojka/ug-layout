@@ -1,3 +1,5 @@
+import { filter, first, delay } from 'rxjs/operators';
+
 import {
   ViewComponentConfig,
   ViewConfig,
@@ -75,9 +77,10 @@ export class ViewFactory {
     // view to become visible before initializing the view container.
     if (isLazy) {
       viewContainer.visibilityChanges
-        .first(() => viewContainer.isVisible(), v => v, false)
-        .filter(Boolean)
-        .delay(0)
+        .pipe(
+          first(() => viewContainer.isVisible(), false),
+          filter(Boolean),
+          delay(0))
         .subscribe(() => viewContainer.initialize());
     } else {
       viewContainer.initialize();

@@ -1,10 +1,11 @@
-import { Subject } from 'rxjs/Subject';
-import { Observable } from 'rxjs/Observable';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import {
+  Subject,
+  Observable,
+  BehaviorSubject,
+  forkJoin
+} from 'rxjs';
+import { takeUntil, first } from 'rxjs/operators';
 import { RootLayout, ViewManager, ViewContainerStatus } from 'ug-layout';
-
-import 'rxjs/add/observable/forkJoin';
-import 'rxjs/add/operator/takeUntil';
 
 export class AngularViewTestability {
   private _layout: RootLayout | null = null;
@@ -35,13 +36,13 @@ export class AngularViewTestability {
 
     const viewManager = this._layout.injector.get(ViewManager);
 
-    Observable.forkJoin(
+    forkJoin(
       ...[ ...viewManager.entries() ]
         .filter(view => view.isVisible)
         .map(view => view.status
-          .first(status => status === ViewContainerStatus.READY, undefined, true))
+          .pipe(first(status => status === ViewContainerStatus.READY, ViewContainerStatus.READY)))
     )
-      .takeUntil(this._checking)
+      .pipe(takeUntil(this._checking))
       .subscribe(() => {
         this._isStable = true;
         callback();

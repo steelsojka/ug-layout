@@ -1,8 +1,7 @@
 import { ConfiguredRenderable, SerializedRenderable } from '../dom';
 import { Inject } from '../di';
 import { GenericSerializer, SerializerContainer, Serializer, Serialized } from '../serialization';
-import { Stack, StackConfig } from './Stack';
-import { StackTab } from './StackTab';
+import { Stack } from './Stack';
 import { StackHeaderConfig } from './StackHeader';
 import { StackControl, MinimizeStackControl, CloseStackControl, StackControlSerializer } from './controls'
 import { TabControl, CloseTabControl } from './tabControls'

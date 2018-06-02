@@ -1,3 +1,5 @@
+import { Subscription, Observable, Observer, Subject } from 'rxjs';
+
 import { Inject, Injector } from '../di';
 import { ViewManager, ViewManagerQueryEvent } from './ViewManager';
 import {
@@ -11,7 +13,6 @@ import {
   ViewQueryInitConfig
 } from './common';
 import { ViewContainer, ViewContainerStatus } from './ViewContainer';
-import { Subscription, Observable, Observer, Subject } from '../events';
 import { get, isFunction, isObject, pluck } from '../utils';
 import { LayoutManipulator } from '../layout';
 import { getDefaultMetadata } from './decorators';

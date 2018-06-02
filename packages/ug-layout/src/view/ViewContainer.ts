@@ -1,8 +1,10 @@
 import { CompleteOn } from 'rx-decorators/completeOn';
+import { Observable, Subject, BehaviorSubject } from 'rxjs';
+import { filter, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 
 import { Injector, Type, Inject, PostConstruct, forwardRef } from '../di';
 import { Renderable, RenderableDestroyedContext } from '../dom';
-import { Observable, Subject, BeforeDestroyEvent, BehaviorSubject } from '../events';
+import { BeforeDestroyEvent } from '../events';
 import { DocumentRef, ContextType } from '../common';
 import { View } from './View';
 import { ViewFactory } from './ViewFactory';
@@ -139,8 +141,9 @@ export class ViewContainer<T> {
    */
   sizeChanges: Observable<{ width: number, height: number }> = this._sizeChanges
     .asObservable()
-    .filter(e => e.height !== -1 && e.width !== -1)
-    .distinctUntilChanged((p, c) => p.width === c.width && p.height === c.height)
+    .pipe(
+      filter(e => e.height !== -1 && e.width !== -1),
+      distinctUntilChanged((p, c) => p.width === c.width && p.height === c.height));
   /**
    * Notifies when the status of this component changes.
    * @type {Observable<ViewContainerStatus>}
@@ -160,12 +163,14 @@ export class ViewContainer<T> {
    * Notifies when the view has become attached.
    * @type {Observable<boolean>}
    */
-  attached: Observable<boolean> = this._attached.asObservable().filter(eq(true));
+  attached: Observable<boolean> = this._attached.asObservable()
+    .pipe(filter(eq(true)));
   /**
    * Notifies when the view has become detached.
    * @type {Observable<boolean>}
    */
-  detached: Observable<boolean> = this._attached.asObservable().filter(eq(false));
+  detached: Observable<boolean> = this._attached.asObservable()
+    .pipe(filter(eq(false)));
   /**
    * Notifies when the component is assigned to the container and ready for access.
    * @type {Observable<boolean>}
@@ -259,10 +264,12 @@ export class ViewContainer<T> {
     this.initialized.subscribe(v => this._isInitialized = v);
 
     // Reset the retry function when the component is no longer failed.
-    this.status.filter(eq(ViewContainerStatus.READY)).subscribe(() => {
-      this._retry = null;
-      this._failedReason = null;
-    });
+    this.status
+      .pipe(filter(eq(ViewContainerStatus.READY)))
+      .subscribe(() => {
+        this._retry = null;
+        this._failedReason = null;
+      })
     this.status.subscribe(s => this._statusInternal = s);
   }
 
@@ -370,25 +377,25 @@ export class ViewContainer<T> {
 
     if (this._container) {
       this._container.destroyed
-        .takeUntil(this.containerChange)
+        .pipe(takeUntil(this.containerChange))
         .subscribe(context => this._onViewDestroy(context));
 
       this._container
         .scope<BeforeDestroyEvent<Renderable>>(BeforeDestroyEvent)
-        .takeUntil(this.containerChange)
+        .pipe(takeUntil(this.containerChange))
         .subscribe(e => this._beforeDestroy.next(e));
 
       this._container.visibilityChanges
-        .takeUntil(this.containerChange)
+        .pipe(takeUntil(this.containerChange))
         .subscribe(e => this._visibilityChanges.next(e));
 
       this._container.sizeChanges
-        .takeUntil(this.containerChange)
+        .pipe(takeUntil(this.containerChange))
         .subscribe(e => this._sizeChanges.next(e));
 
       this._container
         .scope(CustomViewHookEvent)
-        .takeUntil(this.containerChange)
+        .pipe(takeUntil(this.containerChange))
         .subscribe(e => this._onCustomViewHook(e));
     }
   }

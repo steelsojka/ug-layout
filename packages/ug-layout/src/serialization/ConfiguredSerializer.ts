@@ -1,5 +1,5 @@
 import { ConfiguredItem } from '../ConfiguredItem';
-import { SerializerConfig, Serializer } from './Serializer';
+import { SerializerConfig } from './Serializer';
 import { SerializerContainer, SerializerConstructor, BaseSerializer } from './SerializerContainer';
 
 export class ConfiguredSerializer<T extends SerializerConstructor<BaseSerializer>, C extends SerializerConfig> extends ConfiguredItem<T, C> {

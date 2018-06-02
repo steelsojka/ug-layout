@@ -1,10 +1,7 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
-import { Inject, Injector } from '../../di';
 import { TabControl } from './TabControl';
-import { ContainerRef } from '../../common';
-import { StackItemContainer } from '../StackItemContainer';
 import { StackTab } from '../StackTab';
 import { TabCloseEvent } from '../TabCloseEvent';
 
@@ -18,7 +15,7 @@ export class CloseTabControl extends TabControl {
   render(): VNode {
     return h('div.ug-layout__stack-tab-close.ug-icon-close', {
       attrs: {
-        title: 'Close tab'  
+        title: 'Close tab'
       },
       on: {
         click: e => this._onClick(e)
@@ -32,7 +29,7 @@ export class CloseTabControl extends TabControl {
 
   private _onClick(e: MouseEvent): void {
     const tab = this.container.tab as StackTab;
-    
+
     e.stopPropagation();
     tab.emitUp(new TabCloseEvent(tab));
   }

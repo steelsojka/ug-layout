@@ -1,7 +1,5 @@
-import { Injector } from '../di';
 import { ConfiguredRenderable } from './ConfiguredRenderable';
 import { Renderable } from './Renderable';
-import { Renderer } from './Renderer';
 import test from 'ava';
 
 class MyClass extends Renderable {
@@ -32,6 +30,6 @@ test('should determine if the renderable is in list', t => {
   t.true(ConfiguredRenderable.inList([ new MyClass() ], configured));
   t.true(ConfiguredRenderable.inList([ configured ], new MyClass()));
   t.true(ConfiguredRenderable.inList([ configured ], MyClass));
-  
+
   t.false(ConfiguredRenderable.inList([ {} as any ], MyClass));
 });

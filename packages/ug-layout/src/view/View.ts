@@ -1,14 +1,15 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 import { CompleteOn } from 'rx-decorators/completeOn';
+import { Subject, Observable, BehaviorSubject } from 'rxjs';
+import { distinctUntilChanged, takeUntil } from 'rxjs/operators';
 
-import { Type, ProviderArg, Inject, Injector, Optional, forwardRef, PostConstruct } from '../di';
-import { Renderer, Renderable, ConfiguredRenderable } from '../dom';
-import { ContainerRef, ConfigurationRef, ElementRef, DocumentRef, ContextType } from '../common';
-import { Stack } from '../stack';
+import { Inject, PostConstruct } from '../di';
+import { Renderable, ConfiguredRenderable } from '../dom';
+import { ContainerRef, ConfigurationRef, DocumentRef, ContextType } from '../common';
 import { ViewContainer } from './ViewContainer';
 import { ViewConfig, ResolverStrategy, CacheStrategy } from './common';
-import { Subject, Observable, BeforeDestroyEvent, BehaviorSubject } from '../events';
+import { BeforeDestroyEvent } from '../events';
 import { MakeVisibleCommand, MinimizeCommand } from '../commands';
 import { ViewManager } from './ViewManager';
 import { ViewFactory } from './ViewFactory';
@@ -44,7 +45,8 @@ export class View extends Renderable {
    * Notifies when the visibility of this view changes.
    * @type {Observable<boolean>}
    */
-  visibilityChanges: Observable<boolean> = this._visibilityChanges.asObservable().distinctUntilChanged();
+  visibilityChanges: Observable<boolean> = this._visibilityChanges.asObservable().pipe(
+    distinctUntilChanged());
   /**
    * Notifies when the dimensions of this view changes.
    * @type {Observable<{ width: number, height: number }>}
@@ -122,7 +124,7 @@ export class View extends Renderable {
     super.initialize();
 
     this._renderer.rendered
-      .takeUntil(this.destroyed)
+      .pipe(takeUntil(this.destroyed))
       .subscribe(this._postRender.bind(this));
   }
 

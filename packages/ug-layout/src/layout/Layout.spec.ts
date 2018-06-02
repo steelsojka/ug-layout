@@ -1,12 +1,12 @@
 import test from 'ava';
 import { stub, spy } from 'sinon';
-import { Subject } from 'rxjs/Subject'
+import { Subject } from 'rxjs'
 
 import { Injector } from '../di';
 import { Layout } from './Layout';
-import { ConfigurationRef, ContainerRef } from '../common';
+import { ConfigurationRef, ContainerRef, ContextType } from '../common';
 import { DragHost } from '../DragHost';
-import { Renderable, RenderableInjector, ConfiguredRenderable, Renderer } from '../dom';
+import { Renderable } from '../dom';
 import { createRenderableInjector, getRenderableClass } from '../../test/unit/helpers';
 
 let stubs;
@@ -43,7 +43,7 @@ test('throw an error if missing config', t => {
 
   injector.registerProvider({ provide: ConfigurationRef, useValue: null });
   t.throws(() => getLayout(injector).initialize());
-  
+
   injector.registerProvider({ provide: ConfigurationRef, useValue: {} });
   t.throws(() => getLayout(injector).initialize());
 });
@@ -57,9 +57,9 @@ test('create configured content item', t => {
 
   stub(layout, 'createChild').returns(stubs.contentItem);
   stub(Renderable.prototype, 'initialize');
-  
+
   layout.initialize();
-  
+
   t.is((<any>layout)._contentItems[0], stubs.contentItem);
 });
 
@@ -85,16 +85,16 @@ test('rendering', t => {
     _container: {
       height: 25,
       width: 50
-    }  
+    }
   });
-  
+
   const vnode = layout.render();
-  
+
   t.is((<any>vnode.children).length, 1);
   t.is(vnode.sel, 'div.ug-layout__layout');
   t.deepEqual((<any>vnode.data).style, {
     height: '25px',
-    width: '50px'    
+    width: '50px'
   });
 });
 
@@ -102,7 +102,7 @@ test('destroying', t => {
   const layout = getLayout();
   const superStub = stub(Renderable.prototype, 'destroy');
 
-  layout.destroy();
+  layout.destroy({ type: ContextType.NONE });
 
   t.true(stubs.dragHost.destroy.called);
   t.true(superStub.called);
@@ -114,7 +114,7 @@ test('getting item visible areas', t => {
     { isVisible: () => true, getArea: () => ({ x: 2, y: 5 }) },
     { isVisible: () => false, getArea: () => ({ x: 12, y: 15 }) }
   ];
-  
+
   layout.getDescendants = () => desc as any;
   const results = layout.getItemVisibleAreas();
 
@@ -135,7 +135,7 @@ test('when dragging starts', t => {
       offsetX: 5,
       offsetY: 10
     },
-    _getDropTargets: () => dropTargets  
+    _getDropTargets: () => dropTargets
   }) as Layout;
 
   const dragContainer = {
@@ -152,7 +152,7 @@ test('when dragging starts', t => {
   t.is(stubs.dragHost.bounds.y, 10);
   t.is(stubs.dragHost.bounds.x2, 85);
   t.is(stubs.dragHost.bounds.y2, 135);
-  
+
   t.true(stubs.dragHost.setDropAreas.called);
   t.is(stubs.dragHost.setDropAreas.firstCall.args[0], dropTargets);
 });
@@ -184,17 +184,17 @@ test('getting drop targets', t => {
   containsStub.returns(true);
   results = run();
   t.is(results.length, 0);
-  
+
   containsStub.returns(false);
   isContainedWithinStub.returns(true);
   results = run();
   t.is(results.length, 0);
-  
+
   isContainedWithinStub.returns(false);
   isDroppable = false;
   results = run();
   t.is(results.length, 0);
-  
+
   isDroppable = true;
   isDropTargetStub.returns(false);
   results = run();

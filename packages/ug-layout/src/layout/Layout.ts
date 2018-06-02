@@ -1,10 +1,9 @@
 import h from 'snabbdom/h';
 import { VNode } from 'snabbdom/vnode';
 
-import { Injector, Inject, Optional, Injectable, PostConstruct } from '../di';
+import { Inject, Injectable, PostConstruct } from '../di';
 import {
   Renderable,
-  RenderableInjector,
   ConfiguredRenderable,
   RenderableArea,
   RenderableConfig,

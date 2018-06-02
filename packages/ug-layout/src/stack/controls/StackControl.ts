@@ -1,9 +1,9 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
 
-import { Type, Injector, PostConstruct, Inject } from '../../di';
+import { PostConstruct, Inject } from '../../di';
 import { Renderable, ConfiguredRenderable, RenderableConfig } from '../../dom';
-import { RenderableArg, ConfigurationRef } from '../../common';
+import { ConfigurationRef } from '../../common';
 import { defaults } from '../../utils';
 import { StackHeader } from '../StackHeader';
 

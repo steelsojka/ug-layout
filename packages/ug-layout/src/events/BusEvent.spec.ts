@@ -1,6 +1,6 @@
 import test from 'ava';
 import { spy } from 'sinon';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 
 import { BusEvent } from './BusEvent';
 

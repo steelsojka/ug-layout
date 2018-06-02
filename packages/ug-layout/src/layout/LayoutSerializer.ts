@@ -1,5 +1,4 @@
 import { ConfiguredRenderable, SerializedRenderable } from '../dom';
-import { Inject } from '../di';
 import { SerializerContainer, Serializer, Serialized } from '../serialization';
 import { Layout } from './Layout';
 
@@ -16,8 +15,8 @@ export interface SerializedLayout extends SerializedRenderable {
 export class LayoutSerializer extends Serializer<Layout, SerializedLayout> {
   /**
    * Serializes a Layout renderable.
-   * @param {Layout} node 
-   * @returns {SerializedLayout} 
+   * @param {Layout} node
+   * @returns {SerializedLayout}
    */
   serialize(node: Layout): SerializedLayout {
     return {
@@ -29,8 +28,8 @@ export class LayoutSerializer extends Serializer<Layout, SerializedLayout> {
 
   /**
    * Deserializes a serialized layout node.
-   * @param {SerializedLayout} node 
-   * @returns {ConfiguredRenderable<Layout>} 
+   * @param {SerializedLayout} node
+   * @returns {ConfiguredRenderable<Layout>}
    */
   deserialize(node: SerializedLayout): ConfiguredRenderable<Layout> {
     return Layout.configure({
@@ -42,7 +41,7 @@ export class LayoutSerializer extends Serializer<Layout, SerializedLayout> {
   /**
    * Invoked when the serializer is registered.
    * @static
-   * @param {SerializerContainer} container 
+   * @param {SerializerContainer} container
    */
   static register(container: SerializerContainer): void {
     container.registerClass('Layout', Layout);

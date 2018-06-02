@@ -1,4 +1,4 @@
-import { forwardRef, ForwardRef } from '../di';
+import { ForwardRef } from '../di';
 import { Cancellable } from '../events';
 import { ViewHookExecutor } from './hooks';
 import { ViewContainer } from './ViewContainer';
@@ -30,7 +30,7 @@ export interface CustomViewHookEventArgs<T> {
  * @export
  * @class CustomViewHookEvent
  * @extends {Cancellable<null>}
- * @template T 
+ * @template T
  */
 export class CustomViewHookEvent<T> extends Cancellable<null> {
   constructor(private _config: CustomViewHookEventArgs<T>) {

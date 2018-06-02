@@ -1,6 +1,5 @@
 import { VNode } from 'snabbdom/vnode';
-import { PartialObserver } from 'rxjs/Observer';
-import { Subscription } from 'rxjs/Subscription';
+import { PartialObserver, Subscription, Observable, Subject } from 'rxjs';
 import { CompleteOn } from 'rx-decorators/completeOn';
 
 import {
@@ -11,8 +10,6 @@ import {
   Inject
 } from '../di';
 import {
-  Observable,
-  Subject,
   EventBus,
   BusEvent
 } from '../events';
