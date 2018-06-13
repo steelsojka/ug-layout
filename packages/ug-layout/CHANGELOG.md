@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.2.1"></a>
+## [4.2.1](https://github.com/steelsojka/ug-layout/compare/v4.2.0...v4.2.1) (2018-06-13)
+
+
+### Bug Fixes
+
+* **angular:** complete outputs on destroy ([9f8a022](https://github.com/steelsojka/ug-layout/commit/9f8a022))
+* **events:** fix Cancellable error handling ([4980f4c](https://github.com/steelsojka/ug-layout/commit/4980f4c))
+
+
+
 <a name="4.2.0"></a>
 # [4.2.0](https://github.com/steelsojka/ug-layout/compare/v4.0.2...v4.2.0) (2018-04-11)
 
