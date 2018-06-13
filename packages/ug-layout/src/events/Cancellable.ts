@@ -17,31 +17,35 @@ export class Cancellable<T> extends BusEvent<T> {
    * @see {@link BusEvent#wait}
    */
   cancel(): void {
-    throw new CancelAction();  
+    throw new CancelAction();
   }
 
   /**
    * Creates an observable that waits for the results of the event.
-   * @returns {Observable<this>} 
+   * @returns {Observable<this>}
    * @example
    * const event = new Cancellable(null);
-   * 
+   *
    * bus.emit(event);
-   * 
+   *
    * event.results().subscribe(() => {
    *   // The event was successful and NOT cancelled.
    * });
    */
   results(): Observable<this> {
     return Observable.create(async (subscriber: Subscriber<this>) => {
+      let error: Error | null = null;
+
       try {
         await this.done;
-        subscriber.next(this);
       } catch (e) {
-        if (!(e instanceof CancelAction)) {
-          subscriber.error(e);
-        }
-      } finally {
+        error = e;
+      }
+
+      if (error && !(error instanceof CancelAction)) {
+        subscriber.error(error);
+      } else {
+        subscriber.next(this);
         subscriber.complete();
       }
     });
