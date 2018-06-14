@@ -42,8 +42,12 @@ export class Cancellable<T> extends BusEvent<T> {
         error = e;
       }
 
-      if (error && !(error instanceof CancelAction)) {
-        subscriber.error(error);
+      if (error) {
+        if (!(error instanceof CancelAction)) {
+          subscriber.error(error);
+        } else {
+          subscriber.complete();
+        }
       } else {
         subscriber.next(this);
         subscriber.complete();
