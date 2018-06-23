@@ -150,13 +150,16 @@ export class AngularViewFactory extends ViewFactory {
       injector
     );
 
-    this._setupInputs<T>(componentFactory, componentRef);
+    const unbindInputs = this._setupInputs<T>(componentFactory, componentRef);
 
     componentRef.instance[COMPONENT_REF_KEY] = componentRef;
     viewContainer.mount(componentRef.location.nativeElement);
 
     viewContainer.destroyed
-      .subscribe(() => this._onComponentDestroy(componentRef, componentFactory));
+      .subscribe(() => {
+        unbindInputs();
+        this._onComponentDestroy(componentRef, componentFactory);
+      });
 
     viewContainer.attached
       .subscribe(() => this._onAttachChange(true, componentRef, viewContainer));
@@ -208,7 +211,9 @@ export class AngularViewFactory extends ViewFactory {
     }
   }
 
-  private _setupInputs<T>(factory: ComponentFactory<T>, componentRef: ComponentRef<T>): void {
+  private _setupInputs<T>(factory: ComponentFactory<T>, componentRef: ComponentRef<T>): () => void {
+    let isBound: boolean = true;
+
     for (const input of factory.inputs) {
       const descriptor = Object.getOwnPropertyDescriptor(componentRef.instance, input.propName)
         // Account for getter/setters
@@ -231,11 +236,15 @@ export class AngularViewFactory extends ViewFactory {
               set.call(this, value);
             }
 
-            componentRef.changeDetectorRef.detectChanges();
+            if (isBound) {
+              componentRef.changeDetectorRef.detectChanges();
+            }
           }
         });
       }
     }
+
+    return () => isBound = false;
   }
 
   private _onDestroyNotify<T>(componentRef: ComponentRef<T>, viewContainer: ViewContainer<T>): void {
