@@ -1,4 +1,4 @@
-import { Observer } from '../events';
+import { Observer } from 'rxjs';
 
 export * from './Deferred';
 export * from './ReversibleMap';
@@ -45,9 +45,9 @@ export function get<T>(obj: any, path: string, defaultValue?: T, comparer: (v) =
 
   while (pathParts.length) {
     if (!isObject(result)) {
-      return defaultValue as T; 
+      return defaultValue as T;
     }
-    
+
     result = result[pathParts.shift() as any];
   }
 
@@ -77,8 +77,8 @@ export function isPromise<T>(value: any): value is Promise<T> {
 }
 
 export function partition<T>(list: T[], predicate: (v: T) => boolean): [T[], T[]] {
-  const pass: T[] = [];  
-  const fail: T[] = [];  
+  const pass: T[] = [];
+  const fail: T[] = [];
 
   for (const item of list) {
     if (predicate(item)) {
@@ -95,7 +95,7 @@ export function defaults<T>(dest: T, src: T|object|null): T {
   if (!dest) {
     return (src || {}) as T;
   }
-  
+
   if (src) {
     for (const key of Object.keys(src)) {
       if (dest[key] === undefined) {
@@ -113,6 +113,6 @@ export function pluck<T>(key: string, items: any[]): T[] {
 
 export const uid: () => number = (() => {
   let uid = 0;
-  
+
   return () => uid++;
 })();

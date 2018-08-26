@@ -8,7 +8,8 @@
     "importHelpers": true,
     "skipLibCheck": true
   },
-  "include": [
-    "packages/**/*"
+  "references": [
+    { "path": "./packages/ug-layout" },
+    { "path": "./packages/ug-layout-angular" }
   ]
 }

@@ -1,10 +1,11 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
+import { takeUntil } from 'rxjs/operators';
 
 import { Inject, PostConstruct } from '../di';
-import { 
-  Renderable, 
-  ConfiguredRenderable, 
+import {
+  Renderable,
+  ConfiguredRenderable,
   RenderableArea,
   AddChildArgs,
   RenderableConfig
@@ -18,11 +19,11 @@ import { TabSelectionEvent } from './TabSelectionEvent';
 import { TabDragEvent } from './TabDragEvent';
 import { get, partition, propEq } from '../utils';
 import { STACK_TAB_CLASS } from './common';
-import { 
-  ConfigurationRef, 
-  ContainerRef, 
-  DropTarget, 
-  DropArea, 
+import {
+  ConfigurationRef,
+  ContainerRef,
+  DropTarget,
+  DropArea,
   HighlightCoordinateArgs,
   DragEvent,
   RenderableArg
@@ -90,13 +91,13 @@ export class StackHeader extends Renderable implements DropTarget {
     }, this._config);
 
     super.initialize();
-    
+
     this._dragHost.start
-      .takeUntil(this.destroyed)
+      .pipe(takeUntil(this.destroyed))
       .subscribe(this._onDragHostStart.bind(this));
-      
+
     this._dragHost.dropped
-      .takeUntil(this.destroyed)
+      .pipe(takeUntil(this.destroyed))
       .subscribe(this._onDragHostDropped.bind(this));
   }
 
@@ -135,7 +136,7 @@ export class StackHeader extends Renderable implements DropTarget {
         height: `${this.height}px`,
         width: `${this.width}px`
       }
-    }, 
+    },
       [
         h('div.ug-layout__stack-controls', preTabControls.map(c => c.render())),
         h('div.ug-layout__tab-container', this._contentItems.map(tab => tab.render())),
@@ -157,18 +158,18 @@ export class StackHeader extends Renderable implements DropTarget {
 
   handleDrop(item: Renderable, dropArea: DropArea, e: DragEvent<Renderable>): void {
     const index = this._getIndexFromArea(e.pageX, e.pageY, dropArea.area) + 1;
-    
+
     if (item instanceof StackItemContainer && this._container.getIndexOf(item) === -1) {
       this._container.addChild(item, { index });
       this._container.setActiveIndex(index);
-    } 
+    }
 
     this.onDropHighlightExit();
   }
 
   getHighlightCoordinates(args: HighlightCoordinateArgs): RenderableArea {
     let { pageX, pageY, dragArea, dropArea: { area: { x, y, y2 } } } = args;
-    
+
     const highlightArea = new RenderableArea(x, dragArea.width + x, y, y2);
     let leftMostTabIndex = this._getIndexFromArea(pageX, pageY, args.dropArea.area);
     let leftMostTabArea = this._tabAreas[leftMostTabIndex];
@@ -183,7 +184,7 @@ export class StackHeader extends Renderable implements DropTarget {
         tab.element.style.transform = index > leftMostTabIndex ? `translateX(${dragArea.width}px)` : 'translateX(0px)';
       }
     }
-    
+
     return highlightArea;
   }
 
@@ -199,10 +200,10 @@ export class StackHeader extends Renderable implements DropTarget {
     if (this.isHorizontal) {
       return this._contentItems.slice(0, this.getIndexOf(tab)).reduce((result, tab) => result + tab.width, this.offsetX);
     }
-    
+
     return this.offsetX;
   }
-  
+
   getOffsetYForTab(tab: StackTab): number {
     if (!this.isHorizontal) {
       return this._contentItems.slice(0, this.getIndexOf(tab)).reduce((result, tab) => result + tab.height, this.offsetY);
@@ -214,14 +215,14 @@ export class StackHeader extends Renderable implements DropTarget {
   private _onDragHostStart(): void {
     this._tabAreas = this._contentItems.map(tab => tab.getArea());
   }
-  
+
   private _onDragHostDropped(): void {
     this._tabAreas = [];
   }
 
   private _getIndexFromArea(pageX: number, pageY: number, area: RenderableArea): number {
     let { x } = area;
-    
+
     const deltaX = pageX - x;
 
     let result = -1;

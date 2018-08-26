@@ -1,5 +1,6 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
+import { filter, takeUntil, first } from 'rxjs/operators';
 
 import { Inject, PostConstruct } from '../di'
 import { TabSelectionEvent } from './TabSelectionEvent';
@@ -140,23 +141,23 @@ export class StackTab extends Renderable {
     super.initialize();
 
     this._draggable.drag
-      .filter(Draggable.isDraggingEvent)
+      .pipe(filter(Draggable.isDraggingEvent))
       .subscribe(this._onDragMove.bind(this));
 
     this._draggable.drag
-      .filter(Draggable.isDragStopEvent)
+      .pipe(filter(Draggable.isDragStopEvent))
       .subscribe(this._onDragStop.bind(this));
 
     this._draggable.drag
-      .filter(Draggable.isDragStartEvent)
+      .pipe(filter(Draggable.isDragStartEvent))
       .subscribe(this._onDragStart.bind(this));
 
     this._dragHost.start
-      .takeUntil(this.destroyed)
+      .pipe(takeUntil(this.destroyed))
       .subscribe(this._onDragHostStart.bind(this));
 
     this._dragHost.dropped
-      .takeUntil(this.destroyed)
+      .pipe(takeUntil(this.destroyed))
       .subscribe(this._onDragHostDropped.bind(this));
   }
 
@@ -255,16 +256,16 @@ export class StackTab extends Renderable {
         dragArea: this.getArea()
       });
 
-      this._dragHost.fail
-        .takeUntil(this._dragHost.dropped)
+      this._dragHost.fail.pipe(
+        takeUntil(this._dragHost.dropped)
+      )
         .subscribe(() => {
           if (originStack) {
             originStack.addChild(item, { index: originIndex });
           }
         });
 
-      this._dragHost.dropped
-        .first()
+      this._dragHost.dropped.pipe(first())
         .subscribe(() => this.destroy({ type: ContextType.NONE }));
     }
   }

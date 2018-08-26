@@ -1,4 +1,5 @@
-import { Subject, Observable, Observer } from './events';
+import { Subject, Observable, Observer } from 'rxjs';
+import { filter, distinctUntilChanged } from 'rxjs/operators';
 
 export const LOCK_DRAGGING = 'dragging';
 export const LOCK_RESIZING = 'resizing';
@@ -30,15 +31,16 @@ export class LockState {
   }
 
   scope(name: string): Observable<boolean> {
-    return Observable.create((observer: Observer<boolean>) => {
+    return new Observable((observer: Observer<boolean>) => {
       if (this._map.has(name)) {
         observer.next(this._map.get(name) as boolean);
       }
 
-      return this.changes
-        .filter(e => e.name === name)
+      return this.changes.pipe(
+        filter(e => e.name === name)
+      )
         .subscribe(e => observer.next(e.value));
     })
-      .distinctUntilChanged();
+      .pipe(distinctUntilChanged());
   }
 }
