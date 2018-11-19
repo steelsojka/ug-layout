@@ -302,8 +302,11 @@ export class ViewContainer<T> {
     const cacheStrategy = this.caching;
 
     switch (cacheStrategy) {
-      case CacheStrategy.RELOAD:
+      case CacheStrategy.RESET_ONLY:
         return context === ContextType.RESET;
+      case CacheStrategy.RELOAD:
+        return context === ContextType.RESET
+          || context === ContextType.NONE;
       case CacheStrategy.PERSISTENT:
         return true;
       default:
