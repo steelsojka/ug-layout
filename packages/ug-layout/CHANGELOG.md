@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.2.4"></a>
+## [4.2.4](https://github.com/steelsojka/ug-layout/compare/v4.2.2...v4.2.4) (2018-11-19)
+
+
+### Bug Fixes
+
+* **AngularViewFactoryt:** unbind inputs on destroy ([c67d379](https://github.com/steelsojka/ug-layout/commit/c67d379))
+* **view:** proxy correct view container property ([9ff202a](https://github.com/steelsojka/ug-layout/commit/9ff202a))
+* **ViewContainer:** only cache RELOAD on RESET context ([ff4050a](https://github.com/steelsojka/ug-layout/commit/ff4050a))
+
+
+
 <a name="4.2.3"></a>
 ## [4.2.3](https://github.com/steelsojka/ug-layout/compare/v4.2.2...v4.2.3) (2018-09-10)
 
