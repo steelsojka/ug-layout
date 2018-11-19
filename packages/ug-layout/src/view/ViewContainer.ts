@@ -301,13 +301,14 @@ export class ViewContainer<T> {
   isCacheable(context: ContextType = ContextType.NONE): boolean {
     const cacheStrategy = this.caching;
 
-    if ((cacheStrategy === CacheStrategy.RELOAD
-        && (context === ContextType.NONE) || context === ContextType.RESET)
-      || cacheStrategy === CacheStrategy.PERSISTENT) {
-      return true;
+    switch (cacheStrategy) {
+      case CacheStrategy.RELOAD:
+        return context === ContextType.RESET;
+      case CacheStrategy.PERSISTENT:
+        return true;
+      default:
+        return false;
     }
-
-    return false;
   }
 
 
