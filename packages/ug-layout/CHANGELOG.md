@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.2.5"></a>
+## [4.2.5](https://github.com/steelsojka/ug-layout/compare/v4.2.4...v4.2.5) (2018-11-19)
+
+
+### Bug Fixes
+
+* **ViewContainer:** add new cache strategy for RELOAD only ([64e031f](https://github.com/steelsojka/ug-layout/commit/64e031f))
+
+
+
 <a name="4.2.4"></a>
 ## [4.2.4](https://github.com/steelsojka/ug-layout/compare/v4.2.2...v4.2.4) (2018-11-19)
 
