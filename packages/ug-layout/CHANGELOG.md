@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.2.6"></a>
+## [4.2.6](https://github.com/steelsojka/ug-layout/compare/v4.2.5...v4.2.6) (2019-02-04)
+
+
+### Bug Fixes
+
+* **ViewFactory:** fix uneeded first operator ([583fcc8](https://github.com/steelsojka/ug-layout/commit/583fcc8))
+
+
+
 <a name="4.2.5"></a>
 ## [4.2.5](https://github.com/steelsojka/ug-layout/compare/v4.2.4...v4.2.5) (2018-11-19)
 
