@@ -28,7 +28,7 @@ export interface ConfigureableType<T extends Renderable> extends Type<T> {
   configure?: (config: object) => ConfiguredRenderable<T>;
 }
 
-export interface DropArea { 
+export interface DropArea {
   item: RenderableDropTarget;
   area: RenderableArea;
   dragArea: RenderableArea;
@@ -37,7 +37,7 @@ export interface DropArea {
 export enum DragStatus {
   START,
   STOP,
-  DRAGGING  
+  DRAGGING
 }
 
 export interface DragOptions<T> {
@@ -78,7 +78,7 @@ export interface DragEvent<T> {
    * The current page y offset.
    * @type {number}
    */
-  pageY: number;  
+  pageY: number;
   /**
    * The drag status.
    * @type {DragStatus}
@@ -101,15 +101,15 @@ export interface HighlightCoordinateArgs {
 export interface DropTarget {
   /**
    * Handles an item being dropped on this Renderable.
-   * @param {Renderable} item 
-   * @param {DropArea} dropArea 
-   * @param {DragEvent<Renderable>} event 
+   * @param {Renderable} item
+   * @param {DropArea} dropArea
+   * @param {DragEvent<Renderable>} event
    */
   handleDrop(item: Renderable, dropArea: DropArea, event: DragEvent<Renderable>): void;
   /**
    * Calculates the highlight coordinates for the drop target.
-   * @param {HighlightCoordinateArgs} args 
-   * @returns {RenderableArea} 
+   * @param {HighlightCoordinateArgs} args
+   * @returns {RenderableArea}
    */
   getHighlightCoordinates(args: HighlightCoordinateArgs): RenderableArea;
   /**
@@ -118,7 +118,7 @@ export interface DropTarget {
   onDropHighlightExit(): void;
 }
 
-export interface RenderableDropTarget extends Renderable, DropTarget {} 
+export interface RenderableDropTarget extends Renderable, DropTarget {}
 
 /**
  * Injection token for the Document API.
@@ -153,3 +153,7 @@ export const ElementRef = new Token<HTMLElement>('ElementRef');
  * @type {Token}
  */
 export const PatchRef = new Token<Function>('PatchRef');
+/**
+ * Injection token for injecting the global window.
+ */
+export const WindowRef = new Token<typeof Window>('Window');

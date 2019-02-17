@@ -3,7 +3,7 @@ import h from 'snabbdom/h';
 import { filter, takeUntil } from 'rxjs/operators';
 
 import { Inject, PostConstruct } from '../di'
-import { Renderable, AddChildArgs, ConfiguredRenderable, RenderableArea, RenderableConfig, Transferable } from '../dom';
+import { Renderable, AddChildArgs, ConfiguredRenderable, RenderableArea, RenderableConfig, Transferable, RenderableDestroyContext } from '../dom';
 import { BeforeDestroyEvent } from '../events';
 import { MakeVisibleCommand } from '../commands';
 import {
@@ -22,6 +22,7 @@ import { XYContainer } from '../XYContainer';
 import { StackRegion } from './common';
 import { get } from '../utils'
 import { TabControl, CloseTabControl } from './tabControls';
+import { DetachHandler } from './DetachHandler';
 
 export interface StackItemContainerConfig extends RenderableConfig {
   use: RenderableArg<Renderable>;
@@ -42,6 +43,7 @@ export interface StackItemContainerConfig extends RenderableConfig {
  */
 export class StackItemContainer extends Renderable implements DropTarget, Transferable {
   private _controls: TabControl[] = [];
+  private _detachHandler: DetachHandler;
 
   @Inject(ConfigurationRef) protected _config: StackItemContainerConfig;
   @Inject(ContainerRef) protected _container: Stack;
@@ -114,6 +116,10 @@ export class StackItemContainer extends Renderable implements DropTarget, Transf
     return this._config ? this._config.persist !== false : true;
   }
 
+  get isDetachable(): boolean {
+    return !this._detachHandler.isDetached;
+  }
+
   protected get _item(): Renderable {
     return this._contentItems[0];
   }
@@ -121,6 +127,8 @@ export class StackItemContainer extends Renderable implements DropTarget, Transf
   @PostConstruct()
   initialize(): void {
     super.initialize();
+
+    this._detachHandler = this._injector.resolveAndInstantiate(DetachHandler);
 
     this._contentItems = [
       this.createChild(this._config.use)
@@ -137,19 +145,32 @@ export class StackItemContainer extends Renderable implements DropTarget, Transf
     }
 
     this.subscribe(MakeVisibleCommand, this.makeVisible.bind(this));
+    this._detachHandler.onClose.subscribe(() => this._renderer.render());
   }
 
   render(): VNode {
-    return h('div.ug-layout__stack-item-container', {
-      key: this._uid,
-      props: {
-        hidden: !this.isActive
-      },
-      style: {
-        height: `${this.height}px`,
-        width: `${this.width}px`
-      }
-    }, [ this._item.render() ]);
+    if (this._detachHandler.isDetached) {
+      this._detachHandler.render(h('div.ug-layout__stack-item-container', {
+        key: this._uid,
+        style: {
+          height: `${this._detachHandler.height}`,
+          width: `${this._detachHandler.width}`
+        }
+      }, [ this._item.render() ]));
+
+      return h('div.ug-layout__detached');
+    } else {
+      return h('div.ug-layout__stack-item-container', {
+        key: this._uid,
+        props: {
+          hidden: !this.isActive
+        },
+        style: {
+          height: `${this.height}px`,
+          width: `${this.width}px`
+        }
+      }, [ this._item.render() ]);
+    }
   }
 
   isVisible(): boolean {
@@ -158,6 +179,7 @@ export class StackItemContainer extends Renderable implements DropTarget, Transf
 
   makeVisible(): void {
     this._container.setActiveContainer(this);
+    this._detachHandler.focus();
   }
 
   getChildren(): Renderable[] {
@@ -240,8 +262,31 @@ export class StackItemContainer extends Renderable implements DropTarget, Transf
       .subscribe(this._onTabClose.bind(this));
   }
 
+  detach(): void {
+    this._detachHandler.detach();
+    this._renderer.render();
+  }
+
+  destroy(context: RenderableDestroyContext): void {
+    super.destroy(context);
+
+    this._detachHandler.destroy();
+  }
+
+  getWidthForChild(): number {
+    return this._detachHandler.isDetached
+      ? this._detachHandler.width
+      : super.getWidthForChild();
+  }
+
+  getHeightForChild(): number {
+    return this._detachHandler.isDetached
+      ? this._detachHandler.height
+      : super.getHeightForChild();
+  }
+
   private _getRegionFromArea(pageX: number, pageY: number, area: RenderableArea): StackRegion|null {
-    const { x, x2, y, y2 } = area;
+    const { x, y } = area;
     const deltaX = pageX - x;
     const deltaY = pageY - y;
 

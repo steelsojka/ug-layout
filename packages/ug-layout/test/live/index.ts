@@ -5,12 +5,12 @@ import '../../src/styles/core.css';
 import '../../src/styles/theme-gl.css';
 import './index.css';
 
-import { 
-  RootLayout, 
-  Column, 
-  Layout, 
-  View, 
-  Stack, 
+import {
+  RootLayout,
+  Column,
+  Layout,
+  View,
+  Stack,
   Inject,
   ViewContainer,
   ElementRef,
@@ -21,14 +21,15 @@ import {
   ConfiguredRenderable,
   ResolverStrategy,
   BeforeDestroyEvent,
-  ViewConfig
+  ViewConfig,
+  DetachStackControl
 } from '../../src';
 
 const colors = [ 'red', 'blue', 'white', 'cyan', 'yellow' ];
 
 class MyView extends View {
   initialize(): void {
-    super.initialize();  
+    super.initialize();
 
     const token = this.token;
 
@@ -55,7 +56,7 @@ class OtherComponent {
 })
 class TestView {
   private _color: string = colors.shift() as string;
-  
+
   constructor(
     @Inject(ElementRef) private element: HTMLElement
   ) {
@@ -82,7 +83,7 @@ window.addEventListener('resize', () => {
     x: 0,
     y: 0
   });
-  
+
   rootLayout.update();
 }, false);
 
@@ -91,29 +92,33 @@ const initialLayout = RootLayout.configure({
     child: Column.configure({
       children: [{
         use: View.configure({
-          cacheable: true,
           ref: 'View 1',
           useClass: TestView
         })
       }, {
         use: Layout.configure({
           child: Stack.configure({
+            controls: [
+              DetachStackControl.configure({
+                position: StackControlPosition.POST_TAB
+              })
+            ],
             children: [{
               closeable: true,
               title: 'View 2',
-              use: MyView.configure({ useClass: TestView, cacheable: false, ref: 'View 2' })  
+              use: MyView.configure({ useClass: TestView, ref: 'View 2' })
             }, {
               title: 'View 3',
-              use: View.configure({ useClass: TestView, ref: 'View 3' })  
+              use: View.configure({ useClass: TestView, ref: 'View 3' })
             }, {
               title: 'View 4',
-              use: View.configure({ useClass: TestView, ref: 'View 4' })  
+              use: View.configure({ useClass: TestView, ref: 'View 4' })
             }, {
               title: 'View 5',
-              use: View.configure({ useClass: TestView, ref: 'View 5' })  
+              use: View.configure({ useClass: TestView, ref: 'View 5' })
             }, {
               title: 'View 6',
-              use: View.configure({ lazy: true, useClass: TestView, ref: 'View 6' })  
+              use: View.configure({ lazy: true, useClass: TestView, ref: 'View 6' })
             }]
           })
         })
@@ -140,10 +145,10 @@ const initialLayout = RootLayout.configure({
 
 const rootLayout = window['rootLayout'] = RootLayout
   .create({
-    container: document.body  
+    container: document.body
   });
-  
-  
+
+
 const serializer = RootSerializer.fromRoot(rootLayout);
 
 serializer.registerClasses({

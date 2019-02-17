@@ -627,6 +627,14 @@ export abstract class Renderable<C extends RenderableConfig = RenderableConfig> 
     return false;
   }
 
+  getHeightForChild(): number {
+    return this.height;
+  }
+
+  getWidthForChild(): number {
+    return this.width;
+  }
+
   protected _matchesRenderable<T extends Renderable>(instance: T, query: Type<T>|Type<T>[]): boolean {
     const matches = q => instance instanceof q;
 

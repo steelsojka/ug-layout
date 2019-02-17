@@ -3,7 +3,7 @@ import { Inject } from '../di';
 import { GenericSerializer, SerializerContainer, Serializer, Serialized } from '../serialization';
 import { Stack } from './Stack';
 import { StackHeaderConfig } from './StackHeader';
-import { StackControl, MinimizeStackControl, CloseStackControl, StackControlSerializer } from './controls'
+import { StackControl, MinimizeStackControl, CloseStackControl, StackControlSerializer, DetachStackControl } from './controls'
 import { TabControl, CloseTabControl } from './tabControls'
 import { XYDirection } from '../common';
 import {
@@ -102,6 +102,7 @@ export class StackSerializer extends Serializer<Stack, SerializedStack> {
     container.registerSerializer(MinimizeStackControl, StackControlSerializer.configure<MinimizeStackControl>({ name: 'MinimizeStackControl', type: MinimizeStackControl }));
     container.registerSerializer(CloseStackControl, StackControlSerializer.configure<CloseStackControl>({ name: 'CloseStackControl', type: CloseStackControl }));
     container.registerSerializer(CloseTabControl, GenericSerializer.configure({ name: 'CloseTabControl', type: CloseTabControl }));
+    container.registerSerializer(DetachStackControl, GenericSerializer.configure<DetachStackControl>({ name: 'DetachControl', type: DetachStackControl }));
 
     Serializer.register.call(this, container);
   }

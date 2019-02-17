@@ -8,7 +8,7 @@ import DOMAttrs from 'snabbdom/modules/attributes';
 import { ProviderArg, forwardRef } from './di';
 import { Renderer, RenderableInjector } from './dom';
 import { ViewFactory, ViewManager, ViewLinker, ViewHookExecutor } from './view';
-import { DocumentRef, PatchRef } from './common';
+import { DocumentRef, PatchRef, WindowRef } from './common';
 import { LayoutManipulator } from './layout';
 import { LockState } from './LockState';
 import {
@@ -65,6 +65,7 @@ export class RootInjector extends RenderableInjector {
       { provide: VIEW_CONTAINER_CLASS, useValue: ViewContainer },
       { provide: PatchRef, useValue: patch },
       { provide: DocumentRef, useValue: document },
+      { provide: WindowRef, useValue: window },
       ...providers,
       { provide: RootInjector, useValue: forwardRef(() => this) }
     ]);

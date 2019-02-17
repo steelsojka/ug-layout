@@ -32,6 +32,7 @@ export interface RootLayoutCreationConfigArgs {
   plugins?: UgPlugin[];
   providers?: ProviderArg[];
   interceptors?: ProviderArg[];
+  detachUrl?: string;
 }
 
 export class RootLayout extends Renderable<RootLayoutConfig> {

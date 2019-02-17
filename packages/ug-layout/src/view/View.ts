@@ -60,11 +60,11 @@ export class View extends Renderable {
   viewContainerCreated: Observable<{ fromCache: boolean, container: ViewContainer<any> }> = this._viewContainerCreated.asObservable();
 
   get width(): number {
-    return this._container.width;
+    return this._container.getWidthForChild();
   }
 
   get height(): number {
-    return this._container.height;
+    return this._container.getHeightForChild();
   }
 
   /**
