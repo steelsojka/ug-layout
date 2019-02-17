@@ -2,6 +2,89 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.2.6"></a>
+## [4.2.6](https://github.com/steelsojka/ug-layout/compare/v4.2.5...v4.2.6) (2019-02-04)
+
+
+### Bug Fixes
+
+* **ViewFactory:** fix uneeded first operator ([583fcc8](https://github.com/steelsojka/ug-layout/commit/583fcc8))
+
+
+
+<a name="4.2.5"></a>
+## [4.2.5](https://github.com/steelsojka/ug-layout/compare/v4.2.4...v4.2.5) (2018-11-19)
+
+
+### Bug Fixes
+
+* **ViewContainer:** add new cache strategy for RELOAD only ([64e031f](https://github.com/steelsojka/ug-layout/commit/64e031f))
+
+
+
+<a name="4.2.4"></a>
+## [4.2.4](https://github.com/steelsojka/ug-layout/compare/v4.2.2...v4.2.4) (2018-11-19)
+
+
+### Bug Fixes
+
+* **AngularViewFactoryt:** unbind inputs on destroy ([c67d379](https://github.com/steelsojka/ug-layout/commit/c67d379))
+* **view:** proxy correct view container property ([9ff202a](https://github.com/steelsojka/ug-layout/commit/9ff202a))
+* **ViewContainer:** only cache RELOAD on RESET context ([ff4050a](https://github.com/steelsojka/ug-layout/commit/ff4050a))
+
+
+
+<a name="4.2.3"></a>
+## [4.2.3](https://github.com/steelsojka/ug-layout/compare/v4.2.2...v4.2.3) (2018-09-10)
+
+
+### Bug Fixes
+
+* **AngularViewFactoryt:** unbind inputs on destroy ([c67d379](https://github.com/steelsojka/ug-layout/commit/c67d379))
+* **view:** proxy correct view container property ([9ff202a](https://github.com/steelsojka/ug-layout/commit/9ff202a))
+
+
+
+<a name="4.2.2"></a>
+## [4.2.2](https://github.com/steelsojka/ug-layout/compare/v4.2.1...v4.2.2) (2018-06-14)
+
+
+### Bug Fixes
+
+* **events:** fix breaking cancellable events ([2c819c0](https://github.com/steelsojka/ug-layout/commit/2c819c0))
+
+
+
+<a name="4.2.1"></a>
+## [4.2.1](https://github.com/steelsojka/ug-layout/compare/v4.2.0...v4.2.1) (2018-06-13)
+
+
+### Bug Fixes
+
+* **angular:** complete outputs on destroy ([9f8a022](https://github.com/steelsojka/ug-layout/commit/9f8a022))
+* **events:** fix Cancellable error handling ([4980f4c](https://github.com/steelsojka/ug-layout/commit/4980f4c))
+
+
+
+<a name="4.2.0"></a>
+# [4.2.0](https://github.com/steelsojka/ug-layout/compare/v4.0.2...v4.2.0) (2018-04-11)
+
+
+### Bug Fixes
+
+* **testability:** clear pending when layout switches ([a6ff9f6](https://github.com/steelsojka/ug-layout/commit/a6ff9f6))
+* **testability:** don't use testability by default ([596644e](https://github.com/steelsojka/ug-layout/commit/596644e))
+* **Testability:** fix condition ([6eb2c18](https://github.com/steelsojka/ug-layout/commit/6eb2c18))
+* **ViewContainer:** revert attached subject change ([57fef8b](https://github.com/steelsojka/ug-layout/commit/57fef8b))
+
+
+### Features
+
+* **Renderable:** allow for querying a parent ([f95735f](https://github.com/steelsojka/ug-layout/commit/f95735f))
+* **ViewManager:** add register apis ([814fafa](https://github.com/steelsojka/ug-layout/commit/814fafa))
+
+
+
 <a name="4.0.2"></a>
 ## [4.0.2](https://github.com/steelsojka/ug-layout/compare/v4.0.1...v4.0.2) (2018-01-05)
 

@@ -73,7 +73,7 @@ export class ViewHookExecutor {
     for (const { prop, key } of metadata.containerProps) {
       Object.defineProperty(component, key, {
         configurable: true,
-        get: () => viewContainer[key]
+        get: () => viewContainer[prop]
       });
     }
 

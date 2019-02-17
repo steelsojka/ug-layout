@@ -15,6 +15,7 @@
     "taggable",
     "unallocated",
     "unminimize",
-    "vnode"
+    "vnode",
+    "Renderable"
   ]
 }

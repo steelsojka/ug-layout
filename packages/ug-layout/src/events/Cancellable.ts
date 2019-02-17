@@ -33,14 +33,22 @@ export class Cancellable<T> extends BusEvent<T> {
    */
   results(): Observable<this> {
     return Observable.create(async (subscriber: Subscriber<this>) => {
+      let error: Error | null = null;
+
       try {
         await this.done;
-        subscriber.next(this);
       } catch (e) {
-        if (!(e instanceof CancelAction)) {
-          subscriber.error(e);
+        error = e;
+      }
+
+      if (error) {
+        if (!(error instanceof CancelAction)) {
+          subscriber.error(error);
+        } else {
+          subscriber.complete();
         }
-      } finally {
+      } else {
+        subscriber.next(this);
         subscriber.complete();
       }
     });

@@ -5918,6 +5918,15 @@ ug-layout@^3.2.2:
     snabbdom "~0.6.3"
     tslib "^1.6.0"
 
+ug-layout@^3.2.2:
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/ug-layout/-/ug-layout-3.3.1.tgz#cb2813da0b1b9d1cb527cd14bdb74e65be6e7919"
+  dependencies:
+    mindi "^2.7.0"
+    rx-decorators "^1.2.1"
+    snabbdom "~0.6.3"
+    tslib "^1.6.0"
+
 uglify-js@^2.6, uglify-js@^2.8.27:
   version "2.8.29"
   resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-2.8.29.tgz#29c5733148057bb4e1f75df35b7a9cb72e6a59dd"

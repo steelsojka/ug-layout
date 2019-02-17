@@ -313,6 +313,20 @@ export abstract class Renderable<C extends RenderableConfig = RenderableConfig> 
   }
 
   /**
+   * Creates an Observable that emits when the parent matching renderable changes.
+   * @template T
+   * @param {Type<T>} Ctor
+   * @returns {(Observable<T | null>)}
+   */
+  queryParent<T extends Renderable>(Ctor: Type<T> | Type<T>[]): Observable<T | null> {
+    return this._renderer.rendered
+      .startWith(undefined)
+      .takeUntil(this.destroyed)
+      .map(() => this.getParent(Ctor))
+      .distinctUntilChanged();
+  }
+
+  /**
    * Gets this renderables parents or any parents that are
    * an instance of the passed in constructor.
    * @template T The constructor type.

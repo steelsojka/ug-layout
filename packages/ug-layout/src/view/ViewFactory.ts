@@ -1,4 +1,4 @@
-import { filter, first, delay } from 'rxjs/operators';
+import { filter, delay, take } from 'rxjs/operators';
 
 import {
   ViewComponentConfig,
@@ -78,8 +78,8 @@ export class ViewFactory {
     if (isLazy) {
       viewContainer.visibilityChanges
         .pipe(
-          first(() => viewContainer.isVisible(), false),
-          filter(Boolean),
+          filter(() => viewContainer.isVisible()),
+          take(1),
           delay(0))
         .subscribe(() => viewContainer.initialize());
     } else {

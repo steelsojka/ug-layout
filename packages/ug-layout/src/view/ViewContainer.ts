@@ -84,6 +84,9 @@ export class ViewContainer<T> {
   private _containerChange: Subject<View|null> = new Subject<View|null>();
 
   @CompleteOn('destroy')
+  private _containerSource: BehaviorSubject<View | null> = new BehaviorSubject(null);
+
+  @CompleteOn('destroy')
   private _visibilityChanges: BehaviorSubject<boolean> = new BehaviorSubject(true);
 
   @CompleteOn('destroy')
@@ -181,6 +184,11 @@ export class ViewContainer<T> {
    * @type {Observable<boolean>}
    */
   componentInitialized: Observable<boolean> = this._componentInitialized.asObservable();
+  /**
+   * Emits the current container upon subscription and any other changes.
+   * @type {(Observable<View | null>)}
+   */
+  container: Observable<View | null> = this._containerSource.asObservable();
 
   get hasComponent(): boolean {
     return Boolean(this._component);
@@ -262,6 +270,7 @@ export class ViewContainer<T> {
     this.visibilityChanges.subscribe(isVisible => this._executeHook('ugOnVisibilityChange', isVisible));
     this.beforeDestroy.subscribe(event => this._executeHook('ugOnBeforeDestroy', event));
     this.initialized.subscribe(v => this._isInitialized = v);
+    this.containerChange.subscribe(container => this._containerSource.next(container));
 
     // Reset the retry function when the component is no longer failed.
     this.status
@@ -299,13 +308,17 @@ export class ViewContainer<T> {
   isCacheable(context: ContextType = ContextType.NONE): boolean {
     const cacheStrategy = this.caching;
 
-    if ((cacheStrategy === CacheStrategy.RELOAD
-        && (context === ContextType.NONE) || context === ContextType.RESET)
-      || cacheStrategy === CacheStrategy.PERSISTENT) {
-      return true;
+    switch (cacheStrategy) {
+      case CacheStrategy.RESET_ONLY:
+        return context === ContextType.RESET;
+      case CacheStrategy.RELOAD:
+        return context === ContextType.RESET
+          || context === ContextType.NONE;
+      case CacheStrategy.PERSISTENT:
+        return true;
+      default:
+        return false;
     }
-
-    return false;
   }
 
 
@@ -421,6 +434,18 @@ export class ViewContainer<T> {
    */
   getParents<U extends Renderable>(Ctor: Type<U>): U[] {
     return this._container ? this._container.getParents(Ctor) : [];
+  }
+
+  /**
+   * Queries for a parent renderable for the view.
+   * @template U
+   * @param {(Type<U> | Type<U>[])} Ctor
+   * @returns {(Observable<[ U | null, Observable<void> ]>)}
+   */
+  queryParent<U extends Renderable>(Ctor: Type<U> | Type<U>[]): Observable<U | null> {
+    return this.container
+      .switchMap<View | null, U | null>(
+        container => container ? container.queryParent(Ctor) : Observable.empty<U | null>());
   }
 
   /**

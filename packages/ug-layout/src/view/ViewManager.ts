@@ -54,10 +54,18 @@ export class ViewManager {
   @CompleteOn('destroy')
   private _refChanges: Subject<RefChangeEvent<any>> = new Subject();
 
+  @CompleteOn('destroy')
+  private _registered: Subject<ViewManagerEvent<any>> = new Subject();
+
+  @CompleteOn('destroy')
+  private _unregistered: Subject<ViewManagerEvent<any>> = new Subject();
+
   resolved: Observable<ViewManagerEvent<any>> = this._resolved.asObservable();
   created: Observable<ViewManagerEvent<any>> = this._created.asObservable();
   destroyed: Observable<void> = this._destroyed.asObservable();
   refChanges: Observable<RefChangeEvent<any>> = this._refChanges.asObservable();
+  registered: Observable<ViewManagerEvent<any>> = this._registered.asObservable();
+  unregistered: Observable<ViewManagerEvent<any>> = this._unregistered.asObservable();
 
   has(token: any, id?: number): boolean {
     const map = this.getAll(token);
@@ -185,6 +193,8 @@ export class ViewManager {
         type: 'add',
       });
     }
+
+    this._registered.next({ container, token, ref });
   }
 
   unregister(token: any, container: ViewContainer<any>, options: { ref?: string|null } = {}): void {
@@ -212,6 +222,8 @@ export class ViewManager {
         type: 'remove'
       });
     }
+
+    this._unregistered.next({ container, token, ref });
   }
 
   /**

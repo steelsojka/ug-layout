@@ -30,7 +30,8 @@ export enum ViewQueryReadType {
 export enum CacheStrategy {
   NONE,
   PERSISTENT,
-  RELOAD
+  RELOAD,
+  RESET_ONLY
 }
 
 export enum ViewQueryResolveType {
