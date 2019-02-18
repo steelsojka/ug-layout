@@ -219,10 +219,6 @@ export abstract class Renderable<C extends RenderableConfig = RenderableConfig> 
     return this._injector;
   }
 
-  get contentItems(): Renderable[] {
-    return [ ...this._contentItems ];
-  }
-
   /**
    * Creates this renderables VNode for diffing against the previous VNode state.
    * @abstract
@@ -260,7 +256,7 @@ export abstract class Renderable<C extends RenderableConfig = RenderableConfig> 
    * @returns {Renderable[]}
    */
   getChildren(): Renderable[] {
-    return [ ...this._contentItems ];
+    return this._contentItems;
   }
 
   /**
@@ -608,6 +604,10 @@ export abstract class Renderable<C extends RenderableConfig = RenderableConfig> 
     return 0;
   }
 
+  getRenderableChildren(): Renderable[] {
+    return this.getChildren().filter(item => item.isRenderable());
+  }
+
   /**
    * Returns the active leaf nodes of the render tree from this node. Basically
    * the node at the end of the tree.
@@ -648,6 +648,10 @@ export abstract class Renderable<C extends RenderableConfig = RenderableConfig> 
 
   getWidthForChild(): number {
     return this.width;
+  }
+
+  isRenderable(): boolean {
+    return true;
   }
 
   protected _matchesRenderable<T extends Renderable>(instance: T, query: Type<T>|Type<T>[]): boolean {

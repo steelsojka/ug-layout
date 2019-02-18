@@ -139,7 +139,17 @@ export class StackHeader extends Renderable implements DropTarget {
     },
       [
         h('div.ug-layout__stack-controls', preTabControls.map(c => c.render())),
-        h('div.ug-layout__tab-container', this._contentItems.map(tab => tab.render())),
+        h(
+          'div.ug-layout__tab-container',
+          this._contentItems.reduce((items, tab) => {
+            const item = this.getItemFromTab(tab);
+
+            if (item && item.isRenderable()) {
+              items.push(tab.render());
+            }
+
+            return items;
+          }, [] as VNode[])),
         h('div.ug-layout__stack-controls', postTabControls.map(c => c.render()))
       ]
     );
@@ -213,7 +223,9 @@ export class StackHeader extends Renderable implements DropTarget {
   }
 
   private _onDragHostStart(): void {
-    this._tabAreas = this._contentItems.map(tab => tab.getArea());
+    this._tabAreas = this._contentItems
+      .filter(tab => tab.isRenderable())
+      .map(tab => tab.getArea());
   }
 
   private _onDragHostDropped(): void {

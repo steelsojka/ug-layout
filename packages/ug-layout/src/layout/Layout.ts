@@ -117,6 +117,10 @@ export class Layout extends Renderable {
       }) as any;
   }
 
+  isRenderable(): boolean {
+    return this._contentItems.some(item => item.isRenderable());
+  }
+
   private _onDragHostStart(container: DragHostContainer): void {
     const { offsetX, offsetY, height, width } = this;
     const { dragArea, item } = container;

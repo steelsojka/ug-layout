@@ -6,6 +6,9 @@
     "Deserialized",
     "Renderable",
     "deserialize",
-    "serializers"
+    "injectable",
+    "renderables",
+    "serializers",
+    "unallocated"
   ]
 }

@@ -48,6 +48,13 @@ class OtherComponent {
   }
 }
 
+@ViewComponent()
+class TextComponent {
+  ugOnInit(container: ViewContainer<this>): void {
+    container.mountHTML('<div><input type="text" /></div>');
+  }
+}
+
 @ViewComponent({
   resolution: ResolverStrategy.REF
 })
@@ -109,7 +116,7 @@ const initialLayout = RootLayout.configure({
               use: View.configure({ useClass: TestView, ref: 'View 3' })
             }, {
               title: 'View 4',
-              use: View.configure({ useClass: TestView, ref: 'View 4' })
+              use: View.configure({ useClass: TextComponent, ref: 'View 4' })
             }, {
               title: 'View 5',
               use: View.configure({ useClass: TestView, ref: 'View 5' })

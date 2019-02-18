@@ -266,8 +266,17 @@ export class StackItemContainer extends Renderable implements DropTarget, Transf
   }
 
   detach(): void {
+    const isActive = this.isActive;
+    const index = this.container.getIndexOf(this);
+
     this._detachHandler.detach()
-      .then(() => this._renderer.render());
+      .then(() => {
+        if (isActive) {
+          this.container.setActiveIndex(index === 0 ? 1 : index - 1, { render: false });
+        }
+
+        this._renderer.render();
+      });
   }
 
   destroy(context: RenderableDestroyContext): void {
@@ -286,6 +295,14 @@ export class StackItemContainer extends Renderable implements DropTarget, Transf
     return this._detachHandler.isDetached
       ? this._detachHandler.height
       : super.getHeightForChild();
+  }
+
+  isRenderable(): boolean {
+    return !this._detachHandler.isDetached;
+  }
+
+  isDetached(): boolean {
+    return this._detachHandler.isDetached;
   }
 
   private _getRegionFromArea(pageX: number, pageY: number, area: RenderableArea): StackRegion|null {

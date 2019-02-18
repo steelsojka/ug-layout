@@ -28,13 +28,13 @@ export class LayoutManipulator {
       const container = position === LayoutInsertPosition.CLOSEST ? parents[0] : parents[parents.length - 1];
 
       if (container) {
-        let child = args.tag ? TagUtil.matches(container.contentItems, [ args.tag ])[0] : null;
+        let child = args.tag ? TagUtil.matches(container.getChildren(), [ args.tag ])[0] : null;
 
         if (!child) {
           child = container.createChild(insert);
 
           container.addChild(child, {
-            index: index === -1 ? container.contentItems.length : index
+            index: index === -1 ? container.getChildren().length : index
           });
 
           if (args.tag) {

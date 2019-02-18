@@ -115,7 +115,9 @@ export class XYItemContainer extends Renderable {
     if (this._container.isRow) {
       const children = this._container.getChildren();
       const index = children.indexOf(this);
-      const prev = children.slice(0, index);
+      const prev = children
+        .slice(0, index)
+        .filter(item => item.isRenderable());
       const totalSplitterSize = this._container.getTotalSplitterSizes(0, index);
 
       return prev.reduce((result, item) => result + item.width, offset) + totalSplitterSize;
@@ -130,7 +132,9 @@ export class XYItemContainer extends Renderable {
     if (!this._container.isRow) {
       const children = this._container.getChildren();
       const index = children.indexOf(this);
-      const prev = children.slice(0, index);
+      const prev = children
+        .slice(0, index)
+        .filter(item => item.isRenderable());
       const totalSplitterSize = this._container.getTotalSplitterSizes(0, index);
 
       return prev.reduce((result, item) => result + item.height, offset) + totalSplitterSize;
@@ -212,6 +216,10 @@ export class XYItemContainer extends Renderable {
     if (this.isMinimized) {
       this.emit(new MinimizeCommand(this, { minimize: false }));
     }
+  }
+
+  isRenderable(): boolean {
+    return this.item.isRenderable();
   }
 
   private _minimize(e: MinimizeCommand<Renderable>): void {

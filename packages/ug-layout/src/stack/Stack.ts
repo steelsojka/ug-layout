@@ -32,7 +32,7 @@ import { TabDragEvent } from './TabDragEvent';
 import { StackItemCloseEvent } from './StackItemCloseEvent';
 import { StackItemContainer, StackItemContainerConfig } from './StackItemContainer';
 import { StackTab } from './StackTab';
-import { clamp, get, isNumber, propEq } from '../utils';
+import { clamp, get, isNumber, propEq, partition } from '../utils';
 import { StackRegion, STACK_HEADER_CLASS, STACK_ITEM_CONTAINER_CLASS } from './common';
 import { RenderableConfigArgs, RenderableConfig } from '../dom';
 import { StackControl, CloseStackControl } from './controls';
@@ -180,6 +180,10 @@ export class Stack extends Renderable {
   }
 
   render(): VNode {
+    const [ detachedItems, attachedItems ] = partition(this._contentItems, item => item.isDetached());
+
+    detachedItems.forEach(item => item.render());
+
     return h(`div.ug-layout__stack`, {
       key: this.uid,
       class: {
@@ -188,7 +192,7 @@ export class Stack extends Renderable {
       }
     }, [
       this._header.render(),
-      ...this._contentItems.map(item => item.render())
+      ...attachedItems.map(item => item.render())
     ]);
   }
 
@@ -434,6 +438,10 @@ export class Stack extends Renderable {
     }
 
     this._renderer.render();
+  }
+
+  isRenderable(): boolean {
+    return this.items.some(item => item.isRenderable());
   }
 
   private _createContainerFromRegion(region: StackRegion): Row|Column {

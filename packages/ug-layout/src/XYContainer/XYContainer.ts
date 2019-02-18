@@ -135,7 +135,7 @@ export class XYContainer extends Renderable {
   }
 
   addChild(item: Renderable, options: ContainerAddChildArgs = {}): void {
-    const { distribute = true, resize = true } = options;
+    const { resize = true } = options;
     const childArgs = Object.assign({}, options, { render: false, resize: false });
     let container: XYItemContainer;
     let transferConfig: { [key: string]: any } = {};
@@ -217,11 +217,13 @@ export class XYContainer extends Renderable {
     const children: VNode[] = [];
 
     for (const [ index, child ] of this._contentItems.entries()) {
-      if (index > 0 && this._splitters[index - 1]) {
+      if (index > 0 && this._splitters[index - 1] && this._isSplitterRenderable(this._splitters[index - 1])) {
         children.push(this._splitters[index - 1].render());
       }
 
-      children.push(child.render());
+      if (child.isRenderable()) {
+        children.push(child.render());
+      }
     }
 
     return h(`div.${this._className}`, {
@@ -292,7 +294,11 @@ export class XYContainer extends Renderable {
   }
 
   getTotalSplitterSizes(start: number = 0, end: number = this._splitters.length - 1): number {
-    return this._splitters.slice(start, end).reduce((res, sptr) => res + sptr.size, 0);
+    return this._splitters.slice(start, end).reduce((res, splitter) => res + splitter.size, 0);
+  }
+
+  isRenderable(): boolean {
+    return Boolean(this.getRenderableChildren().length);
   }
 
   private _createSplitter(): Splitter {
@@ -315,6 +321,15 @@ export class XYContainer extends Renderable {
       || after.isMinimized
       || before.minSize === before.maxSize
       || after.minSize === after.maxSize;
+  }
+
+  private _isSplitterRenderable(splitter: Splitter): boolean {
+    const { before, after } = this._getSplitterItems(splitter);
+
+    return before
+      && after
+      && before.isRenderable()
+      && after.isRenderable();
   }
 
   private _dragStatusChanged(event: DragEvent<Splitter>): void {
@@ -460,7 +475,7 @@ export class XYContainer extends Renderable {
   }
 
   private _distributeRatios(_iterationCount: number = 0): void {
-    // Recursion alert. Check for inifinite loop here.
+    // Recursion alert. Check for infinite loop here.
     const growable: XYItemContainer[] = [];
     const shrinkable: XYItemContainer[] = [];
     const containerSize = this._totalContainerSize;
