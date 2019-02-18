@@ -1,3 +1,7 @@
+@import url('../../src/styles/icons.css');
+@import url('../../src/styles/core.css');
+@import url('../../src/styles/theme-gl.css');
+
 body {
   height: 100%;
   width: 100%;

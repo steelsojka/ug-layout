@@ -1,9 +1,12 @@
 var path = require('path');
 
 module.exports = {
-  entry: path.join(__dirname, 'test/live/index.ts'),
+  entry: {
+    bundle: path.join(__dirname, 'test/live/index.ts'),
+    detached: path.join(__dirname, 'test/live/detached.ts')
+  },
   output: {
-    filename: 'bundle.js',
+    filename: '[name].js',
     path: path.join(__dirname, 'test/live/bundle')
   },
   resolve: {

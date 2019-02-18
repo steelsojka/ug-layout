@@ -1,8 +1,5 @@
 import 'babel-polyfill';
 import 'reflect-metadata';
-import '../../src/styles/icons.css';
-import '../../src/styles/core.css';
-import '../../src/styles/theme-gl.css';
 import './index.css';
 
 import {
@@ -145,7 +142,8 @@ const initialLayout = RootLayout.configure({
 
 const rootLayout = window['rootLayout'] = RootLayout
   .create({
-    container: document.body
+    container: document.body,
+    detachUrl: '/detached.html'
   });
 
 

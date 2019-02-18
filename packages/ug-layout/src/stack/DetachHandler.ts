@@ -10,12 +10,14 @@ import { VNode, Renderer } from '../dom';
 import { Injector, Inject } from '../di';
 import { WindowRef, PatchRef, DocumentRef, RootConfigRef } from '../common';
 import { RootLayoutCreationConfigArgs } from '../RootLayout';
+import { debounce } from '../utils/throttle';
 
 export class DetachHandler {
   private _child: Window | null = null;
   private _renderer: Renderer | null = null;
   private _vnode: VNode | null = null;
   private _onClose: Subject<void> = new Subject();
+  private _onResize: Subject<void> = new Subject();
   private _boundClose = this.close.bind(this);
   private _lastLoc: {
     x?: number;
@@ -25,6 +27,7 @@ export class DetachHandler {
   } = {};
 
   readonly onClose: Observable<void> = this._onClose.asObservable();
+  readonly onResize: Observable<void> = this._onResize.asObservable();
 
   constructor(
     @Inject(WindowRef) private _windowRef: Window,
@@ -53,47 +56,57 @@ export class DetachHandler {
     }
   }
 
-  detach(): void {
-    if (this.isDetached) {
-      return;
-    }
+  detach(): Promise<void> {
+    return new Promise(resolve => {
+      if (this.isDetached) {
+        resolve();
 
-    const top = this._lastLoc.y || 0;
-    const left = this._lastLoc.x || 0;
-    const height = this._lastLoc.height || 680;
-    const width = this._lastLoc.width || 800;
-    const url = this._rootConfig.detachUrl || undefined;
+        return;
+      }
 
-    this._child = this._windowRef.open(url, '_blank', `height=${height},width=${width},menubar=no,status=no,top=${top},left=${left}`);
-    this._child!.addEventListener('beforeunload', () => {
-      this._lastLoc = {
-        x: this._child!.screenX,
-        y: this._child!.screenY,
-        height: this._child!.innerHeight,
-        width: this._child!.innerWidth
-      };
-      this._child = null;
-      this._renderer = null;
-      this._onClose.next();
+      const top = this._lastLoc.y || 0;
+      const left = this._lastLoc.x || 0;
+      const height = this._lastLoc.height || 680;
+      const width = this._lastLoc.width || 800;
+      const url = this._rootConfig.detachUrl || undefined;
+
+      this._child = this._windowRef.open(url, '_blank', `height=${height},width=${width},menubar=no,status=no,top=${top},left=${left},resizable=true`);
+      this._renderer = this._injector.resolveAndCreateChild([ {
+        provide: PatchRef,
+        useValue: snabbdom.init([
+          DOMClass,
+          DOMStyle,
+          DOMProps,
+          DOMEvents,
+          DOMAttrs
+        ])
+      }, {
+        provide: DocumentRef,
+        useValue: this._child!.document
+      } ])
+        .resolveAndInstantiate(Renderer);
+
+      this._renderer!.useNodeGenerator(() => this._vnode!);
+
+      this._child!.addEventListener('beforeunload', () => {
+        this._lastLoc = {
+          x: this._child!.screenX,
+          y: this._child!.screenY,
+          height: this._child!.innerHeight,
+          width: this._child!.innerWidth
+        };
+        this._child = null;
+        this._renderer = null;
+        this._onClose.next();
+      });
+
+      this._child!.addEventListener('resize', debounce(() => this._onResize.next(), 50));
+
+      this._child!.addEventListener('DOMContentLoaded', () => {
+        this._renderer!.setContainer(this._child!.document.body);
+        resolve();
+      });
     });
-
-    this._renderer = this._injector.resolveAndCreateChild([ {
-      provide: PatchRef,
-      useValue: snabbdom.init([
-        DOMClass,
-        DOMStyle,
-        DOMProps,
-        DOMEvents,
-        DOMAttrs
-      ])
-    }, {
-      provide: DocumentRef,
-      useValue: this._child!.document
-    } ])
-      .resolveAndInstantiate(Renderer);
-
-    this._renderer!.useNodeGenerator(() => this._vnode!);
-    this._renderer!.setContainer(this._child!.document.body);
   }
 
   close(): void {
@@ -105,6 +118,7 @@ export class DetachHandler {
   destroy(): void {
     this.close();
     this._onClose.complete();
+    this._onResize.complete();
     this._windowRef.removeEventListener('beforeunload', this._boundClose);
   }
 

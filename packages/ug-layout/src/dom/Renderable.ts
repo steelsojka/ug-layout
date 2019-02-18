@@ -21,6 +21,7 @@ import { RenderableInjector } from './RenderableInjector';
 import { ConfiguredRenderable } from './ConfiguredRenderable';
 import { RenderableConfig } from './common';
 import { BaseSerializerArg } from '../serialization';
+import { startWith, takeUntil, map, distinctUntilChanged } from 'rxjs/operators';
 
 export interface BaseModificationArgs {
   /**
@@ -319,11 +320,11 @@ export abstract class Renderable<C extends RenderableConfig = RenderableConfig> 
    * @returns {(Observable<T | null>)}
    */
   queryParent<T extends Renderable>(Ctor: Type<T> | Type<T>[]): Observable<T | null> {
-    return this._renderer.rendered
-      .startWith(undefined)
-      .takeUntil(this.destroyed)
-      .map(() => this.getParent(Ctor))
-      .distinctUntilChanged();
+    return this._renderer.rendered.pipe(
+      startWith(null),
+      takeUntil(this.destroyed),
+      map(() => this.getParent(Ctor)),
+      distinctUntilChanged());
   }
 
   /**

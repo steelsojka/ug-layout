@@ -146,6 +146,9 @@ export class StackItemContainer extends Renderable implements DropTarget, Transf
 
     this.subscribe(MakeVisibleCommand, this.makeVisible.bind(this));
     this._detachHandler.onClose.subscribe(() => this._renderer.render());
+    this._detachHandler.onResize.subscribe(() => {
+      this._renderer.render();
+    });
   }
 
   render(): VNode {
@@ -153,8 +156,8 @@ export class StackItemContainer extends Renderable implements DropTarget, Transf
       this._detachHandler.render(h('div.ug-layout__stack-item-container', {
         key: this._uid,
         style: {
-          height: `${this._detachHandler.height}`,
-          width: `${this._detachHandler.width}`
+          height: `${this._detachHandler.height}px`,
+          width: `${this._detachHandler.width}px`
         }
       }, [ this._item.render() ]));
 
@@ -263,8 +266,8 @@ export class StackItemContainer extends Renderable implements DropTarget, Transf
   }
 
   detach(): void {
-    this._detachHandler.detach();
-    this._renderer.render();
+    this._detachHandler.detach()
+      .then(() => this._renderer.render());
   }
 
   destroy(context: RenderableDestroyContext): void {
