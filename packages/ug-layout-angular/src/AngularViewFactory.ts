@@ -25,7 +25,6 @@ import { Subject, Observable } from 'rxjs';
 
 import * as angular from './angular';
 import { AngularPlugin } from './AngularPlugin';
-import { DestroyNotifyEvent } from './DestroyNotifyEvent';
 import { Angular1ComponentFactory } from './Angular1ComponentFactory';
 import {
   ANGULAR_TAG,

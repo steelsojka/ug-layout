@@ -31,6 +31,7 @@ export interface StackItemContainerConfig extends RenderableConfig {
   droppable?: boolean;
   draggable?: boolean;
   closeable?: boolean;
+  detachable?: boolean;
   persist?: boolean;
   tabControls?: RenderableArg<TabControl>[];
 }
@@ -99,6 +100,10 @@ export class StackItemContainer extends Renderable implements DropTarget, Transf
     return Boolean(get(this._config, 'closeable', false));
   }
 
+  get detachable(): boolean {
+    return Boolean(get(this._config, 'detachable', false));
+  }
+
   get title(): string {
     return (this._config && this._config.title) || '';
   }
@@ -118,7 +123,7 @@ export class StackItemContainer extends Renderable implements DropTarget, Transf
   }
 
   get isDetachable(): boolean {
-    return !this._detachHandler.isDetached;
+    return this._config.detachable === true && !this._detachHandler.isDetached;
   }
 
   protected get _item(): Renderable {
@@ -308,6 +313,12 @@ export class StackItemContainer extends Renderable implements DropTarget, Transf
 
   isDetached(): boolean {
     return this._detachHandler.isDetached;
+  }
+
+  getActiveWindow(): Window | null {
+    return this._detachHandler.isDetached
+      ? this._detachHandler.getChild()
+      : super.getActiveWindow();
   }
 
   private _getRegionFromArea(pageX: number, pageY: number, area: RenderableArea): StackRegion|null {

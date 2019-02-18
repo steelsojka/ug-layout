@@ -56,6 +56,10 @@ export class DetachHandler {
     }
   }
 
+  getChild(): Window | null {
+    return this._child;
+  }
+
   detach(): Promise<boolean> {
     return new Promise(resolve => {
       if (this.isDetached) {

@@ -1,17 +1,11 @@
-import { ComponentRef } from '@angular/core';
-import { 
-  ViewComponent as _ViewComponent, 
+import {
+  ViewComponent as _ViewComponent,
   VIEW_CONFIG_KEY
 } from 'ug-layout';
 
-import { 
-  COMPONENT_REF_KEY, 
-  PRIVATE_PREFIX, 
-  ViewComponentConfigArgs,
-  SCOPE_REF_KEY
+import {
+  ViewComponentConfigArgs
 } from './common';
-
-const noop = function() {};
 
 export function ViewComponent(config?: ViewComponentConfigArgs): ClassDecorator {
   return (target: Function) => {

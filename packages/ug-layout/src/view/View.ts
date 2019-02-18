@@ -34,6 +34,9 @@ export class View extends Renderable {
   @CompleteOn('destroy')
   protected _viewContainerCreated: Subject<{ fromCache: boolean, container: ViewContainer<any> }> = new Subject();
 
+  @CompleteOn('destroy')
+  protected _windowChanges: BehaviorSubject<Window | null> = new BehaviorSubject(null);
+
   protected _initialCreate: boolean = true;
   @Inject(ContainerRef) protected _container: Renderable;
   @Inject(ConfigurationRef) protected _configuration: ViewConfig;
@@ -45,13 +48,20 @@ export class View extends Renderable {
    * Notifies when the visibility of this view changes.
    * @type {Observable<boolean>}
    */
-  visibilityChanges: Observable<boolean> = this._visibilityChanges.asObservable().pipe(
-    distinctUntilChanged());
+  readonly windowChanges: Observable<Window | null> = this._windowChanges.asObservable()
+    .pipe(distinctUntilChanged());
+
+  /**
+   * Notifies when the visibility of this view changes.
+   * @type {Observable<boolean>}
+   */
+  readonly visibilityChanges: Observable<boolean> = this._visibilityChanges.asObservable()
+    .pipe(distinctUntilChanged());
   /**
    * Notifies when the dimensions of this view changes.
    * @type {Observable<{ width: number, height: number }>}
    */
-  sizeChanges: Observable<SizeChanges> = this._sizeChanges.asObservable();
+  readonly sizeChanges: Observable<SizeChanges> = this._sizeChanges.asObservable();
 
   /**
    * Notifies when the view container is resolved.
@@ -198,6 +208,7 @@ export class View extends Renderable {
     // Check for these changes every render iteration.
     this._visibilityChanges.next(this.isVisible());
     this._sizeChanges.next({ width: this.width, height: this.height });
+    this._windowChanges.next(this.getActiveWindow());
   }
 
   /**

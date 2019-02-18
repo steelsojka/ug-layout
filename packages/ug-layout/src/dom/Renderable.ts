@@ -317,7 +317,7 @@ export abstract class Renderable<C extends RenderableConfig = RenderableConfig> 
    */
   queryParent<T extends Renderable>(Ctor: Type<T> | Type<T>[]): Observable<T | null> {
     return this._renderer.rendered.pipe(
-      startWith(null),
+      startWith(null!),
       takeUntil(this.destroyed),
       map(() => this.getParent(Ctor)),
       distinctUntilChanged());
@@ -652,6 +652,10 @@ export abstract class Renderable<C extends RenderableConfig = RenderableConfig> 
 
   isRenderable(): boolean {
     return true;
+  }
+
+  getActiveWindow(): Window | null {
+    return this._container ? this._container.getActiveWindow() : null;
   }
 
   protected _matchesRenderable<T extends Renderable>(instance: T, query: Type<T>|Type<T>[]): boolean {

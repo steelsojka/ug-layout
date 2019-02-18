@@ -5,7 +5,3 @@ export * from './AngularView';
 export * from './UgLayoutOutlet.component';
 export * from './AngularPlugin';
 export * from './AngularViewFactory';
-export * from './UgLayout.directive';
-export * from './UgLayoutRow.directive';
-export * from './UgLayoutView.directive';
-export * from './AngularViewTestability';

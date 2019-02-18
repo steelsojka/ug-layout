@@ -52,6 +52,7 @@ class OtherComponent {
 class TextComponent {
   ugOnInit(container: ViewContainer<this>): void {
     container.mountHTML('<div><input type="text" /></div>');
+    container.windowChanges.subscribe(win => console.log(win));
   }
 }
 
@@ -110,12 +111,15 @@ const initialLayout = RootLayout.configure({
             children: [{
               closeable: true,
               title: 'View 2',
+              detachable: true,
               use: MyView.configure({ useClass: TestView, ref: 'View 2' })
             }, {
               title: 'View 3',
+              detachable: true,
               use: View.configure({ useClass: TestView, ref: 'View 3' })
             }, {
               title: 'View 4',
+              detachable: true,
               use: View.configure({ useClass: TextComponent, ref: 'View 4' })
             }, {
               title: 'View 5',

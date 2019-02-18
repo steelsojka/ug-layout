@@ -12,7 +12,8 @@ import {
   RootConfigRef,
   RenderableArg,
   ElementRef,
-  ContextType
+  ContextType,
+  WindowRef
 } from './common';
 import { UgPlugin } from './UgPlugin';
 import { LockState, LOCK_DRAGGING, LOCK_RESIZING } from './LockState';
@@ -50,6 +51,7 @@ export class RootLayout extends Renderable<RootLayoutConfig> {
   @Inject(ViewManager) protected _viewManager: ViewManager;
   @Inject(RootConfigRef) protected _rootConfig: RootLayoutCreationConfig;
   @Inject(LockState) protected _lockState: LockState;
+  @Inject(WindowRef) protected _window: Window;
 
   get height(): number {
     return this._height;
@@ -171,6 +173,10 @@ export class RootLayout extends Renderable<RootLayoutConfig> {
     return this._rootConfig.plugins.filter(plugin => {
       return type ? plugin instanceof type : true;
     }) as T[];
+  }
+
+  getActiveWindow(): Window | null {
+    return this._window;
   }
 
   static create<T extends RootLayout>(config: RootLayoutCreationConfigArgs = {}): T {

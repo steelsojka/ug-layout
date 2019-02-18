@@ -35,7 +35,7 @@ export const FAILED_RESOLVE = new ViewFailReason('Failed resolve hook');
 
 export interface ViewContainerReadyOptions {
   /**
-   * Whether to initiale the component.
+   * Whether to initialize the component.
    * @type {boolean}
    */
   init?: boolean;
@@ -93,6 +93,9 @@ export class ViewContainer<T> {
   private _sizeChanges: BehaviorSubject<SizeChanges> = new BehaviorSubject({ width: -1, height: -1 });
 
   @CompleteOn('destroy')
+  private _windowChanges: BehaviorSubject<Window | null> = new BehaviorSubject(null);
+
+  @CompleteOn('destroy')
   private _attached: Subject<boolean> = new Subject();
 
   @CompleteOn('destroy')
@@ -127,22 +130,27 @@ export class ViewContainer<T> {
    * @see Cancellable
    * @type {Observable<BeforeDestroyEvent<Renderable>>}
    */
-  beforeDestroy: Observable<BeforeDestroyEvent<Renderable>> = this._beforeDestroy.asObservable();
+  readonly beforeDestroy: Observable<BeforeDestroyEvent<Renderable>> = this._beforeDestroy.asObservable();
   /**
    * Notifies when the view is destroyed.
    * @type {Observable<ViewContainer<T>>}
    */
-  destroyed: Observable<ViewContainer<T>> = this._destroyed.asObservable();
+  readonly destroyed: Observable<ViewContainer<T>> = this._destroyed.asObservable();
   /**
    * Notifies when the visibility of this view changes.
    * @type {Observable<boolean>}
    */
-  visibilityChanges: Observable<boolean> = this._visibilityChanges.asObservable();
+  readonly visibilityChanges: Observable<boolean> = this._visibilityChanges.asObservable();
+  /**
+   * Notifies when the containing window changes.
+   * @type {Observable<boolean>}
+   */
+  readonly windowChanges: Observable<Window | null> = this._windowChanges.asObservable();
   /**
    * Notifies when the dimensions of this views container has changed.
    * @type {Observable<{ width: number, height: number }>}
    */
-  sizeChanges: Observable<{ width: number, height: number }> = this._sizeChanges
+  readonly sizeChanges: Observable<{ width: number, height: number }> = this._sizeChanges
     .asObservable()
     .pipe(
       filter(e => e.height !== -1 && e.width !== -1),
@@ -151,44 +159,44 @@ export class ViewContainer<T> {
    * Notifies when the status of this component changes.
    * @type {Observable<ViewContainerStatus>}
    */
-  status: Observable<ViewContainerStatus> = this._status.asObservable();
+  readonly status: Observable<ViewContainerStatus> = this._status.asObservable();
   /**
    * Contains the state of ths views initialized state.
    * @type {Observable<boolean>}
    */
-  initialized: Observable<boolean> = this._initialized.asObservable();
+  readonly initialized: Observable<boolean> = this._initialized.asObservable();
   /**
    * Notifies when this container has changed the {@link View} it is associated with.
    * @type {(Observable<View|null>)}
    */
-  containerChange: Observable<View|null> = this._containerChange.asObservable();
+  readonly containerChange: Observable<View|null> = this._containerChange.asObservable();
   /**
    * Notifies when the view has become attached.
    * @type {Observable<boolean>}
    */
-  attached: Observable<boolean> = this._attached.asObservable()
+  readonly attached: Observable<boolean> = this._attached.asObservable()
     .pipe(filter(eq(true)));
   /**
    * Notifies when the view has become detached.
    * @type {Observable<boolean>}
    */
-  detached: Observable<boolean> = this._attached.asObservable()
+  readonly detached: Observable<boolean> = this._attached.asObservable()
     .pipe(filter(eq(false)));
   /**
    * Notifies when the component is assigned to the container and ready for access.
    * @type {Observable<boolean>}
    */
-  componentReady: Observable<boolean> = this._componentReady.asObservable();
+  readonly componentReady: Observable<boolean> = this._componentReady.asObservable();
   /**
    * Notifies when the component is initialized.
    * @type {Observable<boolean>}
    */
-  componentInitialized: Observable<boolean> = this._componentInitialized.asObservable();
+  readonly componentInitialized: Observable<boolean> = this._componentInitialized.asObservable();
   /**
    * Emits the current container upon subscription and any other changes.
    * @type {(Observable<View | null>)}
    */
-  container: Observable<View | null> = this._containerSource.asObservable();
+  readonly container: Observable<View | null> = this._containerSource.asObservable();
 
   get hasComponent(): boolean {
     return Boolean(this._component);
@@ -283,7 +291,7 @@ export class ViewContainer<T> {
   }
 
   /**
-   * Get's a token from this containers injector. Note, this should not be used to grab
+   * Gets a token from this containers injector. Note, this should not be used to grab
    * parent renderables or any item that can be changed.
    * @template U The return type.
    * @param {*} token
@@ -405,6 +413,10 @@ export class ViewContainer<T> {
       this._container.sizeChanges
         .pipe(takeUntil(this.containerChange))
         .subscribe(e => this._sizeChanges.next(e));
+
+      this._container.windowChanges
+        .pipe(takeUntil(this.containerChange))
+        .subscribe(e => this._windowChanges.next(e));
 
       this._container
         .scope(CustomViewHookEvent)

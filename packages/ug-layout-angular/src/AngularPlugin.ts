@@ -1,8 +1,7 @@
-import { 
-  Renderer, 
-  UgPlugin, 
-  RootLayout, 
-  Token, 
+import {
+  Renderer,
+  UgPlugin,
+  RootLayout,
   ViewFactory,
   ProviderArg
 } from 'ug-layout';
@@ -31,10 +30,10 @@ export class AngularPlugin implements UgPlugin {
     this._angularGlobal = config.angularGlobal || null;
     this._scope = config.scope || null;
   }
-  
+
   initialize(root: RootLayout): void {
     const renderer = root.injector.get(Renderer);
-    
+
     root.destroyed.subscribe(() => {
       this._viewContainerRef.clear();
       renderer.detach();

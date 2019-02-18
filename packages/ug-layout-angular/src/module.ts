@@ -1,22 +1,13 @@
 import { NgModule } from '@angular/core';
 
 import { UgLayoutOutletComponent } from './UgLayoutOutlet.component';
-import { UgLayoutDirective } from './UgLayout.directive';
-import { UgLayoutRowDirective } from './UgLayoutRow.directive';
-import { UgLayoutViewDirective } from './UgLayoutView.directive';
 
 @NgModule({
   declarations: [
-    UgLayoutOutletComponent,
-    UgLayoutDirective,
-    UgLayoutRowDirective,
-    UgLayoutViewDirective
+    UgLayoutOutletComponent
   ],
   exports: [
-    UgLayoutOutletComponent,
-    UgLayoutDirective,
-    UgLayoutRowDirective,
-    UgLayoutViewDirective
+    UgLayoutOutletComponent
   ]
 })
 export class UgLayoutModule {}

@@ -31,10 +31,10 @@ export class DragHost {
   private _dragArea: RenderableArea;
   private _element: HTMLElement;
 
-  dropped: Observable<DropArea> = this._dropped.asObservable();
-  start: Observable<DragHostContainer> = this._start.asObservable();
-  fail: Observable<Renderable> = this._fail.asObservable();
-  success: Observable<Renderable> = this._success.asObservable();
+  readonly dropped: Observable<DropArea> = this._dropped.asObservable();
+  readonly start: Observable<DragHostContainer> = this._start.asObservable();
+  readonly fail: Observable<Renderable> = this._fail.asObservable();
+  readonly success: Observable<Renderable> = this._success.asObservable();
 
   get bounds(): RenderableArea|null {
     return this._bounds;

@@ -9,11 +9,10 @@ import {
   SimpleChanges,
   ViewChild,
   EventEmitter,
-  OnDestroy,
-  Type
+  OnDestroy
 } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
-import { RootLayout, ProviderArg, Renderable, ConfiguredRenderable, Layout } from 'ug-layout';
+import { RootLayout, ConfiguredRenderable } from 'ug-layout';
 import { takeUntil } from 'rxjs/operators';
 
 import { AngularPlugin, AngularPluginConfig } from './AngularPlugin';

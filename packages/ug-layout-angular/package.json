@@ -7,8 +7,8 @@
   "scripts": {
     "test": "ts-node test/index.ts",
     "clean": "del dist",
-    "prebuild": "npm run clean",
-    "build": "npm run build:es2015 && npm run build:es5",
+    "prebuild": "yarn run clean",
+    "build": "yarn run build:es2015 && yarn run build:es5",
     "build:es2015": "tsc -p tsconfig.es2015.json",
     "build:es5": "tsc -p tsconfig.es5.json",
     "start": "webpack-dev-server"
@@ -36,8 +36,8 @@
     "style-loader": "^0.13.1",
     "ts-loader": "^2.0.0",
     "ts-node": "^2.1.2",
-    "typescript": "~3",
-    "ug-layout": "^3.2.2",
+    "typescript": "~3.3.1",
+    "ug-layout": "^4",
     "webpack": "^2.2.1",
     "webpack-dev-server": "^2.2.1",
     "zone.js": "^0.7.7"
@@ -45,6 +45,7 @@
   "peerDependencies": {
     "@angular/core": "^6.0.0",
     "rxjs": "^6.0.0",
+    "ug-layout": "^4",
     "zone.js": "^0.8.4"
   },
   "dependencies": {

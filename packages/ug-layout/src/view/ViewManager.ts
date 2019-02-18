@@ -387,20 +387,6 @@ export class ViewManager {
     return result;
   }
 
-  private _resolveViewQueryStream<T>(types: ViewQueryResolveType[], initStream: Observable<ViewManagerEvent<T>>): Observable<ViewManagerEvent<T>> {
-    const streams: Observable<ViewManagerEvent<T>>[] = [];
-
-    if (types.indexOf(ViewQueryResolveType.INIT) !== -1) {
-      streams.push(initStream);
-    }
-
-    if (types.indexOf(ViewQueryResolveType.RESOLVE) !== -1) {
-      streams.push(this.resolved);
-    }
-
-    return streams.length > 0 ? merge(...streams) : empty();
-  }
-
   private _assertAndReadComponent(token: any): ViewComponentConfig {
     const metadata = Reflect.getOwnMetadata(VIEW_CONFIG_KEY, token) as ViewComponentConfig|undefined;
 

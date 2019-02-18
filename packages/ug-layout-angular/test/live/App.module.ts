@@ -10,8 +10,8 @@ import { TestComponent } from './Test.component';
 @NgModule({
   imports: [
     UpgradeModule,
-    BrowserModule, 
-    UgLayoutModule.forRoot({ hybrid: true })
+    BrowserModule,
+    UgLayoutModule
   ],
   declarations: [ AppComponent, TestComponent ],
   entryComponents: [ TestComponent ],

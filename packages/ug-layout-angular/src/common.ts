@@ -1,4 +1,3 @@
-import { Type } from '@angular/core';
 import {
   ViewComponentConfig as _ViewComponentConfig,
   Token

@@ -1,11 +1,10 @@
 import {
   Subject,
-  Observable,
-  BehaviorSubject,
-  forkJoin
+  merge,
+  combineLatest
 } from 'rxjs';
-import { takeUntil, first } from 'rxjs/operators';
-import { RootLayout, ViewManager, ViewContainerStatus, ViewContainer } from 'ug-layout';
+import { takeUntil, distinctUntilChanged, startWith } from 'rxjs/operators';
+import { RootLayout, ViewManager, ViewContainer } from 'ug-layout';
 
 /**
  * Class used for protractor testing.
@@ -19,7 +18,7 @@ export class AngularViewTestability {
   private _pendingUpdate = new Subject<ViewContainer<any>[]>();
   private _destroyed = new Subject();
   private _pending: ViewContainer<any>[] = [];
-  private _clearSubscriptions = Observable.merge(
+  private _clearSubscriptions = merge(
     this._destroyed.asObservable(),
     this._layoutSource.asObservable());
 
@@ -43,10 +42,6 @@ export class AngularViewTestability {
     if (this.isStable()) {
       return callback();
     }
-
-    // this._pendingUpdate
-    //   .first(pending => pending.length === 0, undefined, true)
-    //   .subscribe(() => callback());
   }
 
   findProviders(using: any, provider: string, exactMatch: boolean): any[] {
@@ -95,25 +90,28 @@ export class AngularViewTestability {
       this.subscribeToContainerEvents(container);
     }
 
-    viewManager.registered
-      .takeUntil(this._clearSubscriptions)
+    viewManager.registered.pipe(
+      takeUntil(this._clearSubscriptions)
+    )
       .subscribe(({ container }) => this.subscribeToContainerEvents(container));
 
-    viewManager.unregistered
-      .takeUntil(this._clearSubscriptions)
+    viewManager.unregistered.pipe(
+      takeUntil(this._clearSubscriptions)
+    )
       .subscribe(({ container }) => this.remove(container));
   }
 
   private subscribeToContainerEvents(container: ViewContainer<any>): void {
-    Observable.combineLatest(
-      container.visibilityChanges.distinctUntilChanged(),
-      container.componentInitialized.distinctUntilChanged(),
+    combineLatest(
+      container.visibilityChanges.pipe(distinctUntilChanged()),
+      container.componentInitialized.pipe(distinctUntilChanged()),
       // Emit initially so combine latest doesn't wait for attach events.
-      Observable.merge(container.attached, container.detached)
-        .startWith(true)
-        .distinctUntilChanged()
-    )
-      .takeUntil(this._clearSubscriptions)
+      merge(container.attached, container.detached)
+        .pipe(
+          startWith(true),
+          distinctUntilChanged()))
+      .pipe(
+        takeUntil(this._clearSubscriptions))
       .subscribe(([ isVisible, isInitialized ]) => {
         if (isVisible && !isInitialized && container.isAttached) {
           this.add(container);

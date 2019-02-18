@@ -17,6 +17,8 @@ export interface SerializedStackItem {
   droppable: boolean;
   draggable: boolean;
   closeable: boolean;
+  detachable: boolean;
+  isDetached: boolean;
   tabControls: Serialized[];
   persist?: boolean;
 }
@@ -59,6 +61,8 @@ export class StackSerializer extends Serializer<Stack, SerializedStack> {
             draggable: item.draggable,
             droppable: item.droppable,
             closeable: item.closeable,
+            detachable: item.detachable,
+            isDetached: item.isDetached(),
             tabControls: item.controls.map(control => {
               return this.container.serialize(control);
             })
@@ -88,6 +92,7 @@ export class StackSerializer extends Serializer<Stack, SerializedStack> {
           draggable: child.draggable,
           droppable: child.droppable,
           closeable: child.closeable,
+          detachable: child.detachable,
           use: this.container.deserialize(child.use),
           tabControls: child.tabControls.map(tabCtrl => {
             return this.container.deserialize<TabControl, Serialized>(tabCtrl);
