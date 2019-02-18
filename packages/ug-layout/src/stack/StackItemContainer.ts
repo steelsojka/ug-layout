@@ -23,6 +23,7 @@ import { StackRegion } from './common';
 import { get } from '../utils'
 import { TabControl, CloseTabControl } from './tabControls';
 import { DetachHandler } from './DetachHandler';
+import { RenderableStateChangeEvent } from '../events/RenderableStateChangeEvent';
 
 export interface StackItemContainerConfig extends RenderableConfig {
   use: RenderableArg<Renderable>;
@@ -145,10 +146,11 @@ export class StackItemContainer extends Renderable implements DropTarget, Transf
     }
 
     this.subscribe(MakeVisibleCommand, this.makeVisible.bind(this));
-    this._detachHandler.onClose.subscribe(() => this._renderer.render());
-    this._detachHandler.onResize.subscribe(() => {
+    this._detachHandler.onClose.subscribe(() => {
+      this.emitUp(new RenderableStateChangeEvent(this));
       this._renderer.render();
     });
+    this._detachHandler.onResize.subscribe(() => this._renderer.render());
   }
 
   render(): VNode {
@@ -270,12 +272,15 @@ export class StackItemContainer extends Renderable implements DropTarget, Transf
     const index = this.container.getIndexOf(this);
 
     this._detachHandler.detach()
-      .then(() => {
-        if (isActive) {
-          this.container.setActiveIndex(index === 0 ? 1 : index - 1, { render: false });
-        }
+      .then(didDetach => {
+        if (didDetach) {
+          if (isActive) {
+            this.container.setActiveIndex(index === 0 ? 1 : index - 1, { render: false });
+          }
 
-        this._renderer.render();
+          this.emitUp(new RenderableStateChangeEvent(this));
+          this._renderer.render();
+        }
       });
   }
 

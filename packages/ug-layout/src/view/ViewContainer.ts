@@ -1,6 +1,6 @@
 import { CompleteOn } from 'rx-decorators/completeOn';
-import { Observable, Subject, BehaviorSubject } from 'rxjs';
-import { filter, distinctUntilChanged, takeUntil } from 'rxjs/operators';
+import { Observable, Subject, BehaviorSubject, EMPTY } from 'rxjs';
+import { filter, distinctUntilChanged, takeUntil, switchMap } from 'rxjs/operators';
 
 import { Injector, Type, Inject, PostConstruct, forwardRef } from '../di';
 import { Renderable, RenderableDestroyedContext } from '../dom';
@@ -443,9 +443,9 @@ export class ViewContainer<T> {
    * @returns {(Observable<[ U | null, Observable<void> ]>)}
    */
   queryParent<U extends Renderable>(Ctor: Type<U> | Type<U>[]): Observable<U | null> {
-    return this.container
-      .switchMap<View | null, U | null>(
-        container => container ? container.queryParent(Ctor) : Observable.empty<U | null>());
+    return this.container.pipe(
+      switchMap<View | null, U | null>(
+        container => container ? container.queryParent(Ctor) : EMPTY));
   }
 
   /**

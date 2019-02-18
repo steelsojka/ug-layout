@@ -125,11 +125,14 @@ export class StackHeader extends Renderable implements DropTarget {
     return this._container.getAtIndex(this.getIndexOf(tab)) as StackItemContainer|null;
   }
 
+  getRenderableChildren(): StackTab[] {
+    return this._contentItems.filter(item => item.isRenderable());
+  }
+
   render(): VNode {
     const [ postTabControls, preTabControls ] = partition(
       this._controls.filter(c => c.isActive()),
-      propEq('position', StackControlPosition.POST_TAB)
-    );
+      propEq('position', StackControlPosition.POST_TAB));
 
     return h('div.ug-layout__stack-header', {
       style: {
@@ -189,7 +192,7 @@ export class StackHeader extends Renderable implements DropTarget {
       highlightArea.x2 = leftMostTabArea.x2 + dragArea.width;
     }
 
-    for (const [ index, tab ] of this._contentItems.entries()) {
+    for (const [ index, tab ] of (this.getRenderableChildren() as StackTab[]).entries()) {
       if (!tab.isDragging) {
         tab.element.style.transform = index > leftMostTabIndex ? `translateX(${dragArea.width}px)` : 'translateX(0px)';
       }
@@ -208,7 +211,9 @@ export class StackHeader extends Renderable implements DropTarget {
 
   getOffsetXForTab(tab: StackTab): number {
     if (this.isHorizontal) {
-      return this._contentItems.slice(0, this.getIndexOf(tab)).reduce((result, tab) => result + tab.width, this.offsetX);
+      return this.getRenderableChildren()
+        .slice(0, this.getIndexOf(tab))
+        .reduce((result, tab) => result + tab.width, this.offsetX);
     }
 
     return this.offsetX;
@@ -216,15 +221,16 @@ export class StackHeader extends Renderable implements DropTarget {
 
   getOffsetYForTab(tab: StackTab): number {
     if (!this.isHorizontal) {
-      return this._contentItems.slice(0, this.getIndexOf(tab)).reduce((result, tab) => result + tab.height, this.offsetY);
+      return this.getRenderableChildren()
+        .slice(0, this.getIndexOf(tab))
+        .reduce((result, tab) => result + tab.height, this.offsetY);
     }
 
     return this.offsetY;
   }
 
   private _onDragHostStart(): void {
-    this._tabAreas = this._contentItems
-      .filter(tab => tab.isRenderable())
+    this._tabAreas = this.getRenderableChildren()
       .map(tab => tab.getArea());
   }
 

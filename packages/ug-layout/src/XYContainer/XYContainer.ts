@@ -25,6 +25,7 @@ import { Splitter, SPLITTER_SIZE } from './Splitter';
 import { get, isNumber, clamp, round } from '../utils';
 import { Stack, StackItemContainer, STACK_CLASS } from '../stack';
 import { XY_ITEM_CONTAINER_CLASS, SPLITTER_CLASS } from './common';
+import { RenderableStateChangeEvent } from '../events/RenderableStateChangeEvent';
 
 export interface XYContainerConfig extends RenderableConfig {
   /**
@@ -128,6 +129,8 @@ export class XYContainer extends Renderable {
 
       return this.addChild(item, { render: false, resize: false });
     });
+
+    this.scope(RenderableStateChangeEvent).subscribe(() => this.resize());
   }
 
   createChildItem(config: XYItemContainerConfig, options: { index?: number } = {}): XYItemContainer {
@@ -215,14 +218,23 @@ export class XYContainer extends Renderable {
 
   render(): VNode {
     const children: VNode[] = [];
+    let renderableIndex = 0;
 
-    for (const [ index, child ] of this._contentItems.entries()) {
-      if (index > 0 && this._splitters[index - 1] && this._isSplitterRenderable(this._splitters[index - 1])) {
-        children.push(this._splitters[index - 1].render());
-      }
+    for (const child of this._contentItems) {
+      // if (index > 0 && this._splitters[index - 1] && this._isSplitterRenderable(this._splitters[index - 1])) {
+      //   children.push(this._splitters[index - 1].render());
+      // }
 
       if (child.isRenderable()) {
+        if (renderableIndex > 0 && this._splitters[renderableIndex - 1]) {
+          children.push(this._splitters[renderableIndex - 1].render());
+        }
+
         children.push(child.render());
+        renderableIndex++;
+      } else {
+        // Render but don't attach to the dom.
+        child.render();
       }
     }
 
@@ -301,6 +313,22 @@ export class XYContainer extends Renderable {
     return Boolean(this.getRenderableChildren().length);
   }
 
+  private _getRenderableSplitters(): Splitter[] {
+    return this._splitters.slice(0, this.getRenderableChildren().length - 1);
+  }
+
+  private _getRenderableSplitterSize(): number {
+    return this._getRenderableSplitters().reduce((res, splitter) => res + splitter.size, 0);
+  }
+
+  private _getRenderableContainerSize(): number {
+    return this.container
+      ? this.isRow
+        ? this.container.width - this._getRenderableSplitterSize()
+        : this.container.height - this._getRenderableSplitterSize()
+      : 0;
+  }
+
   private _createSplitter(): Splitter {
     const splitterConfig = {
       size: this._config && this._config.splitterSize ? this._config.splitterSize : SPLITTER_SIZE,
@@ -323,15 +351,6 @@ export class XYContainer extends Renderable {
       || after.minSize === after.maxSize;
   }
 
-  private _isSplitterRenderable(splitter: Splitter): boolean {
-    const { before, after } = this._getSplitterItems(splitter);
-
-    return before
-      && after
-      && before.isRenderable()
-      && after.isRenderable();
-  }
-
   private _dragStatusChanged(event: DragEvent<Splitter>): void {
     switch (event.status) {
       case DragStatus.START: return this._dragStart(event);
@@ -342,10 +361,11 @@ export class XYContainer extends Renderable {
 
   private _getSplitterItems(splitter: Splitter): { before: XYItemContainer, after: XYItemContainer } {
     const index = this._splitters.indexOf(splitter);
+    const children = this.getRenderableChildren() as XYItemContainer[];
 
     return {
-      before: this._contentItems[index],
-      after: this._contentItems[index + 1]
+      before: children[index],
+      after: children[index + 1]
     };
   }
 
@@ -393,11 +413,12 @@ export class XYContainer extends Renderable {
   }
 
   private _setDimensions(): void {
-    const totalSplitterSize = this._totalSplitterSize;
+    const totalSplitterSize = this._getRenderableSplitterSize();
     let total = 0;
     let totalWidth = this._width;
     let totalHeight = this._height;
     let sizes: number[] = [];
+    const children = this.getRenderableChildren() as XYItemContainer[];
 
     if (this.isRow) {
       totalWidth -= totalSplitterSize;
@@ -405,7 +426,7 @@ export class XYContainer extends Renderable {
       totalHeight -= totalSplitterSize;
     }
 
-    for (const child of this._contentItems) {
+    for (const child of children) {
       let size = (this.isRow ? totalWidth : totalHeight) * (<number>child.ratio / 100);
 
       total += size;
@@ -414,7 +435,7 @@ export class XYContainer extends Renderable {
 
     const extraPixels = Math.floor((this.isRow ? totalWidth : totalHeight) - total);
 
-    for (const [ index, child ] of this._contentItems.entries()) {
+    for (const [ index, child ] of children.entries()) {
       if (extraPixels - index > 0) {
         sizes[index]++;
       }
@@ -431,12 +452,13 @@ export class XYContainer extends Renderable {
     let total = 0;
     const unallocatedChildren: XYItemContainer[] = [];
     const minimizedItems: XYItemContainer[] = [];
+    const children = this.getRenderableChildren() as XYItemContainer[];
 
-    if (!this._contentItems.length) {
+    if (!children.length) {
       return;
     }
 
-    for (const child of this._contentItems) {
+    for (const child of children) {
       if (child.ratio !== UNALLOCATED) {
         total += child.ratio as number;
       } else {
@@ -461,7 +483,7 @@ export class XYContainer extends Renderable {
           }
         }
 
-        for (const child of this._contentItems) {
+        for (const child of children) {
           child.ratio = (<number>child.ratio / total) * 100;
         }
       }
@@ -479,9 +501,10 @@ export class XYContainer extends Renderable {
     const growable: XYItemContainer[] = [];
     const shrinkable: XYItemContainer[] = [];
     const containerSize = this._totalContainerSize;
+    const children = this.getRenderableChildren() as XYItemContainer[];
     let totalRatio = 0;
 
-    for (const child of this._contentItems) {
+    for (const child of children) {
       const minRatio = !child.isMinimized ? (child.minSize / containerSize) * 100 : 0;
       const maxRatio = (child.maxSize / containerSize) * 100;
 
@@ -509,9 +532,9 @@ export class XYContainer extends Renderable {
       }
     }
 
-    totalRatio = this._contentItems.reduce((r, i) => r + <number>i.ratio, 0);
+    totalRatio = children.reduce((r, i) => r + <number>i.ratio, 0);
 
-    for (const child of this._contentItems) {
+    for (const child of children) {
       child.ratio = (<number>child.ratio / totalRatio) * 100;
     }
   }

@@ -56,10 +56,10 @@ export class DetachHandler {
     }
   }
 
-  detach(): Promise<void> {
+  detach(): Promise<boolean> {
     return new Promise(resolve => {
       if (this.isDetached) {
-        resolve();
+        resolve(false);
 
         return;
       }
@@ -104,7 +104,7 @@ export class DetachHandler {
 
       this._child!.addEventListener('DOMContentLoaded', () => {
         this._renderer!.setContainer(this._child!.document.body);
-        resolve();
+        resolve(true);
       });
     });
   }

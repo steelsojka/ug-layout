@@ -35,7 +35,7 @@ import { StackTab } from './StackTab';
 import { clamp, get, isNumber, propEq, partition } from '../utils';
 import { StackRegion, STACK_HEADER_CLASS, STACK_ITEM_CONTAINER_CLASS } from './common';
 import { RenderableConfigArgs, RenderableConfig } from '../dom';
-import { StackControl, CloseStackControl } from './controls';
+import { StackControl, CloseStackControl, DetachStackControl } from './controls';
 
 export interface StackConfig extends RenderableConfig {
   children: StackItemContainerConfig[];
@@ -173,6 +173,10 @@ export class Stack extends Renderable {
 
     if (!ConfiguredRenderable.inList(this._config.controls, CloseStackControl)) {
       this._config.controls.push(CloseStackControl);
+    }
+
+    if (!ConfiguredRenderable.inList(this._config.controls, DetachStackControl)) {
+      this._config.controls.push(DetachStackControl);
     }
 
     this._config.controls.forEach(control => this.addControl(control));

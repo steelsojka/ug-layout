@@ -200,6 +200,12 @@ export class StackTab extends Renderable {
     ]);
   }
 
+  isRenderable(): boolean {
+    const item = this.item;
+
+    return !item || item.isRenderable();
+  }
+
   destroy(context: RenderableDestroyContext): void {
     this._draggable.destroy();
     super.destroy(context);
