@@ -10,7 +10,7 @@
 
 .ug-layout__splitter:not(.ug-layout__splitter-disabled):hover, .ug-layout__splitter-dragging {
   opacity: 1;
-} 
+}
 
 .ug-layout__xy-item-container {
   background-color: rgb(25, 25, 25);
@@ -24,9 +24,10 @@
   background-color: rgb(45, 45, 45);
   color: rgb(142, 142, 142);
   border-right: 1px solid rgb(37, 37, 38);
-} 
+}
 
-.ug-layout__stack-tab-active {
+.ug-layout__stack-tab-active,
+.ug-layout__default-detach-container {
   background-color: rgb(27, 43, 52);
   color: white;
 }

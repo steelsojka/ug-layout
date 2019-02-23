@@ -9,6 +9,7 @@ import { XYDirection } from '../common';
 import {
   STACK_CLASS
 } from './common';
+import { DetachLoc } from './DetachHandler';
 
 export interface SerializedStackItem {
   tags: string[];
@@ -18,7 +19,11 @@ export interface SerializedStackItem {
   draggable: boolean;
   closeable: boolean;
   detachable: boolean;
-  isDetached: boolean;
+  detach: {
+    isDetached: boolean;
+    loc?: Partial<DetachLoc>;
+    keepContainer: boolean;
+  },
   tabControls: Serialized[];
   persist?: boolean;
 }
@@ -62,7 +67,11 @@ export class StackSerializer extends Serializer<Stack, SerializedStack> {
             droppable: item.droppable,
             closeable: item.closeable,
             detachable: item.detachable,
-            isDetached: item.isDetached(),
+            detach: {
+              isDetached: item.isDetached(),
+              loc: item.getLoc(),
+              keepContainer: item.keepContainerOnDetach
+            },
             tabControls: item.controls.map(control => {
               return this.container.serialize(control);
             })
@@ -93,6 +102,11 @@ export class StackSerializer extends Serializer<Stack, SerializedStack> {
           droppable: child.droppable,
           closeable: child.closeable,
           detachable: child.detachable,
+          detach: {
+            isDetached: child.detach.isDetached,
+            keepContainer: child.detach.keepContainer,
+            loc: child.detach.loc
+          },
           use: this.container.deserialize(child.use),
           tabControls: child.tabControls.map(tabCtrl => {
             return this.container.deserialize<TabControl, Serialized>(tabCtrl);

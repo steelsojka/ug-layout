@@ -35,6 +35,8 @@ import {
   ViewContainer,
   VIEW_CONTAINER_CLASS
 } from './view';
+import { DetachContainerRenderer } from './stack/DetachContainerRenderer';
+import { DefaultDetachContainerRenderer } from './stack/DefaultDetachContainerRenderer';
 
 const patch = snabbdom.init([
   DOMClass,
@@ -66,6 +68,7 @@ export class RootInjector extends RenderableInjector {
       { provide: PatchRef, useValue: patch },
       { provide: DocumentRef, useValue: document },
       { provide: WindowRef, useValue: window },
+      { provide: DetachContainerRenderer, useClass: DefaultDetachContainerRenderer },
       ...providers,
       { provide: RootInjector, useValue: forwardRef(() => this) }
     ]);

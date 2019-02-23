@@ -184,7 +184,8 @@ export class Stack extends Renderable {
   }
 
   render(): VNode {
-    const [ detachedItems, attachedItems ] = partition(this._contentItems, item => item.isDetached());
+    const [ detachedItems, attachedItems ] = partition(this._contentItems, item =>
+      item.isDetached() && !this.isRenderable());
 
     detachedItems.forEach(item => item.render());
 

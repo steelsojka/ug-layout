@@ -18,12 +18,12 @@ import {
   ConfiguredRenderable,
   ResolverStrategy,
   BeforeDestroyEvent,
-  ViewConfig,
-  DetachStackControl
+  ViewConfig
 } from '../../src';
 
 const colors = [ 'red', 'blue', 'white', 'cyan', 'yellow' ];
 
+@ViewComponent()
 class MyView extends View {
   initialize(): void {
     super.initialize();
@@ -103,16 +103,11 @@ const initialLayout = RootLayout.configure({
       }, {
         use: Layout.configure({
           child: Stack.configure({
-            controls: [
-              DetachStackControl.configure({
-                position: StackControlPosition.POST_TAB
-              })
-            ],
             children: [{
               closeable: true,
               title: 'View 2',
               detachable: true,
-              use: MyView.configure({ useClass: TestView, ref: 'View 2' })
+              use: View.configure({ useClass: TestView, ref: 'View 2' })
             }, {
               title: 'View 3',
               detachable: true,
@@ -161,7 +156,10 @@ const rootLayout = window['rootLayout'] = RootLayout
 const serializer = RootSerializer.fromRoot(rootLayout);
 
 serializer.registerClasses({
-  TestView
+  TestView,
+  MyView,
+  OtherComponent,
+  TextComponent
 });
 
 rootLayout.load(initialLayout);

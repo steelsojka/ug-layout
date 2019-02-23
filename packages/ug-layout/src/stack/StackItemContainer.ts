@@ -1,6 +1,6 @@
 import { VNode } from 'snabbdom/vnode';
 import h from 'snabbdom/h';
-import { filter, takeUntil } from 'rxjs/operators';
+import { filter, takeUntil, take } from 'rxjs/operators';
 
 import { Inject, PostConstruct } from '../di'
 import { Renderable, AddChildArgs, ConfiguredRenderable, RenderableArea, RenderableConfig, Transferable, RenderableDestroyContext } from '../dom';
@@ -22,8 +22,9 @@ import { XYContainer } from '../XYContainer';
 import { StackRegion } from './common';
 import { get } from '../utils'
 import { TabControl, CloseTabControl } from './tabControls';
-import { DetachHandler } from './DetachHandler';
+import { DetachHandler, DetachLoc } from './DetachHandler';
 import { RenderableStateChangeEvent } from '../events/RenderableStateChangeEvent';
+import { DetachContainerRenderer } from './DetachContainerRenderer';
 
 export interface StackItemContainerConfig extends RenderableConfig {
   use: RenderableArg<Renderable>;
@@ -32,6 +33,11 @@ export interface StackItemContainerConfig extends RenderableConfig {
   draggable?: boolean;
   closeable?: boolean;
   detachable?: boolean;
+  detach?: {
+    loc?: Partial<DetachLoc>,
+    keepContainer: boolean;
+    isDetached: boolean;
+  };
   persist?: boolean;
   tabControls?: RenderableArg<TabControl>[];
 }
@@ -49,6 +55,7 @@ export class StackItemContainer extends Renderable implements DropTarget, Transf
 
   @Inject(ConfigurationRef) protected _config: StackItemContainerConfig;
   @Inject(ContainerRef) protected _container: Stack;
+  @Inject(DetachContainerRenderer) protected _detachContainerRenderer: DetachContainerRenderer;
 
   get container(): Stack {
     return this._container as Stack;
@@ -126,6 +133,10 @@ export class StackItemContainer extends Renderable implements DropTarget, Transf
     return this._config.detachable === true && !this._detachHandler.isDetached;
   }
 
+  get keepContainerOnDetach(): boolean {
+    return Boolean(get(this._config.detach, 'keepContainer', false));
+  }
+
   protected get _item(): Renderable {
     return this._contentItems[0];
   }
@@ -156,6 +167,12 @@ export class StackItemContainer extends Renderable implements DropTarget, Transf
       this._renderer.render();
     });
     this._detachHandler.onResize.subscribe(() => this._renderer.render());
+
+    if (this._config.detach && this._config.detach.isDetached) {
+      this._renderer.rendered
+        .pipe(take(1))
+        .subscribe(() => this.detach(this._config.detach!.loc));
+    }
   }
 
   render(): VNode {
@@ -167,20 +184,22 @@ export class StackItemContainer extends Renderable implements DropTarget, Transf
           width: `${this._detachHandler.width}px`
         }
       }, [ this._item.render() ]));
-
-      return h('div.ug-layout__detached');
-    } else {
-      return h('div.ug-layout__stack-item-container', {
-        key: this._uid,
-        props: {
-          hidden: !this.isActive
-        },
-        style: {
-          height: `${this.height}px`,
-          width: `${this.width}px`
-        }
-      }, [ this._item.render() ]);
     }
+
+    return h('div.ug-layout__stack-item-container', {
+      key: this._uid,
+      props: {
+        hidden: !this.isActive
+      },
+      style: {
+        height: `${this.height}px`,
+        width: `${this.width}px`
+      }
+    }, [
+      this._detachHandler.isDetached
+        ? this._detachContainerRenderer.render(this)
+        : this._item.render()
+    ]);
   }
 
   isVisible(): boolean {
@@ -198,7 +217,6 @@ export class StackItemContainer extends Renderable implements DropTarget, Transf
 
   handleDrop(item: StackItemContainer, dropArea: DropArea, e: DragEvent<Renderable>): void {
     const region = this._getRegionFromArea(e.pageX, e.pageY, dropArea.area);
-
     this._container.handleItemDrop(region as StackRegion, item);
     this._renderer.render();
   }
@@ -272,14 +290,14 @@ export class StackItemContainer extends Renderable implements DropTarget, Transf
       .subscribe(this._onTabClose.bind(this));
   }
 
-  detach(): void {
+  detach(loc?: Partial<DetachLoc>): void {
     const isActive = this.isActive;
     const index = this.container.getIndexOf(this);
 
-    this._detachHandler.detach()
+    this._detachHandler.detach(loc)
       .then(didDetach => {
         if (didDetach) {
-          if (isActive) {
+          if (isActive && !this.keepContainerOnDetach) {
             this.container.setActiveIndex(index === 0 ? 1 : index - 1, { render: false });
           }
 
@@ -308,7 +326,7 @@ export class StackItemContainer extends Renderable implements DropTarget, Transf
   }
 
   isRenderable(): boolean {
-    return !this._detachHandler.isDetached;
+    return !this._detachHandler.isDetached || this.keepContainerOnDetach;
   }
 
   isDetached(): boolean {
@@ -319,6 +337,10 @@ export class StackItemContainer extends Renderable implements DropTarget, Transf
     return this._detachHandler.isDetached
       ? this._detachHandler.getChild()
       : super.getActiveWindow();
+  }
+
+  getLoc(): Partial<DetachLoc> {
+    return this._detachHandler.getLoc();
   }
 
   private _getRegionFromArea(pageX: number, pageY: number, area: RenderableArea): StackRegion|null {
