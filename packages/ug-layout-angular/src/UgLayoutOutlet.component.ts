@@ -12,7 +12,7 @@ import {
   OnDestroy
 } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
-import { RootLayout, ConfiguredRenderable } from 'ug-layout';
+import { RootLayout, ConfiguredRenderable, RootLayoutCreationConfigArgs } from 'ug-layout';
 import { takeUntil } from 'rxjs/operators';
 
 import { AngularPlugin, AngularPluginConfig } from './AngularPlugin';
@@ -34,6 +34,7 @@ export class UgLayoutOutletComponent implements OnChanges, OnDestroy {
   @Input() root?: RootLayout;
   @Input() destroyNotifier?: Observable<void>;
   @Input() pluginFactory?: (config: AngularPluginConfig) => AngularPlugin;
+  @Input() configFactory?: (config: RootLayoutCreationConfigArgs) => RootLayoutCreationConfigArgs;
   @Output() initialized: EventEmitter<RootLayout> = new EventEmitter();
 
   @ViewChild('container', { read: ViewContainerRef })
@@ -68,11 +69,12 @@ export class UgLayoutOutletComponent implements OnChanges, OnDestroy {
 
       const plugin = this.pluginFactory ? this.pluginFactory(pluginConfig) : new AngularPlugin(pluginConfig);
 
-      this._rootLayout = RootLayout.create({
+      const config = {
         plugins: [ plugin ],
         container: this._viewContainerRef.element.nativeElement
-      });
+      };
 
+      this._rootLayout = RootLayout.create(this.configFactory ? this.configFactory(config) : config);
       this._rootLayout.initialize();
     }
 
