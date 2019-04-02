@@ -26,6 +26,7 @@ export interface RootLayoutCreationConfig {
   container: HTMLElement;
   plugins: UgPlugin[];
   providers: ProviderArg[];
+  getContainerDimensions: (() => { x: number; y: number; width: number; height: number }) | null;
 }
 
 export interface RootLayoutCreationConfigArgs {
@@ -34,6 +35,7 @@ export interface RootLayoutCreationConfigArgs {
   providers?: ProviderArg[];
   interceptors?: ProviderArg[];
   detachUrl?: string;
+  getContainerDimensions?: (() => { x: number; y: number; width: number; height: number }) | null;
 }
 
 export class RootLayout extends Renderable<RootLayoutConfig> {
@@ -94,7 +96,13 @@ export class RootLayout extends Renderable<RootLayoutConfig> {
     }, this._contentItems.map(item => item.render()));
   }
 
-  resize(dimensions?: { height: number, width: number, x: number, y: number }): void {
+  resize(dimensionsOrNone?: { height: number, width: number, x: number, y: number }): void {
+    const dimensions = dimensionsOrNone 
+      ? dimensionsOrNone 
+      : this._rootConfig.getContainerDimensions 
+        ? this._rootConfig.getContainerDimensions() 
+        : null;
+
     if (dimensions) {
       this._width = dimensions.width;
       this._height = dimensions.height;
@@ -182,7 +190,8 @@ export class RootLayout extends Renderable<RootLayoutConfig> {
   static create<T extends RootLayout>(config: RootLayoutCreationConfigArgs = {}): T {
     const _config = defaults(config, {
       plugins: [],
-      providers: []
+      providers: [],
+      getContainerDimensions: null
     }) as RootLayoutCreationConfig;
 
     const providers = _config.plugins.reduce((result, plugin) => {
