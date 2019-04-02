@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.3.0"></a>
+# [4.3.0](https://github.com/steelsojka/ug-layout/compare/v4.2.6...v4.3.0) (2019-04-02)
+
+
+### Features
+
+* **detach:** add serializer and window change events ([12f689d](https://github.com/steelsojka/ug-layout/commit/12f689d))
+* **rootLayout:** allow custom dimensions handler ([8d6c2a4](https://github.com/steelsojka/ug-layout/commit/8d6c2a4))
+* **stack:** add config to keep detached container ([b1223e1](https://github.com/steelsojka/ug-layout/commit/b1223e1))
+* **Stack:** add base detachable window support ([29142b0](https://github.com/steelsojka/ug-layout/commit/29142b0))
+* **Stack:** improved styling for detaching ([6e78dfe](https://github.com/steelsojka/ug-layout/commit/6e78dfe))
+
+
+
 <a name="4.2.6"></a>
 ## [4.2.6](https://github.com/steelsojka/ug-layout/compare/v4.2.5...v4.2.6) (2019-02-04)
 
