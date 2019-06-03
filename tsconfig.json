@@ -6,7 +6,8 @@
     "sourceMap": true,
     "strictNullChecks": true,
     "importHelpers": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "preserveSymlinks": true
   },
   "references": [
     { "path": "./packages/ug-layout" },

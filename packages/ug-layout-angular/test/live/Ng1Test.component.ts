@@ -1,11 +1,10 @@
-import { ViewComponent, Detect } from '../../src';
+import { ViewComponent } from '../../src';
 
 @ViewComponent({
   upgrade: true,
   template: `<div>Hi {{$ctrl.name}}</div>`
 })
 export class Ng1TestComponent {
-  @Detect()
   name: string = 'Steven';
 
   constructor() {

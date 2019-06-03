@@ -4,7 +4,7 @@ import DOMStyle from 'snabbdom/modules/style';
 import DOMProps from 'snabbdom/modules/props';
 import DOMEvents from 'snabbdom/modules/eventlisteners';
 import DOMAttrs from 'snabbdom/modules/attributes';
-import { Subject, Observable, fromEvent } from 'rxjs';
+import { Subject, Observable, fromEvent, timer } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import { VNode, Renderer } from '../dom';
@@ -52,7 +52,7 @@ export class DetachHandler {
   }
 
   get width(): number {
-    return this._child ? this._child.innerWidth: 0;
+    return this._child ? this._child.innerWidth : 0;
   }
 
   render(node: VNode): void {
@@ -86,20 +86,28 @@ export class DetachHandler {
       const width = loc.width || this._lastLoc.width || 800;
       const url = this._rootConfig.detachUrl || undefined;
 
-      this._child = this._windowRef.open(url, '_blank', `height=${height},width=${width},menubar=no,status=no,top=${top},left=${left},resizable=true`);
-      this._renderer = this._injector.resolveAndCreateChild([ {
-        provide: PatchRef,
-        useValue: snabbdom.init([
-          DOMClass,
-          DOMStyle,
-          DOMProps,
-          DOMEvents,
-          DOMAttrs
+      this._child = this._windowRef.open(
+        url,
+        '_blank',
+        `height=${height},width=${width},menubar=no,status=no,top=${top},left=${left},resizable=true`
+      );
+      this._renderer = this._injector
+        .resolveAndCreateChild([
+          {
+            provide: PatchRef,
+            useValue: snabbdom.init([
+              DOMClass,
+              DOMStyle,
+              DOMProps,
+              DOMEvents,
+              DOMAttrs
+            ])
+          },
+          {
+            provide: DocumentRef,
+            useValue: this._child!.document
+          }
         ])
-      }, {
-        provide: DocumentRef,
-        useValue: this._child!.document
-      } ])
         .resolveAndInstantiate(Renderer);
 
       this._renderer!.useNodeGenerator(() => this._vnode!);
@@ -116,7 +124,7 @@ export class DetachHandler {
         .pipe(takeUntil(this.onDestroy))
         .subscribe(debounce(() => this._onResize.next(), 50));
 
-      fromEvent(this._child!, 'DOMContentLoaded')
+      timer(0)
         .pipe(takeUntil(this.onDestroy))
         .subscribe(() => {
           this._renderer!.setContainer(this._child!.document.body);

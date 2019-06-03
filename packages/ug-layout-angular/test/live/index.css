@@ -4,7 +4,8 @@ body {
   margin: 0;
 }
 
-app, .app {
+app,
+.app {
   display: block;
   height: 100%;
   width: 100%;
@@ -15,5 +16,5 @@ app, .app {
 }
 
 .ug-layout__view-container {
-  background-color: white;
+  background-color: red;
 }
