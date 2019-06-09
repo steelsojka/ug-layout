@@ -44,6 +44,7 @@
   },
   "peerDependencies": {
     "@angular/core": "^6.0.0",
+    "@angular/platform-browser": "^6.0.0",
     "rxjs": "^6.0.0",
     "ug-layout": "^4",
     "zone.js": "^0.8.4"

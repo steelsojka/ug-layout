@@ -8,3 +8,5 @@ export * from './StackTab';
 export * from './TabCloseEvent';
 export * from './StackSerializer';
 export * from './TabSelectionEvent';
+export * from './DetachHost';
+export * from './DetachHandler';

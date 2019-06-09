@@ -4,7 +4,7 @@ import DOMStyle from 'snabbdom/modules/style';
 import DOMProps from 'snabbdom/modules/props';
 import DOMEvents from 'snabbdom/modules/eventlisteners';
 import DOMAttrs from 'snabbdom/modules/attributes';
-import { Subject, Observable, fromEvent, timer } from 'rxjs';
+import { Subject, Observable, fromEvent } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import { VNode, Renderer } from '../dom';
@@ -12,6 +12,7 @@ import { Injector, Inject } from '../di';
 import { WindowRef, PatchRef, DocumentRef, RootConfigRef } from '../common';
 import { RootLayoutCreationConfigArgs } from '../RootLayout';
 import { debounce } from '../utils/throttle';
+import { DetachHost } from './DetachHost';
 
 export interface DetachLoc {
   x: number;
@@ -27,20 +28,25 @@ export class DetachHandler {
   private _onClose: Subject<void> = new Subject();
   private _onResize: Subject<void> = new Subject();
   private _onDestroy: Subject<void> = new Subject();
+  private _onDetach: Subject<void> = new Subject();
   private _lastLoc: Partial<DetachLoc> = {};
 
   readonly onClose: Observable<void> = this._onClose.asObservable();
   readonly onResize: Observable<void> = this._onResize.asObservable();
   readonly onDestroy: Observable<void> = this._onDestroy.asObservable();
+  readonly onDetach: Observable<void> = this._onDetach.asObservable();
 
   constructor(
     @Inject(WindowRef) private _windowRef: Window,
     @Inject(Injector) private _injector: Injector,
-    @Inject(RootConfigRef) private _rootConfig: RootLayoutCreationConfigArgs
+    @Inject(RootConfigRef) private _rootConfig: RootLayoutCreationConfigArgs,
+    @Inject(DetachHost) private _detachHost: DetachHost
   ) {
     fromEvent(this._windowRef, 'beforeunload')
       .pipe(takeUntil(this.onDestroy))
       .subscribe(() => this.destroy());
+
+    this._detachHost.registerHandler(this);
   }
 
   get isDetached(): boolean {
@@ -124,10 +130,11 @@ export class DetachHandler {
         .pipe(takeUntil(this.onDestroy))
         .subscribe(debounce(() => this._onResize.next(), 50));
 
-      timer(0)
+      fromEvent(this._child!, 'DOMContentLoaded')
         .pipe(takeUntil(this.onDestroy))
         .subscribe(() => {
           this._renderer!.setContainer(this._child!.document.body);
+          this._onDetach.next();
           resolve(true);
         });
     });
@@ -149,6 +156,7 @@ export class DetachHandler {
     this._onDestroy.complete();
     this._onClose.complete();
     this._onResize.complete();
+    this._onDetach.complete();
   }
 
   focus(): void {

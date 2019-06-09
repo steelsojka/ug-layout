@@ -31,12 +31,10 @@ import {
   XY_ITEM_CONTAINER_CLASS,
   SPLITTER_CLASS
 } from './XYContainer';
-import {
-  ViewContainer,
-  VIEW_CONTAINER_CLASS
-} from './view';
+import { ViewContainer, VIEW_CONTAINER_CLASS } from './view';
 import { DetachContainerRenderer } from './stack/DetachContainerRenderer';
 import { DefaultDetachContainerRenderer } from './stack/DefaultDetachContainerRenderer';
+import { DetachHost } from './stack/DetachHost';
 
 const patch = snabbdom.init([
   DOMClass,
@@ -56,6 +54,7 @@ export class RootInjector extends RenderableInjector {
       LayoutManipulator,
       LockState,
       ViewHookExecutor,
+      DetachHost,
       { provide: STACK_TAB_CLASS, useValue: StackTab },
       { provide: STACK_HEADER_CLASS, useValue: StackHeader },
       { provide: STACK_ITEM_CONTAINER_CLASS, useValue: StackItemContainer },
@@ -68,7 +67,10 @@ export class RootInjector extends RenderableInjector {
       { provide: PatchRef, useValue: patch },
       { provide: DocumentRef, useValue: document },
       { provide: WindowRef, useValue: window },
-      { provide: DetachContainerRenderer, useClass: DefaultDetachContainerRenderer },
+      {
+        provide: DetachContainerRenderer,
+        useClass: DefaultDetachContainerRenderer
+      },
       ...providers,
       { provide: RootInjector, useValue: forwardRef(() => this) }
     ]);

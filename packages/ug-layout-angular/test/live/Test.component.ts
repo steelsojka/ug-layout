@@ -1,4 +1,18 @@
-import { Inject, Component, Input, Output, EventEmitter } from '@angular/core';
+import {
+  Inject,
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  ChangeDetectorRef,
+  ViewRef,
+  Injector,
+  ViewEncapsulation
+} from '@angular/core';
+import {
+  ɵSharedStylesHost,
+  ɵDomSharedStylesHost
+} from '@angular/platform-browser';
 import { ViewComponent, ViewContainer, ResolverStrategy } from 'ug-layout';
 
 @ViewComponent({
@@ -7,6 +21,13 @@ import { ViewComponent, ViewContainer, ResolverStrategy } from 'ug-layout';
 })
 @Component({
   selector: 'test',
+  styles: [
+    `
+      h1 {
+        color: blue;
+      }
+    `
+  ],
   template: `
     <div>
       <h1>This is a test</h1>
@@ -21,7 +42,9 @@ export class TestComponent {
   test: number = 0;
 
   constructor(
-    @Inject(ViewContainer) private _viewContainer: ViewContainer<TestComponent>
+    @Inject(ViewContainer) private _viewContainer: ViewContainer<TestComponent>,
+    @Inject(ChangeDetectorRef) private _viewRef: ViewRef,
+    @Inject(ɵDomSharedStylesHost) private _stylesHost: ɵDomSharedStylesHost
   ) {
     window['component'] = this;
   }

@@ -21,7 +21,8 @@ import {
   ElementRef,
   Provider
 } from '@angular/core';
-import { Subject, Observable } from 'rxjs';
+import { ɵDomSharedStylesHost } from '@angular/platform-browser';
+import { Subject, merge } from 'rxjs';
 
 import * as angular from './angular';
 import { AngularPlugin } from './AngularPlugin';
@@ -33,10 +34,12 @@ import {
   ANGULAR_PLUGIN,
   ANGULAR_GLOBAL
 } from './common';
+import { DetachHost } from 'ug-layout';
 
 export class AngularViewFactory extends ViewFactory {
   @Inject(ANGULAR_PLUGIN) protected _plugin: AngularPlugin;
   @Inject(ANGULAR_GLOBAL) protected _angularGlobal: any;
+  @Inject(DetachHost) protected _detachHost: DetachHost;
 
   protected _componentFactoryResolver: ComponentFactoryResolver;
   protected _ng1Bootstrapped: Subject<void> = new Subject<void>();
@@ -53,21 +56,47 @@ export class AngularViewFactory extends ViewFactory {
 
   @PostConstruct()
   init(): void {
-    this._componentFactoryResolver = this._ng2Injector.get(ComponentFactoryResolver);
+    // This is technically private... BUT it is exported so... it's fair game.
+    const styleHost = this._ng2Injector.get(ɵDomSharedStylesHost);
+
+    this._componentFactoryResolver = this._ng2Injector.get(
+      ComponentFactoryResolver
+    );
+
+    // On detach add the detach child as a style host to add
+    // all styles to that child.
+    if (this._plugin.detachComponentStyles) {
+      this._detachHost.onDetach.subscribe(handler => {
+        const childWindow = handler.getChild();
+
+        if (childWindow) {
+          const childHost = childWindow.document.head;
+
+          styleHost.addHost(childHost);
+          handler.onClose.subscribe(() => styleHost.removeHost(childHost));
+        }
+      });
+    }
   }
 
   create<T>(args: ViewFactoryArgs): ViewContainer<T> {
     // Pass through for non angular components.
-    if (!TagUtil.matchesTags(args.config, [ ANGULAR_TAG ])) {
+    if (!TagUtil.matchesTags(args.config, [ANGULAR_TAG])) {
       return super.create<T>(args);
     }
 
     let viewConfig = null;
 
     if (args.config.useClass) {
-      viewConfig = ConfiguredItem.resolveConfig<any>(args.config.useClass, null);
+      viewConfig = ConfiguredItem.resolveConfig<any>(
+        args.config.useClass,
+        null
+      );
     } else if (args.config.useFactory) {
-      viewConfig = ConfiguredItem.resolveConfig<any>(args.config.useFactory, null);
+      viewConfig = ConfiguredItem.resolveConfig<any>(
+        args.config.useFactory,
+        null
+      );
     }
 
     const component = this.getTokenFrom(args.config);
@@ -77,15 +106,24 @@ export class AngularViewFactory extends ViewFactory {
       config: {
         ...args.config,
         token: component,
-        useFactory: new ConfiguredItem(this.createFactory<T>(component, args.config), viewConfig),
-        deps: [ ViewContainer, VIEW_COMPONENT_CONFIG ]
+        useFactory: new ConfiguredItem(
+          this.createFactory<T>(component, args.config),
+          viewConfig
+        ),
+        deps: [ViewContainer, VIEW_COMPONENT_CONFIG]
       }
     });
   }
 
-  protected createFactory<T>(component: Type<T>, config: ViewConfig): (...args: any[]) => Promise<T> {
+  protected createFactory<T>(
+    component: Type<T>,
+    config: ViewConfig
+  ): (...args: any[]) => Promise<T> {
     return async (viewContainer: ViewContainer<T>, config: any): Promise<T> => {
-      const metadata = Reflect.getMetadata(VIEW_CONFIG_KEY, component) as ViewComponentConfig;
+      const metadata = Reflect.getMetadata(
+        VIEW_CONFIG_KEY,
+        component
+      ) as ViewComponentConfig;
 
       if (metadata.upgrade) {
         return await this._ng1Factory(viewContainer, component, config);
@@ -95,7 +133,11 @@ export class AngularViewFactory extends ViewFactory {
     };
   }
 
-  private async _ng1Factory<T>(viewContainer: ViewContainer<T>, component: Type<T>, config: any): Promise<T> {
+  private async _ng1Factory<T>(
+    viewContainer: ViewContainer<T>,
+    component: Type<T>,
+    config: any
+  ): Promise<T> {
     if (!this._isNg1Bootstrapped) {
       if (!this._isCheckingForNg1) {
         this._checkForNg1Init();
@@ -105,33 +147,53 @@ export class AngularViewFactory extends ViewFactory {
     }
 
     const token = component;
-    const metadata = Reflect.getOwnMetadata(VIEW_CONFIG_KEY, token) as ViewComponentConfig;
+    const metadata = Reflect.getOwnMetadata(
+      VIEW_CONFIG_KEY,
+      token
+    ) as ViewComponentConfig;
     const ng1Injector = this._ng2Injector.get('$injector') as angular.Injector;
-    const componentRef = ng1Injector.instantiate<Angular1ComponentFactory<T>>(Angular1ComponentFactory, {
-      viewContainer,
-      Component: token,
-      config: metadata,
-      $scope: this._plugin.scope || ng1Injector.get<angular.Scope>('$rootScope'),
-      angularGlobal: this._angularGlobal,
-      providers: this.getNg1Providers({
-        viewComponentConfig: config
-      }, viewContainer)
-    });
+    const componentRef = ng1Injector.instantiate<Angular1ComponentFactory<T>>(
+      Angular1ComponentFactory,
+      {
+        viewContainer,
+        Component: token,
+        config: metadata,
+        $scope:
+          this._plugin.scope || ng1Injector.get<angular.Scope>('$rootScope'),
+        angularGlobal: this._angularGlobal,
+        providers: this.getNg1Providers(
+          {
+            viewComponentConfig: config
+          },
+          viewContainer
+        )
+      }
+    );
 
-    viewContainer.destroyed
-      .subscribe(() => this._onNg1ComponentDestroyed(componentRef.scope, viewContainer));
+    viewContainer.destroyed.subscribe(() =>
+      this._onNg1ComponentDestroyed(componentRef.scope, viewContainer)
+    );
 
     return componentRef.create();
   }
 
-  private async _ng2Factory<T>(viewContainer: ViewContainer<T>, component: Type<T>, config: any): Promise<T> {
+  private async _ng2Factory<T>(
+    viewContainer: ViewContainer<T>,
+    component: Type<T>,
+    config: any
+  ): Promise<T> {
     const token = component;
 
-    const componentFactory = this._componentFactoryResolver.resolveComponentFactory<T>(token);
+    const componentFactory = this._componentFactoryResolver.resolveComponentFactory<
+      T
+    >(token);
     const injector = ReflectiveInjector.resolveAndCreate(
       this.getNg2Providers(
         [
-          { provide: ElementRef, useValue: new ElementRef(viewContainer.element) },
+          {
+            provide: ElementRef,
+            useValue: new ElementRef(viewContainer.element)
+          },
           { provide: ViewContainer, useValue: viewContainer },
           { provide: VIEW_COMPONENT_CONFIG, useValue: config }
         ],
@@ -151,17 +213,18 @@ export class AngularViewFactory extends ViewFactory {
     componentRef.instance[COMPONENT_REF_KEY] = componentRef;
     viewContainer.mount(componentRef.location.nativeElement);
 
-    viewContainer.destroyed
-      .subscribe(() => {
-        unbindInputs();
-        this._onComponentDestroy(componentRef, componentFactory);
-      });
+    viewContainer.destroyed.subscribe(() => {
+      unbindInputs();
+      this._onComponentDestroy(componentRef, componentFactory);
+    });
 
-    viewContainer.attached
-      .subscribe(() => this._onAttachChange(true, componentRef, viewContainer));
+    viewContainer.attached.subscribe(() =>
+      this._onAttachChange(true, componentRef, viewContainer)
+    );
 
-    viewContainer.detached
-      .subscribe(() => this._onAttachChange(false, componentRef, viewContainer));
+    viewContainer.detached.subscribe(() =>
+      this._onAttachChange(false, componentRef, viewContainer)
+    );
 
     // This is needed for dynamic components...
     componentRef.changeDetectorRef.markForCheck();
@@ -169,7 +232,11 @@ export class AngularViewFactory extends ViewFactory {
     return componentRef.instance;
   }
 
-  private _onAttachChange<T>(isAttached: boolean, componentRef: ComponentRef<T>, viewContainer: ViewContainer<T>): void {
+  private _onAttachChange<T>(
+    isAttached: boolean,
+    componentRef: ComponentRef<T>,
+    viewContainer: ViewContainer<T>
+  ): void {
     const index = this._viewContainerRef.indexOf(componentRef.hostView);
     const hasViewRef = index !== -1;
 
@@ -207,19 +274,29 @@ export class AngularViewFactory extends ViewFactory {
     }
   }
 
-  private _setupInputs<T>(factory: ComponentFactory<T>, componentRef: ComponentRef<T>): () => void {
+  private _setupInputs<T>(
+    factory: ComponentFactory<T>,
+    componentRef: ComponentRef<T>
+  ): () => void {
     let isBound: boolean = true;
 
     for (const input of factory.inputs) {
-      const descriptor = Object.getOwnPropertyDescriptor(componentRef.instance, input.propName)
+      const descriptor =
+        Object.getOwnPropertyDescriptor(
+          componentRef.instance,
+          input.propName
+        ) ||
         // Account for getter/setters
-        || Object.getOwnPropertyDescriptor(componentRef.componentType.prototype, input.propName);
+        Object.getOwnPropertyDescriptor(
+          componentRef.componentType.prototype,
+          input.propName
+        );
 
       if (descriptor) {
         let { set, get, value } = descriptor;
 
         if (!set && !get) {
-          set = v => value = v;
+          set = v => (value = v);
           get = () => value;
         }
 
@@ -240,10 +317,13 @@ export class AngularViewFactory extends ViewFactory {
       }
     }
 
-    return () => isBound = false;
+    return () => (isBound = false);
   }
 
-  private _onDestroyNotify<T>(componentRef: ComponentRef<T>, viewContainer: ViewContainer<T>): void {
+  private _onDestroyNotify<T>(
+    componentRef: ComponentRef<T>,
+    viewContainer: ViewContainer<T>
+  ): void {
     const index = this._viewContainerRef.indexOf(componentRef.hostView);
 
     if (viewContainer.isCacheable) {
@@ -255,8 +335,14 @@ export class AngularViewFactory extends ViewFactory {
     }
   }
 
-  private _onNg1ComponentDestroyed<T>(scope: angular.Scope, container: ViewContainer<T>): void {
-    if (container.component && typeof container.component['$onDestroy'] === 'function') {
+  private _onNg1ComponentDestroyed<T>(
+    scope: angular.Scope,
+    container: ViewContainer<T>
+  ): void {
+    if (
+      container.component &&
+      typeof container.component['$onDestroy'] === 'function'
+    ) {
       container.component['$onDestroy']();
     }
 
@@ -269,7 +355,10 @@ export class AngularViewFactory extends ViewFactory {
     }
   }
 
-  private _onComponentDestroy<T>(componentRef: ComponentRef<T>, componentFactory: ComponentFactory<T>): void {
+  private _onComponentDestroy<T>(
+    componentRef: ComponentRef<T>,
+    componentFactory: ComponentFactory<T>
+  ): void {
     const index = this._viewContainerRef.indexOf(componentRef.hostView);
 
     if (index !== -1) {
@@ -279,19 +368,27 @@ export class AngularViewFactory extends ViewFactory {
     componentRef.destroy();
 
     for (const output of componentFactory.outputs) {
-      if (typeof componentRef.instance === 'object'
-        && typeof componentRef.instance[output.propName] === 'object'
-        && typeof componentRef.instance[output.propName].complete === 'function') {
+      if (
+        typeof componentRef.instance === 'object' &&
+        typeof componentRef.instance[output.propName] === 'object' &&
+        typeof componentRef.instance[output.propName].complete === 'function'
+      ) {
         componentRef.instance[output.propName].complete();
       }
     }
   }
 
-  protected getNg1Providers(providers: { [key: string]: any }, viewContainer: ViewContainer<any>): { [key: string]: any } {
+  protected getNg1Providers(
+    providers: { [key: string]: any },
+    viewContainer: ViewContainer<any>
+  ): { [key: string]: any } {
     return providers;
   }
 
-  protected getNg2Providers(providers: Provider[], viewContainer: ViewContainer<any>): Provider[] {
+  protected getNg2Providers(
+    providers: Provider[],
+    viewContainer: ViewContainer<any>
+  ): Provider[] {
     return providers;
   }
 }

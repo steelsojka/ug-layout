@@ -15,20 +15,24 @@ export interface AngularPluginConfig {
   viewContainerRef: ViewContainerRef;
   ngInjector: Injector;
   scope?: angular.Scope;
-  angularGlobal?: any
+  angularGlobal?: any;
+  // Whether a detach child should be added as a style host.
+  detachComponentStyles?: boolean;
 }
 
 export class AngularPlugin implements UgPlugin {
   private _viewContainerRef: ViewContainerRef;
   private _injector: Injector;
-  private _scope: angular.Scope|null;
+  private _scope: angular.Scope | null;
   private _angularGlobal: any;
+  private _detachComponentStyles: boolean;
 
   constructor(config: AngularPluginConfig) {
     this.setInjector(config.ngInjector);
     this.setViewContainerRef(config.viewContainerRef);
     this._angularGlobal = config.angularGlobal || null;
     this._scope = config.scope || null;
+    this._detachComponentStyles = !(config.detachComponentStyles === false);
   }
 
   initialize(root: RootLayout): void {
@@ -49,6 +53,10 @@ export class AngularPlugin implements UgPlugin {
     ];
   }
 
+  get detachComponentStyles(): boolean {
+    return this._detachComponentStyles;
+  }
+
   get viewContainerRef(): ViewContainerRef {
     return this._viewContainerRef;
   }
@@ -57,7 +65,7 @@ export class AngularPlugin implements UgPlugin {
     return this._injector;
   }
 
-  get scope(): angular.Scope|null {
+  get scope(): angular.Scope | null {
     return this._scope;
   }
 
