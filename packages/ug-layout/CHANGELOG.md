@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.4.0"></a>
+# [4.4.0](https://github.com/steelsojka/ug-layout/compare/v4.2.4...v4.4.0) (2019-06-09)
+
+
+### Bug Fixes
+
+* **angular:** use detach child as a style host ([1398d71](https://github.com/steelsojka/ug-layout/commit/1398d71))
+* **ViewContainer:** add new cache strategy for RELOAD only ([64e031f](https://github.com/steelsojka/ug-layout/commit/64e031f))
+* **ViewFactory:** fix uneeded first operator ([583fcc8](https://github.com/steelsojka/ug-layout/commit/583fcc8))
+
+
+### Features
+
+* **detach:** add serializer and window change events ([12f689d](https://github.com/steelsojka/ug-layout/commit/12f689d))
+* **outlet:** allow config factory for root layout ([2d94143](https://github.com/steelsojka/ug-layout/commit/2d94143))
+* **rootLayout:** allow custom dimensions handler ([8d6c2a4](https://github.com/steelsojka/ug-layout/commit/8d6c2a4))
+* **stack:** add config to keep detached container ([b1223e1](https://github.com/steelsojka/ug-layout/commit/b1223e1))
+* **Stack:** add base detachable window support ([29142b0](https://github.com/steelsojka/ug-layout/commit/29142b0))
+* **Stack:** improved styling for detaching ([6e78dfe](https://github.com/steelsojka/ug-layout/commit/6e78dfe))
+
+
+
 <a name="4.3.0"></a>
 # [4.3.0](https://github.com/steelsojka/ug-layout/compare/v4.2.6...v4.3.0) (2019-04-02)
 
