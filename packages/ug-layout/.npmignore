@@ -6,3 +6,4 @@ tsconfig*
 webpack*
 esdoc-plugin.js
 .esdoc.json
+.history
