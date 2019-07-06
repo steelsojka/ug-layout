@@ -22,42 +22,18 @@ import { Ng1TestComponent } from './Ng1Test.component';
   selector: 'app',
   template: `
     <div class="app">
-      <ug-layout-outlet
-        [config]="config"
-        [configFactory]="configFactory"
-      ></ug-layout-outlet>
+      <ug-layout>
+        <ug-layout-column>
+          <ng-container *ugLayoutView="let viewContainer">
+            <test [container]="viewContainer"></test>
+          </ng-container>
+          <ng-container *ugLayoutView>
+            <test [show]="false"></test>
+          </ng-container>
+          <div *ugLayoutView>Some HTML</div>
+        </ug-layout-column>
+      </ug-layout>
     </div>
   `
 })
-export class AppComponent {
-  config = RootLayout.configure({
-    use: Layout.configure({
-      child: Stack.configure({
-        children: [
-          {
-            title: 'Test 1',
-            detachable: true,
-            use: AngularView.configure({
-              ref: 'test1',
-              useClass: TestComponent
-            })
-          },
-          {
-            title: 'Test 2',
-            use: AngularView.configure({
-              ref: 'test2',
-              useClass: TestComponent
-            })
-          }
-        ]
-      })
-    })
-  });
-
-  configFactory(config) {
-    return {
-      ...config,
-      detachUrl: '/detached.html'
-    };
-  }
-}
+export class AppComponent {}

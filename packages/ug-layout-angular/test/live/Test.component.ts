@@ -41,11 +41,10 @@ export class TestComponent {
 
   test: number = 0;
 
-  constructor(
-    @Inject(ViewContainer) private _viewContainer: ViewContainer<TestComponent>,
-    @Inject(ChangeDetectorRef) private _viewRef: ViewRef,
-    @Inject(ɵDomSharedStylesHost) private _stylesHost: ɵDomSharedStylesHost
-  ) {
+  constructor() // @Inject(ViewContainer) private _viewContainer: ViewContainer<TestComponent>,
+  // @Inject(ChangeDetectorRef) private _viewRef: ViewRef,
+  // @Inject(ɵDomSharedStylesHost) private _stylesHost: ɵDomSharedStylesHost
+  {
     window['component'] = this;
   }
 

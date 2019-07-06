@@ -8,13 +8,9 @@ import { AppComponent } from './App.component';
 import { TestComponent } from './Test.component';
 
 @NgModule({
-  imports: [
-    UpgradeModule,
-    BrowserModule,
-    UgLayoutModule
-  ],
-  declarations: [ AppComponent, TestComponent ],
-  entryComponents: [ TestComponent ],
-  bootstrap: [ AppComponent ]
+  imports: [UpgradeModule, BrowserModule, UgLayoutModule],
+  declarations: [AppComponent, TestComponent],
+  entryComponents: [TestComponent],
+  bootstrap: [AppComponent]
 })
 export class AppModule {}

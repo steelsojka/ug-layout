@@ -1,19 +1,19 @@
-import { Directive, Inject, forwardRef, SkipSelf } from '@angular/core';
-import { ConfiguredRenderable, RowConfig } from 'ug-layout';
+import { Directive, Inject, forwardRef, SkipSelf, Host } from '@angular/core';
+import { ConfiguredRenderable, Row, Column } from 'ug-layout';
 
-import { UgLayoutRenderableDirective, UG_CONTAINER } from './UgLayoutRenderable.directive';
+import {
+  UgLayoutRenderableDirective,
+  UG_CONTAINER
+} from './UgLayoutRenderable.directive';
 
-@Directive({
-  selector: 'ug-layout-row',
-  providers: [
-    { provide: UG_CONTAINER, useExisting: forwardRef(() => UgLayoutRowDirective) }
-  ]
-})
-export class UgLayoutRowDirective extends UgLayoutRenderableDirective {
-  private _children: UgLayoutRenderableDirective[] = [];
+export abstract class UgLayoutXYDirective extends UgLayoutRenderableDirective {
+  protected _children: UgLayoutRenderableDirective[] = [];
 
   constructor(
-    @Inject(UG_CONTAINER) @SkipSelf() _parent: UgLayoutRenderableDirective
+    @Inject(UG_CONTAINER)
+    @SkipSelf()
+    @Host()
+    _parent: UgLayoutRenderableDirective
   ) {
     super(_parent);
   }
@@ -22,9 +22,39 @@ export class UgLayoutRowDirective extends UgLayoutRenderableDirective {
     this._children.push(child);
   }
 
-  getConfig(): RowConfig {
-    return {
+  abstract getConfig(): ConfiguredRenderable<Row | Column>;
+}
+
+@Directive({
+  selector: 'ug-layout-row',
+  providers: [
+    {
+      provide: UG_CONTAINER,
+      useExisting: forwardRef(() => UgLayoutRowDirective)
+    }
+  ]
+})
+export class UgLayoutRowDirective extends UgLayoutXYDirective {
+  getConfig(): ConfiguredRenderable<Row> {
+    return Row.configure({
       children: this._children.map(child => child.getConfig())
-    };
+    });
+  }
+}
+
+@Directive({
+  selector: 'ug-layout-column',
+  providers: [
+    {
+      provide: UG_CONTAINER,
+      useExisting: forwardRef(() => UgLayoutColumnDirective)
+    }
+  ]
+})
+export class UgLayoutColumnDirective extends UgLayoutXYDirective {
+  getConfig(): ConfiguredRenderable<Column> {
+    return Column.configure({
+      children: this._children.map(child => child.getConfig())
+    });
   }
 }
