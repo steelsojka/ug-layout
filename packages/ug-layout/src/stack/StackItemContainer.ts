@@ -155,7 +155,12 @@ export class StackItemContainer extends Renderable
   initialize(): void {
     super.initialize();
 
-    this._detachHandler = this._injector.resolveAndInstantiate(DetachHandler);
+    this._detachHandler = this._injector
+      .resolveAndCreateChild([
+        DetachHandler,
+        { provide: Renderable, useValue: this }
+      ])
+      .get(DetachHandler);
 
     this._contentItems = [this.createChild(this._config.use)];
 

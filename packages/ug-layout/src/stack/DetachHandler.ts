@@ -7,12 +7,13 @@ import DOMAttrs from 'snabbdom/modules/attributes';
 import { Subject, Observable, fromEvent } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-import { VNode, Renderer } from '../dom';
+import { VNode, Renderer, Renderable } from '../dom';
 import { Injector, Inject } from '../di';
 import { WindowRef, PatchRef, DocumentRef, RootConfigRef } from '../common';
 import { RootLayoutCreationConfigArgs } from '../RootLayout';
 import { debounce } from '../utils/throttle';
 import { DetachHost } from './DetachHost';
+import {StackItemContainer} from './StackItemContainer';
 
 export interface DetachLoc {
   x: number;
@@ -40,7 +41,8 @@ export class DetachHandler {
     @Inject(WindowRef) private _windowRef: Window,
     @Inject(Injector) private _injector: Injector,
     @Inject(RootConfigRef) private _rootConfig: RootLayoutCreationConfigArgs,
-    @Inject(DetachHost) private _detachHost: DetachHost
+    @Inject(DetachHost) private _detachHost: DetachHost,
+    @Inject(Renderable) private _renderable: Renderable
   ) {
     fromEvent(this._windowRef, 'beforeunload')
       .pipe(takeUntil(this.onDestroy))
@@ -59,6 +61,10 @@ export class DetachHandler {
 
   get width(): number {
     return this._child ? this._child.innerWidth : 0;
+  }
+
+  get renderable(): Renderable {
+    return this._renderable;
   }
 
   render(node: VNode): void {

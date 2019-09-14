@@ -136,16 +136,16 @@ export class ViewManager {
       return container;
     }
 
-    return this.createWith<T>(config, factory, options);
+    return this.createWith<T>(config, factory);
   }
 
-  create<T>(args: ViewFactoryArgs, options: ViewResolutionOptions = {}): ViewContainer<T> {
+  create<T>(args: ViewFactoryArgs): ViewContainer<T> {
     return this.createWith(args.config, (): ViewContainer<T> => {
       return this._viewFactory.create<T>(args);
-    }, options);
+    });
   }
 
-  createWith<T>(config: ViewConfig, factory: (viewFactory: ViewFactory) => ViewContainer<T>, options: ViewResolutionOptions = {}): ViewContainer<T> {
+  createWith<T>(config: ViewConfig, factory: (viewFactory: ViewFactory) => ViewContainer<T>): ViewContainer<T> {
     const token = this._viewFactory.getTokenFrom(config);
 
     this._assertAndReadComponent(token);
@@ -247,7 +247,7 @@ export class ViewManager {
   queryToken<T>(token: any, id?: number, options: ViewQueryArgs = {}): Observable<ViewManagerQueryEvent<T>> {
     const { immediate = false } = options;
 
-    return Observable.create((observer: Observer<ViewManagerQueryEvent<T>>) => {
+    return new Observable<ViewManagerQueryEvent<T>>(observer => {
       for (const container of this.query<T>({ token, id })) {
         observer.next({
           token,
@@ -276,7 +276,7 @@ export class ViewManager {
   queryRef<T>(ref: string, options: ViewQueryArgs = {}): Observable<ViewManagerQueryEvent<T>> {
     const { immediate = false } = options;
 
-    return Observable.create((observer: Observer<ViewManagerQueryEvent<T>>) => {
+    return new Observable<ViewManagerQueryEvent<T>>(observer => {
       const result = this.query<T>({ ref });
 
       if (result.length) {

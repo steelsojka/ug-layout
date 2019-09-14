@@ -129,6 +129,10 @@ export class View extends Renderable {
     return this._element;
   }
 
+  get viewContainer(): ViewContainer<any> | null {
+    return this._viewContainer;
+  }
+
   @PostConstruct()
   initialize(): void {
     super.initialize();

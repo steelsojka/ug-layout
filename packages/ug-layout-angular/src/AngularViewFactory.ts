@@ -8,7 +8,8 @@ import {
   ConfiguredItem,
   TagUtil,
   ViewConfig,
-  VIEW_CONFIG_KEY
+  VIEW_CONFIG_KEY,
+  DetachHandler
 } from 'ug-layout';
 import {
   Injector,
@@ -35,6 +36,8 @@ import {
   ANGULAR_GLOBAL
 } from './common';
 import { DetachHost } from 'ug-layout';
+import { AngularView } from './AngularView';
+import { startWith, map, take, filter } from 'rxjs/operators';
 
 export class AngularViewFactory extends ViewFactory {
   @Inject(ANGULAR_PLUGIN) protected _plugin: AngularPlugin;
@@ -77,6 +80,10 @@ export class AngularViewFactory extends ViewFactory {
         }
       });
     }
+
+    this._detachHost.onDetach.subscribe(handler =>
+      this._handleComponentDetach(handler)
+    );
   }
 
   create<T>(args: ViewFactoryArgs): ViewContainer<T> {
@@ -375,6 +382,23 @@ export class AngularViewFactory extends ViewFactory {
       ) {
         componentRef.instance[output.propName].complete();
       }
+    }
+  }
+
+  private _handleComponentDetach(handler: DetachHandler): void {
+    const views: AngularView[] = handler.renderable
+      .getLeafNodes()
+      .filter(renderable => renderable instanceof AngularView);
+
+    for (const view of views) {
+      view.viewContainerCreated
+        .pipe(
+          map(event => event.container),
+          startWith(view.viewContainer),
+          filter<ViewContainer<any> | null, ViewContainer<any>>(Boolean),
+          take(1)
+        )
+        .subscribe(container => container);
     }
   }
 
