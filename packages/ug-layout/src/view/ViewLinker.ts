@@ -1,4 +1,4 @@
-import { Subscription, Observable, Observer, Subject } from 'rxjs';
+import { Subscription, Observable, Subject, OperatorFunction } from 'rxjs';
 
 import { Inject, Injector } from '../di';
 import { ViewManager, ViewManagerQueryEvent } from './ViewManager';
@@ -116,7 +116,7 @@ export class ViewLinker {
     }
 
     subscription.add(
-      this.readQuery(this._viewManager.subscribeToQuery(config), read)
+      this._viewManager.subscribeToQuery(config).pipe(this.readQuery(read))
         .subscribe(arg => subscription.add(instance[method](arg, unsubscribed)))
     );
 
@@ -172,7 +172,7 @@ export class ViewLinker {
    * @param {(ViewQueryReadType|ViewQueryReadOptions)} [options]
    * @returns {Observable<any>}
    */
-  readQuery<T>(query: Observable<ViewManagerQueryEvent<T>>, options?: ViewQueryReadType|ViewQueryReadOptions): Observable<any> {
+  readQuery<T>(options?: ViewQueryReadType|ViewQueryReadOptions): OperatorFunction<ViewManagerQueryEvent<T>, any> {
     const _options = (isObject(options) ? options : { type: options }) as ViewQueryReadOptions;
     const {
       type = ViewQueryReadType.COMPONENT,
@@ -181,29 +181,28 @@ export class ViewLinker {
       lazy = true
     } = _options;
 
-    return Observable.create((observer: Observer<any>) => {
+    return source => new Observable<any>(observer => {
       if (type === ViewQueryReadType.OBSERVABLE) {
-        observer.next(query);
+        observer.next(source);
         observer.complete();
 
         return;
       }
 
-      return query.subscribe(event => {
-        const { container } = event;
+      return source.subscribe({
+        next: event => {
+          const { container } = event;
 
-        if (type === ViewQueryReadType.EVENT) {
-          observer.next(event);
-          observer.complete();
-        } else if (type === ViewQueryReadType.COMPONENT) {
-          container.ready({ when, until, init: !lazy }).subscribe({
-            next: () => observer.next(container.component),
-            complete: () => observer.complete()
-          });
-        } else {
-          observer.next(container);
-          observer.complete();
-        }
+          if (type === ViewQueryReadType.EVENT) {
+            observer.next(event);
+          } else if (type === ViewQueryReadType.COMPONENT) {
+            container.ready({ when, until, init: !lazy }).subscribe(() => observer.next(container.component));
+          } else {
+            observer.next(container);
+          }
+        },
+        error: err => observer.error(err),
+        complete: () => observer.complete()
       });
     });
   }
@@ -246,7 +245,7 @@ export class ViewLinker {
   private _insert<T>(instance: object, config: ViewInsertConfig): Observable<any> {
     const { query, read } = config;
 
-    return Observable.create((observer: Observer<any>) => {
+    return new Observable<any>(observer => {
       const from = this._viewManager.query<T>(config.from)[0];
       const view = from ? from.view : null;
 
@@ -254,10 +253,10 @@ export class ViewLinker {
 
       // If the view exists and is attached, we don't need to insert it.
       if (existing.length && existing[0].isAttached) {
-        this.readQuery(this._viewManager.subscribeToQuery(query), read).subscribe(observer);
+        this._viewManager.subscribeToQuery(query).pipe(this.readQuery(read)).subscribe(observer);
       } else if (view) {
         this._manipulator.insert({ ...(config as any), from: view }).subscribe(() => {
-          this.readQuery(this._viewManager.subscribeToQuery(query), read).subscribe(observer);
+          this._viewManager.subscribeToQuery(query).pipe(this.readQuery(read)).subscribe(observer);
         });
       } else {
         observer.complete();
@@ -277,7 +276,7 @@ export class ViewLinker {
       return this._viewManager.query<T>(config.query);
     }
 
-    return this.readQuery(this._viewManager.subscribeToQuery(query), _options);
+    return this._viewManager.subscribeToQuery(query).pipe(this.readQuery(_options));
   }
 
   static readMetadata(target: any): ViewLinkerMetadata {
