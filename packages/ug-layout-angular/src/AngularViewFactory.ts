@@ -19,7 +19,8 @@ import {
   ComponentFactory,
   ComponentRef,
   ElementRef,
-  Provider
+  Provider,
+  ViewRef
 } from '@angular/core';
 import { ɵDomSharedStylesHost } from '@angular/platform-browser';
 import { Subject, merge } from 'rxjs';
@@ -35,6 +36,7 @@ import {
   ANGULAR_GLOBAL
 } from './common';
 import { DetachHost } from 'ug-layout';
+import {isFunction} from 'ug-layout/dist/es5/utils';
 
 export class AngularViewFactory extends ViewFactory {
   @Inject(ANGULAR_PLUGIN) protected _plugin: AngularPlugin;
@@ -309,7 +311,7 @@ export class AngularViewFactory extends ViewFactory {
               set.call(this, value);
             }
 
-            if (isBound) {
+            if (isBound && !(componentRef.changeDetectorRef as ViewRef).destroyed) {
               componentRef.changeDetectorRef.detectChanges();
             }
           }
