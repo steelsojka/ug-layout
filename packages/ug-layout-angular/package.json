@@ -50,7 +50,6 @@
     "zone.js": "^0.8.4"
   },
   "dependencies": {
-    "tslib": "^1.6.0",
-    "ug-layout": "^4.4.1"
+    "tslib": "^1.6.0"
   }
 }
