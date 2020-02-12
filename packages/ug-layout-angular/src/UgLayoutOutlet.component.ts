@@ -37,7 +37,7 @@ export class UgLayoutOutletComponent implements OnChanges, OnDestroy {
   @Input() configFactory?: (config: RootLayoutCreationConfigArgs) => RootLayoutCreationConfigArgs;
   @Output() initialized: EventEmitter<RootLayout> = new EventEmitter();
 
-  @ViewChild('container', { read: ViewContainerRef })
+  @ViewChild('container', { read: ViewContainerRef, static: true })
   private _viewContainerRef: ViewContainerRef;
   private _isInitialized: boolean = false;
   private _rootLayout: RootLayout;

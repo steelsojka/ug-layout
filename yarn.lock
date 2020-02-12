@@ -2,47 +2,35 @@
 # yarn lockfile v1
 
 
-"@angular/common@^6.0.1":
-  version "6.1.10"
-  resolved "https://registry.yarnpkg.com/@angular/common/-/common-6.1.10.tgz#96e01564031b23cf54e4264e4c9defd6e10a0e11"
-  dependencies:
-    tslib "^1.9.0"
+"@angular/common@9.x":
+  version "9.0.1"
+  resolved "https://artifactory.associatesys.local:443/artifactory/api/npm/npm-virtual/@angular/common/-/common-9.0.1.tgz#78457633a447c49bcc0e0bd8049cc2adbb016484"
+  integrity sha1-eEV2M6RHxJvMDgvYBJzCrbsBZIQ=
 
-"@angular/compiler@^6.0.1":
-  version "6.1.10"
-  resolved "https://registry.yarnpkg.com/@angular/compiler/-/compiler-6.1.10.tgz#6ab35c8584fbda13a6708df14b8b03cc8f849a94"
-  dependencies:
-    tslib "^1.9.0"
+"@angular/compiler@9.x":
+  version "9.0.1"
+  resolved "https://artifactory.associatesys.local:443/artifactory/api/npm/npm-virtual/@angular/compiler/-/compiler-9.0.1.tgz#19b6f83026a2b2771b7ef1b9be20bbe8828d8be9"
+  integrity sha1-Gbb4MCaisncbfvG5viC76IKNi+k=
 
-"@angular/core@^6.0.1":
-  version "6.1.10"
-  resolved "https://registry.yarnpkg.com/@angular/core/-/core-6.1.10.tgz#9f3d8b7e44ec0a68c88745d25a920f98bfb2bc43"
-  dependencies:
-    tslib "^1.9.0"
+"@angular/core@9.x":
+  version "9.0.1"
+  resolved "https://artifactory.associatesys.local:443/artifactory/api/npm/npm-virtual/@angular/core/-/core-9.0.1.tgz#8908112ce6bb22aa1ae537230240ef9a324409ad"
+  integrity sha1-iQgRLOa7Iqoa5TcjAkDvmjJECa0=
 
-"@angular/http@^6.0.1":
-  version "6.1.10"
-  resolved "https://registry.yarnpkg.com/@angular/http/-/http-6.1.10.tgz#91239b27990b992cdb312056d3f11cc804bfeaf4"
-  dependencies:
-    tslib "^1.9.0"
+"@angular/platform-browser-dynamic@9.x":
+  version "9.0.1"
+  resolved "https://artifactory.associatesys.local:443/artifactory/api/npm/npm-virtual/@angular/platform-browser-dynamic/-/platform-browser-dynamic-9.0.1.tgz#43d6679863775d4f463a67b96a83c3a619854336"
+  integrity sha1-Q9ZnmGN3XU9GOme5aoPDphmFQzY=
 
-"@angular/platform-browser-dynamic@^6.0.1":
-  version "6.1.10"
-  resolved "https://registry.yarnpkg.com/@angular/platform-browser-dynamic/-/platform-browser-dynamic-6.1.10.tgz#f7e192454e221cbe25ab0b8dc250bad4f6a2605b"
-  dependencies:
-    tslib "^1.9.0"
+"@angular/platform-browser@9.x":
+  version "9.0.1"
+  resolved "https://artifactory.associatesys.local:443/artifactory/api/npm/npm-virtual/@angular/platform-browser/-/platform-browser-9.0.1.tgz#292306095c0e4b89927ba1b94eb1714cdbdfcb65"
+  integrity sha1-KSMGCVwOS4mSe6G5TrFxTNvfy2U=
 
-"@angular/platform-browser@^6.0.1":
-  version "6.1.10"
-  resolved "https://registry.yarnpkg.com/@angular/platform-browser/-/platform-browser-6.1.10.tgz#ef9d6408db7ae9443daa355f3655adeb496f1216"
-  dependencies:
-    tslib "^1.9.0"
-
-"@angular/upgrade@^6.0.1":
-  version "6.1.10"
-  resolved "https://registry.yarnpkg.com/@angular/upgrade/-/upgrade-6.1.10.tgz#e6c6eee376acc07caf856aa6169e302cdbdf38e3"
-  dependencies:
-    tslib "^1.9.0"
+"@angular/upgrade@9.x":
+  version "9.0.1"
+  resolved "https://artifactory.associatesys.local:443/artifactory/api/npm/npm-virtual/@angular/upgrade/-/upgrade-9.0.1.tgz#b09c39cb03d48f5c46453d6157996afa1d7b80fb"
+  integrity sha1-sJw5ywPUj1xGRT1hV5lq+h17gPs=
 
 "@ava/babel-preset-stage-4@^1.0.0":
   version "1.1.0"

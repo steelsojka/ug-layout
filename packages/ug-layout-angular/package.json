@@ -16,13 +16,12 @@
   "author": "Steven Sojka",
   "license": "ISC",
   "devDependencies": {
-    "@angular/common": "^6.0.1",
-    "@angular/compiler": "^6.0.1",
-    "@angular/core": "^6.0.1",
-    "@angular/http": "^6.0.1",
-    "@angular/platform-browser": "^6.0.1",
-    "@angular/platform-browser-dynamic": "^6.0.1",
-    "@angular/upgrade": "^6.0.1",
+    "@angular/common": "9.x",
+    "@angular/compiler": "9.x",
+    "@angular/core": "9.x",
+    "@angular/platform-browser": "9.x",
+    "@angular/platform-browser-dynamic": "9.x",
+    "@angular/upgrade": "9.x",
     "@types/reflect-metadata": "0.0.5",
     "angular": "^1.6.2",
     "babel-cli": "^6.22.2",
@@ -43,8 +42,8 @@
     "zone.js": "^0.7.7"
   },
   "peerDependencies": {
-    "@angular/core": "^6.0.0",
-    "@angular/platform-browser": "^6.0.0",
+    "@angular/core": "8.x || 9.x",
+    "@angular/platform-browser": "8.x || 9.x",
     "rxjs": "^6.0.0",
     "ug-layout": "^4",
     "zone.js": "^0.8.4"

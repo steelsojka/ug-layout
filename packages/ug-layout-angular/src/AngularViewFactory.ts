@@ -36,7 +36,6 @@ import {
   ANGULAR_GLOBAL
 } from './common';
 import { DetachHost } from 'ug-layout';
-import {isFunction} from 'ug-layout/dist/es5/utils';
 
 export class AngularViewFactory extends ViewFactory {
   @Inject(ANGULAR_PLUGIN) protected _plugin: AngularPlugin;
