@@ -15,8 +15,8 @@ import { Observable, Subject } from 'rxjs';
 import { RootLayout, ConfiguredRenderable, RootLayoutCreationConfigArgs } from 'ug-layout';
 import { takeUntil } from 'rxjs/operators';
 
-import { AngularPlugin, AngularPluginConfig } from './AngularPlugin';
-import { DestroyNotifyEvent } from './DestroyNotifyEvent';
+import { AngularPlugin, AngularPluginConfig } from './angular-plugin';
+import { DestroyNotifyEvent } from './destroy-notify-event';
 
 @Component({
   selector: 'ug-layout-outlet',
@@ -39,7 +39,6 @@ export class UgLayoutOutletComponent implements OnChanges, OnDestroy {
 
   @ViewChild('container', { read: ViewContainerRef, static: true })
   private _viewContainerRef: ViewContainerRef;
-  private _isInitialized: boolean = false;
   private _rootLayout: RootLayout;
   private _destroyed: Subject<void> = new Subject<void>();
 

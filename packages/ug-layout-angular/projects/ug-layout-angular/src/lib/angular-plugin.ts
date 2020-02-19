@@ -9,7 +9,7 @@ import { ViewContainerRef, Injector } from '@angular/core';
 
 import { ANGULAR_PLUGIN, ANGULAR_GLOBAL } from './common';
 import * as angular from './angular';
-import { AngularViewFactory } from './AngularViewFactory';
+import { AngularViewFactory } from './angular-view-factory';
 
 export interface AngularPluginConfig {
   viewContainerRef: ViewContainerRef;

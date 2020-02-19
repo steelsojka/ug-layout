@@ -12,8 +12,6 @@ import { RootLayout, ViewManager, ViewContainer } from 'ug-layout';
  * @class AngularViewTestability
  */
 export class AngularViewTestability {
-  private _layout: RootLayout | null = null;
-  private _isStable: boolean = true;
   private _layoutSource = new Subject<RootLayout | null>();
   private _pendingUpdate = new Subject<ViewContainer<any>[]>();
   private _destroyed = new Subject();
@@ -44,7 +42,7 @@ export class AngularViewTestability {
     }
   }
 
-  findProviders(using: any, provider: string, exactMatch: boolean): any[] {
+  findProviders(_using: any, _provider: string, _exactMatch: boolean): any[] {
     return [];
   }
 

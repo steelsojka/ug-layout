@@ -23,11 +23,12 @@ import {
   ViewRef
 } from '@angular/core';
 import { ɵDomSharedStylesHost } from '@angular/platform-browser';
-import { Subject, merge } from 'rxjs';
+import { Subject } from 'rxjs';
+import { DetachHost } from 'ug-layout';
 
 import * as angular from './angular';
-import { AngularPlugin } from './AngularPlugin';
-import { Angular1ComponentFactory } from './Angular1ComponentFactory';
+import { AngularPlugin } from './angular-plugin';
+import { Angular1ComponentFactory } from './angularjs-component-factory';
 import {
   ANGULAR_TAG,
   ViewComponentConfig,
@@ -35,7 +36,6 @@ import {
   ANGULAR_PLUGIN,
   ANGULAR_GLOBAL
 } from './common';
-import { DetachHost } from 'ug-layout';
 
 export class AngularViewFactory extends ViewFactory {
   @Inject(ANGULAR_PLUGIN) protected _plugin: AngularPlugin;
