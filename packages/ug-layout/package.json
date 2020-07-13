@@ -48,7 +48,7 @@
     "reflect-metadata": "^0.1.9",
     "rxjs": "^6.0.0",
     "sinon": "^1.17.7",
-    "standard-version": "^4.2.0",
+    "standard-version": "^8.0.1",
     "style-loader": "^0.13.1",
     "ts-loader": "^2.0.0",
     "ts-node": "^2.1.0",
