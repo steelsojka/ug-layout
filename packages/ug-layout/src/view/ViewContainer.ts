@@ -456,7 +456,7 @@ export class ViewContainer<T> {
    */
   queryParent<U extends Renderable>(Ctor: Type<U> | Type<U>[]): Observable<U | null> {
     return this.container.pipe(
-      switchMap<View | null, U | null>(
+      switchMap<View | null, Observable<U | null>>(
         container => container ? container.queryParent(Ctor) : EMPTY));
   }
 

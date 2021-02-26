@@ -1,7 +1,8 @@
 import { Subscription, Observable, Subject, OperatorFunction } from 'rxjs';
+import { switchMap, take, filter } from 'rxjs/operators';
 
 import { Inject, Injector } from '../di';
-import { ViewManager, ViewManagerQueryEvent } from './ViewManager';
+import { ViewManager, ViewManagerEvent } from './ViewManager';
 import {
   VIEW_LINKER_METADATA,
   ViewQueryConfig,
@@ -64,7 +65,11 @@ export class ViewLinker {
    */
   autowire(instance: object): Subscription {
     const metadata = this.readInstanceMetadata(instance);
-    const subscription = new Subscription();
+    const unlinkSource = new Subject();
+    const subscription = new Subscription(() => {
+      unlinkSource.next();
+      unlinkSource.complete();
+    });
 
     for (const insert of metadata.inserts) {
       this.wireInsert(instance, insert);
@@ -79,12 +84,7 @@ export class ViewLinker {
     }
 
     for (const unlink of metadata.unlinks) {
-      instance[unlink] = Observable.create(observer => {
-        subscription.add(() => {
-          observer.next();
-          observer.complete();
-        });
-      });
+      instance[unlink] = unlinkSource.asObservable();
     }
 
     for (const init of metadata.inits) {
@@ -103,22 +103,37 @@ export class ViewLinker {
   wireQuery(instance: object, config: ViewQueryConfig): Subscription {
     const { read, method } = config;
     const subscription = new Subscription();
-    const _unsubscribed = new Subject<void>();
-    const unsubscribed = _unsubscribed.asObservable();
-
-    subscription.add(() => {
-      _unsubscribed.next();
-      _unsubscribed.complete();
-    });
 
     if (!isFunction(instance[method])) {
       throw new Error(`Can not wire method '${method}'. Method does not exist.`);
     }
 
     subscription.add(
-      this._viewManager.subscribeToQuery(config).pipe(this.readQuery(read))
-        .subscribe(arg => subscription.add(instance[method](arg, unsubscribed)))
-    );
+      this._viewManager.subscribeToQuery(config).pipe(
+        this.readQuery(read),
+        switchMap(arg => new Observable(subscriber => {
+          if (!arg) {
+            return;
+          }
+
+          const _unsubscribed = new Subject<void>();
+          const innerSub = new Subscription(() => {
+            _unsubscribed.next();
+            _unsubscribed.complete();
+
+            if (handlerSub) {
+              handlerSub.unsubscribe();
+            }
+          });
+
+          const handlerSub = instance[method](arg, _unsubscribed.asObservable());
+
+          subscriber.next(arg);
+
+          return innerSub;
+        }))
+      )
+        .subscribe());
 
     return subscription;
   }
@@ -172,7 +187,7 @@ export class ViewLinker {
    * @param {(ViewQueryReadType|ViewQueryReadOptions)} [options]
    * @returns {Observable<any>}
    */
-  readQuery<T>(options?: ViewQueryReadType|ViewQueryReadOptions): OperatorFunction<ViewManagerQueryEvent<T>, any> {
+  readQuery<T>(options?: ViewQueryReadType|ViewQueryReadOptions): OperatorFunction<ViewManagerEvent<T>, any> {
     const _options = (isObject(options) ? options : { type: options }) as ViewQueryReadOptions;
     const {
       type = ViewQueryReadType.COMPONENT,
@@ -195,6 +210,8 @@ export class ViewLinker {
 
           if (type === ViewQueryReadType.EVENT) {
             observer.next(event);
+          } else if (!ViewManager.isResolvedEventType(event.type)) {
+            observer.next(null);
           } else if (type === ViewQueryReadType.COMPONENT) {
             container.ready({ when, until, init: !lazy }).subscribe(() => observer.next(container.component));
           } else {
@@ -242,7 +259,7 @@ export class ViewLinker {
     return result;
   }
 
-  private _insert<T>(instance: object, config: ViewInsertConfig): Observable<any> {
+  private _insert<T>(_instance: object, config: ViewInsertConfig): Observable<any> {
     const { query, read } = config;
 
     return new Observable<any>(observer => {
@@ -253,18 +270,26 @@ export class ViewLinker {
 
       // If the view exists and is attached, we don't need to insert it.
       if (existing.length && existing[0].isAttached) {
-        this._viewManager.subscribeToQuery(query).pipe(this.readQuery(read)).subscribe(observer);
+        return this._viewManager.subscribeToQuery(query).pipe(
+          this.readQuery(read),
+          filter(Boolean),
+          take(1)
+        ).subscribe(observer);
       } else if (view) {
-        this._manipulator.insert({ ...(config as any), from: view }).subscribe(() => {
-          this._viewManager.subscribeToQuery(query).pipe(this.readQuery(read)).subscribe(observer);
-        });
+        return this._manipulator.insert({ ...(config as any), from: view }).pipe(
+          switchMap(() => this._viewManager.subscribeToQuery(query).pipe(
+            this.readQuery(read),
+            filter(Boolean),
+            take(1)
+          ))
+        ).subscribe(observer);
       } else {
         observer.complete();
       }
     });
   }
 
-  private _resolve<T>(instance: object, config: ViewResolveConfig, options: ViewQueryReadOptions = {}): Observable<any> | ViewContainer<T>[] {
+  private _resolve<T>(_instance: object, config: ViewResolveConfig, options: ViewQueryReadOptions = {}): Observable<any> | ViewContainer<T>[] {
     const { query, read } = config;
     const _options = {
       lazy: false,
@@ -276,7 +301,11 @@ export class ViewLinker {
       return this._viewManager.query<T>(config.query);
     }
 
-    return this._viewManager.subscribeToQuery(query).pipe(this.readQuery(_options));
+    return this._viewManager.subscribeToQuery(query).pipe(
+      this.readQuery(_options),
+      filter(Boolean),
+      take(1)
+    );
   }
 
   static readMetadata(target: any): ViewLinkerMetadata {
@@ -285,5 +314,9 @@ export class ViewLinker {
     }
 
     return Reflect.getOwnMetadata(VIEW_LINKER_METADATA, target) || getDefaultMetadata();
+  }
+
+  static resolveQueryReadType(arg: ViewQueryReadType|ViewQueryReadOptions): ViewQueryReadType | undefined {
+    return isObject(arg) ? arg.type : arg;
   }
 }

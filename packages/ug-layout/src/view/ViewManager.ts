@@ -1,5 +1,5 @@
 import { CompleteOn } from 'rx-decorators/completeOn';
-import { Subject, Observable, Observer, empty, merge } from 'rxjs';
+import { Subject, Observable, empty, merge, MonoTypeOperatorFunction } from 'rxjs';
 import { map, filter } from 'rxjs/operators';
 
 import { Inject } from '../di';
@@ -12,24 +12,26 @@ import {
   ViewComponentConfig,
   ResolverStrategy,
   ViewQueryArgs,
-  ViewQueryResolveType,
   CacheStrategy
 } from './common';
 import { propEq } from '../utils';
 
 export interface ViewManagerEvent<T> {
+  type: 'resolve' | 'create' | 'register' | 'unregister' | 'refAdd' | 'refRemove' | 'query';
   ref?: string|null;
   token: any;
   container: ViewContainer<T>;
+  initial?: boolean;
 }
 
 export interface ViewManagerQueryEvent<T> extends ViewManagerEvent<T> {
+  type: 'query',
   initial: boolean;
 }
 
 export interface RefChangeEvent<T> extends ViewManagerEvent<T> {
+  type: 'refAdd' | 'refRemove';
   ref: string;
-  type: 'add'|'remove';
 }
 
 export interface ViewResolutionOptions {
@@ -43,29 +45,18 @@ export class ViewManager {
   private _refs: Map<string, ViewContainer<any>> = new Map();
 
   @CompleteOn('destroy')
-  private _resolved: Subject<ViewManagerEvent<any>> = new Subject();
-
-  @CompleteOn('destroy')
-  private _created: Subject<ViewManagerEvent<any>> = new Subject();
-
-  @CompleteOn('destroy')
   private _destroyed: Subject<void> = new Subject<void>();
 
   @CompleteOn('destroy')
-  private _refChanges: Subject<RefChangeEvent<any>> = new Subject();
+  private _events: Subject<ViewManagerEvent<any>> = new Subject();
 
-  @CompleteOn('destroy')
-  private _registered: Subject<ViewManagerEvent<any>> = new Subject();
-
-  @CompleteOn('destroy')
-  private _unregistered: Subject<ViewManagerEvent<any>> = new Subject();
-
-  resolved: Observable<ViewManagerEvent<any>> = this._resolved.asObservable();
-  created: Observable<ViewManagerEvent<any>> = this._created.asObservable();
+  events = this._events.asObservable();
+  resolved = this.events.pipe(filter(propEq('type', 'resolve')));
+  created = this.events.pipe(filter(propEq('type', 'create')));
+  registered = this.events.pipe(filter(propEq('type', 'register')));
+  unregistered = this.events.pipe(filter(propEq('type', 'unregister')));
+  refChanges = this.events.pipe(filter(event => event.type === 'refAdd' || event.type === 'refRemove')) as Observable<RefChangeEvent<any>>;
   destroyed: Observable<void> = this._destroyed.asObservable();
-  refChanges: Observable<RefChangeEvent<any>> = this._refChanges.asObservable();
-  registered: Observable<ViewManagerEvent<any>> = this._registered.asObservable();
-  unregistered: Observable<ViewManagerEvent<any>> = this._unregistered.asObservable();
 
   has(token: any, id?: number): boolean {
     const map = this.getAll(token);
@@ -152,11 +143,12 @@ export class ViewManager {
 
     const container = factory(this._viewFactory);
 
-    this._created.next({
+    this._events.next({
+      type: 'create',
       container,
       token,
       ref: config.ref
-    });
+    })
 
     this.register(token, container, { ref: config.ref });
 
@@ -188,13 +180,16 @@ export class ViewManager {
       }
 
       this._refs.set(ref, container);
-      this._refChanges.next({
+      this._events.next({
         ref, container, token,
-        type: 'add',
+        type: 'refAdd',
       });
     }
 
-    this._registered.next({ container, token, ref });
+    this._events.next({
+      type: 'register',
+      container, token, ref
+    });
   }
 
   unregister(token: any, container: ViewContainer<any>, options: { ref?: string|null } = {}): void {
@@ -217,13 +212,13 @@ export class ViewManager {
 
     if (ref && this._refs.has(ref)) {
       this._refs.delete(ref);
-      this._refChanges.next({
+      this._events.next({
         ref, container, token,
-        type: 'remove'
+        type: 'refRemove'
       });
     }
 
-    this._unregistered.next({ container, token, ref });
+    this._events.next({ type: 'unregister', container, token, ref });
   }
 
   /**
@@ -232,7 +227,7 @@ export class ViewManager {
    * @param {{ token?: any, ref?: string }} [query={}]
    * @returns {Observable<ViewContainer<T>>}
    */
-  subscribeToQuery<T>(query: ViewQueryArgs = {}): Observable<ViewManagerQueryEvent<T>> {
+  subscribeToQuery<T>(query: ViewQueryArgs = {}): Observable<ViewManagerEvent<T>> {
     const { ref, token, id } = query;
 
     if (ref) {
@@ -244,12 +239,13 @@ export class ViewManager {
     return empty();
   }
 
-  queryToken<T>(token: any, id?: number, options: ViewQueryArgs = {}): Observable<ViewManagerQueryEvent<T>> {
+  queryToken<T>(token: any, id?: number, options: ViewQueryArgs = {}): Observable<ViewManagerEvent<T>> {
     const { immediate = false } = options;
 
     return new Observable<ViewManagerQueryEvent<T>>(observer => {
       for (const container of this.query<T>({ token, id })) {
         observer.next({
+          type: 'query',
           token,
           container,
           initial: true
@@ -264,7 +260,7 @@ export class ViewManager {
 
       return merge(
         this.created.pipe(map(event => ({ ...event, initial: true }))),
-        this.resolved.pipe(map(event => ({ ...event, initial: false })))
+        this.unregistered.pipe(map(event => ({ ...event, initial: false })))
       )
         .pipe(
           filter(propEq('token', token)),
@@ -273,7 +269,7 @@ export class ViewManager {
     });
   }
 
-  queryRef<T>(ref: string, options: ViewQueryArgs = {}): Observable<ViewManagerQueryEvent<T>> {
+  queryRef<T>(ref: string, options: ViewQueryArgs = {}): Observable<ViewManagerEvent<T>> {
     const { immediate = false } = options;
 
     return new Observable<ViewManagerQueryEvent<T>>(observer => {
@@ -281,6 +277,7 @@ export class ViewManager {
 
       if (result.length) {
         observer.next({
+          type: 'query',
           ref,
           token: this._viewFactory.getTokenFrom(result[0].config),
           initial: true,
@@ -294,15 +291,10 @@ export class ViewManager {
         return;
       }
 
-      return merge(
-        this.refChanges
-          .pipe(
-            filter(propEq('type', 'add')),
-            map(event => ({ ...event, initial: true }))),
-        this.resolved
-          .pipe(map(event => ({ ...event, initial: false })))
+      return this.refChanges.pipe(
+        map(event => ({ ...event, initial: event.type === 'refAdd' })),
+        filter(propEq('ref', ref))
       )
-        .pipe(filter(propEq('ref', ref)))
         .subscribe(observer);
     });
   }
@@ -377,7 +369,8 @@ export class ViewManager {
     }
 
     if (result && options.emit !== false) {
-      this._resolved.next({
+      this._events.next({
+        type: 'resolve',
         ref: config.ref,
         container: result,
         token: this._viewFactory.getTokenFrom(config)
@@ -395,5 +388,9 @@ export class ViewManager {
     }
 
     return metadata;
+  }
+
+  static isResolvedEventType(eventType: ViewManagerEvent<any>['type']): boolean {
+    return eventType !== 'unregister' && eventType !== 'refRemove';
   }
 }
