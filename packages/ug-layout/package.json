@@ -37,7 +37,7 @@
     "@types/node": "^7.0.5",
     "@types/reflect-metadata": "0.0.5",
     "@types/sinon": "^1.16.34",
-    "ava": "^0.18.2",
+    "ava": "^5.1.0",
     "chokidar-cli": "^1.2.0",
     "css-loader": "^0.26.1",
     "esdoc": "^0.5.2",
